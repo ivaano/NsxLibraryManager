@@ -1,0 +1,22 @@
+﻿@page "/"
+@using NsxLibraryManager.Models
+
+
+<PageTitle>Index</PageTitle>
+<RadzenRow >
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.NoWrap" Gap="1rem">
+        <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+    </RadzenStack>
+</RadzenRow>
+
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem" >
+<RadzenDataGrid Data="@regionTitles" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" PageSize="100" AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+    <Columns>
+        <RadzenDataGridColumn TItem="RegionTitle" Property="Id" Title="ID"  />
+        <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" />
+        <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" />
+        <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" />
+    </Columns>
+</RadzenDataGrid>
+</RadzenStack>
