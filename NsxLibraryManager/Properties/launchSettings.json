@@ -8,6 +8,15 @@
     }
   },
   "profiles": {
+    "http-linux": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:5161",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "DeveLinux"
+      }
+    },
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,

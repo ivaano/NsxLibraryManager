@@ -1,3 +1,4 @@
+using NsxLibraryManager;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.FileLoading;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
@@ -30,6 +31,12 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
+//Static web assets for linux development https://learn.microsoft.com/en-us/aspnet/core/razor-pages/ui-class?view=aspnetcore-7.0&tabs=visual-studio#consume-content-from-a-referenced-rcl
+if (builder.Environment.IsEnvironment("DeveLinux"))
+{
+    builder.WebHost.UseStaticWebAssets();
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -40,7 +47,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+
+
+//app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
