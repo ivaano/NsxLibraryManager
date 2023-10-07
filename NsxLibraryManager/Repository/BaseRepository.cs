@@ -4,24 +4,24 @@ namespace NsxLibraryManager.Repository;
 
 public abstract class BaseRepository<T> : IBaseRepository<T>
 {
-    public ILiteDatabase DB { get; }
-    public ILiteCollection<T> Collection { get; set; }
+    private ILiteDatabase Db { get; }
+    protected ILiteCollection<T> Collection { get; set; }
 
     protected BaseRepository(ILiteDatabase db)
     {
-        DB = db;
+        Db = db;
         Collection = db.GetCollection<T>();
     }
     
     protected BaseRepository(ILiteDatabase db, string collectionName)
     {
-        DB = db;
+        Db = db;
         Collection = db.GetCollection<T>(collectionName);
     }
-    
-    public virtual void SetCollection(string collectionName)
+
+    protected virtual void SetCollection(string collectionName)
     {
-        Collection = DB.GetCollection<T>(collectionName);
+        Collection = Db.GetCollection<T>(collectionName);
     }
 
     public virtual T Create(T entity)
@@ -52,7 +52,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
 
     public virtual bool Drop(string collectionName)
     {
-        return DB.DropCollection(collectionName);
+        return Db.DropCollection(collectionName);
     }
 }
 

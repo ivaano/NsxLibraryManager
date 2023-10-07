@@ -2,8 +2,8 @@
 
 public interface ITitleLibraryService
 {
-    public bool DropLibraryAsync();
+    public bool DropLibrary();
+    public string GetLibraryPath();
     public Task<bool> ProcessFileAsync(string file);
-
     public Task<IEnumerable<string>> GetFilesAsync();
 }

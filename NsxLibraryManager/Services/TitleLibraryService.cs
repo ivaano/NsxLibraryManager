@@ -8,16 +8,22 @@ public class TitleLibraryService : ITitleLibraryService
     private readonly IDataService _dataService;
     private readonly IFileInfoService _fileInfoService;
     private readonly AppSettings _configuration;
+    private readonly ILogger<TitleLibraryService> _logger;
 
     
-    public TitleLibraryService(IDataService dataService, IFileInfoService fileInfoService, IOptions<AppSettings> configuration)
+    public TitleLibraryService(
+            IDataService dataService, 
+            IFileInfoService fileInfoService, 
+            IOptions<AppSettings> configuration,
+            ILogger<TitleLibraryService> logger)
     {
         _dataService = dataService;
         _fileInfoService = fileInfoService;
         _configuration = configuration.Value;
+        _logger = logger;
     }
     
-    public bool DropLibraryAsync()
+    public bool DropLibrary()
     {
         return _dataService.DropDbCollection(AppConstants.LibraryCollectionName);
     }
@@ -32,14 +38,20 @@ public class TitleLibraryService : ITitleLibraryService
         }
         catch (Exception e)
         {
+            _logger.LogError(e, $"Error processing file: {file}");
             return false;
         }
+    }
+
+    public string GetLibraryPath()
+    {
+        return Path.GetFullPath(_configuration.LibraryPath);
     }
 
     public async Task<IEnumerable<string>> GetFilesAsync()
     {
         var files = await _fileInfoService.GetFileNames(_configuration.LibraryPath,
-                                                                        _configuration.Required);
+                                                                        _configuration.Recursive);
         return files;
     }
 }

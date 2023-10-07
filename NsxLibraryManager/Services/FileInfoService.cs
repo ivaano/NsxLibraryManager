@@ -9,16 +9,23 @@ public class FileInfoService : IFileInfoService
 {
     private readonly IPackageInfoLoader _packageInfoLoader;
     private readonly IDataService _dataService;
+    private readonly ILogger<FileInfoService> _logger;
     private IEnumerable<string> _directoryFiles = new List<string>();
 
     
-    public FileInfoService(IPackageInfoLoader packageInfoLoader, IDataService dataService)
+    public FileInfoService(
+            IPackageInfoLoader packageInfoLoader, 
+            IDataService dataService,
+            ILogger<FileInfoService> logger)
     {
         _packageInfoLoader = packageInfoLoader ?? throw new ArgumentNullException(nameof(packageInfoLoader));
         _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+        _logger = logger;
     }
     
-    public  async Task<IEnumerable<string>> GetFileNames(string filePath, bool recursive = false)
+    public  async Task<IEnumerable<string>> GetFileNames(
+            string filePath, 
+            bool recursive = false)
     {
         var fileList = new List<string>();
         _directoryFiles = fileList;

@@ -3,21 +3,43 @@
 
 
 <PageTitle>Index</PageTitle>
-<RadzenRow >
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Wrap="FlexWrap.NoWrap" Gap="1rem">
-        <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+        <RadzenRow Style="width: 100%">
+            <RadzenColumn Size="6">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Library Location: <strong>@LibraryPath</strong></RadzenText>
+            </RadzenColumn>
+            <RadzenColumn Size="6" Style="text-align: right">
+                <RadzenRow >
+                    <RadzenColumn>
+                        <RadzenText TextStyle="TextStyle.Subtitle2">
+                            <strong>@AppCount</strong> Games, <strong>@PatchCount</strong> Updates and <strong>@DlcCount</strong> DLCs in library
+                        </RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="4">
+                        <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenColumn>
+        </RadzenRow>
     </RadzenStack>
-</RadzenRow>
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+        <RadzenDataGrid @ref="Grid" Data="@LibraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                        AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        AllowColumnResize="true">
+            <Columns>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" />
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="File Name"/>
+
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
 
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem" >
-    <RadzenDataGrid  @ref="grid" Data="@libraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100" 
-            AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
-    <Columns>
-        <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" />
-        <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" />
-        <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher" />
-        <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="File Name" />
-    </Columns>
-</RadzenDataGrid>
+
+
 </RadzenStack>

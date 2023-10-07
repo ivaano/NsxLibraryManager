@@ -3,16 +3,17 @@ using NsxLibraryManager.Services;
 using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;
-
+#nullable disable
 public partial class RefreshLibraryProgressDialog : IDisposable
 {
     [Inject]
     protected DialogService DialogService { get; set; }
     [Inject]
     protected ITitleLibraryService TitleLibraryService { get; set; }
-
-    public double progressCompleted { get; set; }
-    public int fileCount { get; set; }
+    [Inject]
+    protected ILogger<RefreshLibraryProgressDialog> Logger { get; set; }
+    public double ProgressCompleted { get; set; }
+    public int FileCount { get; set; }
 
     private IEnumerable<string> FilesEnumerable { get; set; }
 
@@ -20,7 +21,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
     protected override async Task OnInitializedAsync()
     {
         FilesEnumerable = await TitleLibraryService.GetFilesAsync();
-        fileCount = FilesEnumerable.Count();
+        FileCount = FilesEnumerable.Count();
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,15 +39,15 @@ public partial class RefreshLibraryProgressDialog : IDisposable
             {
                 FilesEnumerable = await TitleLibraryService.GetFilesAsync();
                 var fileList = FilesEnumerable.ToList();
-                fileCount = fileList.Count;
-                if (fileCount > 0)
+                FileCount = fileList.Count;
+                if (FileCount > 0)
                 {
-                    TitleLibraryService.DropLibraryAsync();
+                    TitleLibraryService.DropLibrary();
                 }
                 foreach (var file in fileList)
                 {
                     var result = await TitleLibraryService.ProcessFileAsync(file);
-                    progressCompleted++;
+                    ProgressCompleted++;
                     StateHasChanged();                    
                 }
             });
@@ -55,8 +56,8 @@ public partial class RefreshLibraryProgressDialog : IDisposable
     
     void IDisposable.Dispose()
     {
-        fileCount = 0;
-        progressCompleted = 0;
+        FileCount = 0;
+        ProgressCompleted = 0;
         FilesEnumerable = new List<string>();
     }
 }
