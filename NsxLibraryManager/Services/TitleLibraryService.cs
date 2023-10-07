@@ -52,7 +52,8 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task<IEnumerable<string>> GetFilesAsync()
     {
-        var files = await _fileInfoService.GetFileNames($"n:\\roms validados", true);
+        var files = await _fileInfoService.GetFileNames(_configuration.LibraryPath,
+                                                                        _configuration.Required);
         return files;
     }
 }

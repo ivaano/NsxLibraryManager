@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Pages.Components;
 using NsxLibraryManager.Services;
 using Radzen;
-
 
 namespace NsxLibraryManager.Pages;
 
@@ -17,11 +17,11 @@ public partial class Index
     [Inject]
     protected DialogService DialogService { get; set; }
     
-    private IEnumerable<RegionTitle> regionTitles;
+    private IEnumerable<LibraryTitle> libraryTitles;
     
     protected override async Task OnInitializedAsync()
     {
-        regionTitles = await DataService.GetRegionTitlesAsync("US");
+        libraryTitles = await DataService.GetLibraryTitlesAsync();
     }
 
     private async Task RefreshLibrary()

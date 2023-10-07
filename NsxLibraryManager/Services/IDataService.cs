@@ -12,6 +12,7 @@ public interface IDataService : IDisposable
     public IRegionRepository RegionRepository(string region);
     
     public Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region);
+    public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default);

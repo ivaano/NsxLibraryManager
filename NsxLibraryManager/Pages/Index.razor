@@ -11,12 +11,13 @@
 
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem" >
-<RadzenDataGrid Data="@regionTitles" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" PageSize="100" AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+    <RadzenDataGrid Data="@libraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100" 
+            AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
     <Columns>
-        <RadzenDataGridColumn TItem="RegionTitle" Property="Id" Title="ID"  />
-        <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" />
-        <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" />
-        <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" />
+        <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" />
+        <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" />
+        <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher" />
+        <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="File Name" />
     </Columns>
 </RadzenDataGrid>
 </RadzenStack>

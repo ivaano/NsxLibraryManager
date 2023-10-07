@@ -2,7 +2,7 @@
 using NsxLibraryManager.Services;
 using Radzen;
 
-namespace NsxLibraryManager.Pages;
+namespace NsxLibraryManager.Pages.Components;
 
 public partial class ProgressDialog : IDisposable
 {

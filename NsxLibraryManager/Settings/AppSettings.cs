@@ -8,6 +8,8 @@ public class AppSettings
     public string TitleDatabase { get; set; } = string.Empty;
     [Required]
     public string LibraryPath { get; set; } = string.Empty;
+    
+    public bool Required { get; set; } = false;
     public string ProdKeys { get; set; } = string.Empty;
 
 }

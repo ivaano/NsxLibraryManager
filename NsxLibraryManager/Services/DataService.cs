@@ -45,6 +45,12 @@ public class DataService : IDataService
         var regionTitleRepository = RegionRepository(region);
         return await Task.Run(() => regionTitleRepository.All());
     }
+    
+    public async Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync()
+    {
+        var libraryRepository = TitleLibraryRepository();
+        return await Task.Run(() => libraryRepository.All());
+    }
 
     public async Task AddLibraryTitleAsync(LibraryTitle libraryTitle)
     {
