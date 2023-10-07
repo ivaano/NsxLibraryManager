@@ -17,23 +17,10 @@ public class TitleLibraryService : ITitleLibraryService
         _fileInfoService = fileInfoService;
         _configuration = configuration.Value;
     }
-
-
-    public async Task RefreshLibraryAsync()
+    
+    public bool DropLibraryAsync()
     {
-        var failedFiles = new List<string>();
-        var files = await _fileInfoService.GetFileNames($"n:\\roms", true);
-        foreach (var file in files)
-        {
-            try
-            {
-                var info = await _fileInfoService.GetFileInfo(file);
-            }
-            catch (Exception e)
-            {
-                failedFiles.Add(file);
-            }
-        }
+        return _dataService.DropDbCollection(AppConstants.LibraryCollectionName);
     }
 
     public async Task<bool> ProcessFileAsync(string file)

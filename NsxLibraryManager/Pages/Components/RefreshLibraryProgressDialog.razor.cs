@@ -4,7 +4,7 @@ using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;
 
-public partial class ProgressDialog : IDisposable
+public partial class RefreshLibraryProgressDialog : IDisposable
 {
     [Inject]
     protected DialogService DialogService { get; set; }
@@ -13,14 +13,14 @@ public partial class ProgressDialog : IDisposable
 
     public double progressCompleted { get; set; }
     public int fileCount { get; set; }
-    
-    public IEnumerable<string> fileList { get; set; }
+
+    private IEnumerable<string> FilesEnumerable { get; set; }
 
     
     protected override async Task OnInitializedAsync()
     {
-        fileList = await TitleLibraryService.GetFilesAsync();
-        fileCount = fileList.Count();
+        FilesEnumerable = await TitleLibraryService.GetFilesAsync();
+        fileCount = FilesEnumerable.Count();
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -30,14 +30,19 @@ public partial class ProgressDialog : IDisposable
             await DoWork();
         }
     }
-    
-    public async Task DoWork()
+
+    private async Task DoWork()
     {
         await InvokeAsync(
             async () =>
             {
-                fileList = await TitleLibraryService.GetFilesAsync();
-                fileCount = fileList.Count();
+                FilesEnumerable = await TitleLibraryService.GetFilesAsync();
+                var fileList = FilesEnumerable.ToList();
+                fileCount = fileList.Count;
+                if (fileCount > 0)
+                {
+                    TitleLibraryService.DropLibraryAsync();
+                }
                 StateHasChanged();
                 foreach (var file in fileList)
                 {
@@ -53,6 +58,6 @@ public partial class ProgressDialog : IDisposable
     {
         fileCount = 0;
         progressCompleted = 0;
-        fileList = new List<string>();
+        FilesEnumerable = new List<string>();
     }
 }

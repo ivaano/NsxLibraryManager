@@ -33,7 +33,7 @@ public partial class Index
         {
             DialogService.Close(confirmationResult);
             StateHasChanged();
-            await DialogService.OpenAsync<ProgressDialog>("Refreshing library...");
+            await DialogService.OpenAsync<RefreshLibraryProgressDialog>("Refreshing library...");
         }
     }
 }

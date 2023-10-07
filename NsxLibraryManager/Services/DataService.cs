@@ -58,6 +58,11 @@ public class DataService : IDataService
         await Task.Run(() => titleLibraryRepository.Create(libraryTitle));
     }
 
+    public bool DropDbCollection(string collectionName)
+    {
+        return Db.DropCollection(collectionName);
+    }
+
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default)
     {
         var regionTitleRepository = RegionRepository(region);
