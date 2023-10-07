@@ -11,7 +11,7 @@
 
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem" >
-    <RadzenDataGrid Data="@libraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100" 
+    <RadzenDataGrid  @ref="grid" Data="@libraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100" 
             AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
     <Columns>
         <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" />

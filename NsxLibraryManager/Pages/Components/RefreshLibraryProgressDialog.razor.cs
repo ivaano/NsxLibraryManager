@@ -43,7 +43,6 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                 {
                     TitleLibraryService.DropLibraryAsync();
                 }
-                StateHasChanged();
                 foreach (var file in fileList)
                 {
                     var result = await TitleLibraryService.ProcessFileAsync(file);

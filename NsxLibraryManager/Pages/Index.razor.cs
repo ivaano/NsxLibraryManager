@@ -3,6 +3,7 @@ using NsxLibraryManager.Models;
 using NsxLibraryManager.Pages.Components;
 using NsxLibraryManager.Services;
 using Radzen;
+using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 
@@ -17,7 +18,8 @@ public partial class Index
     [Inject]
     protected DialogService DialogService { get; set; }
     
-    private IEnumerable<LibraryTitle> libraryTitles;
+    public IEnumerable<LibraryTitle> libraryTitles;
+    public RadzenDataGrid<LibraryTitle> grid;
     
     protected override async Task OnInitializedAsync()
     {
@@ -34,6 +36,7 @@ public partial class Index
             DialogService.Close(confirmationResult);
             StateHasChanged();
             await DialogService.OpenAsync<RefreshLibraryProgressDialog>("Refreshing library...");
+            await grid.Reload();
         }
     }
 }

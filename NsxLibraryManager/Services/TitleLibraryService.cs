@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using NsxLibraryManager.Models;
 using NsxLibraryManager.Settings;
 
 namespace NsxLibraryManager.Services;
