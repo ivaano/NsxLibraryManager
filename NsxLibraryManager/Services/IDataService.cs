@@ -1,4 +1,5 @@
-﻿using NsxLibraryManager.Models;
+﻿using Newtonsoft.Json.Linq;
+using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
 
 namespace NsxLibraryManager.Services;
@@ -10,7 +11,7 @@ public interface IDataService : IDisposable
   
     public ITitleRepository TitleRepository { get; }
     public IRegionRepository RegionRepository(string region);
-    
+    public void ImportTitleDbRegionTitles(JObject titles, string region);
     public Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);

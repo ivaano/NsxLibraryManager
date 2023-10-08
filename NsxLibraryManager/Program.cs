@@ -1,5 +1,3 @@
-using NsxLibraryManager;
-using NsxLibraryManager.Data;
 using NsxLibraryManager.FileLoading;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 using NsxLibraryManager.Services;
@@ -9,23 +7,27 @@ using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// configuration.
 builder.Services
     .AddOptions<AppSettings>()
     .BindConfiguration("NsxLibraryManager")
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddRadzenComponents();
+//nsx services
 builder.Services.AddSingleton<IDataService, DataService>();
 builder.Services.AddSingleton<ITitleLibraryService, TitleLibraryService>();
+builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
+builder.Services.AddSingleton<IDownloadService, DownloadService>();
 builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
+builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
 builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
 builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
-
-builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
-
+//radzen services
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();

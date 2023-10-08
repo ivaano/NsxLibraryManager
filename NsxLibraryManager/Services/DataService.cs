@@ -1,5 +1,7 @@
-﻿using LiteDB;
+﻿using AutoMapper;
+using LiteDB;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
@@ -13,17 +15,21 @@ public class DataService : IDataService
     private ILiteDatabase? _db;
     private bool _disposed;
     private ITitleRepository? _titleRepository;
-    private IRegionRepository? _regionRepository;
+    private Dictionary<string, IRegionRepository>? _regionRepository;
     private ITitleLibraryRepository? _titleLibraryRepository;
     private readonly AppSettings _configuration;
-
+    private readonly IMapper _mapper;
+    private readonly ILogger<DataService> _logger;
+    
     private ILiteDatabase Db
     {
         get { return _db ??= new LiteDatabase(_connStr); }
     }
 
-    public DataService(IOptions<AppSettings> configuration)
+    public DataService(IOptions<AppSettings> configuration, IMapper mapper, ILogger<DataService> logger)
     {
+        _logger = logger;
+        _mapper = mapper;
         _configuration = configuration.Value;
         var configTitleDb = _configuration.TitleDatabase;
         var titleDbLocation = configTitleDb ?? throw new InvalidOperationException();
@@ -32,7 +38,19 @@ public class DataService : IDataService
     
     public IRegionRepository RegionRepository(string region)
     {
-        return _regionRepository ??= new RegionRepository(Db, region);
+        if (_regionRepository is not null)
+        {
+            if (_regionRepository.TryGetValue(region, out var repository))
+                return repository;
+        }
+        
+        _regionRepository = new Dictionary<string, IRegionRepository>()
+        {
+                [region] = new RegionRepository(Db, region)
+        };
+        return _regionRepository[region];
+
+
     }
     
     public ITitleLibraryRepository TitleLibraryRepository()
@@ -75,10 +93,10 @@ public class DataService : IDataService
         get { return _titleRepository ??= new TitleRepository(Db); }
     }
 
-    private void LoadTitlesInDb(JObject titles, string region)
+    public void ImportTitleDbRegionTitles(JObject titles, string region)
     {
         var i = 0;
-        /*
+        var regionTitleRepository = RegionRepository(region);
         foreach (var title in titles)
         {
             var tt = title.Value;
@@ -86,12 +104,12 @@ public class DataService : IDataService
             var titleDbTitle = JsonConvert.DeserializeObject<TitleDbTitle>(title.Value.ToString());
 
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
-            var regionTitleRepository = RegionRepository(region);
-            _consoleService.Print($"{regionTitle.Name}");
+
+            _logger.LogDebug($"{regionTitle.Name}");
             regionTitleRepository.Create(regionTitle);
             i++;
         }
-        */
+
     }
 
     public async Task Import()

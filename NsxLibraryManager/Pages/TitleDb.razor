@@ -1,12 +1,17 @@
 ﻿@page "/titledb"
 @using NsxLibraryManager.Models
-<h3>TtitleDb</h3>
-
-<RadzenDataGrid Data="@regionTitles" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" PageSize="100" AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
-    <Columns>
-        <RadzenDataGridColumn TItem="RegionTitle" Property="Id" Title="ID"  />
-        <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" />
-        <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" />
-        <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" />
-    </Columns>
-</RadzenDataGrid>
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" Wrap="FlexWrap.NoWrap" Gap="1rem">
+        <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+        <RadzenDataGrid Data="@regionTitles" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" PageSize="100" AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+            <Columns>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Id" Title="ID"  />
+                <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" />
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" />
+                <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenStack>
