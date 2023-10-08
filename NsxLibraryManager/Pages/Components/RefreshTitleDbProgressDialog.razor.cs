@@ -34,6 +34,9 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
                         StateHasChanged();
                         await TitleDbService.ImportRegionAsync(region);
                     }
+                    RegionDownloaded = "CNMTS";
+                    StateHasChanged();
+                    await TitleDbService.ImportCnmtsAsync();
                 });
         DialogService.Close();
     }

@@ -6,12 +6,12 @@ namespace NsxLibraryManager.Services;
 
 public interface IDataService : IDisposable
 {
-    public Task Import();
     new void Dispose();
   
     public ITitleRepository TitleRepository { get; }
     public IRegionRepository RegionRepository(string region);
-    public void ImportTitleDbRegionTitles(JObject titles, string region);
+    public int ImportTitleDbRegionTitles(JObject titles, string region);
+    public int ImportTitleDbCnmts(JObject cnmts);
     public Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);

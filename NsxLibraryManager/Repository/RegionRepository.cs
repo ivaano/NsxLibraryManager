@@ -25,6 +25,14 @@ public sealed class RegionRepository : BaseRepository<RegionTitle>, IRegionRepos
         return Collection.Find(o => o.TitleId == entity.TitleId).FirstOrDefault() ?? throw new InvalidOperationException();
     }
 
+    public int InsertBulk(IEnumerable<RegionTitle> entities)
+    {
+        var resultCount = Collection.InsertBulk(entities);
+        Collection.EnsureIndex(x => x.Ids);
+        Collection.EnsureIndex(x => x.TitleId);
+        return resultCount;
+    }
+
     public RegionTitle? GetTitleById(string id)
     {
         return Collection.Find(o => o.TitleId == id)?.FirstOrDefault();

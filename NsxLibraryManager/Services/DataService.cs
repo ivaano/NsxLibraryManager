@@ -49,13 +49,16 @@ public class DataService : IDataService
                 [region] = new RegionRepository(Db, region)
         };
         return _regionRepository[region];
-
-
     }
     
     public ITitleLibraryRepository TitleLibraryRepository()
     {
         return _titleLibraryRepository ??= new TitleLibraryRepository(Db);
+    }
+
+    public int ImportTitleDbCnmts(JObject cnmts)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region)
@@ -93,43 +96,20 @@ public class DataService : IDataService
         get { return _titleRepository ??= new TitleRepository(Db); }
     }
 
-    public void ImportTitleDbRegionTitles(JObject titles, string region)
+    public int ImportTitleDbRegionTitles(JObject titles, string region)
     {
-        var i = 0;
         var regionTitleRepository = RegionRepository(region);
+        var entities = new List<RegionTitle>();
         foreach (var title in titles)
         {
-            var tt = title.Value;
             if (title.Value != null && title.Value.ToString() == "{}") continue;
+
             var titleDbTitle = JsonConvert.DeserializeObject<TitleDbTitle>(title.Value.ToString());
-
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
-
+            entities.Add(regionTitle);
             _logger.LogDebug($"{regionTitle.Name}");
-            regionTitleRepository.Create(regionTitle);
-            i++;
         }
-
-    }
-
-    public async Task Import()
-    {
-        var naranjas = "nada aun";
-        /*
-        var downloadConfig = _configuration.GetSection("download").Get<DownloadSettings>();
-
-        if (downloadConfig is not null)
-        {
-            foreach (var region in downloadConfig.Regions)
-            {
-                Db.DropCollection(region);
-
-                var destFilePath = await _downloadService.GetRegionFile(region, CancellationToken.None);
-                var titles = JObject.Parse(await File.ReadAllTextAsync(destFilePath));
-                LoadTitlesInDb(titles, region);
-            }
-        }
-        */
+        return regionTitleRepository.InsertBulk(entities);
     }
 
     public void Dispose()

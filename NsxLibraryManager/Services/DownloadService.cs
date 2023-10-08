@@ -19,7 +19,6 @@ public sealed class DownloadService : IDownloadService
 
     public async Task<string> GetRegionFile(string region, CancellationToken cancellationToken = default)
     {
-
         var downloadConfig = _configuration.DownloadSettings;
         if (downloadConfig is { TitleDbPath: null })
             throw new InvalidOperationException("TitleDbPath is needed in config");
@@ -27,6 +26,17 @@ public sealed class DownloadService : IDownloadService
                   throw new InvalidOperationException("DownloadRegionUrl is needed in config");
         var destFilePath = Path.Combine(downloadConfig.TitleDbPath, $"{region}.en.json");
         _logger.LogInformation($"Downloading region {region} from {url} to {destFilePath}");
+        await DownloadFileAsync(url, destFilePath, cancellationToken);
+        return destFilePath;
+    }
+
+    public async Task<string> GetCnmtsFile(CancellationToken cancellationToken = default)
+    {
+        var downloadConfig = _configuration.DownloadSettings;
+        if (downloadConfig is { TitleDbPath: null })
+            throw new InvalidOperationException("TitleDbPath is needed in config");
+        var destFilePath = Path.Combine(downloadConfig.TitleDbPath, $"cnmts.json");
+        var url = "https://raw.githubusercontent.com/blawar/titledb/master/cnmts.json";
         await DownloadFileAsync(url, destFilePath, cancellationToken);
         return destFilePath;
     }

@@ -28,6 +28,11 @@ public class TitleDbService : ITitleDbService
         _dataService.ImportTitleDbRegionTitles(titles, region);
     }
 
+    public async Task ImportCnmtsAsync()
+    {
+        var destFilePath = await _downloadService.GetCnmtsFile(CancellationToken.None);
+    }
+
     public IEnumerable<string> GetRegionsToImport()
     {
         return _configuration.DownloadSettings.Regions;
