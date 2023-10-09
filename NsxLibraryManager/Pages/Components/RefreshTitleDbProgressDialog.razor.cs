@@ -7,7 +7,7 @@ namespace NsxLibraryManager.Pages.Components;
 
 public partial class RefreshTitleDbProgressDialog : IDisposable
 {
-    public string RegionDownloaded { get; set; }
+    public string DownloadingInfo { get; set; }
 
     [Inject]
     protected DialogService DialogService { get; set; }
@@ -30,11 +30,11 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
                     var regions = TitleDbService.GetRegionsToImport();
                     foreach (var region in regions)
                     {
-                        RegionDownloaded = region;
+                        DownloadingInfo = $"region {region}";
                         StateHasChanged();
                         await TitleDbService.ImportRegionAsync(region);
                     }
-                    RegionDownloaded = "CNMTS";
+                    DownloadingInfo = "cnmts";
                     StateHasChanged();
                     await TitleDbService.ImportCnmtsAsync();
                 });

@@ -17,6 +17,7 @@ public class DataService : IDataService
     private ITitleRepository? _titleRepository;
     private Dictionary<string, IRegionRepository>? _regionRepository;
     private ITitleLibraryRepository? _titleLibraryRepository;
+    private ITitleDbCnmtsRepository? _titleDbCnmtsRepository;
     private readonly AppSettings _configuration;
     private readonly IMapper _mapper;
     private readonly ILogger<DataService> _logger;
@@ -56,9 +57,9 @@ public class DataService : IDataService
         return _titleLibraryRepository ??= new TitleLibraryRepository(Db);
     }
 
-    public int ImportTitleDbCnmts(JObject cnmts)
+    public ITitleDbCnmtsRepository TitleDbCnmtsRepository()
     {
-        throw new NotImplementedException();
+        return _titleDbCnmtsRepository ??= new TitleDbCnmtsRepository(Db);
     }
 
     public async Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region)
@@ -91,11 +92,13 @@ public class DataService : IDataService
         return firstTitle?.CreatedTime;
     }
 
-    public ITitleRepository TitleRepository
+    
+    public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta)
     {
-        get { return _titleRepository ??= new TitleRepository(Db); }
+        var cnmtsRepository = TitleDbCnmtsRepository();
+        return cnmtsRepository.InsertBulk(packagedContentMeta);
     }
-
+    
     public int ImportTitleDbRegionTitles(JObject titles, string region)
     {
         var regionTitleRepository = RegionRepository(region);
@@ -107,7 +110,7 @@ public class DataService : IDataService
             var titleDbTitle = JsonConvert.DeserializeObject<TitleDbTitle>(title.Value.ToString());
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
             entities.Add(regionTitle);
-            _logger.LogDebug($"{regionTitle.Name}");
+            _logger.LogDebug("{Message}", regionTitle.Name);
         }
         return regionTitleRepository.InsertBulk(entities);
     }

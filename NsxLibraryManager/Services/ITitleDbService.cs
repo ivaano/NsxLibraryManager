@@ -6,6 +6,8 @@ public interface ITitleDbService
     
     public Task ImportCnmtsAsync();
     
+    public Task ImportVersionsAsync();
+    
     public IEnumerable<string> GetRegionsToImport();
 
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NsxLibraryManager.Models;
 using NsxLibraryManager.Settings;
 
 namespace NsxLibraryManager.Services;
@@ -31,6 +33,25 @@ public class TitleDbService : ITitleDbService
     public async Task ImportCnmtsAsync()
     {
         var destFilePath = await _downloadService.GetCnmtsFile(CancellationToken.None);
+        var json = await File.ReadAllTextAsync(@destFilePath);
+        var packagedContentMeta = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, PackagedContentMeta>>>(json);
+        //flat the data
+        var cnmts = new List<PackagedContentMeta>();
+        foreach (var cnmt in packagedContentMeta)
+        {
+            var gameVersions = cnmt.Value;
+            foreach (var gameVersion in gameVersions)
+            {
+                cnmts.Add(gameVersion.Value);
+            }
+        }
+        _dataService.DropDbCollection(AppConstants.CnmtsCollectionName);
+        _dataService.ImportTitleDbCnmts(cnmts);
+    }
+
+    public async Task ImportVersionsAsync()
+    {
+        
     }
 
     public IEnumerable<string> GetRegionsToImport()
