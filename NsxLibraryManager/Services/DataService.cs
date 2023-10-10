@@ -18,6 +18,7 @@ public class DataService : IDataService
     private Dictionary<string, IRegionRepository>? _regionRepository;
     private ITitleLibraryRepository? _titleLibraryRepository;
     private ITitleDbCnmtsRepository? _titleDbCnmtsRepository;
+    private ITitleDbVersionsRepository? _titleDbVersionsRepository;
     private readonly AppSettings _configuration;
     private readonly IMapper _mapper;
     private readonly ILogger<DataService> _logger;
@@ -35,6 +36,11 @@ public class DataService : IDataService
         var configTitleDb = _configuration.TitleDatabase;
         var titleDbLocation = configTitleDb ?? throw new InvalidOperationException();
         _connStr = Path.Combine(titleDbLocation);
+        /*
+        _titleLibraryRepository ??= new TitleLibraryRepository(Db);
+        _titleDbCnmtsRepository ??= new TitleDbCnmtsRepository(Db);
+        _titleDbVersionsRepository ??= new TitleDbVersionsRepository(Db);
+        */
     }
     
     public IRegionRepository RegionRepository(string region)
@@ -60,6 +66,11 @@ public class DataService : IDataService
     public ITitleDbCnmtsRepository TitleDbCnmtsRepository()
     {
         return _titleDbCnmtsRepository ??= new TitleDbCnmtsRepository(Db);
+    }
+    
+    public ITitleDbVersionsRepository TitleDbVersionsRepositoryRepository()
+    {
+        return _titleDbVersionsRepository ??= new TitleDbVersionsRepository(Db);
     }
 
     public async Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region)
@@ -92,6 +103,11 @@ public class DataService : IDataService
         return firstTitle?.CreatedTime;
     }
 
+    public int ImportTitleDbVersions(List<GameVersions> gameVersions)
+    {
+        var versionsRepository = TitleDbVersionsRepositoryRepository();
+        return versionsRepository.InsertBulk(gameVersions);
+    }
     
     public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta)
     {

@@ -37,6 +37,9 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
                     DownloadingInfo = "cnmts";
                     StateHasChanged();
                     await TitleDbService.ImportCnmtsAsync();
+                    DownloadingInfo = "versions";
+                    StateHasChanged();
+                    await TitleDbService.ImportVersionsAsync();
                 });
         DialogService.Close();
     }

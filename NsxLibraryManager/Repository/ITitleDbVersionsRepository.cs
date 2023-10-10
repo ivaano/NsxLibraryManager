@@ -2,7 +2,7 @@
 
 namespace NsxLibraryManager.Repository;
 
-public interface ITitleDbVersions: IBaseRepository<GameVersions>
+public interface ITitleDbVersionsRepository: IBaseRepository<GameVersions>
 {
     public int InsertBulk(IEnumerable<GameVersions> entities);
 }

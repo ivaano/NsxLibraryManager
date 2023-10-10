@@ -22,7 +22,7 @@ public sealed class DownloadService : IDownloadService
         var downloadConfig = _configuration.DownloadSettings;
         if (downloadConfig is { TitleDbPath: null })
             throw new InvalidOperationException("TitleDbPath is needed in config");
-        var url = downloadConfig.DownloadRegionUrl.Replace("{region}", region) ??
+        var url = downloadConfig.RegionUrl.Replace("{region}", region) ??
                   throw new InvalidOperationException("DownloadRegionUrl is needed in config");
         var destFilePath = Path.Combine(downloadConfig.TitleDbPath, $"{region}.en.json");
         _logger.LogInformation($"Downloading region {region} from {url} to {destFilePath}");
@@ -36,11 +36,19 @@ public sealed class DownloadService : IDownloadService
         if (downloadConfig is { TitleDbPath: null })
             throw new InvalidOperationException("TitleDbPath is needed in config");
         var destFilePath = Path.Combine(downloadConfig.TitleDbPath, $"cnmts.json");
-        var url = "https://raw.githubusercontent.com/blawar/titledb/master/cnmts.json";
-        await DownloadFileAsync(url, destFilePath, cancellationToken);
+        await DownloadFileAsync(downloadConfig.CnmtsUrl, destFilePath, cancellationToken);
         return destFilePath;
     }
 
+    public async Task<string> GetVersionsFile(CancellationToken cancellationToken = default)
+    {
+        var downloadConfig = _configuration.DownloadSettings;
+        if (downloadConfig is { TitleDbPath: null })
+            throw new InvalidOperationException("TitleDbPath is needed in config");
+        var destFilePath = Path.Combine(downloadConfig.TitleDbPath, $"versions.json");
+        await DownloadFileAsync(downloadConfig.VersionsUrl, destFilePath, cancellationToken);
+        return destFilePath;
+    }
 
     public async Task DownloadFileAsync(string url, string destFilePath, CancellationToken cancellationToken)
     {

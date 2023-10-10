@@ -4,9 +4,9 @@ using NsxLibraryManager.Settings;
 
 namespace NsxLibraryManager.Repository;
 
-public class TitleDbVersions : BaseRepository<GameVersions>, ITitleDbVersions
+public class TitleDbVersionsRepository : BaseRepository<GameVersions>, ITitleDbVersionsRepository
 {
-    public TitleDbVersions(ILiteDatabase db) : base(db, collectionName: AppConstants.VersionsCollectionName)
+    public TitleDbVersionsRepository(ILiteDatabase db) : base(db, collectionName: AppConstants.VersionsCollectionName)
     {
     }
 

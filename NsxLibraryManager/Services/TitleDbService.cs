@@ -51,7 +51,7 @@ public class TitleDbService : ITitleDbService
 
     public async Task ImportVersionsAsync()
     {
-        var destFilePath = await _downloadService.GetCnmtsFile(CancellationToken.None);
+        var destFilePath = await _downloadService.GetVersionsFile(CancellationToken.None);
         var json = await File.ReadAllTextAsync(@destFilePath);
         var gameVersions  = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
         var gameVersionsList = new List<GameVersions>();
@@ -69,6 +69,8 @@ public class TitleDbService : ITitleDbService
                 gameVersionsList.Add(gameVersion);
             }
         }
+        _dataService.DropDbCollection(AppConstants.VersionsCollectionName);
+        _dataService.ImportTitleDbVersions(gameVersionsList);
     }
 
     public IEnumerable<string> GetRegionsToImport()

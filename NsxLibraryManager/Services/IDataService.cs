@@ -11,6 +11,7 @@ public interface IDataService : IDisposable
     public IRegionRepository RegionRepository(string region);
     public int ImportTitleDbRegionTitles(JObject titles, string region);
     public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta);
+    public int ImportTitleDbVersions(List<GameVersions> gameVersions);
     public Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);
