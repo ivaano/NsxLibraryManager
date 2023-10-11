@@ -1,11 +1,10 @@
-﻿using NsxLibraryManager.Enums;
+using NsxLibraryManager.Enums;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 
 namespace NsxLibraryManager.Models;
 
-public record LibraryTitle
+public record Game
 {
-
     public int Id { get; set; }
     public required string TitleId { get; init; }
  
@@ -23,7 +22,4 @@ public record LibraryTitle
     public TitleLibraryType Type { get; set; }
     public AccuratePackageType PackageType { get; init; }
     public required string FileName { get; set; }
-    public string? NewFileName { get; set; }
-    public bool Error { get; set; } = false;
-    public string ErrorMessage { get; set; } = string.Empty;
-};
+}

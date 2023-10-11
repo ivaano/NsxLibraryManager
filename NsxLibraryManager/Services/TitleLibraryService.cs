@@ -34,6 +34,7 @@ public class TitleLibraryService : ITitleLibraryService
         {
             var libraryTitle = await _fileInfoService.GetFileInfo(file);
             await _dataService.AddLibraryTitleAsync(libraryTitle);
+            
             return true;
         }
         catch (Exception e)

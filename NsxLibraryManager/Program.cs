@@ -37,7 +37,7 @@ builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
 var modelBuilder = new ODataConventionModelBuilder();
-modelBuilder.EntitySet<LibraryTitle>("LibraryTitle");
+modelBuilder.EntitySet<Game>("Games");
 
 builder.Services.AddControllers().AddOData(
         options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
