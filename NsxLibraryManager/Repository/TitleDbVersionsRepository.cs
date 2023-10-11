@@ -16,4 +16,9 @@ public class TitleDbVersionsRepository : BaseRepository<GameVersions>, ITitleDbV
         Collection.EnsureIndex(x => x.TitleId);
         return resultCount;
     }
+    
+    public IEnumerable<GameVersions> FindByTitleId(string titleId)
+    {
+        return Collection.Find(x => x.TitleId == titleId);
+    }
 }

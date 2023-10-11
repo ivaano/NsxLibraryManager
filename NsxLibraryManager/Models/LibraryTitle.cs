@@ -1,4 +1,5 @@
 ﻿using LibHac.Ncm;
+using NsxLibraryManager.Enums;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 
 namespace NsxLibraryManager.Models;
@@ -17,7 +18,8 @@ public record LibraryTitle
     public string? TitleName { get; set; }
     public string? Publisher { get; set; }
     public uint TitleVersion { get; init; }
-    public ContentMetaType Type { get; set; }
+    public uint AvailableVersion { get; set; }
+    public TitleLibraryType Type { get; set; }
     public AccuratePackageType PackageType { get; init; }
     public required string FileName { get; set; }
     public string? NewFileName { get; set; }

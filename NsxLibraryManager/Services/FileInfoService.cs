@@ -1,4 +1,5 @@
 ﻿using LibHac.Ncm;
+using NsxLibraryManager.Enums;
 using NsxLibraryManager.Exceptions;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 using NsxLibraryManager.Models;
@@ -9,17 +10,21 @@ public class FileInfoService : IFileInfoService
 {
     private readonly IPackageInfoLoader _packageInfoLoader;
     private readonly IDataService _dataService;
+    private readonly ITitleDbService _titleDbService;
     private readonly ILogger<FileInfoService> _logger;
     private IEnumerable<string> _directoryFiles = new List<string>();
+    
 
     
     public FileInfoService(
             IPackageInfoLoader packageInfoLoader, 
             IDataService dataService,
+            ITitleDbService titleDbService,
             ILogger<FileInfoService> logger)
     {
         _packageInfoLoader = packageInfoLoader ?? throw new ArgumentNullException(nameof(packageInfoLoader));
         _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+        _titleDbService = titleDbService ?? throw new ArgumentNullException(nameof(titleDbService));
         _logger = logger;
     }
     
@@ -84,17 +89,27 @@ public class FileInfoService : IFileInfoService
             PatchNumber = packageInfo.Contents.First().PatchNumber,
             TitleId = packageInfo.Contents.First().TitleId,
             TitleVersion = packageInfo.Contents.First().Version.Version,
-            Type = packageInfo.Contents.First().Type,
+            //Type = packageInfo.Contents.First().Type,
             PackageType = packageInfo.AccuratePackageType,
             FileName = filePath
         };
         
-        if (title.Type != ContentMetaType.Application)
+        var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);
+        title.AvailableVersion = availableVersion >> 16;
+        title.Type = packageInfo.Contents.First().Type switch
+        {
+                ContentMetaType.Application => TitleLibraryType.Base,
+                ContentMetaType.Patch => TitleLibraryType.Update,
+                ContentMetaType.AddOnContent => TitleLibraryType.DLC,
+                _ => title.Type
+        };
+
+        if (title.Type != TitleLibraryType.Base)
         {
             title.ApplicationTitleName = _dataService.RegionRepository("US").GetTitleById(packageInfo.Contents.First().ApplicationTitleId)?.Name;
         }
-
-        if (packageInfo.Contents.First().NacpData is null)
+        var nacpData = packageInfo.Contents.First().NacpData;
+        if (nacpData is null)
         {
             var titleDb = _dataService.RegionRepository("US").FindTitleByIds(packageInfo.Contents.First().TitleId);
 
@@ -107,19 +122,19 @@ public class FileInfoService : IFileInfoService
             
             title.TitleName = titleDb.Name ?? string.Empty;
             title.Publisher = titleDb.Publisher ?? string.Empty;
-            return await Task.FromResult(title);
+            return title;
         }
 
-        var nacpData = packageInfo.Contents.First().NacpData;
-        if (nacpData != null)
-            foreach (var ncpTitle in nacpData.Titles)
-            {
-                if (ncpTitle is null) continue;
-                title.TitleName = ncpTitle.Name;
-                title.Publisher = ncpTitle.Publisher;
-                break;
-            }
 
-        return await Task.FromResult(title);
+        foreach (var ncpTitle in nacpData.Titles)
+        {
+            if (ncpTitle is null) continue;
+            if (ncpTitle.Name == "") continue;
+            title.TitleName = ncpTitle.Name;
+            title.Publisher = ncpTitle.Publisher;
+            break;
+        }
+
+        return title;
     }
 }

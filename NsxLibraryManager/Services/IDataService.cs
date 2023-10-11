@@ -17,4 +17,5 @@ public interface IDataService : IDisposable
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);
     public bool DropDbCollection(string collectionName);
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default);
+    public List<GameVersions> GetTitleDbVersions(string titleTitleId);
 }

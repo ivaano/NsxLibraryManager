@@ -17,7 +17,6 @@
                         </RadzenText>
                     </RadzenColumn>
                     <RadzenColumn Size="4">
-                        <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
                     </RadzenColumn>
                 </RadzenRow>
             </RadzenColumn>
@@ -27,18 +26,20 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
         <RadzenDataGrid @ref="Grid" Data="@LibraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        AllowColumnResize="true">
+                        AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px"  AllowColumnPicking="true">
+            <HeaderTemplate>
+                <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+            </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" />
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="File Name"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="Filename"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="Error" Title="Error"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="ErrorMessage" Title="Error Message"/>
             </Columns>
         </RadzenDataGrid>
     </RadzenStack>
-
-
-
-
 </RadzenStack>

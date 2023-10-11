@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Globalization;
+using AutoMapper;
 using LiteDB;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -19,7 +20,6 @@ public class DataService : IDataService
     private ITitleLibraryRepository? _titleLibraryRepository;
     private ITitleDbCnmtsRepository? _titleDbCnmtsRepository;
     private ITitleDbVersionsRepository? _titleDbVersionsRepository;
-    private readonly AppSettings _configuration;
     private readonly IMapper _mapper;
     private readonly ILogger<DataService> _logger;
     
@@ -32,15 +32,8 @@ public class DataService : IDataService
     {
         _logger = logger;
         _mapper = mapper;
-        _configuration = configuration.Value;
-        var configTitleDb = _configuration.TitleDatabase;
-        var titleDbLocation = configTitleDb ?? throw new InvalidOperationException();
+        var titleDbLocation = configuration.Value.TitleDatabase ?? throw new InvalidOperationException();
         _connStr = Path.Combine(titleDbLocation);
-        /*
-        _titleLibraryRepository ??= new TitleLibraryRepository(Db);
-        _titleDbCnmtsRepository ??= new TitleDbCnmtsRepository(Db);
-        _titleDbVersionsRepository ??= new TitleDbVersionsRepository(Db);
-        */
     }
     
     public IRegionRepository RegionRepository(string region)
@@ -103,6 +96,12 @@ public class DataService : IDataService
         return firstTitle?.CreatedTime;
     }
 
+    public List<GameVersions> GetTitleDbVersions(string titleTitleId)
+    {
+        var versionsRepository = TitleDbVersionsRepositoryRepository();
+        return versionsRepository.FindByTitleId(titleTitleId).ToList();
+    }
+
     public int ImportTitleDbVersions(List<GameVersions> gameVersions)
     {
         var versionsRepository = TitleDbVersionsRepositoryRepository();
@@ -119,12 +118,19 @@ public class DataService : IDataService
     {
         var regionTitleRepository = RegionRepository(region);
         var entities = new List<RegionTitle>();
+        var currentDateTime = DateTime.Now;
         foreach (var title in titles)
         {
             if (title.Value != null && title.Value.ToString() == "{}") continue;
 
             var titleDbTitle = JsonConvert.DeserializeObject<TitleDbTitle>(title.Value.ToString());
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
+            regionTitle.Region = region;
+            regionTitle.CreatedTime = currentDateTime;
+            if (DateTime.TryParseExact(regionTitle.ReleaseDate.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None,  out var parsedDate))
+            {
+                regionTitle.ReleaseDateOnly = parsedDate;
+            }
             entities.Add(regionTitle);
             _logger.LogDebug("{Message}", regionTitle.Name);
         }

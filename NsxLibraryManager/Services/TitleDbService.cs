@@ -77,4 +77,12 @@ public class TitleDbService : ITitleDbService
     {
         return _configuration.DownloadSettings.Regions;
     }
+
+    public Task<uint> GetAvailableVersion(string titleTitleId)
+    {
+        var versions = _dataService.GetTitleDbVersions(titleTitleId);
+        var latestVersion = versions.MaxBy(o => o.Date);
+        var algo = Convert.ToUInt32(latestVersion?.Version);
+        return Task.FromResult(algo);
+    }
 }

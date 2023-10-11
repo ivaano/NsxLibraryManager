@@ -10,4 +10,5 @@ public interface ITitleDbService
     
     public IEnumerable<string> GetRegionsToImport();
 
+    public Task<uint> GetAvailableVersion(string titleTitleId);
 }

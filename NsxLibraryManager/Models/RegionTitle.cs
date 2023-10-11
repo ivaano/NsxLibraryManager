@@ -22,6 +22,7 @@ public class RegionTitle
     public List<string>? RatingContent { get; set; }
     public string? Region { get; set; }
     public int? ReleaseDate { get; set; }
+    public DateTime? ReleaseDateOnly { get; set; }
     public string? RightsId { get; set; }
     public List<string>? Screenshots { get; set; }
     public long? Size { get; set; }
