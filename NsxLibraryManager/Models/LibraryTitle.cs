@@ -1,11 +1,11 @@
-﻿using LibHac.Ncm;
-using NsxLibraryManager.Enums;
+﻿using NsxLibraryManager.Enums;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 
 namespace NsxLibraryManager.Models;
 
 public record LibraryTitle
 {
+    public int Id { get; set; }
     public required string TitleId { get; init; }
  
     public string? ApplicationTitleId { get; set; }

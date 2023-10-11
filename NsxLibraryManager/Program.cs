@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.ModelBuilder;
 using NsxLibraryManager.FileLoading;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Models;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.KeysManagement;
 using NsxLibraryManager.Settings;
@@ -33,6 +36,14 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<TooltipService>();
 builder.Services.AddScoped<ContextMenuService>();
 
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntitySet<LibraryTitle>("LibraryTitle");
+
+builder.Services.AddControllers().AddOData(
+        options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
+                "odata",
+                modelBuilder.GetEdmModel()));
+
 //Static web assets for linux development https://learn.microsoft.com/en-us/aspnet/core/razor-pages/ui-class?view=aspnetcore-7.0&tabs=visual-studio#consume-content-from-a-referenced-rcl
 if (builder.Environment.IsEnvironment("DeveLinux"))
 {
@@ -56,6 +67,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.MapControllers();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
