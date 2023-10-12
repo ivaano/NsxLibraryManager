@@ -15,14 +15,27 @@ public class GamesController : ODataController
         _dataService = dataService;
     }
 
-
-    
     [EnableQuery]
-    public async Task<ActionResult<IEnumerable<LibraryTitle>>> Get()
+    public async Task<ActionResult<IEnumerable<Game>>> Get()
     {
         var libTitles = await _dataService.GetLibraryTitlesAsync();
 
-        return Ok();
+        var games = new List<Game>();
+        
+        foreach (var libTitle in libTitles)
+        {
+            var game = new Game
+            {
+                TitleId = libTitle.TitleId,
+                FileName = libTitle.FileName,
+                TitleName = libTitle.TitleName,
+                Type = libTitle.Type,
+                TitleVersion = libTitle.TitleVersion,
+                Publisher = libTitle.Publisher
+            };
+            games.Add(game);
+        }
+        return Ok(games);
     }
     
 }

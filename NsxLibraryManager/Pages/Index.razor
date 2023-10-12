@@ -31,11 +31,11 @@
                 <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
             </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" Width="150px"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" Width="300px"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type" Width="80px"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type" Width="130px"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="Filename"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="Error" Title="Error"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="ErrorMessage" Title="Error Message"/>
