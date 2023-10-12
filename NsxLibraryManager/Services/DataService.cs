@@ -78,7 +78,8 @@ public class DataService : IDataService
     public async Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId)
     {
         var regionTitleRepository = RegionRepository(region);
-        return await Task.Run(() => regionTitleRepository.FindOne(x => x.TitleId == titleId));
+        var regionTitle = regionTitleRepository.FindOne(x => x.TitleId == titleId) ?? regionTitleRepository.FindTitleByIds(titleId);
+        return await Task.Run(() => regionTitle);
     }
 
     public async Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId)

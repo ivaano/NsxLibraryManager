@@ -50,7 +50,9 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.BannerUrl = regionTitle.BannerUrl;
         libraryTitle.IconUrl = regionTitle.IconUrl;
         libraryTitle.Screenshots = regionTitle.Screenshots;
-        
+
+        var dlcVal = TitleLibraryType.DLC;
+        //var intDlc = BitConverter.ToInt32(dlcVal);   //Convert.ToUInt32(TitleLibraryType.DLC.ToString(), 16);
         var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == 130 select cnmt.TitleId).ToList();
 
         if (dlc.Any())
