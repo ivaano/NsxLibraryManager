@@ -18,7 +18,7 @@ public partial class TitleDb
     
     protected override async Task OnInitializedAsync()
     {
-        regionTitles = await DataService.GetRegionTitlesAsync("US");
+        regionTitles = await DataService.GetTitleDbRegionTitlesAsync("US");
     }
 
     private async Task RefreshTitleDb()

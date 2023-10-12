@@ -12,10 +12,13 @@ public interface IDataService : IDisposable
     public int ImportTitleDbRegionTitles(JObject titles, string region);
     public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta);
     public int ImportTitleDbVersions(List<GameVersions> gameVersions);
-    public Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region);
+    public List<GameVersions> GetTitleDbVersions(string titleTitleId);
+    public Task<IEnumerable<RegionTitle>> GetTitleDbRegionTitlesAsync(string region);
+    public Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId);
+    public Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);
     public bool DropDbCollection(string collectionName);
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default);
-    public List<GameVersions> GetTitleDbVersions(string titleTitleId);
+
 }

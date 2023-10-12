@@ -23,6 +23,17 @@ public record LibraryTitle
     public TitleLibraryType Type { get; set; }
     public AccuratePackageType PackageType { get; init; }
     public required string FileName { get; set; }
+    
+    public string? BannerUrl { get; set; }
+    public List<string>? Category { get; set; }
+    public string? Description { get; set; }
+    public string? Developer { get; set; }
+    public string? FrontBoxArt { get; set; }
+    public string? IconUrl { get; set; }
+    public string? Intro { get; set; }
+    public List<string>? Screenshots { get; set; }
+
+    
     public string? NewFileName { get; set; }
     public bool Error { get; set; } = false;
     public string ErrorMessage { get; set; } = string.Empty;

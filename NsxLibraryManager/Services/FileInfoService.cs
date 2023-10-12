@@ -9,7 +9,6 @@ namespace NsxLibraryManager.Services;
 public class FileInfoService : IFileInfoService
 {
     private readonly IPackageInfoLoader _packageInfoLoader;
-    private readonly IDataService _dataService;
     private readonly ITitleDbService _titleDbService;
     private readonly ILogger<FileInfoService> _logger;
     private IEnumerable<string> _directoryFiles = new List<string>();
@@ -18,12 +17,10 @@ public class FileInfoService : IFileInfoService
     
     public FileInfoService(
             IPackageInfoLoader packageInfoLoader, 
-            IDataService dataService,
             ITitleDbService titleDbService,
             ILogger<FileInfoService> logger)
     {
         _packageInfoLoader = packageInfoLoader ?? throw new ArgumentNullException(nameof(packageInfoLoader));
-        _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
         _titleDbService = titleDbService ?? throw new ArgumentNullException(nameof(titleDbService));
         _logger = logger;
     }
@@ -89,9 +86,8 @@ public class FileInfoService : IFileInfoService
             PatchNumber = packageInfo.Contents.First().PatchNumber,
             TitleId = packageInfo.Contents.First().TitleId,
             TitleVersion = packageInfo.Contents.First().Version.Version,
-            //Type = packageInfo.Contents.First().Type,
             PackageType = packageInfo.AccuratePackageType,
-            FileName = filePath
+            FileName = Path.GetFullPath(filePath)
         };
         
         var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);
@@ -104,27 +100,8 @@ public class FileInfoService : IFileInfoService
                 _ => title.Type
         };
 
-        if (title.Type != TitleLibraryType.Base)
-        {
-            title.ApplicationTitleName = _dataService.RegionRepository("US").GetTitleById(packageInfo.Contents.First().ApplicationTitleId)?.Name;
-        }
         var nacpData = packageInfo.Contents.First().NacpData;
-        if (nacpData is null)
-        {
-            var titleDb = _dataService.RegionRepository("US").FindTitleByIds(packageInfo.Contents.First().TitleId);
-
-            if (titleDb is null)
-            {
-                title.Error = true;
-                title.ErrorMessage = "Title not found in the nca or the database (Is it on a different region?).";
-                return await Task.FromResult(title);
-            } 
-            
-            title.TitleName = titleDb.Name ?? string.Empty;
-            title.Publisher = titleDb.Publisher ?? string.Empty;
-            return title;
-        }
-
+        if (nacpData == null) return title;
 
         foreach (var ncpTitle in nacpData.Titles)
         {
