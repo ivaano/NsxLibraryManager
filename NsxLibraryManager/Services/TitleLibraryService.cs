@@ -38,7 +38,7 @@ public class TitleLibraryService : ITitleLibraryService
         {
             libraryTitle.ApplicationTitleName = regionTitle.Name;
         }
-        
+        // prefer the title name from the file
         libraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(regionTitle.Name);
         libraryTitle.Publisher = libraryTitle.Publisher.ConvertNullOrEmptyTo(regionTitle.Publisher);
 
@@ -50,6 +50,13 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.BannerUrl = regionTitle.BannerUrl;
         libraryTitle.IconUrl = regionTitle.IconUrl;
         libraryTitle.Screenshots = regionTitle.Screenshots;
+        
+        var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == 130 select cnmt.TitleId).ToList();
+
+        if (dlc.Any())
+        {
+            libraryTitle.Dlcs = dlc;
+        }
         return libraryTitle;
     }
     

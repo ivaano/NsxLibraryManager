@@ -12,9 +12,7 @@ public class FileInfoService : IFileInfoService
     private readonly ITitleDbService _titleDbService;
     private readonly ILogger<FileInfoService> _logger;
     private IEnumerable<string> _directoryFiles = new List<string>();
-    
-
-    
+   
     public FileInfoService(
             IPackageInfoLoader packageInfoLoader, 
             ITitleDbService titleDbService,

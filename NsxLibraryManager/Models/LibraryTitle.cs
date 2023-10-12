@@ -32,6 +32,7 @@ public record LibraryTitle
     public string? IconUrl { get; set; }
     public string? Intro { get; set; }
     public List<string>? Screenshots { get; set; }
+    public List<string>? Dlcs { get; set; }
 
     
     public string? NewFileName { get; set; }
