@@ -1,4 +1,5 @@
 ﻿using LiteDB;
+using LiteDB.Queryable;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Settings;
 
@@ -10,4 +11,8 @@ public class TitleLibraryRepository : BaseRepository<LibraryTitle>, ITitleLibrar
     {
     }
 
+    public IQueryable<LibraryTitle> GetTitlesAsQueryable()
+    {
+        return Collection.AsQueryable();
+    }
 }

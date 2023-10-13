@@ -1,5 +1,4 @@
-﻿using LibHac.Ncm;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Pages.Components;

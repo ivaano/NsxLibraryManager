@@ -4,9 +4,11 @@ using LiteDB;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
 using NsxLibraryManager.Settings;
+using Radzen;
 
 namespace NsxLibraryManager.Services;
 
@@ -90,6 +92,21 @@ public class DataService : IDataService
     public async Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync()
     {
         return await Task.Run(() => _titleLibraryRepository.All());
+    }
+
+    public async Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync()
+    {
+        return await Task.Run(() => _titleLibraryRepository.GetTitlesAsQueryable());
+    }
+    
+    public LibraryTitle? GetLibraryTitleById(string titleId)
+    {
+        return _titleLibraryRepository.FindOne(x => x.TitleId == titleId);
+    }
+
+    public async Task UpdateLibraryTitleAsync(LibraryTitle libraryTitle)
+    {
+        await Task.Run(() => _titleLibraryRepository.Update(libraryTitle));
     }
 
     public async Task AddLibraryTitleAsync(LibraryTitle libraryTitle)

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Linq.Dynamic.Core;
+using Microsoft.Extensions.Options;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
@@ -51,13 +52,12 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.IconUrl = regionTitle.IconUrl;
         libraryTitle.Screenshots = regionTitle.Screenshots;
 
-        var dlcVal = TitleLibraryType.DLC;
-        //var intDlc = BitConverter.ToInt32(dlcVal);   //Convert.ToUInt32(TitleLibraryType.DLC.ToString(), 16);
-        var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == 130 select cnmt.TitleId).ToList();
+        var dlcVal = (int) TitleLibraryType.DLC;
+        var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == dlcVal select cnmt.TitleId).ToList();
 
         if (dlc.Any())
         {
-            libraryTitle.Dlcs = dlc;
+            libraryTitle.AvailableDlcs = dlc;
         }
         return libraryTitle;
     }
@@ -84,6 +84,35 @@ public class TitleLibraryService : ITitleLibraryService
             _logger.LogError(e, $"Error processing file: {file}");
             return false;
         }
+    }
+
+    //
+    // Summary: This method should be called after the library has been refreshed
+    //          to add any owned DLCs to the library, it must be done after all the tiles are in the db
+    //          otherwise we would have to do a lot of lookups to see if the DLC is already in the library
+    public async Task AddOwnedDlcToTitlesAsync()
+    {
+        var libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
+        var gamesWithDlc = libraryTitles.Where(x => x.AvailableDlcs != null && x.AvailableDlcs.Any());
+
+
+        foreach (var dlcGame in gamesWithDlc)
+        {
+            if (dlcGame.AvailableDlcs == null) continue;
+            var ownedDlc = new List<string>();
+            foreach (var dlc in dlcGame.AvailableDlcs)
+            {
+                //var titleFound = libraryTitles.FirstOrDefault(x => x.TitleId == dlc);
+                var titleFound = _dataService.GetLibraryTitleById(dlc);
+                if (titleFound is null) continue;
+                ownedDlc.Add(dlc);
+            }
+
+            if (!ownedDlc.Any()) continue;
+            dlcGame.OwnedDlcs = ownedDlc;
+            await _dataService.UpdateLibraryTitleAsync(dlcGame);
+        }
+        
     }
 
     public string GetLibraryPath()

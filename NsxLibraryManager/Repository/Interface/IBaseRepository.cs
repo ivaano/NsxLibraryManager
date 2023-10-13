@@ -1,4 +1,6 @@
-﻿namespace NsxLibraryManager.Repository;
+﻿using System.Linq.Expressions;
+
+namespace NsxLibraryManager.Repository;
 
 public interface IBaseRepository<T>
 {
@@ -9,4 +11,5 @@ public interface IBaseRepository<T>
     bool Delete(int id);
     
     bool Drop(string collectionName);
+    T? FindOne(Expression<Func<T, bool>> predicate);
 }

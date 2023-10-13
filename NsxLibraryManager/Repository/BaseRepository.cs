@@ -1,4 +1,5 @@
-﻿using LiteDB;
+﻿using System.Linq.Expressions;
+using LiteDB;
 
 namespace NsxLibraryManager.Repository;
 
@@ -53,6 +54,11 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
     public virtual bool Drop(string collectionName)
     {
         return Db.DropCollection(collectionName);
+    }
+    
+    public virtual T? FindOne(Expression<Func<T, bool>> predicate)
+    {
+        return Collection.FindOne(predicate);
     }
 }
 
