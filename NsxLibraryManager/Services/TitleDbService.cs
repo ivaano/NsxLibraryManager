@@ -85,4 +85,24 @@ public class TitleDbService : ITitleDbService
         var algo = Convert.ToUInt32(latestVersion?.Version);
         return Task.FromResult(algo);
     }
+
+    // Search in all regions for the title
+    public async Task<RegionTitle?> GetTitle(string titleTitleId)
+    {
+        var regions = _configuration.DownloadSettings.Regions;
+        foreach (var region in regions)
+        {
+            var regionTitle = await _dataService.GetTitleDbRegionTitleByIdAsync(region, titleTitleId);
+            if (regionTitle != null)
+            {
+                return regionTitle;
+            }
+        }
+        return null;
+    }
+
+    public Task<IEnumerable<PackagedContentMeta>> GetTitleCnmts(string titleTitleId)
+    {
+        return _dataService.GetTitleDbCnmtsForTitleAsync(titleTitleId);
+    }
 }

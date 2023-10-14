@@ -4,9 +4,11 @@ using LiteDB;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
 using NsxLibraryManager.Settings;
+using Radzen;
 
 namespace NsxLibraryManager.Services;
 
@@ -17,9 +19,9 @@ public class DataService : IDataService
     private bool _disposed;
     private ITitleRepository? _titleRepository;
     private Dictionary<string, IRegionRepository>? _regionRepository;
-    private ITitleLibraryRepository? _titleLibraryRepository;
-    private ITitleDbCnmtsRepository? _titleDbCnmtsRepository;
-    private ITitleDbVersionsRepository? _titleDbVersionsRepository;
+    private ITitleLibraryRepository _titleLibraryRepository;
+    private ITitleDbCnmtsRepository _titleDbCnmtsRepository;
+    private ITitleDbVersionsRepository _titleDbVersionsRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<DataService> _logger;
     
@@ -34,6 +36,9 @@ public class DataService : IDataService
         _mapper = mapper;
         var titleDbLocation = configuration.Value.TitleDatabase ?? throw new InvalidOperationException();
         _connStr = Path.Combine(titleDbLocation);
+        _titleDbCnmtsRepository = new TitleDbCnmtsRepository(Db);
+        _titleDbVersionsRepository = new TitleDbVersionsRepository(Db);
+        _titleLibraryRepository = new TitleLibraryRepository(Db);
     }
     
     public IRegionRepository RegionRepository(string region)
@@ -66,22 +71,47 @@ public class DataService : IDataService
         return _titleDbVersionsRepository ??= new TitleDbVersionsRepository(Db);
     }
 
-    public async Task<IEnumerable<RegionTitle>> GetRegionTitlesAsync(string region)
+    public async Task<IEnumerable<RegionTitle>> GetTitleDbRegionTitlesAsync(string region)
     {
         var regionTitleRepository = RegionRepository(region);
         return await Task.Run(() => regionTitleRepository.All());
     }
-    
+
+    public async Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId)
+    {
+        var regionTitleRepository = RegionRepository(region);
+        var regionTitle = regionTitleRepository.FindOne(x => x.TitleId == titleId) ?? regionTitleRepository.FindTitleByIds(titleId);
+        return await Task.Run(() => regionTitle);
+    }
+
+    public async Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId)
+    {
+        return await Task.Run(() => _titleDbCnmtsRepository.FindByOtherApplicationIdId(titleId));
+    }
+
     public async Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync()
     {
-        var libraryRepository = TitleLibraryRepository();
-        return await Task.Run(() => libraryRepository.All());
+        return await Task.Run(() => _titleLibraryRepository.All());
+    }
+
+    public async Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync()
+    {
+        return await Task.Run(() => _titleLibraryRepository.GetTitlesAsQueryable());
+    }
+    
+    public LibraryTitle? GetLibraryTitleById(string titleId)
+    {
+        return _titleLibraryRepository.FindOne(x => x.TitleId == titleId);
+    }
+
+    public async Task UpdateLibraryTitleAsync(LibraryTitle libraryTitle)
+    {
+        await Task.Run(() => _titleLibraryRepository.Update(libraryTitle));
     }
 
     public async Task AddLibraryTitleAsync(LibraryTitle libraryTitle)
     {
-        var titleLibraryRepository = TitleLibraryRepository();
-        await Task.Run(() => titleLibraryRepository.Create(libraryTitle));
+        await Task.Run(() => _titleLibraryRepository.Create(libraryTitle));
     }
 
     public bool DropDbCollection(string collectionName)
@@ -98,20 +128,17 @@ public class DataService : IDataService
 
     public List<GameVersions> GetTitleDbVersions(string titleTitleId)
     {
-        var versionsRepository = TitleDbVersionsRepositoryRepository();
-        return versionsRepository.FindByTitleId(titleTitleId).ToList();
+        return _titleDbVersionsRepository.FindByTitleId(titleTitleId).ToList();
     }
 
     public int ImportTitleDbVersions(List<GameVersions> gameVersions)
     {
-        var versionsRepository = TitleDbVersionsRepositoryRepository();
-        return versionsRepository.InsertBulk(gameVersions);
+        return _titleDbVersionsRepository.InsertBulk(gameVersions);
     }
     
     public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta)
     {
-        var cnmtsRepository = TitleDbCnmtsRepository();
-        return cnmtsRepository.InsertBulk(packagedContentMeta);
+        return _titleDbCnmtsRepository.InsertBulk(packagedContentMeta);
     }
     
     public int ImportTitleDbRegionTitles(JObject titles, string region)

@@ -43,11 +43,12 @@ public sealed class RegionRepository : BaseRepository<RegionTitle>, IRegionRepos
         return Collection.Find(o => o.Ids != null && o.Ids.Contains(id)).FirstOrDefault();
     }
 
+   /*
     public RegionTitle? FindOne(Expression<Func<RegionTitle, bool>> predicate)
     {
         return Collection.FindOne(predicate);
     }
-
+*/
     public IEnumerable<RegionTitle> Find(Expression<Func<RegionTitle, bool>> predicate)
     {
         return Collection.Find(predicate);

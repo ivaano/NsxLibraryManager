@@ -2,6 +2,7 @@
 
 public class DownloadSettings
 {
+    public required int TimeoutInSeconds { get; set; }
     public required string TitleDbPath { get; set; }
     public required string RegionUrl { get; set; }
     public required string CnmtsUrl { get; set; }
