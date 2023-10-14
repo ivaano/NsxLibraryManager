@@ -3,6 +3,7 @@ using Microsoft.OData.ModelBuilder;
 using NsxLibraryManager.FileLoading;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.KeysManagement;
 using NsxLibraryManager.Settings;

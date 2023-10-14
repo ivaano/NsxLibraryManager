@@ -1,7 +1,7 @@
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 
-namespace NsxLibraryManager.Models;
+namespace NsxLibraryManager.Models.Dto;
 
 public record Game
 {

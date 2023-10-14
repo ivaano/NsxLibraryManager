@@ -1,5 +1,6 @@
 using LiteDB;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Settings;
 
 namespace NsxLibraryManager.Repository;

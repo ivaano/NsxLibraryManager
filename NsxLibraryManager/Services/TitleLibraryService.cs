@@ -42,15 +42,21 @@ public class TitleLibraryService : ITitleLibraryService
         // prefer the title name from the file
         libraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(regionTitle.Name);
         libraryTitle.Publisher = libraryTitle.Publisher.ConvertNullOrEmptyTo(regionTitle.Publisher);
-
+        
+        libraryTitle.BannerUrl = regionTitle.BannerUrl;
+        libraryTitle.Nsuid = regionTitle.Id;
+        libraryTitle.NumberOfPlayers = regionTitle.NumberOfPlayers;
+        libraryTitle.ReleaseDate = regionTitle.ReleaseDateOnly ?? DateTime.MinValue;
         libraryTitle.Category = regionTitle.Category;
         libraryTitle.Developer = regionTitle.Developer;
         libraryTitle.Description = libraryTitle.Description;
         libraryTitle.FrontBoxArt = regionTitle.FrontBoxArt;
         libraryTitle.Intro = regionTitle.Intro;
-        libraryTitle.BannerUrl = regionTitle.BannerUrl;
         libraryTitle.IconUrl = regionTitle.IconUrl;
+        libraryTitle.Rating = regionTitle.Rating;
+        libraryTitle.RatingContent = regionTitle.RatingContent;
         libraryTitle.Screenshots = regionTitle.Screenshots;
+        libraryTitle.Size = regionTitle.Size;
 
         var dlcVal = (int) TitleLibraryType.DLC;
         var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == dlcVal select cnmt.TitleId).ToList();

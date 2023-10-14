@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using Radzen;
 
 namespace NsxLibraryManager.Shared;
+#nullable disable
 
 public partial class MainLayout
 {
