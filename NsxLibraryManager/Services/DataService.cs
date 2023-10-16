@@ -154,10 +154,7 @@ public class DataService : IDataService
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
             regionTitle.Region = region;
             regionTitle.CreatedTime = currentDateTime;
-            if (DateTime.TryParseExact(regionTitle.ReleaseDate.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None,  out var parsedDate))
-            {
-                regionTitle.ReleaseDateOnly = parsedDate;
-            }
+
             entities.Add(regionTitle);
             _logger.LogDebug("{Message}", regionTitle.Name);
         }

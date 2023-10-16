@@ -26,7 +26,8 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
         <RadzenDataGrid @ref="Grid" Data="@LibraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                        AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px"  AllowColumnPicking="true">
+                        AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px"  AllowColumnPicking="true" 
+                        PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
             <HeaderTemplate>
                 <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
             </HeaderTemplate>
@@ -37,9 +38,17 @@
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type" Width="80px"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type" Width="130px"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="Filename"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="ReleaseDate" Title="Release Date"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="Size" Title="Size"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
                 <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Version"/>
-                <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs" Title="Available DLC"/>
+                <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs" Title="Available DLC" Filterable="false">
+                    <Template Context="detail">
+                        @if (detail.AvailableDlcs != null)
+                        {
+                            <RadzenText Text="@detail.AvailableDlcs.Count.ToString()"/>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
             </Columns>
         </RadzenDataGrid>
     </RadzenStack>

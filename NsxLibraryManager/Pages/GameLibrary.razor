@@ -1,9 +1,6 @@
 ﻿@page "/library"
 @using NsxLibraryManager.Models
 
-<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat"
-             HorizontalAlign="HorizontalAlign.Right" Count="count"
-             PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>
 
 <RadzenDataList IsLoading="@isLoading" LoadData="@LoadData"
                 Data="@games" TItem="LibraryTitle" AllowPaging="false" Style="padding: 0">
@@ -83,6 +80,7 @@
                     </RadzenRow>
                 </RadzenColumn>
             </RadzenRow>
+            
             <RadzenRow Gap="0.3rem" Visible="@ShowDlcInfo" UniqueId="@game.TitleId">
                 <RadzenColumn >
                     <RadzenText>Available DLC</RadzenText>
@@ -98,12 +96,15 @@
                         @(string.Join(", ", game.OwnedDlcs))
                     }
                 </RadzenColumn>
-
             </RadzenRow >
             <RadzenRow Gap="0.3rem" Visible="false">
                 Patch INfo
             </RadzenRow>
+
         </RadzenCard>
 
     </Template>
 </RadzenDataList>
+<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat"
+             HorizontalAlign="HorizontalAlign.Right" Count="count"
+             PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>

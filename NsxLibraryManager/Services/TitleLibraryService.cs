@@ -1,4 +1,5 @@
-﻿using System.Linq.Dynamic.Core;
+﻿using System.Globalization;
+using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Extensions;
@@ -46,7 +47,12 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.BannerUrl = regionTitle.BannerUrl;
         libraryTitle.Nsuid = regionTitle.Id;
         libraryTitle.NumberOfPlayers = regionTitle.NumberOfPlayers;
-        libraryTitle.ReleaseDate = regionTitle.ReleaseDateOnly ?? DateTime.MinValue;
+        libraryTitle.ReleaseDate = DateTime.MinValue;
+        if (DateTime.TryParseExact(regionTitle.ReleaseDate.ToString(), "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None,  out var parsedDate))
+        {
+            libraryTitle.ReleaseDate = parsedDate;
+        }
+        
         libraryTitle.Category = regionTitle.Category;
         libraryTitle.Developer = regionTitle.Developer;
         libraryTitle.Description = libraryTitle.Description;

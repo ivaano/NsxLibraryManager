@@ -18,6 +18,7 @@ public partial class Index
    
     [Inject]
     protected DialogService DialogService { get; set; }
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
     
     public IEnumerable<LibraryTitle> LibraryTitles;
     public RadzenDataGrid<LibraryTitle> Grid;

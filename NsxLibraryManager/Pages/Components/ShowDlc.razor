@@ -1,0 +1,15 @@
+﻿<RadzenRow Gap="0.3rem" Visible="@Visible">
+    <RadzenColumn >
+        <RadzenText>Available DLC</RadzenText>
+        DLC info here
+    </RadzenColumn>
+</RadzenRow>
+@code {
+    public bool Visible { get; set; } = true;
+
+    public void setVisible()
+    {
+        Visible = !Visible;
+    }
+
+}
