@@ -12,7 +12,11 @@
             <Columns>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id"  Width="150px"/>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Type" Title="Type" Width="80px"/>
-                <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name"  Width="300px"/>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" Width="300px">
+                    <Template Context="regionTitle">
+                        <RadzenLink Path="@($"/title/{regionTitle.TitleId}")" Text="@regionTitle.Name" />
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Publisher" Title="Publisher"  Width="180px"/>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
             </Columns>
