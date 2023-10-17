@@ -18,7 +18,7 @@ public class TitleDbCnmtsRepository : BaseRepository<PackagedContentMeta>, ITitl
         return resultCount;
     }
     
-    public IEnumerable<PackagedContentMeta> FindByOtherApplicationIdId(string titleId)
+    public IEnumerable<PackagedContentMeta> FindByOtherApplicationId(string titleId)
     {
         return Collection.Find(x => x.OtherApplicationId == titleId);
     }

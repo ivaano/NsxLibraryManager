@@ -27,6 +27,12 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
         await InvokeAsync(
                 async () =>
                 {
+                    DownloadingInfo = "cnmts";
+                    StateHasChanged();
+                    await TitleDbService.ImportCnmtsAsync();
+                    DownloadingInfo = "versions";
+                    StateHasChanged();
+                    await TitleDbService.ImportVersionsAsync();
                     var regions = TitleDbService.GetRegionsToImport();
                     foreach (var region in regions)
                     {
@@ -34,12 +40,6 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
                         StateHasChanged();
                         await TitleDbService.ImportRegionAsync(region);
                     }
-                    DownloadingInfo = "cnmts";
-                    StateHasChanged();
-                    await TitleDbService.ImportCnmtsAsync();
-                    DownloadingInfo = "versions";
-                    StateHasChanged();
-                    await TitleDbService.ImportVersionsAsync();
                 });
         DialogService.Close();
     }

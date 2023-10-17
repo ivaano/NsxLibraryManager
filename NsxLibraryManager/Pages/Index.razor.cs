@@ -18,6 +18,7 @@ public partial class Index
    
     [Inject]
     protected DialogService DialogService { get; set; }
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
     
     public IEnumerable<LibraryTitle> LibraryTitles;
     public RadzenDataGrid<LibraryTitle> Grid;
@@ -43,11 +44,20 @@ public partial class Index
     
     private void CalculateCounts()
     {
-        var libTitleList = LibraryTitles.ToList();
+        try
+        {
+            var libTitleList = LibraryTitles.ToList();
         
-        AppCount = libTitleList.Count(x => x.Type == TitleLibraryType.Base);
-        PatchCount = libTitleList.Count(x => x.Type == TitleLibraryType.Update);
-        DlcCount = libTitleList.Count(x => x.Type == TitleLibraryType.DLC);
+            AppCount = libTitleList.Count(x => x.Type == TitleLibraryType.Base);
+            PatchCount = libTitleList.Count(x => x.Type == TitleLibraryType.Update);
+            DlcCount = libTitleList.Count(x => x.Type == TitleLibraryType.DLC);
+        } catch (Exception e)
+        {
+            AppCount = 0;
+            PatchCount = 0;
+            DlcCount = 0;
+        }
+
     }
 
     private async Task RefreshLibrary()
@@ -63,5 +73,10 @@ public partial class Index
             await Grid.Reload();
             CalculateCounts();
         }
+    }
+
+    private void TabOnChange(int index)
+    {
+         
     }
 }
