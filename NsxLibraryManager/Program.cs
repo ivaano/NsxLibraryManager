@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 using NsxLibraryManager.FileLoading;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Mapping;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services;
@@ -17,7 +18,7 @@ builder.Services
     .BindConfiguration("NsxLibraryManager")
     .ValidateDataAnnotations()
     .ValidateOnStart();
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();

@@ -86,7 +86,7 @@ public class DataService : IDataService
 
     public async Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId)
     {
-        return await Task.Run(() => _titleDbCnmtsRepository.FindByOtherApplicationIdId(titleId));
+        return await Task.Run(() => _titleDbCnmtsRepository.FindByOtherApplicationId(titleId));
     }
 
     public async Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync()
@@ -154,6 +154,17 @@ public class DataService : IDataService
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
             regionTitle.Region = region;
             regionTitle.CreatedTime = currentDateTime;
+            var cnmt = _titleDbCnmtsRepository.FindOne(x => x.TitleId == regionTitle.TitleId);
+            if (cnmt != null)
+            {
+                regionTitle.Type = cnmt.TitleType switch
+                {
+                        128 => TitleLibraryType.Base,
+                        129 => TitleLibraryType.Update,
+                        130 => TitleLibraryType.DLC,
+                        _ => TitleLibraryType.Unknown
+                };
+            }
 
             entities.Add(regionTitle);
             _logger.LogDebug("{Message}", regionTitle.Name);

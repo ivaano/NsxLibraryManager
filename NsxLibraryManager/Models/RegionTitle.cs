@@ -1,4 +1,6 @@
-﻿namespace NsxLibraryManager.Models;
+﻿using NsxLibraryManager.Enums;
+
+namespace NsxLibraryManager.Models;
 
 public class RegionTitle
 {
@@ -14,6 +16,7 @@ public class RegionTitle
     public string? Intro { get; set; }
     public bool IsDemo { get; set; }
     public string? Key { get; set; }
+    public TitleLibraryType Type { get; set; }
     public List<string>? Languages { get; set; }
     public string? Name { get; set; }
     public int? NumberOfPlayers { get; set; }
@@ -21,7 +24,7 @@ public class RegionTitle
     public int? Rating { get; set; }
     public List<string>? RatingContent { get; set; }
     public string? Region { get; set; }
-    public int? ReleaseDate { get; set; }
+    public DateTime ReleaseDate { get; set; }
     public string? RightsId { get; set; }
     public List<string>? Screenshots { get; set; }
     public long? Size { get; set; }
