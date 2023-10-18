@@ -51,7 +51,7 @@ public class TitleLibraryService : ITitleLibraryService
         
         libraryTitle.Category = regionTitle.Category;
         libraryTitle.Developer = regionTitle.Developer;
-        libraryTitle.Description = libraryTitle.Description;
+        libraryTitle.Description = regionTitle.Description;
         libraryTitle.FrontBoxArt = regionTitle.FrontBoxArt;
         libraryTitle.Intro = regionTitle.Intro;
         libraryTitle.IconUrl = regionTitle.IconUrl;
@@ -59,6 +59,9 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.RatingContent = regionTitle.RatingContent;
         libraryTitle.Screenshots = regionTitle.Screenshots;
         libraryTitle.Size = regionTitle.Size;
+        libraryTitle.Languages = regionTitle.Languages;
+        libraryTitle.Screenshots = regionTitle.Screenshots;
+        libraryTitle.RatingContent = regionTitle.RatingContent;
 
         var dlcVal = (int) TitleLibraryType.DLC;
         var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == dlcVal select cnmt.TitleId).ToList();
@@ -73,6 +76,12 @@ public class TitleLibraryService : ITitleLibraryService
     public bool DropLibrary()
     {
         return _dataService.DropDbCollection(AppConstants.LibraryCollectionName);
+    }
+
+    public LibraryTitle GetTitle(string titleId)
+    {
+        var libraryTitle = _dataService.GetLibraryTitleById(titleId);
+        return libraryTitle;
     }
 
     public async Task<bool> ProcessFileAsync(string file)

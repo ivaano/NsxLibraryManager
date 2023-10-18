@@ -36,7 +36,11 @@
                         </HeaderTemplate>
                         <Columns>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" Width="150px"/>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" Width="300px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" Width="300px">
+                                <Template Context="libraryTitle">
+                                    <RadzenLink Path="@($"/title/{libraryTitle.TitleId}")" Text="@libraryTitle.TitleName"/>
+                                </Template>
+                            </RadzenDataGridColumn>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type" Width="80px"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type" Width="130px"/>
@@ -58,8 +62,8 @@
             </RadzenStack>
         </RadzenTabsItem>
 
-    <RadzenTabsItem Text="DLC">
-        <RadzenText>Hola</RadzenText>
-    </RadzenTabsItem>
-        </Tabs>
+        <RadzenTabsItem Text="DLC">
+            <RadzenText>Hola</RadzenText>
+        </RadzenTabsItem>
+    </Tabs>
 </RadzenTabs>

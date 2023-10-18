@@ -36,7 +36,7 @@ public record LibraryTitle
     public int? Rating { get; set; }
     public List<string>? RatingContent { get; set; }
     public long? Size { get; set; }
-
+    public List<string>? Languages { get; set; }
 
     public string? NewFileName { get; set; }
     public bool Error { get; set; } = false;

@@ -1,7 +1,94 @@
 ﻿@page "/Title/{titleId}"
-<h3>Title @TitleId</h3>
 
-@code {
-    [Parameter]
-    public string? TitleId { get; set; }
-}
+<PageTitle>Title</PageTitle>
+<RadzenRow>
+    <RadzenColumn Size="5">
+        <RadzenImage Path="@(LibraryTitle.BannerUrl)" Style="width: 100%; border-radius: 20px;"></RadzenImage>
+    </RadzenColumn>
+    <RadzenColumn Size="7">
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText Text="@(LibraryTitle.TitleName)" TextStyle="TextStyle.H5"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>Release Date:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(LibraryTitle.ReleaseDate.ToString("MMM dd, yyyy"))" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>Number of Players:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(LibraryTitle.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>Genre:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(string.Join(", ", LibraryTitle.Category))" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>Publisher:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(LibraryTitle.Publisher)" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>ESRB Rating:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(string.Join(", ", LibraryTitle.RatingContent))" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>Game File Size:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(LibraryTitle.Size.ToString())" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    <strong>Languages:</strong>
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn>
+                <RadzenText Text="@(string.Join(", ", LibraryTitle.Languages))" TextStyle="TextStyle.Body1"/>
+            </RadzenColumn>
+        </RadzenRow>        
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow Style="padding-top: 10px">
+    <RadzenColumn Size="12">
+        <RadzenText Text="@(LibraryTitle.Intro)" TextStyle="TextStyle.H6"/>
+        <RadzenText Text="@(LibraryTitle.Description)" TextStyle="TextStyle.Body1"/>
+
+
+    </RadzenColumn>
+
+</RadzenRow>
