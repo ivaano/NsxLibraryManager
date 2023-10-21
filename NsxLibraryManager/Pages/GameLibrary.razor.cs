@@ -37,8 +37,8 @@ public partial class GameLibrary
         };
         await LoadData(loadDataArgs);
     }
-    
-    async Task LoadData(LoadDataArgs args)
+
+    private async Task LoadData(LoadDataArgs args)
     {
         isLoading = true;
 

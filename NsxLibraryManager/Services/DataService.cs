@@ -126,9 +126,9 @@ public class DataService : IDataService
         return firstTitle?.CreatedTime;
     }
 
-    public List<GameVersions> GetTitleDbVersions(string titleTitleId)
+    public IEnumerable<GameVersions> GetTitleDbVersions(string titleTitleId)
     {
-        return _titleDbVersionsRepository.FindByTitleId(titleTitleId).ToList();
+        return _titleDbVersionsRepository.FindByTitleId(titleTitleId);
     }
 
     public int ImportTitleDbVersions(List<GameVersions> gameVersions)

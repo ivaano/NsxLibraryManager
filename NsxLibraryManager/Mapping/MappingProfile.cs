@@ -15,6 +15,14 @@ public class MappingProfile : Profile
                 .ForMember(dest => dest.TitleId,
                         opt => opt.MapFrom(src => src.id))
                 .ForMember(dest => dest.ReleaseDate, opt => opt.ConvertUsing(new DateTimeConverter()));
+
+        CreateMap<RegionTitle, LibraryTitle>()
+                .ForMember(dest => dest.Id,
+                        opt => opt.Ignore())
+                .ForMember(dest => dest.TitleName,
+                        opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Nsuid,
+                        opt => opt.MapFrom(src => src.Id));
     }
 }
 

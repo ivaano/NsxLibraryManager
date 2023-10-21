@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Settings;
 
 namespace NsxLibraryManager.Services;
@@ -78,6 +80,11 @@ public class TitleDbService : ITitleDbService
         return _configuration.DownloadSettings.Regions;
     }
 
+    public IEnumerable<GameVersions> GetVersions(string titleTitleId)
+    {
+        return  _dataService.GetTitleDbVersions(titleTitleId);
+    }
+
     public Task<uint> GetAvailableVersion(string titleTitleId)
     {
         var versions = _dataService.GetTitleDbVersions(titleTitleId);
@@ -99,6 +106,57 @@ public class TitleDbService : ITitleDbService
             }
         }
         return null;
+    }
+    
+    public async Task<IEnumerable<Dlc>> GetTitleDlc(string titleTitleId)
+    {
+        
+        var packagedContentMetas = await GetTitleCnmts(titleTitleId);
+        var dlcVal = (int) TitleLibraryType.DLC;
+        var cnmts = packagedContentMetas
+                .OrderByDescending(p => p.Version)
+                .Where(p => p.TitleType == dlcVal);
+
+        var dlcList = new List<Dlc>();        
+        foreach (var cnmt in cnmts)
+        {
+            var regionTitle = await GetTitle(cnmt.TitleId);
+            if (regionTitle != null)
+            {
+                var updateDlc = false;
+                var alreadyInList = false;
+                foreach (var exists in dlcList)
+                {
+                    if (exists.TitleId == cnmt.TitleId)
+                    {
+                        alreadyInList = true;
+                        var existsVersion = Convert.ToUInt32(exists.TitleVersion);
+                        var currentVersion = Convert.ToUInt32(cnmt.Version);
+                        
+                        if (currentVersion > existsVersion)
+                        {
+                            exists.TitleVersion = cnmt.Version;
+                            updateDlc = true;
+                        }
+                    }
+                }
+
+                if (!alreadyInList)
+                {
+                    var dlc = new Dlc
+                    {
+                            TitleId = regionTitle.TitleId,
+                            TitleVersion = cnmt.Version,
+                            TitleName = regionTitle.Name
+                    };
+                    if (!updateDlc)
+                    {
+                        dlcList.Add(dlc);    
+                    }      
+                }
+            }
+        }
+        return dlcList;
     }
 
     public Task<IEnumerable<PackagedContentMeta>> GetTitleCnmts(string titleTitleId)

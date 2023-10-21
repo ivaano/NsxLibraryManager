@@ -5,7 +5,7 @@
         <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
-        <RadzenDataGrid Data="@regionTitles" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+        <RadzenDataGrid @bind-Settings="@Settings" FilterPopupRenderMode="PopupRenderMode.OnDemand" Data="@regionTitles" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                         ShowPagingSummary="true" style="height: 95vh">
@@ -14,7 +14,7 @@
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Type" Title="Type" Width="80px"/>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" Width="300px">
                     <Template Context="regionTitle">
-                        <RadzenLink Path="@($"/title/{regionTitle.TitleId}")" Text="@regionTitle.Name" />
+                        <RadzenLink Path="@($"/TitleDbTitle/{regionTitle.TitleId}")" Text="@regionTitle.Name" />
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Publisher" Title="Publisher"  Width="180px"/>

@@ -1,4 +1,5 @@
 ﻿
+using AutoMapper;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Extensions;
@@ -13,6 +14,7 @@ public class TitleLibraryService : ITitleLibraryService
     private readonly IFileInfoService _fileInfoService;
     private readonly ITitleDbService _titleDbService;
     private readonly AppSettings _configuration;
+    private readonly IMapper _mapper;
     private readonly ILogger<TitleLibraryService> _logger;
 
     
@@ -21,6 +23,7 @@ public class TitleLibraryService : ITitleLibraryService
             IFileInfoService fileInfoService, 
             ITitleDbService titleDbService,
             IOptions<AppSettings> configuration,
+            IMapper mapper,
             ILogger<TitleLibraryService> logger)
     {
         _dataService = dataService;
@@ -28,6 +31,7 @@ public class TitleLibraryService : ITitleLibraryService
         _configuration = configuration.Value;
         _logger = logger;
         _titleDbService = titleDbService;
+        _mapper = mapper;
     }
 
 
@@ -78,10 +82,23 @@ public class TitleLibraryService : ITitleLibraryService
         return _dataService.DropDbCollection(AppConstants.LibraryCollectionName);
     }
 
-    public LibraryTitle GetTitle(string titleId)
+    public LibraryTitle? GetTitle(string titleId)
     {
         var libraryTitle = _dataService.GetLibraryTitleById(titleId);
         return libraryTitle;
+    }
+
+    public async Task<LibraryTitle?> GetTitleFromTitleDb(string titleId)
+    {
+        var regionTitle = await _titleDbService.GetTitle(titleId);
+        if (regionTitle is not null)
+        {
+            var libraryTitle = _mapper.Map<LibraryTitle>(regionTitle);
+            libraryTitle.FileName = string.Empty;
+            return libraryTitle;
+        }
+
+        return null;
     }
 
     public async Task<bool> ProcessFileAsync(string file)
