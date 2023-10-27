@@ -5,6 +5,7 @@ namespace NsxLibraryManager.Repository;
 
 public interface IRegionRepository: IBaseRepository<RegionTitle>
 {
+    public IQueryable<RegionTitle> GetTitlesAsQueryable();
     public RegionTitle? FindTitleByIds(string id);
     public RegionTitle? GetTitleById(string id);
     public RegionTitle? FindOne(Expression<Func<RegionTitle, bool>> predicate);

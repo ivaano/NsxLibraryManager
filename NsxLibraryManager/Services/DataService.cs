@@ -2,13 +2,13 @@
 using AutoMapper;
 using LiteDB;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
 using NsxLibraryManager.Settings;
-using Radzen;
 
 namespace NsxLibraryManager.Services;
 
@@ -29,8 +29,9 @@ public class DataService : IDataService
     {
         get { return _db ??= new LiteDatabase(_connStr); }
     }
+    public IMemoryCache MemoryCache { get; }
 
-    public DataService(IOptions<AppSettings> configuration, IMapper mapper, ILogger<DataService> logger)
+    public DataService(IOptions<AppSettings> configuration, IMapper mapper, ILogger<DataService> logger, IMemoryCache memoryCache)
     {
         _logger = logger;
         _mapper = mapper;
@@ -39,6 +40,7 @@ public class DataService : IDataService
         _titleDbCnmtsRepository = new TitleDbCnmtsRepository(Db);
         _titleDbVersionsRepository = new TitleDbVersionsRepository(Db);
         _titleLibraryRepository = new TitleLibraryRepository(Db);
+        MemoryCache = memoryCache;
     }
     
     public IRegionRepository RegionRepository(string region)
@@ -56,25 +58,21 @@ public class DataService : IDataService
         return _regionRepository[region];
     }
     
-    public ITitleLibraryRepository TitleLibraryRepository()
+    public Task<IEnumerable<RegionTitle>?> GetTitleDbRegionTitlesAsync(string region)
     {
-        return _titleLibraryRepository ??= new TitleLibraryRepository(Db);
-    }
+        return MemoryCache.GetOrCreateAsync(region, async e =>
+        {
+            e.SetOptions(new MemoryCacheEntryOptions
+            {
+                    AbsoluteExpirationRelativeToNow =
+                            TimeSpan.FromSeconds(30)
+            });
 
-    public ITitleDbCnmtsRepository TitleDbCnmtsRepository()
-    {
-        return _titleDbCnmtsRepository ??= new TitleDbCnmtsRepository(Db);
-    }
-    
-    public ITitleDbVersionsRepository TitleDbVersionsRepositoryRepository()
-    {
-        return _titleDbVersionsRepository ??= new TitleDbVersionsRepository(Db);
-    }
-
-    public async Task<IEnumerable<RegionTitle>> GetTitleDbRegionTitlesAsync(string region)
-    {
-        var regionTitleRepository = RegionRepository(region);
-        return await Task.Run(() => regionTitleRepository.All());
+            var regionTitleRepository = RegionRepository(region);
+            return await Task.Run(() => regionTitleRepository.All());
+        });
+//        var regionTitleRepository = RegionRepository(region);
+//        return await Task.Run(() => regionTitleRepository.All());
     }
 
     public async Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId)
@@ -97,6 +95,12 @@ public class DataService : IDataService
     public async Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync()
     {
         return await Task.Run(() => _titleLibraryRepository.GetTitlesAsQueryable());
+    }
+    
+    public async Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region)
+    {
+        var regionTitleRepository = RegionRepository(region);
+        return await Task.Run(() => regionTitleRepository.GetTitlesAsQueryable());
     }
     
     public LibraryTitle? GetLibraryTitleById(string titleId)

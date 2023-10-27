@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
-using Radzen;
 
 namespace NsxLibraryManager.Services;
 
@@ -14,11 +13,12 @@ public interface IDataService : IDisposable
     public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta);
     public int ImportTitleDbVersions(List<GameVersions> gameVersions);
     public IEnumerable<GameVersions> GetTitleDbVersions(string titleTitleId);
-    public Task<IEnumerable<RegionTitle>> GetTitleDbRegionTitlesAsync(string region);
+    public Task<IEnumerable<RegionTitle>?> GetTitleDbRegionTitlesAsync(string region);
     public Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId);
     public Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync();
+    public Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region);
     public LibraryTitle? GetLibraryTitleById(string titleId);
     public Task UpdateLibraryTitleAsync(LibraryTitle libraryTitle);
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);

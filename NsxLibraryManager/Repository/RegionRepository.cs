@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using LiteDB;
+using LiteDB.Queryable;
 using NsxLibraryManager.Models;
 
 
@@ -42,13 +43,12 @@ public sealed class RegionRepository : BaseRepository<RegionTitle>, IRegionRepos
     {
         return Collection.Find(o => o.Ids != null && o.Ids.Contains(id)).FirstOrDefault();
     }
-
-   /*
-    public RegionTitle? FindOne(Expression<Func<RegionTitle, bool>> predicate)
+    
+    public IQueryable<RegionTitle> GetTitlesAsQueryable()
     {
-        return Collection.FindOne(predicate);
+        return Collection.AsQueryable();
     }
-*/
+
     public IEnumerable<RegionTitle> Find(Expression<Func<RegionTitle, bool>> predicate)
     {
         return Collection.Find(predicate);

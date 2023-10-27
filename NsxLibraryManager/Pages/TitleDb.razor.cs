@@ -18,9 +18,12 @@ public partial class TitleDb
   
     [Inject]
     protected DialogService DialogService { get; set; } = default!;
-    
+
+
     private IEnumerable<RegionTitle> regionTitles;
     private DataGridSettings _settings;
+    private static readonly string _settingsParamaterName = "TitleDbGridSettings";
+    private int count = 0;
     public DataGridSettings Settings 
     { 
         get
@@ -37,10 +40,14 @@ public partial class TitleDb
         }
     }
     
+    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        //regionTitles = await DataService.GetTitleDbRegionTitlesQueryableAsync("US");
         regionTitles = await DataService.GetTitleDbRegionTitlesAsync("US");
+        count = regionTitles.Count();
+
     }
     
 
@@ -58,7 +65,7 @@ public partial class TitleDb
     {
         await Task.CompletedTask;
 
-        var result = await JsRuntime.InvokeAsync<string>("window.localStorage.getItem", "Settings");
+        var result = await JsRuntime.InvokeAsync<string>("window.localStorage.getItem", _settingsParamaterName);
         if (!string.IsNullOrEmpty(result))
         {
             _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
@@ -69,7 +76,7 @@ public partial class TitleDb
     {
         await Task.CompletedTask;
 
-        await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", "Settings", JsonSerializer.Serialize(Settings));
+        await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", _settingsParamaterName, JsonSerializer.Serialize(Settings));
     }
 
     private async Task RefreshTitleDb()
