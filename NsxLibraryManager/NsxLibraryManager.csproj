@@ -22,7 +22,7 @@
       <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.3" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="Radzen.Blazor" Version="4.19.0" />
+      <PackageReference Include="Radzen.Blazor" Version="4.19.1" />
     </ItemGroup>
 
     <ItemGroup>

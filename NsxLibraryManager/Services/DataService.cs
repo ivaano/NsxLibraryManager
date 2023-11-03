@@ -8,7 +8,9 @@ using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Repository;
+using NsxLibraryManager.Repository.Interface;
 using NsxLibraryManager.Settings;
+using Radzen;
 
 namespace NsxLibraryManager.Services;
 
@@ -22,6 +24,7 @@ public class DataService : IDataService
     private ITitleLibraryRepository _titleLibraryRepository;
     private ITitleDbCnmtsRepository _titleDbCnmtsRepository;
     private ITitleDbVersionsRepository _titleDbVersionsRepository;
+    private ISettingsRepository _settingsRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<DataService> _logger;
     
@@ -40,6 +43,7 @@ public class DataService : IDataService
         _titleDbCnmtsRepository = new TitleDbCnmtsRepository(Db);
         _titleDbVersionsRepository = new TitleDbVersionsRepository(Db);
         _titleLibraryRepository = new TitleLibraryRepository(Db);
+        _settingsRepository = new SettingsRepository(Db);
         MemoryCache = memoryCache;
     }
     
@@ -128,6 +132,16 @@ public class DataService : IDataService
         var regionTitleRepository = RegionRepository(region);
         var firstTitle = regionTitleRepository.FindOne(o => true);
         return firstTitle?.CreatedTime;
+    }
+
+    public async Task SaveDataGridStateAsync(string name, DataGridSettings settings)
+    {
+        await _settingsRepository.SaveDataGridStateAsync(name, settings);
+    }
+
+    public async Task<DataGridSettings?> LoadDataGridStateAsync(string name)
+    {
+        return await _settingsRepository.LoadDataGridStateAsync(name);
     }
 
     public IEnumerable<GameVersions> GetTitleDbVersions(string titleTitleId)
