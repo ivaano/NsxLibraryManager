@@ -1,9 +1,7 @@
 ﻿@page "/titledb"
 @using NsxLibraryManager.Models
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
-    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.End" Wrap="FlexWrap.NoWrap" Gap="1rem">
-        <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
-    </RadzenStack>
+
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
 
         <RadzenDataGrid @ref="grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@regionTitles" LoadData="@LoadData" 
@@ -11,7 +9,11 @@
                         Count="@count" IsLoading="@isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" 
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
-                        ShowPagingSummary="true" style="height: 95vh">
+                        ShowPagingSummary="true" style="height: 90vh">
+            <HeaderTemplate>
+                        <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
+
+            </HeaderTemplate>
                 <Columns>
                     <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" Width="150px"/>
                     <RadzenDataGridColumn TItem="RegionTitle" Property="Type" Title="Type" Width="80px"/>

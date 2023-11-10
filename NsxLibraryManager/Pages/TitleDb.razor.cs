@@ -25,14 +25,14 @@ public partial class TitleDb
     private IEnumerable<RegionTitle> regionTitles;
     private DataGridSettings _settings;
     private IEnumerable<int> pageSizeOptions = new[] { 25, 50, 100 };
-    private int pageSize = 25;
+    private int pageSize = 100;
     private static readonly string _settingsParamaterName = "TitleDbGridSettings";
     private int count = 0;
     private bool isLoading = false;
     private bool loaded = false;
     private const string titleDbSettings = "TitledbGridSettings";
 
-    public DataGridSettings Settings 
+    public DataGridSettings? Settings 
     { 
         get => _settings;
         set
@@ -44,7 +44,6 @@ public partial class TitleDb
             }
         }
     }
-
 
     private void LoadSettings(DataGridLoadSettingsEventArgs args)
     {
@@ -58,9 +57,9 @@ public partial class TitleDb
     {
         isLoading = true;
 
-        //await Task.Yield();
+        await Task.Yield();
         //var gridSettings = await DataService.LoadDataGridStateAsync(titleDbSettings);
-
+        await JsRuntime.InvokeAsync<string>("console.log", "LoadData");
         
         var query = await DataService.GetTitleDbRegionTitlesQueryableAsync("US");
         
@@ -69,33 +68,32 @@ public partial class TitleDb
         {
             query = query.Where(args.Filter);
         }
-/*
+
+        count = query.Count();
+
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
-            query = query.OrderBy(args.OrderBy);
+            regionTitles =
+                    await Task.FromResult(
+                            query.OrderBy(args.OrderBy).Skip(args.Skip.Value).Take(args.Top.Value).ToList());
         }
-*/
-        //query.Where(x => x.Type == TitleLibraryType.DLC);
-        // Simulate async data loading
-        //await Task.Delay(2000);
-        count = query.Count();
-/*
-        regionTitles = await Task.FromResult(query
-                .Where(x => x.Type == TitleLibraryType.Unknown)
-                .Skip(args.Skip.Value).Take(args.Top.Value).ToList());
-        */
-        regionTitles =  await Task.FromResult(query.OrderBy(x => x.Name).Skip(args.Skip.Value).Take(args.Top.Value).ToList());
-        
+        else
+        {
+            regionTitles =
+                    await Task.FromResult(
+                            query.OrderBy(x => x.Name).Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+        }
+
         isLoading = false;
 
         loaded = true;
-
     } 
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            await JsRuntime.InvokeAsync<string>("console.log", "OnAfterRenderAsync");
             await LoadStateAsync();
             StateHasChanged();
         }
