@@ -19,6 +19,6 @@ public class TitleDbVersionsRepository : BaseRepository<GameVersions>, ITitleDbV
     
     public IEnumerable<GameVersions> FindByTitleId(string titleId)
     {
-        return Collection.Find(x => x.TitleId == titleId).OrderBy(x => x.Version);
+        return Collection.Find(x => x.TitleId == titleId).OrderBy(x => x.VersionShifted);
     }
 }

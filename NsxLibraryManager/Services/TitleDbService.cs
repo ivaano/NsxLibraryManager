@@ -5,6 +5,7 @@ using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Settings;
+using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Services;
 
@@ -66,6 +67,7 @@ public class TitleDbService : ITitleDbService
                 {
                         TitleId = game.Key,
                         Version = versions.Key,
+                        VersionShifted = versions.Key.VersionShifted(),
                         Date = versions.Value
                 };
                 gameVersionsList.Add(gameVersion);

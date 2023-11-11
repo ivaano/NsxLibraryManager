@@ -4,28 +4,32 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
 
-        <RadzenDataGrid @ref="grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@regionTitles" LoadData="@LoadData" 
-                        PageSize="@pageSize" PageSizeOptions="@pageSizeOptions" PageSizeChanged="@(args => pageSize = args)" 
-                        Count="@count" IsLoading="@isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" 
-                        AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+        <RadzenDataGrid @ref="grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@regionTitles" LoadData="@LoadData"
+                        PageSize="@pageSize" PageSizeOptions="@pageSizeOptions" PageSizeChanged="@(args => pageSize = args)"
+                        Count="@count" IsLoading="@isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true"
+                        AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                         ShowPagingSummary="true" style="height: 90vh">
             <HeaderTemplate>
-                        <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
-
+                <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
+                Last updated 11/11/2023
             </HeaderTemplate>
-                <Columns>
-                    <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" Width="150px"/>
-                    <RadzenDataGridColumn TItem="RegionTitle" Property="Type" Title="Type" Width="80px"/>
-                    <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" Width="300px">
-                        <Template Context="regionTitle">
-                            <RadzenLink Path="@($"/TitleDbTitle/{regionTitle.TitleId}")" Text="@regionTitle.Name"/>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="RegionTitle" Property="Publisher" Title="Publisher" Width="180px"/>
-                    <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
-                </Columns>
-            </RadzenDataGrid>
-        
+            <Columns>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" Width="150px"/>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Type" Title="Type" Width="80px"/>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" Width="300px">
+                    <Template Context="regionTitle">
+                        <RadzenLink Path="@($"/TitleDbTitle/{regionTitle.TitleId}")" Text="@regionTitle.Name"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Publisher" Title="Publisher" Width="180px">
+                    <Template Context="regionTitle">
+                        <RadzenLink Path="@($"/publisher/{regionTitle.Publisher}")" Text="@regionTitle.Publisher"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
+            </Columns>
+        </RadzenDataGrid>
+
     </RadzenStack>
 </RadzenStack>

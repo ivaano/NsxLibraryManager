@@ -45,10 +45,10 @@ public static class TextFormatterHelper
         return sb.ToString();
     }
 
-    public static string VersionShifted(this string versionString)
+    public static int VersionShifted(this string versionString)
     {
         var intVer = Convert.ToUInt32(versionString);
         var shiftedVer = intVer >> 16;
-        return shiftedVer.ToString();
+        return shiftedVer > 0 ? (int) shiftedVer : 0;
     }
 }
