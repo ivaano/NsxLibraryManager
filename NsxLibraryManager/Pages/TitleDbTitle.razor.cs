@@ -2,6 +2,7 @@
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services;
+using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Pages;
@@ -27,6 +28,8 @@ public partial class TitleDbTitle
         LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId);
         if (LibraryTitle != null)
         {
+            var ownedTitle = TitleLibraryService.GetTitle(TitleId);
+            if (ownedTitle is not null) LibraryTitle = ownedTitle;
             var sizeInBytes = LibraryTitle.Size ?? 0;
             GameFileSize = sizeInBytes.ToHumanReadableBytes();
             HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;

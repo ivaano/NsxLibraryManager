@@ -1,6 +1,6 @@
 ﻿using NsxLibraryManager.Models;
 
-namespace NsxLibraryManager.Services;
+namespace NsxLibraryManager.Services.Interface;
 
 public interface ITitleLibraryService
 {

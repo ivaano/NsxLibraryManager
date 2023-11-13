@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Settings;
 
 namespace NsxLibraryManager.Services;

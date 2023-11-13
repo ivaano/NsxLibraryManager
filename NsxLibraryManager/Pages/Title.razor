@@ -39,7 +39,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitle?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -54,7 +54,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.Category.ListToString())" TextStyle="TextStyle.Body1"/>
+                <RadzenText Text="@(LibraryTitle?.Category.ListToString())" TextStyle="TextStyle.Body1"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -69,7 +69,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.Publisher.NullStringToEmpty())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitle?.Publisher.NullStringToEmpty())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -84,7 +84,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.RatingContent.ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitle?.RatingContent.ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -114,7 +114,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.Languages.ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitle?.Languages.ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -134,37 +134,42 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.TitleId)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitle?.TitleId)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
-            <RadzenColumn Style="display: inline-flex; align-items: center;">
-                <span class="rz-pr-2">
-                    <svg width="28px" height="28px" color="currentColor" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="m9.2929 1.2929c0.18754-0.18753 0.44189-0.29289 0.70711-0.29289h8c1.6569 0 3 1.3432 3 3v3c0 0.55228-0.4477 1-1 1s-1-0.44772-1-1v-3c0-0.55228-0.4477-1-1-1h-7v5c0 0.55228-0.4477 1-1 1h-5v11c0 0.5523 0.44772 1 1 1h2c0.55228 0 1 0.4477 1 1s-0.44772 1-1 1h-2c-1.6568 0-3-1.3431-3-3v-12c0-0.26522 0.10536-0.51957 0.29289-0.70711l6-6zm-2.8787 5.7071h2.5858v-2.5858l-2.5858 2.5858zm12.586 11c0-0.5523 0.4477-1 1-1h1c0.5523 0 1 0.4477 1 1v4c0 0.5523-0.4477 1-1 1s-1-0.4477-1-1v-3c-0.5523 0-1-0.4477-1-1zm-6 2c0-0.5523 0.4477-1 1-1s1 0.4477 1 1-0.4477 1-1 1-1-0.4477-1-1zm1-3c-1.6569 0-3 1.3431-3 3s1.3431 3 3 3 3-1.3431 3-3-1.3431-3-3-3zm6-5c-0.5523 0-1 0.4477-1 1s0.4477 1 1 1 1-0.4477 1-1-0.4477-1-1-1zm-3 1c0-1.6569 1.3431-3 3-3s3 1.3431 3 3-1.3431 3-3 3-3-1.3431-3-3zm-4-3c-0.5523 0-1 0.4477-1 1s0.4477 1 1 1v3c0 0.5523 0.4477 1 1 1s1-0.4477 1-1v-4c0-0.5523-0.4477-1-1-1h-1z" />
-                    </svg>
-                </span>
-                <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
-                    Filename:
-                </RadzenText>
-            </RadzenColumn>
-            <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle.FileName)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
-            </RadzenColumn>
+            @if (LibraryTitle?.FileName != "")
+            {
+                <RadzenColumn Style="display: inline-flex; align-items: center;">
+                    <span class="rz-pr-2">
+                        <svg width="28px" height="28px" color="currentColor" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m9.2929 1.2929c0.18754-0.18753 0.44189-0.29289 0.70711-0.29289h8c1.6569 0 3 1.3432 3 3v3c0 0.55228-0.4477 1-1 1s-1-0.44772-1-1v-3c0-0.55228-0.4477-1-1-1h-7v5c0 0.55228-0.4477 1-1 1h-5v11c0 0.5523 0.44772 1 1 1h2c0.55228 0 1 0.4477 1 1s-0.44772 1-1 1h-2c-1.6568 0-3-1.3431-3-3v-12c0-0.26522 0.10536-0.51957 0.29289-0.70711l6-6zm-2.8787 5.7071h2.5858v-2.5858l-2.5858 2.5858zm12.586 11c0-0.5523 0.4477-1 1-1h1c0.5523 0 1 0.4477 1 1v4c0 0.5523-0.4477 1-1 1s-1-0.4477-1-1v-3c-0.5523 0-1-0.4477-1-1zm-6 2c0-0.5523 0.4477-1 1-1s1 0.4477 1 1-0.4477 1-1 1-1-0.4477-1-1zm1-3c-1.6569 0-3 1.3431-3 3s1.3431 3 3 3 3-1.3431 3-3-1.3431-3-3-3zm6-5c-0.5523 0-1 0.4477-1 1s0.4477 1 1 1 1-0.4477 1-1-0.4477-1-1-1zm-3 1c0-1.6569 1.3431-3 3-3s3 1.3431 3 3-1.3431 3-3 3-3-1.3431-3-3zm-4-3c-0.5523 0-1 0.4477-1 1s0.4477 1 1 1v3c0 0.5523 0.4477 1 1 1s1-0.4477 1-1v-4c0-0.5523-0.4477-1-1-1h-1z"/>
+                        </svg>
+                    </span>
+                    <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
+                        In Library:
+                    </RadzenText>
+                </RadzenColumn>
+                <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
+                    <RadzenText Text="@(LibraryTitle?.FileName)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                </RadzenColumn>
+            }
+
         </RadzenRow>
     </RadzenColumn>
 </RadzenRow>
 <RadzenRow Style="padding-top: 10px">
     <RadzenColumn Size="7">
-        <RadzenText Text="@(LibraryTitle.Intro)" TextStyle="TextStyle.H6"/>
-        <RadzenText Text="@(LibraryTitle.Description)" TextStyle="TextStyle.Body1"/>
+        <RadzenText Text="@(LibraryTitle?.Intro)" TextStyle="TextStyle.H6"/>
+        <p class="rz-text-body1">
+            @((MarkupString)HtmlDescription)
+        </p>
     </RadzenColumn>
     <RadzenColumn>
 
-
         <div id="screenshotsCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
-                @if (LibraryTitle.Screenshots != null)
+                @if (LibraryTitle?.Screenshots != null)
                 {
                     var imageCount = 0;
                     foreach (var image in LibraryTitle.Screenshots)
@@ -183,7 +188,7 @@
             </div>
 
             <div class="carousel-inner">
-                @if (LibraryTitle.Screenshots != null)
+                @if (LibraryTitle?.Screenshots != null)
                 {
                     foreach (var image in LibraryTitle.Screenshots)
                     {
@@ -212,8 +217,70 @@
                 <span class="visually-hidden">Next</span>
             </button>
         </div>
-
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow>
+    <RadzenColumn Size="7">
+        <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 100%;">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
+                    <RadzenIcon Icon="update" class="rz-mr-1"/><b>DLC</b>
+                </RadzenText>
+            </HeaderTemplate>
+            <ChildContent>
+                <RadzenRow>
+                    <RadzenColumn Size="10">
+                        <RadzenText TextStyle="TextStyle.H6">Name</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="1">
+                        <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="1">
+                        <RadzenText TextStyle="TextStyle.H6">Status</RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+                @foreach (var dlc in GameDlcs)
+                {
+                    <RadzenRow>
+                        <RadzenColumn Size="10">@dlc.TitleName</RadzenColumn>
+                        <RadzenColumn Size="1">@dlc.TitleVersion.VersionShifted()</RadzenColumn>
+                        @if (@dlc.Owned)
+                        {
+                            <RadzenColumn Size="1">Owned</RadzenColumn>    
+                        } else {
+                            <RadzenColumn Size="1">Missing</RadzenColumn>
+                        }
+                        
+                    </RadzenRow>
+                }
+            </ChildContent>
+        </RadzenPanel>
 
     </RadzenColumn>
-
+    <RadzenColumn Size="5">
+        <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 100%;">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
+                    <RadzenIcon Icon="update" class="rz-mr-1"/><b>Patches</b>
+                </RadzenText>
+            </HeaderTemplate>
+            <ChildContent>
+                <RadzenRow>
+                    <RadzenColumn Size="10">
+                        <RadzenText TextStyle="TextStyle.H6">Date</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+                @foreach (var version in GameVersions)
+                {
+                    <RadzenRow>
+                        <RadzenColumn Size="10">@version.Date</RadzenColumn>
+                        <RadzenColumn Size="2">@version.Version.VersionShifted()</RadzenColumn>
+                    </RadzenRow>
+                }
+            </ChildContent>
+        </RadzenPanel>
+    </RadzenColumn>
 </RadzenRow>

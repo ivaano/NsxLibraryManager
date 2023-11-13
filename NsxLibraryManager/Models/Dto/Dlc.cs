@@ -5,4 +5,5 @@ public class Dlc
     public required string TitleId { get; init; }
     public string? TitleName { get; set; }
     public string TitleVersion { get; set; }
+    public bool Owned { get; set; } = false;
 }

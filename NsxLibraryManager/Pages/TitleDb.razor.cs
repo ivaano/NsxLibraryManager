@@ -30,8 +30,9 @@ public partial class TitleDb
     private int count = 0;
     private bool isLoading = false;
     private bool loaded = false;
-    private const string titleDbSettings = "TitledbGridSettings";
-
+    private string lastUpdated = "never";
+    private IEnumerable<string> allRegions;
+    private string region = "Around the Horn";
     public DataGridSettings? Settings 
     { 
         get => _settings;
@@ -43,6 +44,19 @@ public partial class TitleDb
                 InvokeAsync(SaveStateAsync);
             }
         }
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var regionList = new List<string>()
+        {
+                "US"
+
+        };
+        allRegions = regionList.AsEnumerable();
+        
     }
 
     private void LoadSettings(DataGridLoadSettingsEventArgs args)
@@ -56,9 +70,8 @@ public partial class TitleDb
     private async Task LoadData(LoadDataArgs args)
     {
         isLoading = true;
-
+        lastUpdated =  DataService.GetRegionLastUpdate("US").ToString() ?? "never";
         await Task.Yield();
-        //var gridSettings = await DataService.LoadDataGridStateAsync(titleDbSettings);
         await JsRuntime.InvokeAsync<string>("console.log", "LoadData");
         
         var query = await DataService.GetTitleDbRegionTitlesQueryableAsync("US");
@@ -117,7 +130,6 @@ public partial class TitleDb
     private async Task SaveStateAsync()
     {
         await Task.CompletedTask;
-        //await DataService.SaveDataGridStateAsync(titleDbSettings, Settings);
         await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", _settingsParamaterName, JsonSerializer.Serialize(Settings));
     }
 

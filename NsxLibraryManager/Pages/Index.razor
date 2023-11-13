@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using NsxLibraryManager.Models
+@using NsxLibraryManager.Utils
 
 
 <PageTitle>Nsx Library Manager</PageTitle>
@@ -45,7 +46,15 @@
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type" Width="80px"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type" Width="130px"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="Filename"/>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="Size" Title="Size"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="Size" Title="Size" Width="100px">
+                            <Template Context="libraryTitle">
+                                @if (libraryTitle.Size != null)
+                                {
+                                    var sizeInBytes = libraryTitle.Size ?? 0;
+                                    <RadzenText Text="@sizeInBytes.ToHumanReadableBytes()"/>
+                                }
+                            </Template>
+                            </RadzenDataGridColumn>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Version"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs" Title="Available DLC" Filterable="false">
