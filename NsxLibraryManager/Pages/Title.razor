@@ -232,7 +232,7 @@
                     <RadzenColumn Size="10">
                         <RadzenText TextStyle="TextStyle.H6">Name</RadzenText>
                     </RadzenColumn>
-                    <RadzenColumn Size="1">
+                    <RadzenColumn Size="1" >
                         <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
                     </RadzenColumn>
                     <RadzenColumn Size="1">
@@ -243,14 +243,16 @@
                 {
                     <RadzenRow>
                         <RadzenColumn Size="10">@dlc.TitleName</RadzenColumn>
-                        <RadzenColumn Size="1">@dlc.TitleVersion.VersionShifted()</RadzenColumn>
+                        <RadzenColumn Size="1"Style="text-align: center" >@dlc.TitleVersion.VersionShifted()</RadzenColumn>
                         @if (@dlc.Owned)
                         {
-                            <RadzenColumn Size="1">Owned</RadzenColumn>    
-                        } else {
-                            <RadzenColumn Size="1">Missing</RadzenColumn>
+                            <RadzenColumn Size="1" class="rz-background-color-success-lighter">Owned</RadzenColumn>
                         }
-                        
+                        else
+                        {
+                            <RadzenColumn Size="1" class="rz-background-color-danger-lighter">Missing</RadzenColumn>
+                        }
+
                     </RadzenRow>
                 }
             </ChildContent>
@@ -266,18 +268,29 @@
             </HeaderTemplate>
             <ChildContent>
                 <RadzenRow>
-                    <RadzenColumn Size="10">
+                    <RadzenColumn Size="8">
                         <RadzenText TextStyle="TextStyle.H6">Date</RadzenText>
                     </RadzenColumn>
-                    <RadzenColumn Size="2">
+                    <RadzenColumn Size="2" Style="text-align: center">
                         <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="2">
+                        <RadzenText TextStyle="TextStyle.H6">Status</RadzenText>
                     </RadzenColumn>
                 </RadzenRow>
                 @foreach (var version in GameVersions)
                 {
                     <RadzenRow>
-                        <RadzenColumn Size="10">@version.Date</RadzenColumn>
-                        <RadzenColumn Size="2">@version.Version.VersionShifted()</RadzenColumn>
+                        <RadzenColumn Size="8">@version.Date</RadzenColumn>
+                        <RadzenColumn Size="2" Style="text-align: center">@version.Version.VersionShifted()</RadzenColumn>
+                        @if (@version.Owned)
+                        {
+                            <RadzenColumn Size="2">Owned</RadzenColumn>
+                        }
+                        else
+                        {
+                            <RadzenColumn Size="2">Missing</RadzenColumn>
+                        }
                     </RadzenRow>
                 }
             </ChildContent>

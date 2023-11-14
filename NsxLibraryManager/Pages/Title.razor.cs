@@ -32,7 +32,24 @@ public partial class Title
             var sizeInBytes = LibraryTitle.Size ?? 0;
             GameFileSize = sizeInBytes.ToHumanReadableBytes();
             HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;
-            GameVersions = TitleDbService.GetVersions(LibraryTitle.TitleId);
+            var titlePatches = TitleDbService.GetVersions(LibraryTitle.TitleId);
+            var titlePatchesList = new List<GameVersions>();
+            foreach (var patch in titlePatches)
+            {
+                if (LibraryTitle.OwnedUpdates == null) continue;
+                try
+                {
+                    var esta = LibraryTitle.OwnedUpdates.First(s => s.Equals(patch.VersionShifted));
+                    patch.Owned = true;
+                } 
+                catch (Exception)
+                {
+                    patch.Owned = false;
+                }
+                titlePatchesList.Add(patch);
+            }
+            GameVersions = titlePatchesList;
+            
             var titleDlcs = await TitleDbService.GetTitleDlc(LibraryTitle.TitleId);
             var titleDlcList = new List<Dlc>();
             foreach (var dlc in titleDlcs)

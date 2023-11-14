@@ -47,21 +47,38 @@
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type" Width="130px"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="Filename"/>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="Size" Title="Size" Width="100px">
-                            <Template Context="libraryTitle">
-                                @if (libraryTitle.Size != null)
-                                {
-                                    var sizeInBytes = libraryTitle.Size ?? 0;
-                                    <RadzenText Text="@sizeInBytes.ToHumanReadableBytes()"/>
-                                }
-                            </Template>
+                                <Template Context="libraryTitle">
+                                    @if (libraryTitle.Size != null)
+                                    {
+                                        var sizeInBytes = libraryTitle.Size ?? 0;
+                                        <RadzenText Text="@sizeInBytes.ToHumanReadableBytes()"/>
+                                    }
+                                </Template>
                             </RadzenDataGridColumn>
                             <RadzenDataGridColumn TItem="LibraryTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Version"/>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs" Title="Available DLC" Filterable="false">
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Version" Filterable="false" Width="50px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedUpdates" Title="Latest Update" Filterable="false" Width="50px" Sortable="false">
+                                <Template Context="detail">
+                                    @if (detail.OwnedUpdates != null)
+                                    {
+                                        @detail.OwnedUpdates.OrderByDescending(x => x).FirstOrDefault().ToString()
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs" Title="Available DLC Count" Filterable="false" Width="50px" Sortable="false">
                                 <Template Context="detail">
                                     @if (detail.AvailableDlcs != null)
                                     {
-                                        <RadzenText Text="@detail.AvailableDlcs.Count.ToString()"/>
+                                        @detail.AvailableDlcs.Count.ToString()
+                                        
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedDlcs" Title="Owned DLC Count" Filterable="false" Width="50px" Sortable="false">
+                                <Template Context="detail">
+                                    @if (detail.OwnedDlcs != null)
+                                    {
+                                        @detail.OwnedDlcs.Count.ToString()
                                     }
                                 </Template>
                             </RadzenDataGridColumn>

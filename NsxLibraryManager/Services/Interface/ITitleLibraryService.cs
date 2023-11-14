@@ -10,6 +10,7 @@ public interface ITitleLibraryService
     public Task<LibraryTitle?> GetTitleFromTitleDb(string titleId);
     public Task<bool> ProcessFileAsync(string file);
     public Task AddOwnedDlcToTitlesAsync();
+    public Task AddOwnedUpdateToTitlesAsync();
     public Task<IEnumerable<string>> GetFilesAsync();
     
 

@@ -51,8 +51,9 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     ProgressCompleted++;
                     StateHasChanged();                    
                 }
-
+                await TitleLibraryService.AddOwnedUpdateToTitlesAsync();
                 await TitleLibraryService.AddOwnedDlcToTitlesAsync();
+
             });
         DialogService.Close();
     }

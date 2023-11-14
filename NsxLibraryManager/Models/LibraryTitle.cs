@@ -10,6 +10,7 @@ public record LibraryTitle
     public required string TitleId { get; init; }
     public long Nsuid { get; set; }
     public int? NumberOfPlayers { get; set; }
+    // Last Patch Version in TitleDb
     public uint AvailableVersion { get; set; }
     public string? ApplicationTitleId { get; set; }
     public string? ApplicationTitleName { get; set; }
@@ -33,6 +34,7 @@ public record LibraryTitle
     public List<string>? Screenshots { get; set; }
     public List<string>? AvailableDlcs { get; set; }
     public List<string>? OwnedDlcs { get; set; }
+    public List<int>? OwnedUpdates { get; set; }
     public int? Rating { get; set; }
     public List<string>? RatingContent { get; set; }
     public long? Size { get; set; }

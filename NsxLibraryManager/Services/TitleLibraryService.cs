@@ -1,4 +1,6 @@
 ﻿
+using System.Globalization;
+using System.Linq.Dynamic.Core;
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Enums;
@@ -6,6 +8,7 @@ using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Settings;
+using Radzen;
 
 namespace NsxLibraryManager.Services;
 
@@ -18,10 +21,10 @@ public class TitleLibraryService : ITitleLibraryService
     private readonly IMapper _mapper;
     private readonly ILogger<TitleLibraryService> _logger;
 
-    
+
     public TitleLibraryService(
-            IDataService dataService, 
-            IFileInfoService fileInfoService, 
+            IDataService dataService,
+            IFileInfoService fileInfoService,
             ITitleDbService titleDbService,
             IOptions<AppSettings> configuration,
             IMapper mapper,
@@ -36,24 +39,26 @@ public class TitleLibraryService : ITitleLibraryService
     }
 
 
-    private LibraryTitle AggregateLibraryTitle(LibraryTitle libraryTitle, RegionTitle? regionTitle, IEnumerable<PackagedContentMeta> packagedContentMetas)
+    private LibraryTitle AggregateLibraryTitle(LibraryTitle libraryTitle, RegionTitle? regionTitle,
+            IEnumerable<PackagedContentMeta> packagedContentMetas)
     {
         if (regionTitle is null) return libraryTitle;
-        
+
         if (libraryTitle.Type != TitleLibraryType.Base)
         {
             libraryTitle.ApplicationTitleName = regionTitle.Name;
         }
+
         // prefer the title name from the file
         libraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(regionTitle.Name);
         libraryTitle.Publisher = libraryTitle.Publisher.ConvertNullOrEmptyTo(regionTitle.Publisher);
-        
+
         libraryTitle.BannerUrl = regionTitle.BannerUrl;
         libraryTitle.Nsuid = regionTitle.Id;
         libraryTitle.NumberOfPlayers = regionTitle.NumberOfPlayers;
         libraryTitle.ReleaseDate = regionTitle.ReleaseDate;
 
-        
+
         libraryTitle.Category = regionTitle.Category;
         libraryTitle.Developer = regionTitle.Developer;
         libraryTitle.Description = regionTitle.Description;
@@ -68,16 +73,17 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.Screenshots = regionTitle.Screenshots;
         libraryTitle.RatingContent = regionTitle.RatingContent;
 
-        var dlcVal = (int) TitleLibraryType.DLC;
+        var dlcVal = (int)TitleLibraryType.DLC;
         var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == dlcVal select cnmt.TitleId).ToList();
 
         if (dlc.Any())
         {
             libraryTitle.AvailableDlcs = dlc;
         }
+
         return libraryTitle;
     }
-    
+
     public bool DropLibrary()
     {
         return _dataService.DropDbCollection(AppConstants.LibraryCollectionName);
@@ -111,7 +117,7 @@ public class TitleLibraryService : ITitleLibraryService
             var titleDbCnmt = await _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
             libraryTitle = AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
             await _dataService.AddLibraryTitleAsync(libraryTitle);
-            
+
             return true;
         }
         catch (Exception e)
@@ -120,6 +126,38 @@ public class TitleLibraryService : ITitleLibraryService
             return false;
         }
     }
+
+    public async Task AddOwnedUpdateToTitlesAsync()
+    {
+        var libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
+        var gamesWithUpdates = libraryTitles.Where(x => x.AvailableVersion > 0);
+
+        foreach (var title in gamesWithUpdates)
+        {
+            var versions = _dataService.GetTitleDbVersions(title.TitleId);
+            var ownedVersions = new List<int>();
+            foreach (var version in versions)
+            {
+                libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
+                var patchTitle = libraryTitles
+                        .Where(x => x.ApplicationTitleId == version.TitleId)
+                        .Where(x => x.PatchNumber == version.VersionShifted)
+                        .Where(x => x.Type == TitleLibraryType.Update)
+                        .FirstOrDefault();
+                if (patchTitle is null) continue;
+                var tryParseDate = DateTime.TryParseExact(version.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                        out var parsedDate)
+                        ? parsedDate
+                        : new DateTime();
+                patchTitle.ReleaseDate = parsedDate;
+                await _dataService.UpdateLibraryTitleAsync(patchTitle);
+                ownedVersions.Add(version.VersionShifted);
+            }
+            title.OwnedUpdates = ownedVersions;
+            await _dataService.UpdateLibraryTitleAsync(title);
+        }
+    }
+
 
     //
     // Summary: This method should be called after the library has been refreshed
@@ -147,7 +185,6 @@ public class TitleLibraryService : ITitleLibraryService
             dlcGame.OwnedDlcs = ownedDlc;
             await _dataService.UpdateLibraryTitleAsync(dlcGame);
         }
-        
     }
 
     public string GetLibraryPath()

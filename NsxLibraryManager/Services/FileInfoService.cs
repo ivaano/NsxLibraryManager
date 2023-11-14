@@ -104,7 +104,7 @@ public class FileInfoService : IFileInfoService
         foreach (var ncpTitle in nacpData.Titles)
         {
             if (ncpTitle is null) continue;
-            if (ncpTitle.Name == "") continue;
+            if (ncpTitle.Name == string.Empty) continue;
             title.TitleName = ncpTitle.Name;
             title.Publisher = ncpTitle.Publisher;
             break;
