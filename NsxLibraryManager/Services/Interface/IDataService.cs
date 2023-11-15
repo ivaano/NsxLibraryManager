@@ -21,7 +21,7 @@ public interface IDataService : IDisposable
     public Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync();
     public Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region);
     public LibraryTitle? GetLibraryTitleById(string titleId);
-    public Task UpdateLibraryTitleAsync(LibraryTitle libraryTitle);
+    public void UpdateLibraryTitleAsync(LibraryTitle libraryTitle);
     public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);
     public bool DropDbCollection(string collectionName);
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default);

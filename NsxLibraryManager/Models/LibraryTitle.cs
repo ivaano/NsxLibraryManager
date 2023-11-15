@@ -43,4 +43,6 @@ public record LibraryTitle
     public string? NewFileName { get; set; }
     public bool Error { get; set; } = false;
     public string ErrorMessage { get; set; } = string.Empty;
+    [DisplayFormat(DataFormatString = @"{0:d MM\ddd\yyyy}")]
+    public DateTime LastUpdated { get; set; }
 }

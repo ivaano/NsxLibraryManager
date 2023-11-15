@@ -242,7 +242,9 @@
                 @foreach (var dlc in GameDlcs)
                 {
                     <RadzenRow>
-                        <RadzenColumn Size="10">@dlc.TitleName</RadzenColumn>
+                    <RadzenColumn Size="10">
+                        <RadzenLink Path="@($"/Title/{dlc.TitleId}")" Text="@dlc.TitleName"/>
+                    </RadzenColumn>
                         <RadzenColumn Size="1" Style="text-align: center" >@dlc.TitleVersion.VersionShifted()</RadzenColumn>
                         @if (@dlc.Owned)
                         {
@@ -281,7 +283,9 @@
                 @foreach (var version in GameVersions.Reverse())
                 {
                     <RadzenRow>
-                        <RadzenColumn Size="8">@version.Date</RadzenColumn>
+                        <RadzenColumn Size="8">
+                            <RadzenLink Path="@($"/Title/{version.TitleId}")" Text="@version.Date"/>
+                        </RadzenColumn>
                         <RadzenColumn Size="2" Style="text-align: center">@version.Version.VersionShifted()</RadzenColumn>
                         @if (@version.Owned)
                         {

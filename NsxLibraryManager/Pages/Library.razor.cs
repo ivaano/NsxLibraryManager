@@ -9,7 +9,7 @@ using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 #nullable disable
-public partial class Index
+public partial class Library
 {
     [Inject]
     protected IDataService DataService { get; set; }
@@ -22,7 +22,9 @@ public partial class Index
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
     
     public IEnumerable<LibraryTitle> LibraryTitles;
+    public IEnumerable<LibraryTitle> MissingDlcs;
     public RadzenDataGrid<LibraryTitle> Grid;
+    private string lastUpdated;
     public int AppCount = 0;
     public int PatchCount = 0;
     public int DlcCount = 0;
@@ -41,6 +43,18 @@ public partial class Index
         LibraryTitles = await DataService.GetLibraryTitlesAsync();
         LibraryPath = TitleLibraryService.GetLibraryPath();
         CalculateCounts();
+        UpdateLastUpdate();
+        var titles = await DataService.GetLibraryTitlesQueryableAsync();
+        MissingDlcs = titles
+                .Where(x => x.Type == TitleLibraryType.Base)
+                .Where(x => x.AvailableDlcs != x.OwnedDlcs);
+        var taa = MissingDlcs;
+    }
+
+    private void UpdateLastUpdate()
+    {
+        var first = LibraryTitles.FirstOrDefault()?.LastUpdated.ToString("g");
+        lastUpdated = first ?? "never";
     }
     
     private void CalculateCounts()
@@ -70,9 +84,18 @@ public partial class Index
         {
             DialogService.Close();
             StateHasChanged();
-            await DialogService.OpenAsync<RefreshLibraryProgressDialog>("Refreshing library...");
+            var paramsDialog = new Dictionary<string, object>() { };
+            var dialogOptions = new DialogOptions()
+                    { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
+            await DialogService.OpenAsync<RefreshLibraryProgressDialog>(
+                    "Refreshing library...", paramsDialog, dialogOptions);
+            await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
+                    "Processing Updates", paramsDialog, dialogOptions);
+            await DialogService.OpenAsync<RefreshDlcProgressDialog>(
+                    "Processing Dlcs", paramsDialog, dialogOptions);
             await Grid.Reload();
             CalculateCounts();
+            UpdateLastUpdate();
         }
     }
 

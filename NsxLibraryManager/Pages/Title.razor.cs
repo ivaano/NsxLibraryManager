@@ -54,7 +54,13 @@ public partial class Title
             var titleDlcList = new List<Dlc>();
             foreach (var dlc in titleDlcs)
             {
-                if (LibraryTitle.OwnedDlcs == null) continue;
+                if (LibraryTitle.OwnedDlcs == null)
+                {
+                    dlc.Owned = false;
+                    titleDlcList.Add(dlc);
+                    continue;
+                }
+                
                 try
                 {
                     var esta = LibraryTitle.OwnedDlcs.First(s => s.Equals(dlc.TitleId, StringComparison.InvariantCultureIgnoreCase));
@@ -67,8 +73,6 @@ public partial class Title
                 titleDlcList.Add(dlc);
             }
             GameDlcs = titleDlcList;
-            
-
         } 
         else
         {

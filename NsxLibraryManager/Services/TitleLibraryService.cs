@@ -72,7 +72,7 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.Languages = regionTitle.Languages;
         libraryTitle.Screenshots = regionTitle.Screenshots;
         libraryTitle.RatingContent = regionTitle.RatingContent;
-
+        libraryTitle.LastUpdated = DateTime.Now;
         var dlcVal = (int)TitleLibraryType.DLC;
         var dlc = (from cnmt in packagedContentMetas where cnmt.TitleType == dlcVal select cnmt.TitleId).ToList();
 
@@ -150,11 +150,11 @@ public class TitleLibraryService : ITitleLibraryService
                         ? parsedDate
                         : new DateTime();
                 patchTitle.ReleaseDate = parsedDate;
-                await _dataService.UpdateLibraryTitleAsync(patchTitle);
+                _dataService.UpdateLibraryTitleAsync(patchTitle);
                 ownedVersions.Add(version.VersionShifted);
             }
             title.OwnedUpdates = ownedVersions;
-            await _dataService.UpdateLibraryTitleAsync(title);
+            _dataService.UpdateLibraryTitleAsync(title);
         }
     }
 
@@ -183,7 +183,7 @@ public class TitleLibraryService : ITitleLibraryService
 
             if (!ownedDlc.Any()) continue;
             dlcGame.OwnedDlcs = ownedDlc;
-            await _dataService.UpdateLibraryTitleAsync(dlcGame);
+            _dataService.UpdateLibraryTitleAsync(dlcGame);
         }
     }
 

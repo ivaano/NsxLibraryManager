@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
 
@@ -51,8 +50,6 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     ProgressCompleted++;
                     StateHasChanged();                    
                 }
-                await TitleLibraryService.AddOwnedUpdateToTitlesAsync();
-                await TitleLibraryService.AddOwnedDlcToTitlesAsync();
 
             });
         DialogService.Close();

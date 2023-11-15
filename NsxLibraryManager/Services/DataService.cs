@@ -112,9 +112,9 @@ public class DataService : IDataService
         return _titleLibraryRepository.FindOne(x => x.TitleId == titleId);
     }
 
-    public async Task UpdateLibraryTitleAsync(LibraryTitle libraryTitle)
+    public void UpdateLibraryTitleAsync(LibraryTitle libraryTitle)
     {
-        await Task.Run(() => _titleLibraryRepository.Update(libraryTitle));
+        _titleLibraryRepository.Update(libraryTitle);
     }
 
     public async Task AddLibraryTitleAsync(LibraryTitle libraryTitle)

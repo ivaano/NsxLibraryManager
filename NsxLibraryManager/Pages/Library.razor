@@ -1,0 +1,118 @@
+﻿@page "/library"
+@using NsxLibraryManager.Models
+@using NsxLibraryManager.Utils
+
+
+<PageTitle>Nsx Library Manager</PageTitle>
+<RadzenTabs Change=@TabOnChange>
+    <Tabs>
+        <RadzenTabsItem Text="Title Library">
+            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+                    <RadzenRow Style="width: 100%">
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.Subtitle1">Library Location: <strong>@LibraryPath</strong></RadzenText>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6" Style="text-align: right">
+                            <RadzenText TextStyle="TextStyle.Subtitle1"> <strong>@AppCount</strong> Games, <strong>@PatchCount</strong> Updates and <strong>@DlcCount</strong> DLCs in library </RadzenText>
+                        </RadzenColumn>
+
+                    </RadzenRow>
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                    <RadzenDataGrid @ref="Grid" Data="@LibraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                                    AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
+                                    PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
+                        <HeaderTemplate>
+                            <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                            <RadzenText TextStyle="TextStyle.Caption">Last updated @lastUpdated</RadzenText>
+
+                        </HeaderTemplate>
+                        <Columns>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" Width="150px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" Width="300px">
+                                <Template Context="libraryTitle">
+                                    <RadzenLink Path="@($"/title/{libraryTitle.TitleId}")" Text="@libraryTitle.TitleName"/>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="Publisher" Title="Publisher"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="Type" Title="Type" Width="80px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="PackageType" Title="Package Type" Width="130px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="FileName" Title="Filename"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="Size" Title="Size" Width="100px">
+                                <Template Context="libraryTitle">
+                                    @if (libraryTitle.Size != null)
+                                    {
+                                        var sizeInBytes = libraryTitle.Size ?? 0;
+                                        <RadzenText Text="@sizeInBytes.ToHumanReadableBytes()"/>
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Version" Filterable="false" Width="50px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedUpdates" Title="Latest Update" Filterable="false" Width="50px" Sortable="false">
+                                <Template Context="detail">
+                                    @if (detail.OwnedUpdates != null)
+                                    {
+                                        @detail.OwnedUpdates.OrderByDescending(x => x).FirstOrDefault().ToString()
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs" Title="Available DLC Count" Filterable="false" Width="50px" Sortable="false">
+                                <Template Context="detail">
+                                    @if (detail.AvailableDlcs != null)
+                                    {
+                                        @detail.AvailableDlcs.Count.ToString()
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedDlcs" Title="Owned DLC Count" Filterable="false" Width="50px" Sortable="false">
+                                <Template Context="detail">
+                                    @if (detail.OwnedDlcs != null)
+                                    {
+                                        @detail.OwnedDlcs.Count.ToString()
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Missing DLC">
+            <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                    <RadzenDataGrid @ref="Grid" Data="@MissingDlcs" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                                    AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
+                                    PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
+                        <HeaderTemplate>
+                            <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                            <RadzenText TextStyle="TextStyle.Caption">Last updated @lastUpdated</RadzenText>
+
+                        </HeaderTemplate>
+                        <Columns>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleId" Title="Title Id" Width="150px"/>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="TitleName" Title="Name" Width="300px">
+                                <Template Context="libraryTitle">
+                                    <RadzenLink Path="@($"/title/{libraryTitle.TitleId}")" Text="@libraryTitle.TitleName"/>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs.Count" Title="Available DLC Count" Filterable="true" Width="100px" Sortable="false">
+
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedDlcs.Count" Title="Owned DLC Count" Filterable="true" Width="100px" Sortable="false">
+
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
