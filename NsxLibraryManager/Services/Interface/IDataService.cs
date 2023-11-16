@@ -16,7 +16,7 @@ public interface IDataService : IDisposable
     public IEnumerable<GameVersions> GetTitleDbVersions(string titleTitleId);
     public Task<IEnumerable<RegionTitle>?> GetTitleDbRegionTitlesAsync(string region);
     public Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId);
-    public Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId);
+    public IEnumerable<PackagedContentMeta> GetTitleDbCnmtsForTitle(string titleId);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync();
     public Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region);

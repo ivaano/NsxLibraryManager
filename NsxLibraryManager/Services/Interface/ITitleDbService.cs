@@ -1,7 +1,7 @@
 ﻿using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 
-namespace NsxLibraryManager.Services;
+namespace NsxLibraryManager.Services.Interface;
 
 public interface ITitleDbService
 {
@@ -20,5 +20,5 @@ public interface ITitleDbService
     
     public Task<IEnumerable<Dlc>>  GetTitleDlc(string titleTitleId);
     
-    public Task<IEnumerable<PackagedContentMeta>> GetTitleCnmts(string titleTitleId);
+    public IEnumerable<PackagedContentMeta> GetTitleCnmts(string titleTitleId);
 }

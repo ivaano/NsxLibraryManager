@@ -88,7 +88,8 @@ public partial class Title
             {
                 LibraryTitle = new LibraryTitle
                 {
-                        TitleId = string.Empty,
+                        TitleId = TitleId,
+                        Size = 0,
                         FileName = string.Empty
                 };
             };

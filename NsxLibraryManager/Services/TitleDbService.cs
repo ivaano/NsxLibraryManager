@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Globalization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Enums;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
+using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Settings;
 using NsxLibraryManager.Utils;
 
@@ -84,7 +86,22 @@ public class TitleDbService : ITitleDbService
 
     public IEnumerable<GameVersions> GetVersions(string titleTitleId)
     {
-        return  _dataService.GetTitleDbVersions(titleTitleId);
+        var patchId = GetTitleCnmts(titleTitleId);
+        var versions = _dataService.GetTitleDbVersions(titleTitleId);
+        var patchFound = patchId.FirstOrDefault(x => x.TitleType == 129);
+        var versionList = versions.ToList();
+        if (patchFound == null) return versionList;
+        foreach (var version in versionList)
+        {
+            var tryParseDate = DateTime.TryParseExact(version.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                    out var parsedDate)
+                    ? parsedDate
+                    : new DateTime();
+            version.Date = parsedDate.ToString("MM/dd/yyyy");
+            version.ApplicationId = titleTitleId.ToUpper();
+            version.TitleId = patchFound.TitleId.ToUpper();
+        }
+        return  versionList;
     }
 
     public Task<uint> GetAvailableVersion(string titleTitleId)
@@ -113,7 +130,7 @@ public class TitleDbService : ITitleDbService
     public async Task<IEnumerable<Dlc>> GetTitleDlc(string titleTitleId)
     {
         
-        var packagedContentMetas = await GetTitleCnmts(titleTitleId);
+        var packagedContentMetas = GetTitleCnmts(titleTitleId);
         var dlcVal = (int) TitleLibraryType.DLC;
         var cnmts = packagedContentMetas
                 .OrderByDescending(p => p.Version)
@@ -161,8 +178,8 @@ public class TitleDbService : ITitleDbService
         return dlcList;
     }
 
-    public Task<IEnumerable<PackagedContentMeta>> GetTitleCnmts(string titleTitleId)
+    public IEnumerable<PackagedContentMeta> GetTitleCnmts(string titleTitleId)
     {
-        return _dataService.GetTitleDbCnmtsForTitleAsync(titleTitleId);
+        return _dataService.GetTitleDbCnmtsForTitle(titleTitleId);
     }
 }

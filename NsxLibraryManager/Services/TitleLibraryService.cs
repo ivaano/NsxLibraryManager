@@ -114,7 +114,7 @@ public class TitleLibraryService : ITitleLibraryService
         {
             var libraryTitle = await _fileInfoService.GetFileInfo(file);
             var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
-            var titleDbCnmt = await _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
+            var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
             libraryTitle = AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
             await _dataService.AddLibraryTitleAsync(libraryTitle);
 

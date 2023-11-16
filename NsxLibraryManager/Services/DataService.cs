@@ -86,9 +86,9 @@ public class DataService : IDataService
         return await Task.Run(() => regionTitle);
     }
 
-    public async Task<IEnumerable<PackagedContentMeta>> GetTitleDbCnmtsForTitleAsync(string titleId)
+    public IEnumerable<PackagedContentMeta> GetTitleDbCnmtsForTitle(string titleId)
     {
-        return await Task.Run(() => _titleDbCnmtsRepository.FindByOtherApplicationId(titleId));
+        return _titleDbCnmtsRepository.FindByOtherApplicationId(titleId);
     }
 
     public async Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync()

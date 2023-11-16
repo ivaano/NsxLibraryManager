@@ -3,6 +3,7 @@ using NsxLibraryManager.Enums;
 using NsxLibraryManager.Exceptions;
 using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Services.Interface;
 
 namespace NsxLibraryManager.Services;
 
