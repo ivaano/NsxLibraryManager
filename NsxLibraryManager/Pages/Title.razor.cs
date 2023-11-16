@@ -23,7 +23,14 @@ public partial class Title
     public LibraryTitle? LibraryTitle { get; set; }
     public string GameFileSize { get; set; } = string.Empty;
     public string HtmlDescription { get; set; } = string.Empty;
-    protected override async Task OnInitializedAsync()
+
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadTitle();
+    }
+    
+    private async Task LoadTitle()
     {
         if (TitleId is null) return;  
         LibraryTitle = TitleLibraryService.GetTitle(TitleId);

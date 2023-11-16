@@ -136,6 +136,7 @@ public class TitleLibraryService : ITitleLibraryService
         {
             var versions = _dataService.GetTitleDbVersions(title.TitleId);
             var ownedVersions = new List<int>();
+            uint lastOwnedVersion = 0;
             foreach (var version in versions)
             {
                 libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
@@ -150,10 +151,16 @@ public class TitleLibraryService : ITitleLibraryService
                         ? parsedDate
                         : new DateTime();
                 patchTitle.ReleaseDate = parsedDate;
+                var patchVersion = Convert.ToUInt32(version.VersionShifted);
+                if (lastOwnedVersion < patchVersion)
+                {
+                    lastOwnedVersion = patchVersion;
+                }
                 _dataService.UpdateLibraryTitleAsync(patchTitle);
                 ownedVersions.Add(version.VersionShifted);
             }
             title.OwnedUpdates = ownedVersions;
+            title.LastOwnedVersion = lastOwnedVersion;
             _dataService.UpdateLibraryTitleAsync(title);
         }
     }

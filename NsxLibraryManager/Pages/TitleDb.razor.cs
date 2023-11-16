@@ -32,7 +32,6 @@ public partial class TitleDb
     private bool loaded = false;
     private string lastUpdated = "never";
     private IEnumerable<string> allRegions;
-    private string region = "Around the Horn";
     public DataGridSettings? Settings 
     { 
         get => _settings;

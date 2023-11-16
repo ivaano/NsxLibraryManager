@@ -12,6 +12,7 @@ public record LibraryTitle
     public int? NumberOfPlayers { get; set; }
     // Last Patch Version in TitleDb
     public uint AvailableVersion { get; set; }
+    public uint LastOwnedVersion { get; set; }
     public string? ApplicationTitleId { get; set; }
     public string? ApplicationTitleName { get; set; }
     public string? PatchTitleId { get; set; }

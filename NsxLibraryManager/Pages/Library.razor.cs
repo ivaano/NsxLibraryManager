@@ -23,6 +23,7 @@ public partial class Library
     
     public IEnumerable<LibraryTitle> LibraryTitles;
     public IEnumerable<LibraryTitle> MissingDlcs;
+    public IEnumerable<LibraryTitle> MissingUpdates;
     public RadzenDataGrid<LibraryTitle> Grid;
     private string lastUpdated;
     public int AppCount = 0;
@@ -48,7 +49,10 @@ public partial class Library
         MissingDlcs = titles
                 .Where(x => x.Type == TitleLibraryType.Base)
                 .Where(x => x.AvailableDlcs != x.OwnedDlcs);
-        var taa = MissingDlcs;
+        MissingUpdates = titles
+                .Where(x => x.Type == TitleLibraryType.Base)
+                .Where(x => x.AvailableVersion != x.LastOwnedVersion);
+        var tata = MissingUpdates;
     }
 
     private void UpdateLastUpdate()

@@ -13,13 +13,6 @@
             <HeaderTemplate>
                 <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
                 <RadzenText TextStyle="TextStyle.Caption">Last updated @lastUpdated</RadzenText>
-                                  
-                                        <RadzenDropDown 
-                                            @bind-Value="@region" 
-                                            Data="allRegions"
-                                           />
-                                 
-                
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" Width="150px"/>
