@@ -23,15 +23,14 @@ public partial class TitleDb
 
     private RadzenDataGrid<RegionTitle> grid;
     private IEnumerable<RegionTitle> regionTitles;
-    private DataGridSettings _settings;
-    private IEnumerable<int> pageSizeOptions = new[] { 25, 50, 100 };
-    private int pageSize = 100;
-    private static readonly string _settingsParamaterName = "TitleDbGridSettings";
-    private int count = 0;
-    private bool isLoading = false;
-    private bool loaded = false;
-    private string lastUpdated = "never";
-    private IEnumerable<string> allRegions;
+    private DataGridSettings? _settings;
+    private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };
+    private int _pageSize = 100;
+    private static readonly string SettingsParamaterName = "TitleDbGridSettings";
+    private int _count;
+    private bool _isLoading;
+    private string _lastUpdated = "never";
+    private IEnumerable<string> _allRegions;
     public DataGridSettings? Settings 
     { 
         get => _settings;
@@ -54,7 +53,7 @@ public partial class TitleDb
                 "US"
 
         };
-        allRegions = regionList.AsEnumerable();
+        _allRegions = regionList.AsEnumerable();
         
     }
 
@@ -68,8 +67,8 @@ public partial class TitleDb
     
     private async Task LoadData(LoadDataArgs args)
     {
-        isLoading = true;
-        lastUpdated =  DataService.GetRegionLastUpdate("US").ToString() ?? "never";
+        _isLoading = true;
+        _lastUpdated =  DataService.GetRegionLastUpdate("US").ToString() ?? "never";
         await Task.Yield();
         await JsRuntime.InvokeAsync<string>("console.log", "LoadData");
         
@@ -81,7 +80,7 @@ public partial class TitleDb
             query = query.Where(args.Filter);
         }
 
-        count = query.Count();
+        _count = query.Count();
 
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
@@ -96,9 +95,7 @@ public partial class TitleDb
                             query.OrderBy(x => x.Name).Skip(args.Skip.Value).Take(args.Top.Value).ToList());
         }
 
-        isLoading = false;
-
-        loaded = true;
+        _isLoading = false;
     } 
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -115,13 +112,13 @@ public partial class TitleDb
     {
         await Task.CompletedTask;
 
-        var result = await JsRuntime.InvokeAsync<string>("window.localStorage.getItem", _settingsParamaterName);
+        var result = await JsRuntime.InvokeAsync<string>("window.localStorage.getItem", SettingsParamaterName);
         if (!string.IsNullOrEmpty(result))
         {
             _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
             if (_settings.PageSize.HasValue)
             {
-                pageSize = _settings.PageSize.Value;
+                _pageSize = _settings.PageSize.Value;
             }
         }
     }
@@ -129,7 +126,7 @@ public partial class TitleDb
     private async Task SaveStateAsync()
     {
         await Task.CompletedTask;
-        await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", _settingsParamaterName, JsonSerializer.Serialize(Settings));
+        await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", SettingsParamaterName, JsonSerializer.Serialize(Settings));
     }
 
     private async Task RefreshTitleDb()

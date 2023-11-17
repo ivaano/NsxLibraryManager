@@ -13,23 +13,21 @@ public partial class GameLibrary
     
     [Inject]
     protected IDataService DataService { get; set; }
-
     
     
     public bool ShowDlcInfo { get; set; } = false;
 
-    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
-    int pageSize = 10;
-    int count;
-    public bool isLoading;
-    private ShowDlc _showDlc;
+    private readonly string _pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
+    private readonly int _pageSize = 10;
+    private int _count;
+    public bool IsLoading;
 
+
+    private IEnumerable<LibraryTitle> _games;
     
-    IEnumerable<LibraryTitle> games;
     
     
-    
-    async Task PageChanged(PagerEventArgs args)
+    private async Task PageChanged(PagerEventArgs args)
     {
         var loadDataArgs = new LoadDataArgs { 
                 Top = args.Top,
@@ -38,20 +36,21 @@ public partial class GameLibrary
         await LoadData(loadDataArgs);
     }
 
-    private async Task LoadData(LoadDataArgs args)
+    private Task LoadData(LoadDataArgs args)
     {
-        isLoading = true;
+        IsLoading = true;
 
-        var libraryTitles = await DataService.GetLibraryTitlesQueryableAsync();
+        var libraryTitles = DataService.GetLibraryTitlesQueryableAsync();
         var baseGames = libraryTitles.Where(o => o.Type == TitleLibraryType.Base);
-        count = baseGames.Count();
-        games = baseGames
-                .Take(args.Top ?? pageSize)
+        _count = baseGames.Count();
+        _games = baseGames
+                .Take(args.Top ?? _pageSize)
                 .OrderBy(t => t.TitleName)
                 .Skip(args.Skip ?? 0)
                 .ToList();
 
-        isLoading = false;
+        IsLoading = false;
+        return Task.CompletedTask;
     }
 
     public void ShowDlcInfoToggle(string titleId)

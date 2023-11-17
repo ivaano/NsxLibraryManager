@@ -10,11 +10,11 @@ namespace NsxLibraryManager.Pages;
 public partial class Title
 {
     [Inject]
-    protected IDataService DataService { get; set; }
+    protected IDataService DataService { get; set; } = default!;
     [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
     [Inject]
-    protected ITitleDbService TitleDbService { get; set; }
+    protected ITitleDbService TitleDbService { get; set; } = default!;
     [Parameter]
     public string? TitleId { get; set; }
     public IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();

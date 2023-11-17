@@ -25,6 +25,8 @@ public partial class Library
     public IEnumerable<LibraryTitle> MissingDlcs;
     public IEnumerable<LibraryTitle> MissingUpdates;
     public RadzenDataGrid<LibraryTitle> Grid;
+    public RadzenDataGrid<LibraryTitle> UpdatesGrid;
+    public RadzenDataGrid<LibraryTitle> DlcGrid;
     private string lastUpdated;
     public int AppCount = 0;
     public int PatchCount = 0;
@@ -38,21 +40,28 @@ public partial class Library
         { "Version", "Version" },
         { "Date", "Date" }
     };
+    private int selectedTabIndex = 0;
     
     protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
     {
         LibraryTitles = await DataService.GetLibraryTitlesAsync();
         LibraryPath = TitleLibraryService.GetLibraryPath();
         CalculateCounts();
         UpdateLastUpdate();
-        var titles = await DataService.GetLibraryTitlesQueryableAsync();
+        var titles = DataService.GetLibraryTitlesQueryableAsync();
         MissingDlcs = titles
                 .Where(x => x.Type == TitleLibraryType.Base)
-                .Where(x => x.AvailableDlcs != x.OwnedDlcs);
+                .Where(x => x.AvailableDlcs != x.OwnedDlcs)
+                .ToList();
         MissingUpdates = titles
                 .Where(x => x.Type == TitleLibraryType.Base)
-                .Where(x => x.AvailableVersion != x.LastOwnedVersion);
-        var tata = MissingUpdates;
+                .Where(x => x.AvailableVersion != x.LastOwnedVersion)
+                .ToList();
     }
 
     private void UpdateLastUpdate()
@@ -97,9 +106,19 @@ public partial class Library
                     "Processing Updates", paramsDialog, dialogOptions);
             await DialogService.OpenAsync<RefreshDlcProgressDialog>(
                     "Processing Dlcs", paramsDialog, dialogOptions);
-            await Grid.Reload();
-            CalculateCounts();
-            UpdateLastUpdate();
+            await LoadData();
+            switch (selectedTabIndex)
+            {
+                case 0:
+                    await Grid.Reload();
+                    break;
+                case 1:
+                    await DlcGrid.Reload();
+                    break;
+                case 2:
+                    await UpdatesGrid.Reload();
+                    break;
+            }
         }
     }
 

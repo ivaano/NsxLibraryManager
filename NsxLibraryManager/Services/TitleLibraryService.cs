@@ -129,7 +129,7 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task AddOwnedUpdateToTitlesAsync()
     {
-        var libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
+        var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
         var gamesWithUpdates = libraryTitles.Where(x => x.AvailableVersion > 0);
 
         foreach (var title in gamesWithUpdates)
@@ -139,7 +139,7 @@ public class TitleLibraryService : ITitleLibraryService
             uint lastOwnedVersion = 0;
             foreach (var version in versions)
             {
-                libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
+                libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
                 var patchTitle = libraryTitles
                         .Where(x => x.ApplicationTitleId == version.TitleId)
                         .Where(x => x.PatchNumber == version.VersionShifted)
@@ -170,9 +170,9 @@ public class TitleLibraryService : ITitleLibraryService
     // Summary: This method should be called after the library has been refreshed
     //          to add any owned DLCs to the library, it must be done after all the tiles are in the db
     //          otherwise we would have to do a lot of lookups to see if the DLC is already in the library
-    public async Task AddOwnedDlcToTitlesAsync()
+    public Task AddOwnedDlcToTitlesAsync()
     {
-        var libraryTitles = await _dataService.GetLibraryTitlesQueryableAsync();
+        var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
         var gamesWithDlc = libraryTitles.Where(x => x.AvailableDlcs != null && x.AvailableDlcs.Any());
 
 
@@ -192,6 +192,8 @@ public class TitleLibraryService : ITitleLibraryService
             dlcGame.OwnedDlcs = ownedDlc;
             _dataService.UpdateLibraryTitleAsync(dlcGame);
         }
+
+        return Task.CompletedTask;
     }
 
     public string GetLibraryPath()

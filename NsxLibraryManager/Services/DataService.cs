@@ -19,7 +19,6 @@ public class DataService : IDataService
     private readonly string _connStr;
     private ILiteDatabase? _db;
     private bool _disposed;
-    private ITitleRepository? _titleRepository;
     private Dictionary<string, IRegionRepository>? _regionRepository;
     private ITitleLibraryRepository _titleLibraryRepository;
     private ITitleDbCnmtsRepository _titleDbCnmtsRepository;
@@ -96,9 +95,9 @@ public class DataService : IDataService
         return await Task.Run(() => _titleLibraryRepository.All());
     }
 
-    public async Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync()
+    public IQueryable<LibraryTitle> GetLibraryTitlesQueryableAsync()
     {
-        return await Task.Run(() => _titleLibraryRepository.GetTitlesAsQueryable());
+        return _titleLibraryRepository.GetTitlesAsQueryable();
     }
     
     public async Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region)

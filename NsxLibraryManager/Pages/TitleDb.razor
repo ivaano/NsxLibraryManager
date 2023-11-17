@@ -5,14 +5,14 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
 
         <RadzenDataGrid @ref="grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@regionTitles" LoadData="@LoadData"
-                        PageSize="@pageSize" PageSizeOptions="@pageSizeOptions" PageSizeChanged="@(args => pageSize = args)"
-                        Count="@count" IsLoading="@isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true"
+                        PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)"
+                        Count="@_count" IsLoading="@_isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                         ShowPagingSummary="true" style="height: 90vh">
             <HeaderTemplate>
                 <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
-                <RadzenText TextStyle="TextStyle.Caption">Last updated @lastUpdated</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="TitleId" Title="Title Id" Width="150px"/>

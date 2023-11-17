@@ -2,7 +2,7 @@
 
 public class PackagedContentMeta
 {
-    public List<ContentEntry> ContentEntries { get; set; }
+    public List<ContentEntry>? ContentEntries { get; set; }
     public List<MetaEntry> MetaEntries { get; set; }
     public string OtherApplicationId { get; set; }
     public int? RequiredApplicationVersion { get; set; }

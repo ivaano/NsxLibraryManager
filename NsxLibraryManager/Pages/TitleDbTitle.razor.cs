@@ -13,7 +13,8 @@ public partial class TitleDbTitle
     protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
     [Inject]
     protected ITitleDbService TitleDbService { get; set; } = default!;
-    [Parameter] public string? TitleId { get; set; }
+    [Parameter] 
+    public string? TitleId { get; set; }
     public LibraryTitle? LibraryTitle { get; set; }
     
     public IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
@@ -25,16 +26,19 @@ public partial class TitleDbTitle
 
     protected override async Task OnInitializedAsync()
     {
-        LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId);
-        if (LibraryTitle != null)
+        if (TitleId != null)
         {
-            var ownedTitle = TitleLibraryService.GetTitle(TitleId);
-            if (ownedTitle is not null) LibraryTitle = ownedTitle;
-            var sizeInBytes = LibraryTitle.Size ?? 0;
-            GameFileSize = sizeInBytes.ToHumanReadableBytes();
-            HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;
-            GameVersions = TitleDbService.GetVersions(LibraryTitle.TitleId);
-            GameDlcs = await TitleDbService.GetTitleDlc(LibraryTitle.TitleId);
+            LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId);
+            if (LibraryTitle != null)
+            {
+                var ownedTitle = TitleLibraryService.GetTitle(TitleId);
+                if (ownedTitle is not null) LibraryTitle = ownedTitle;
+                var sizeInBytes = LibraryTitle.Size ?? 0;
+                GameFileSize = sizeInBytes.ToHumanReadableBytes();
+                HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;
+                GameVersions = TitleDbService.GetVersions(LibraryTitle.TitleId);
+                GameDlcs = await TitleDbService.GetTitleDlc(LibraryTitle.TitleId);
+            }
         }
     }
 }

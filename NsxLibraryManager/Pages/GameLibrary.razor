@@ -2,8 +2,8 @@
 @using NsxLibraryManager.Models
 
 
-<RadzenDataList IsLoading="@isLoading" LoadData="@LoadData"
-                Data="@games" TItem="LibraryTitle" AllowPaging="false" Style="padding: 0">
+<RadzenDataList IsLoading="@IsLoading" LoadData="@LoadData"
+                Data="@_games" TItem="LibraryTitle" AllowPaging="false" Style="padding: 0">
     <Template Context="game">
         <RadzenCard Style="width: 100%; padding: 10px">
             <RadzenRow Gap="0.5rem">
@@ -105,6 +105,6 @@
 
     </Template>
 </RadzenDataList>
-<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@pagingSummaryFormat"
-             HorizontalAlign="HorizontalAlign.Right" Count="count"
-             PageSize="@pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>
+<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
+             HorizontalAlign="HorizontalAlign.Right" Count="_count"
+             PageSize="@_pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>

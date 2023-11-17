@@ -4,7 +4,7 @@
 
 
 <PageTitle>Nsx Library Manager</PageTitle>
-<RadzenTabs Change=@TabOnChange>
+<RadzenTabs Change=@TabOnChange @bind-SelectedIndex=@selectedTabIndex>
     <Tabs>
         <RadzenTabsItem Text="Title Library">
             <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
@@ -46,7 +46,7 @@
                                     @if (libraryTitle.Size != null)
                                     {
                                         var sizeInBytes = libraryTitle.Size ?? 0;
-                                        <RadzenText Text="@sizeInBytes.ToHumanReadableBytes()"/>
+                                        @sizeInBytes.ToHumanReadableBytes();
                                     }
                                 </Template>
                             </RadzenDataGridColumn>
@@ -87,7 +87,7 @@
 
 
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-                    <RadzenDataGrid @ref="Grid" Data="@MissingDlcs" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                    <RadzenDataGrid @ref="DlcGrid" Data="@MissingDlcs" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                                     AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                     AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                                     PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
@@ -103,10 +103,10 @@
                                     <RadzenLink Path="@($"/title/{libraryTitle.TitleId}")" Text="@libraryTitle.TitleName"/>
                                 </Template>
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs.Count" Title="Available DLC Count" Filterable="true" Width="100px" Sortable="false">
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableDlcs.Count" Title="Available DLC Count" Filterable="true" Width="100px" Sortable="true">
 
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedDlcs.Count" Title="Owned DLC Count" Filterable="true" Width="100px" Sortable="false">
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="OwnedDlcs.Count" Title="Owned DLC Count" Filterable="true" Width="100px" Sortable="true">
 
                             </RadzenDataGridColumn>
                         </Columns>
@@ -120,7 +120,7 @@
 
 
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-                    <RadzenDataGrid @ref="Grid" Data="@MissingUpdates" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                    <RadzenDataGrid @ref="UpdatesGrid" Data="@MissingUpdates" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                                     AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                     AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                                     PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
@@ -136,10 +136,10 @@
                                     <RadzenLink Path="@($"/title/{libraryTitle.TitleId}")" Text="@libraryTitle.TitleName"/>
                                 </Template>
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Update" Filterable="true" Width="100px" Sortable="false">
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="AvailableVersion" Title="Available Update" Filterable="true" Width="100px" Sortable="true">
 
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="LibraryTitle" Property="LastOwnedVersion" Title="Current Update" Filterable="true" Width="100px" Sortable="false">
+                            <RadzenDataGridColumn TItem="LibraryTitle" Property="LastOwnedVersion" Title="Current Update" Filterable="true" Width="100px" Sortable="true">
 
                             </RadzenDataGridColumn>
                         </Columns>

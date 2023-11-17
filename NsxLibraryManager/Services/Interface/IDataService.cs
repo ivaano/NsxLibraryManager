@@ -18,7 +18,7 @@ public interface IDataService : IDisposable
     public Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId);
     public IEnumerable<PackagedContentMeta> GetTitleDbCnmtsForTitle(string titleId);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
-    public Task<IQueryable<LibraryTitle>> GetLibraryTitlesQueryableAsync();
+    public IQueryable<LibraryTitle> GetLibraryTitlesQueryableAsync();
     public Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region);
     public LibraryTitle? GetLibraryTitleById(string titleId);
     public void UpdateLibraryTitleAsync(LibraryTitle libraryTitle);

@@ -42,14 +42,16 @@ public class TitleDbService : ITitleDbService
         var packagedContentMeta = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, PackagedContentMeta>>>(json);
         //flat the data
         var cnmts = new List<PackagedContentMeta>();
-        foreach (var cnmt in packagedContentMeta)
-        {
-            var gameVersions = cnmt.Value;
-            foreach (var gameVersion in gameVersions)
+        if (packagedContentMeta != null)
+            foreach (var cnmt in packagedContentMeta)
             {
-                cnmts.Add(gameVersion.Value);
+                var gameVersions = cnmt.Value;
+                foreach (var gameVersion in gameVersions)
+                {
+                    cnmts.Add(gameVersion.Value);
+                }
             }
-        }
+
         _dataService.DropDbCollection(AppConstants.CnmtsCollectionName);
         _dataService.ImportTitleDbCnmts(cnmts);
     }
@@ -121,6 +123,8 @@ public class TitleDbService : ITitleDbService
             var regionTitle = await _dataService.GetTitleDbRegionTitleByIdAsync(region, titleTitleId);
             if (regionTitle != null)
             {
+                //This fixes the id if the titleid is on the ids list
+                regionTitle.TitleId = titleTitleId;
                 return regionTitle;
             }
         }
