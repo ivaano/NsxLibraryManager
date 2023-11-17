@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <ApplicationIcon>wwwroot\images\logo.png</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
