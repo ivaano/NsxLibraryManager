@@ -17,13 +17,13 @@ public partial class RefreshLibraryProgressDialog : IDisposable
 
     private IEnumerable<string> FilesEnumerable { get; set; }
 
-    
+    /*
     protected override async Task OnInitializedAsync()
     {
         FilesEnumerable = await TitleLibraryService.GetFilesAsync();
         FileCount = FilesEnumerable.Count();
     }
-    
+    */
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

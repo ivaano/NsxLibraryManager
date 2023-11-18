@@ -74,7 +74,7 @@ public class FileInfoService : IFileInfoService
     public async Task<LibraryTitle> GetFileInfo(string filePath)
     {
         var packageInfo = _packageInfoLoader.GetPackageInfo(filePath);
-        
+
         if (packageInfo.Contents is null)
             throw new Exception("No contents found in the package");
         
@@ -86,7 +86,8 @@ public class FileInfoService : IFileInfoService
             TitleId = packageInfo.Contents.First().TitleId,
             TitleVersion = packageInfo.Contents.First().Version.Version,
             PackageType = packageInfo.AccuratePackageType,
-            FileName = Path.GetFullPath(filePath)
+            FileName = Path.GetFullPath(filePath),
+            LastWriteTime = File.GetLastWriteTime(filePath)
         };
         
         var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);

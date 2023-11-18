@@ -46,4 +46,5 @@ public record LibraryTitle
     public string ErrorMessage { get; set; } = string.Empty;
     [DisplayFormat(DataFormatString = @"{0:d MM\ddd\yyyy}")]
     public DateTime LastUpdated { get; set; }
+    public DateTime? LastWriteTime { get; set; }
 }

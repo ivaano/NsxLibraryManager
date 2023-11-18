@@ -58,6 +58,7 @@ public partial class Library
                 .Where(x => x.Type == TitleLibraryType.Base)
                 .Where(x => x.AvailableDlcs != x.OwnedDlcs)
                 .ToList();
+        titles = DataService.GetLibraryTitlesQueryableAsync();
         MissingUpdates = titles
                 .Where(x => x.Type == TitleLibraryType.Base)
                 .Where(x => x.AvailableVersion != x.LastOwnedVersion)

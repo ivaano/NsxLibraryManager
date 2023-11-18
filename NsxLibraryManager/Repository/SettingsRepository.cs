@@ -21,7 +21,7 @@ public class SettingsRepository : BaseRepository<Models.Dto.Settings>, ISettings
         return Collection.Find(o => o.Name == entity.Name).FirstOrDefault() ?? throw new InvalidOperationException();
     }
 
-    public async Task SaveDataGridStateAsync(string name, DataGridSettings dataGridSettings)
+    public Task SaveDataGridStateAsync(string name, DataGridSettings dataGridSettings)
     {
         var settings = new Models.Dto.Settings
         {
@@ -29,6 +29,7 @@ public class SettingsRepository : BaseRepository<Models.Dto.Settings>, ISettings
                 Value = System.Text.Json.JsonSerializer.Serialize(dataGridSettings)
         };
         Create(settings);
+        return Task.CompletedTask;
     }
 
     public Task<DataGridSettings?> LoadDataGridStateAsync(string name)

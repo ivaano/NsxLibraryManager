@@ -127,7 +127,7 @@ public class TitleLibraryService : ITitleLibraryService
         }
     }
 
-    public async Task AddOwnedUpdateToTitlesAsync()
+    public Task AddOwnedUpdateToTitlesAsync()
     {
         var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
         var gamesWithUpdates = libraryTitles.Where(x => x.AvailableVersion > 0);
@@ -163,6 +163,8 @@ public class TitleLibraryService : ITitleLibraryService
             title.LastOwnedVersion = lastOwnedVersion;
             _dataService.UpdateLibraryTitleAsync(title);
         }
+
+        return Task.CompletedTask;
     }
 
 
