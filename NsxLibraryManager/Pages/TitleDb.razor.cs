@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using NsxLibraryManager.Models;
 using NsxLibraryManager.Pages.Components;
-using NsxLibraryManager.Services;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq.Dynamic.Core;
+using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Services.Interface;
 
 namespace NsxLibraryManager.Pages;
 

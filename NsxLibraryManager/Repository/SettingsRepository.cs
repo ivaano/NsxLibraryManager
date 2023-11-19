@@ -1,10 +1,12 @@
 ﻿using LiteDB;
+using NsxLibraryManager.Core.Models.Dto;
+using NsxLibraryManager.Core.Repository;
 using NsxLibraryManager.Repository.Interface;
 using Radzen;
 
 namespace NsxLibraryManager.Repository;
 
-public class SettingsRepository : BaseRepository<Models.Dto.Settings>, ISettingsRepository
+public class SettingsRepository : BaseRepository<Settings>, ISettingsRepository
 {
     public SettingsRepository(ILiteDatabase db) : base(db)
     {
@@ -14,7 +16,7 @@ public class SettingsRepository : BaseRepository<Models.Dto.Settings>, ISettings
     {
     }
     
-    public override Models.Dto.Settings Create(Models.Dto.Settings entity)
+    public override Settings Create(Settings entity)
     {
         Collection.Insert(entity);
         Collection.EnsureIndex(x => x.Name);
@@ -23,7 +25,7 @@ public class SettingsRepository : BaseRepository<Models.Dto.Settings>, ISettings
 
     public Task SaveDataGridStateAsync(string name, DataGridSettings dataGridSettings)
     {
-        var settings = new Models.Dto.Settings
+        var settings = new Settings
         {
                 Name = name,
                 Value = System.Text.Json.JsonSerializer.Serialize(dataGridSettings)

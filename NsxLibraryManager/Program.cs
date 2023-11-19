@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
-using NsxLibraryManager.FileLoading;
-using NsxLibraryManager.FileLoading.QuickFileInfoLoading;
-using NsxLibraryManager.Mapping;
-using NsxLibraryManager.Models;
-using NsxLibraryManager.Models.Dto;
-using NsxLibraryManager.Services;
-using NsxLibraryManager.Services.Interface;
-using NsxLibraryManager.Services.KeysManagement;
-using NsxLibraryManager.Settings;
+using NsxLibraryManager.Core.FileLoading;
+using NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Core.Mapping;
+using NsxLibraryManager.Core.Models.Dto;
+using NsxLibraryManager.Core.Services;
+using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Core.Services.KeysManagement;
+using NsxLibraryManager.Core.Settings;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);

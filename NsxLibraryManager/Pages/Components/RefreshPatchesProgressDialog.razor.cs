@@ -1,5 +1,5 @@
-﻿using NsxLibraryManager.Services.Interface;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
+using NsxLibraryManager.Core.Services.Interface;
 using Radzen;
 
 

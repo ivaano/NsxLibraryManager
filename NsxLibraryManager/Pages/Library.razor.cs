@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Enums;
-using NsxLibraryManager.Models;
+using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Pages.Components;
-using NsxLibraryManager.Services;
-using NsxLibraryManager.Services.Interface;
 using Radzen;
 using Radzen.Blazor;
 
