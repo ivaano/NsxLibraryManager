@@ -165,8 +165,7 @@ public class DataService : IDataService
         var currentDateTime = DateTime.Now;
         foreach (var title in titles)
         {
-            if (title.Value != null && title.Value.ToString() == "{}") continue;
-
+            if (title.Value is null || title.Value.ToString() == "{}") continue;
             var titleDbTitle = JsonConvert.DeserializeObject<TitleDbTitle>(title.Value.ToString());
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
             regionTitle.Region = region;

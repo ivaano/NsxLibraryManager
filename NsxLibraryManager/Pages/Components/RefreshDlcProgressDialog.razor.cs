@@ -8,9 +8,9 @@ namespace NsxLibraryManager.Pages.Components;
 partial class RefreshDlcProgressDialog
 {
     [Inject]
-    protected DialogService DialogService { get; set; }
+    protected DialogService DialogService { get; set; } = default!;
     [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

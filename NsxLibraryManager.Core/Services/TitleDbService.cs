@@ -63,20 +63,22 @@ public class TitleDbService : ITitleDbService
         var gameVersions  = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
         var gameVersionsList = new List<GameVersions>();
 
-        foreach (var game in gameVersions)
-        {
-            foreach (var versions in game.Value)
+        if (gameVersions != null)
+            foreach (var game in gameVersions)
             {
-                var gameVersion = new GameVersions
+                foreach (var versions in game.Value)
                 {
-                        TitleId = game.Key,
-                        Version = versions.Key,
-                        VersionShifted = versions.Key.VersionShifted(),
-                        Date = versions.Value
-                };
-                gameVersionsList.Add(gameVersion);
+                    var gameVersion = new GameVersions
+                    {
+                            TitleId = game.Key,
+                            Version = versions.Key,
+                            VersionShifted = versions.Key.VersionShifted(),
+                            Date = versions.Value
+                    };
+                    gameVersionsList.Add(gameVersion);
+                }
             }
-        }
+
         _dataService.DropDbCollection(AppConstants.VersionsCollectionName);
         _dataService.ImportTitleDbVersions(gameVersionsList);
     }
@@ -95,13 +97,13 @@ public class TitleDbService : ITitleDbService
         if (patchFound == null) return versionList;
         foreach (var version in versionList)
         {
-            var tryParseDate = DateTime.TryParseExact(version.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
+            _ = DateTime.TryParseExact(version.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
                     out var parsedDate)
                     ? parsedDate
                     : new DateTime();
             version.Date = parsedDate.ToString("MM/dd/yyyy");
             version.ApplicationId = titleTitleId.ToUpper();
-            version.TitleId = patchFound.TitleId.ToUpper();
+            if (patchFound.TitleId != null) version.TitleId = patchFound.TitleId.ToUpper();
         }
         return  versionList;
     }
@@ -143,40 +145,39 @@ public class TitleDbService : ITitleDbService
         var dlcList = new List<Dlc>();        
         foreach (var cnmt in cnmts)
         {
+            if (cnmt.TitleId is null) continue;
             var regionTitle = await GetTitle(cnmt.TitleId);
-            if (regionTitle != null)
+            if (regionTitle is null) continue;
+            var updateDlc = false;
+            var alreadyInList = false;
+            foreach (var exists in dlcList)
             {
-                var updateDlc = false;
-                var alreadyInList = false;
-                foreach (var exists in dlcList)
+                if (exists.TitleId == cnmt.TitleId)
                 {
-                    if (exists.TitleId == cnmt.TitleId)
-                    {
-                        alreadyInList = true;
-                        var existsVersion = Convert.ToUInt32(exists.TitleVersion);
-                        var currentVersion = Convert.ToUInt32(cnmt.Version);
+                    alreadyInList = true;
+                    var existsVersion = Convert.ToUInt32(exists.TitleVersion);
+                    var currentVersion = Convert.ToUInt32(cnmt.Version);
                         
-                        if (currentVersion > existsVersion)
-                        {
-                            exists.TitleVersion = cnmt.Version;
-                            updateDlc = true;
-                        }
+                    if (currentVersion > existsVersion)
+                    {
+                        exists.TitleVersion = cnmt.Version ?? string.Empty;
+                        updateDlc = true;
                     }
                 }
+            }
 
-                if (!alreadyInList)
+            if (!alreadyInList)
+            {
+                var dlc = new Dlc
                 {
-                    var dlc = new Dlc
-                    {
-                            TitleId = regionTitle.TitleId,
-                            TitleVersion = cnmt.Version,
-                            TitleName = regionTitle.Name
-                    };
-                    if (!updateDlc)
-                    {
-                        dlcList.Add(dlc);    
-                    }      
-                }
+                    TitleId = regionTitle.TitleId,
+                    TitleVersion = cnmt.Version ?? string.Empty,
+                    TitleName = regionTitle.Name
+                };
+                if (!updateDlc)
+                {
+                    dlcList.Add(dlc);    
+                }      
             }
         }
         return dlcList;
