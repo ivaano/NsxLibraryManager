@@ -1,0 +1,89 @@
+﻿{
+  "70010000001130": {
+    "bannerUrl": "https://img-eshop.cdn.nintendo.net/i/c42553b4fd0312c31e70ec7468c6c9bccd739f340152925b9600631f2d29f8b5.jpg",
+    "category": [
+      "Platformer",
+      "Action"
+    ],
+    "description": "Explore incredible places far from the Mushroom Kingdom as you join Mario and his new ally Cappy on a massive, globe-trotting 3D adventure. Use amazing new abilities\u2014like the power to capture and control objects, animals, and enemies\u2014to collect Power Moons so you can power up the Odyssey airship and save Princess Peach from Bowser\u2019s wedding plans!\n\nThanks to heroic, hat-shaped Cappy, Mario\u2019s got new moves that\u2019ll make you rethink his traditional run-and-jump gameplay\u2014like cap jump, cap throw, and capture. Use captured cohorts such as enemies, objects, and animals to progress through the game and uncover loads of hidden collectibles. And if you feel like playing with a friend, just pass them a Joy-Con\u2122 controller! Player 1 controls Mario while Player 2 controls Cappy. This sandbox-style 3D Mario adventure\u2014the first since 1996\u2019s beloved Super Mario 64\u2122 and 2002\u2019s Nintendo GameCube\u2122 classic Super Mario Sunshine\u2122\u2014is packed with secrets and surprises, plus exciting new kingdoms to explore.",
+    "developer": null,
+    "frontBoxArt": null,
+    "iconUrl": "https://img-eshop.cdn.nintendo.net/i/ad4d31f664a1ce704f0219da2805f8459595bc3c01c3f04df2e32ba34a05b8c6.jpg",
+    "id": "0100000000010000",
+    "intro": "Embark on a cap-tivating, globe-trotting adventure",
+    "isDemo": false,
+    "key": null,
+    "languages": [
+      "ja",
+      "en",
+      "es",
+      "fr",
+      "de",
+      "it",
+      "nl",
+      "ru",
+      "zh",
+      "zh"
+    ],
+    "name": "Super Mario Odyssey\u2122",
+    "nsuId": 70010000001130,
+    "numberOfPlayers": 2,
+    "publisher": "Nintendo",
+    "rating": 10,
+    "ratingContent": [
+      "Cartoon Violence",
+      "Comic Mischief"
+    ],
+    "region": null,
+    "releaseDate": 20171027,
+    "rightsId": "01000000000100000000000000000003",
+    "screenshots": [
+      "https://img-eshop.cdn.nintendo.net/i/c497547957d9dd3668e891aa97ff4899a3f40bd1bd430020f8cbdf673f02bdeb.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/1839d571921e3fb19ef48da64c145cb8ce573b07d7390c6350f15291b3905048.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/d0510e4804381287c64dc3ab374ae9273419e263e9a732e72af3b39cd70f2b5f.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/ab713d841b0f0d9bbce38b589d75dd3bba2aef005418e59d3f0fd95389ae7016.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/abcf9708cc28ef5b7ab412aa17fafe4ad181f0b957456ffd9b83de2561d9f62a.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/7db70ecd883f94d935f65b9f4454b8151b6f8be7c4be95543e87488e48e5a6b9.jpg"
+    ],
+    "size": 6025117696,
+    "version": null
+  },
+  "70050000001672": {
+    "bannerUrl": "https://img-eshop.cdn.nintendo.net/i/594cb8c7f9944fdf01baa292cabef3ef3011b57a5b67ba0187c7cf8bce538dcd.jpg",
+    "category": null,
+    "description": "Accessorize your custom character, matching characters from some of your favorite SEGA / Atlus games. You'll have the coolest looking custom character around, with these character costumes from four games: Jet Set Radio\u2122, Persona\u00ae5, NiGHTS\u2122, and Super Monkey Ball\u2122, plus a hat from PuyoPuyo\u2122! \n\nIn SONIC FORCES, you get to create your own custom character equipped with powerful gadgets to help Sonic take back the world \u2013 Join the Uprising.",
+    "developer": null,
+    "frontBoxArt": null,
+    "iconUrl": null,
+    "id": "01001270012B7003",
+    "ids": [
+      "01001270012B7006",
+      "01001270012B7003"
+    ],
+    "intro": null,
+    "isDemo": false,
+    "key": null,
+    "languages": null,
+    "name": "SEGA/ATLUS PACK",
+    "nsuId": 70050000001672,
+    "numberOfPlayers": null,
+    "publisher": "SEGA",
+    "rating": 10,
+    "ratingContent": [
+      "Fantasy Violence"
+    ],
+    "region": null,
+    "releaseDate": 20171107,
+    "rightsId": "01001270012B70060000000000000003",
+    "screenshots": [
+      "https://img-eshop.cdn.nintendo.net/i/98685700faf00674991b2c82eeeaa62b9ad498ff8f41d449cb147858c7993a79.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/43a0e912d372aa7f769b553308fcbf4a307bbba1e197e4d4bbb092b4b54a159b.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/4f4e7ddeb9b291de5c06172fc75567469a71f26c58308ba7056129ea6eb8ee70.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/1c518165fcce5cc2d44d7c4e9962dafcdeb2d812f42caf7dcaf11934dfd01de2.jpg",
+      "https://img-eshop.cdn.nintendo.net/i/072f2c68ca95e2ee9f6b762f38e89b7acd2e02552fabdcc2ed32690c0b043804.jpg"
+    ],
+    "size": 5242880,
+    "version": null
+  },
+  "70010000001131": {}
+}
