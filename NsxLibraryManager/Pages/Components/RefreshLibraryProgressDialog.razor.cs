@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Core.Services.Interface;
 using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;

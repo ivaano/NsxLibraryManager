@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using NsxLibraryManager.Models;
 using NsxLibraryManager.Pages.Components;
-using NsxLibraryManager.Services;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq.Dynamic.Core;
+using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Services.Interface;
 
 namespace NsxLibraryManager.Pages;
 
@@ -21,16 +21,17 @@ public partial class TitleDb
     [Inject]
     protected DialogService DialogService { get; set; } = default!;
 
-    private RadzenDataGrid<RegionTitle> grid;
-    private IEnumerable<RegionTitle> regionTitles;
+    private static readonly string SettingsParamaterName = "TitleDbGridSettings";
+
+    private RadzenDataGrid<RegionTitle> _grid = default!;
+    private IEnumerable<RegionTitle> _regionTitles = default!;
     private DataGridSettings? _settings;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };
     private int _pageSize = 100;
-    private static readonly string SettingsParamaterName = "TitleDbGridSettings";
     private int _count;
     private bool _isLoading;
     private string _lastUpdated = "never";
-    private IEnumerable<string> _allRegions;
+
     public DataGridSettings? Settings 
     { 
         get => _settings;
@@ -48,13 +49,14 @@ public partial class TitleDb
     {
         await base.OnInitializedAsync();
 
+        /*
         var regionList = new List<string>()
         {
                 "US"
 
         };
         _allRegions = regionList.AsEnumerable();
-        
+        */
     }
 
     private void LoadSettings(DataGridLoadSettingsEventArgs args)
@@ -70,7 +72,6 @@ public partial class TitleDb
         _isLoading = true;
         _lastUpdated =  DataService.GetRegionLastUpdate("US").ToString() ?? "never";
         await Task.Yield();
-        await JsRuntime.InvokeAsync<string>("console.log", "LoadData");
         
         var query = await DataService.GetTitleDbRegionTitlesQueryableAsync("US");
         
@@ -81,18 +82,21 @@ public partial class TitleDb
         }
 
         _count = query.Count();
-
+        
+        var skip = args.Skip ?? 0;
+        var take = args.Top ?? 100;
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
-            regionTitles =
+
+            _regionTitles =
                     await Task.FromResult(
-                            query.OrderBy(args.OrderBy).Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+                            query.OrderBy(args.OrderBy).Skip(skip).Take(take).ToList());
         }
         else
         {
-            regionTitles =
+            _regionTitles =
                     await Task.FromResult(
-                            query.OrderBy(x => x.Name).Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+                            query.OrderBy(x => x.Name).Skip(skip).Take(take).ToList());
         }
 
         _isLoading = false;
@@ -102,7 +106,6 @@ public partial class TitleDb
     {
         if (firstRender)
         {
-            await JsRuntime.InvokeAsync<string>("console.log", "OnAfterRenderAsync");
             await LoadStateAsync();
             StateHasChanged();
         }
@@ -116,7 +119,7 @@ public partial class TitleDb
         if (!string.IsNullOrEmpty(result))
         {
             _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
-            if (_settings.PageSize.HasValue)
+            if (_settings is { PageSize: not null })
             {
                 _pageSize = _settings.PageSize.Value;
             }

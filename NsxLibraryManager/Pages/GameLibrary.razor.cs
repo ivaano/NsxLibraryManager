@@ -1,20 +1,18 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using NsxLibraryManager.Enums;
-using NsxLibraryManager.Models;
+using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Pages.Components;
-using NsxLibraryManager.Services;
 using Radzen;
 
 namespace NsxLibraryManager.Pages;
 
 public partial class GameLibrary
 {
-    
-    [Inject]
-    protected IDataService DataService { get; set; }
-    
-    
+    [Inject] protected IDataService DataService { get; set; } = default!;
+
+
     public bool ShowDlcInfo { get; set; } = false;
 
     private readonly string _pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
@@ -23,13 +21,13 @@ public partial class GameLibrary
     public bool IsLoading;
 
 
-    private IEnumerable<LibraryTitle> _games;
-    
-    
-    
+    private IEnumerable<LibraryTitle> _games = default!;
+
+
     private async Task PageChanged(PagerEventArgs args)
     {
-        var loadDataArgs = new LoadDataArgs { 
+        var loadDataArgs = new LoadDataArgs
+        {
                 Top = args.Top,
                 Skip = args.Skip
         };

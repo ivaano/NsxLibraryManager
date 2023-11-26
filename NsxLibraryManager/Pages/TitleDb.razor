@@ -1,10 +1,10 @@
 ﻿@page "/titledb"
-@using NsxLibraryManager.Models
+@using NsxLibraryManager.Core.Models
 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
 
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
 
-        <RadzenDataGrid @ref="grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@regionTitles" LoadData="@LoadData"
+        <RadzenDataGrid @ref="_grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@_regionTitles" LoadData="@LoadData"
                         PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)"
                         Count="@_count" IsLoading="@_isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"

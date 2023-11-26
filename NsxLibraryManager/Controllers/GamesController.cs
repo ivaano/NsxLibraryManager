@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
-using NsxLibraryManager.Models;
-using NsxLibraryManager.Models.Dto;
-using NsxLibraryManager.Services;
+using NsxLibraryManager.Core.Models.Dto;
+using NsxLibraryManager.Core.Services.Interface;
 
 namespace NsxLibraryManager.Controllers;
 
