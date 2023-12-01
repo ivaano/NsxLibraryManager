@@ -81,37 +81,25 @@ public class FileInfoService : IFileInfoService
         
         var title = new LibraryTitle
         {
-            ApplicationTitleId = packageInfo.Contents.First().ApplicationTitleId,
-            PatchTitleId = packageInfo.Contents.First().PatchTitleId,
-            PatchNumber = packageInfo.Contents.First().PatchNumber,
-            TitleId = packageInfo.Contents.First().TitleId,
-            TitleVersion = packageInfo.Contents.First().Version.Version,
+            ApplicationTitleId = packageInfo.Contents.ApplicationTitleId,
+            PatchTitleId = packageInfo.Contents.PatchTitleId,
+            PatchNumber = packageInfo.Contents.PatchNumber,
+            TitleId = packageInfo.Contents.TitleId,
+            TitleVersion = packageInfo.Contents.Version.Version,
             PackageType = packageInfo.AccuratePackageType,
             FileName = Path.GetFullPath(filePath),
             LastWriteTime = File.GetLastWriteTime(filePath)
         };
-        
+
         var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);
         title.AvailableVersion = availableVersion >> 16;
-        title.Type = packageInfo.Contents.First().Type switch
+        title.Type = packageInfo.Contents.Type switch
         {
                 ContentMetaType.Application => TitleLibraryType.Base,
                 ContentMetaType.Patch => TitleLibraryType.Update,
                 ContentMetaType.AddOnContent => TitleLibraryType.DLC,
                 _ => title.Type
         };
-
-        var nacpData = packageInfo.Contents.First().NacpData;
-        if (nacpData == null) return title;
-
-        foreach (var ncpTitle in nacpData.Titles)
-        {
-            if (ncpTitle is null) continue;
-            if (ncpTitle.Name == string.Empty) continue;
-            title.TitleName = ncpTitle.Name;
-            title.Publisher = ncpTitle.Publisher;
-            break;
-        }
 
         return title;
     }

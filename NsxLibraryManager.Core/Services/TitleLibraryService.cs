@@ -49,7 +49,8 @@ public class TitleLibraryService : ITitleLibraryService
 
         // prefer the title name from the file
         libraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(regionTitle.Name);
-        libraryTitle.Publisher = libraryTitle.Publisher.ConvertNullOrEmptyTo(regionTitle.Publisher);
+        // prefer the publisher from the titledb
+        libraryTitle.Publisher = regionTitle.Publisher.ConvertNullOrEmptyTo(libraryTitle.Publisher);
 
         libraryTitle.BannerUrl = regionTitle.BannerUrl;
         libraryTitle.Nsuid = regionTitle.Id;

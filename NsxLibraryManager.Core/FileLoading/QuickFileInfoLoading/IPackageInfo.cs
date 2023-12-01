@@ -3,7 +3,7 @@ namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
 
 public interface IPackageInfo
 {
-    public IEnumerable<IContent>? Contents { get; init; }
+    public IContent? Contents { get; init; }
 
     public AccuratePackageType AccuratePackageType { get; init; }
 
