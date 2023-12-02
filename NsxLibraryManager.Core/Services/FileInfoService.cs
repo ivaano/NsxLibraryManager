@@ -85,6 +85,8 @@ public class FileInfoService : IFileInfoService
             PatchTitleId = packageInfo.Contents.PatchTitleId,
             PatchNumber = packageInfo.Contents.PatchNumber,
             TitleId = packageInfo.Contents.TitleId,
+            TitleName = packageInfo.Contents.Name,
+            Publisher = packageInfo.Contents.Publisher,
             TitleVersion = packageInfo.Contents.Version.Version,
             PackageType = packageInfo.AccuratePackageType,
             FileName = Path.GetFullPath(filePath),

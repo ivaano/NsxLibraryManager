@@ -23,6 +23,8 @@ public class FileInfoServiceTests
     private const string TestTitleId = "1111100000000000";
     private const string TestApplicationTitleId = "1111000000000002";
     private const string TestPatchTitleId = "1111000000000003";
+    private const string TestTitleName = "Test Title";
+    private const string TestPublisher = "Test Publisher";
 
 
     public FileInfoServiceTests()
@@ -35,33 +37,11 @@ public class FileInfoServiceTests
 
     
     [Fact]
-    public async Task Should_Return_File_Info_From_NcpData()
+    public async Task Should_Return_File_Info()
     {
         //Arrange
         const string fileName = "testFile.nsp";
-        var titleName = new Array512<byte>();
-        titleName.Items[0] = 0x54;
-        titleName.Items[1] = 0x65;
-        titleName.Items[2] = 0x73;
-        titleName.Items[3] = 0x74;
-        
-        var titlePublisher = new Array256<byte>();
-        titlePublisher.Items[0] = 0x54;
-        titlePublisher.Items[1] = 0x65;
-        titlePublisher.Items[2] = 0x73;
-        titlePublisher.Items[3] = 0x74;
-        
-        var appControlProperty = new ApplicationControlProperty();
-        var appTitle = new ApplicationControlProperty.ApplicationTitle
-        {
-           Name = titleName,
-           Publisher = titlePublisher
-        };
-        appControlProperty.Title[0] = appTitle;
-        appControlProperty.SupportedLanguageFlag = 1;
-        
-        var nacpData = new NacpData(appControlProperty);
-        var contents = GetBaseContents(nacpData: nacpData);
+        var contents = GetBaseContents();
         var packageInfo = GetBasePackageInfo(content: contents);
         _packageInfoLoader.GetPackageInfo(Arg.Any<string>()).Returns(packageInfo);
         
@@ -73,59 +53,13 @@ public class FileInfoServiceTests
         Assert.Equal(TestTitleId, result.TitleId);
         Assert.Equal(TestApplicationTitleId, result.ApplicationTitleId);
         Assert.Equal(TestPatchTitleId, result.PatchTitleId);
-        Assert.Equal("Test", result.TitleName);
-        Assert.Equal("Test", result.Publisher);
+        Assert.Equal(TestTitleName, result.TitleName);
+        Assert.Equal(TestPublisher, result.Publisher);
         Assert.Equal(Path.GetFullPath(fileName), result.FileName);
         Assert.Equal(TitleLibraryType.Base, result.Type);
         Assert.Equal(AccuratePackageType.NSP, result.PackageType);
     }
     
-    [Fact]
-    public async Task Should_Return_FileInfo_When_NcpDataTitles_Is_Not_First()
-    {
-        //Arrange
-        const string fileName = "testFile.nsp";
-        var titleName = new Array512<byte>();
-        titleName.Items[0] = 0x54;
-        titleName.Items[1] = 0x65;
-        titleName.Items[2] = 0x73;
-        titleName.Items[3] = 0x74;
-        
-        var titlePublisher = new Array256<byte>();
-        titlePublisher.Items[0] = 0x54;
-        titlePublisher.Items[1] = 0x65;
-        titlePublisher.Items[2] = 0x73;
-        titlePublisher.Items[3] = 0x74;
-        
-        var appControlProperty = new ApplicationControlProperty();
-        var appTitle = new ApplicationControlProperty.ApplicationTitle
-        {
-                Name = titleName,
-                Publisher = titlePublisher
-        };
-        appControlProperty.Title[2] = appTitle;
-        appControlProperty.SupportedLanguageFlag = 4;
-        
-        var nacpData = new NacpData(appControlProperty);
-        var contents = GetBaseContents(nacpData: nacpData);
-        var packageInfo = GetBasePackageInfo(content: contents);
-
-        _packageInfoLoader.GetPackageInfo(Arg.Any<string>()).Returns(packageInfo);
-        
-        //Act
-        var result = await _fileInfoService.GetFileInfo(fileName);
-        
-        //Assert
-        Assert.NotNull(result);
-        Assert.Equal(TestTitleId, result.TitleId);
-        Assert.Equal(TestApplicationTitleId, result.ApplicationTitleId);
-        Assert.Equal(TestPatchTitleId, result.PatchTitleId);
-        Assert.Equal("Test", result.TitleName);
-        Assert.Equal("Test", result.Publisher);
-        Assert.Equal(Path.GetFullPath(fileName), result.FileName);
-        Assert.Equal(TitleLibraryType.Base, result.Type);
-        Assert.Equal(AccuratePackageType.NSP, result.PackageType);
-    }
     
     [Fact]
     public async Task Should_Throw_Exception_When_No_Contents()
@@ -210,13 +144,12 @@ public class FileInfoServiceTests
         {
                 PackageType = packageType,
                 AccuratePackageType = accuratePackageType,
-                Contents = new List<IContent> {content}
+                Contents = content
         };
         return packageInfo;
     }
     
-    private static IContent GetBaseContents(ContentMetaType contentMetaType = ContentMetaType.Application, 
-            NacpData? nacpData = null)
+    private static IContent GetBaseContents(ContentMetaType contentMetaType = ContentMetaType.Application)
     {
         var contents = Substitute.For<IContent>();
         contents.Type.Returns(contentMetaType);
@@ -224,7 +157,8 @@ public class FileInfoServiceTests
         contents.TitleId.Returns(TestTitleId);
         contents.ApplicationTitleId.Returns(TestApplicationTitleId);
         contents.PatchTitleId.Returns(TestPatchTitleId);
-        contents.NacpData.Returns(nacpData);
+        contents.Name.Returns(TestTitleName);
+        contents.Publisher.Returns(TestPublisher);
         return contents;
     }    
 }
