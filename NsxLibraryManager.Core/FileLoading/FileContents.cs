@@ -1,7 +1,6 @@
 ﻿using LibHac.Tools.Fs;
 
-
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+namespace NsxLibraryManager.Core.FileLoading;
 
 public class FileContents
 {

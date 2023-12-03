@@ -1,10 +1,9 @@
-﻿using LibHac.Common;
-using LibHac.Common.Keys;
+﻿using LibHac.Common.Keys;
 using LibHac.Fs.Fsa;
 using LibHac.Tools.Fs;
 using LibHac.Tools.FsSystem;
 
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+namespace NsxLibraryManager.Core.FileLoading;
 
 public static class ProcessAppFs
 {

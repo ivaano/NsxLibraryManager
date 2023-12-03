@@ -1,5 +1,7 @@
 ﻿
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Core.Enums;
+
+namespace NsxLibraryManager.Core.FileLoading.Interface;
 
 public interface IPackageInfo
 {

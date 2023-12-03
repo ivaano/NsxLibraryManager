@@ -3,11 +3,12 @@ using LibHac.Common.Keys;
 using LibHac.Fs;
 using LibHac.FsSystem;
 using LibHac.Tools.Fs;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
+using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
 
-
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+namespace NsxLibraryManager.Core.FileLoading;
 
 public class PackageInfoLoader : IPackageInfoLoader
 {
@@ -27,7 +28,6 @@ public class PackageInfoLoader : IPackageInfoLoader
 
         AccuratePackageType accuratePackageType;
         FileContents fileContents;
-        //List<Content> contents;
         switch (_packageTypeAnalyzer.GetType(filePath))
         {
             case PackageType.UNKNOWN:

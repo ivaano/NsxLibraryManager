@@ -1,4 +1,6 @@
-﻿namespace NsxLibraryManager.Core.FileLoading;
+﻿using NsxLibraryManager.Core.Enums;
+
+namespace NsxLibraryManager.Core.FileLoading.Interface;
 
 public interface IPackageTypeAnalyzer
 {
@@ -8,12 +10,4 @@ public interface IPackageTypeAnalyzer
     /// <param name="filePath"></param>
     /// <returns></returns>
     PackageType GetType(string filePath);
-}
-
-
-public enum PackageType
-{
-    UNKNOWN,
-    XCI,
-    NSP
 }

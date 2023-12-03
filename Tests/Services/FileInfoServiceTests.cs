@@ -1,16 +1,13 @@
-﻿using LibHac.Common.FixedArrays;
-using LibHac.Ncm;
-using LibHac.Ns;
+﻿using LibHac.Ncm;
 using LibHac.Tools.FsSystem.NcaUtils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading;
-using NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
-using ILogger = Castle.Core.Logging.ILogger;
 
 namespace Tests.Services;
 
@@ -18,8 +15,6 @@ public class FileInfoServiceTests
 {
     private readonly IFileInfoService _fileInfoService;
     private readonly IPackageInfoLoader _packageInfoLoader;
-    private readonly ITitleDbService _titleDbService;
-    private readonly ILogger<FileInfoService> _logger;
     private const string TestTitleId = "1111100000000000";
     private const string TestApplicationTitleId = "1111000000000002";
     private const string TestPatchTitleId = "1111000000000003";
@@ -29,10 +24,10 @@ public class FileInfoServiceTests
 
     public FileInfoServiceTests()
     {
-        _titleDbService = Substitute.For<ITitleDbService>();
+        var titleDbService = Substitute.For<ITitleDbService>();
         _packageInfoLoader = Substitute.For<IPackageInfoLoader>();
-        _logger = Substitute.For<ILogger<FileInfoService>>();
-        _fileInfoService = new FileInfoService(_packageInfoLoader, _titleDbService, _logger);
+        ILogger<FileInfoService> logger = Substitute.For<ILogger<FileInfoService>>();
+        _fileInfoService = new FileInfoService(_packageInfoLoader, titleDbService, logger);
     }
 
     

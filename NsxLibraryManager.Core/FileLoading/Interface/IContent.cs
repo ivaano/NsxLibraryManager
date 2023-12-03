@@ -1,7 +1,7 @@
 ﻿using LibHac.Ncm;
 using LibHac.Tools.FsSystem.NcaUtils;
 
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+namespace NsxLibraryManager.Core.FileLoading.Interface;
 
 public interface IContent
 {

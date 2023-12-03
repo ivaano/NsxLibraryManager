@@ -12,10 +12,10 @@ public class KeySetProviderService : IKeySetProviderService
     private readonly AppSettings _configuration;
     private readonly object _lock = new();
     private KeySet? _keySet;
-    private ILogger<KeySetProviderService> _logger;
+    private ILogger<IKeySetProviderService> _logger;
 
 
-    public KeySetProviderService(IOptions<AppSettings> configuration, ILogger<KeySetProviderService> logger)
+    public KeySetProviderService(IOptions<AppSettings> configuration, ILogger<IKeySetProviderService> logger)
     {
         _configuration = configuration.Value;
         _logger = logger;

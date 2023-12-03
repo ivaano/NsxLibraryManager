@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 using NsxLibraryManager.Core.FileLoading;
-using NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Models.Dto;
 using NsxLibraryManager.Core.Services;

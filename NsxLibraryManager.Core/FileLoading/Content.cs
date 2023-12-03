@@ -2,9 +2,10 @@
 using LibHac.Tools.FsSystem.NcaUtils;
 using LibHac.Tools.Ncm;
 using NsxLibraryManager.Core.Extensions;
+using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Utils;
 
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+namespace NsxLibraryManager.Core.FileLoading;
 
 /// <summary>
 /// A Nintendo Switch package (XCI, NSP, ...) can contain a single content or multiple contents (known as SuperXCI or SuperNSP).

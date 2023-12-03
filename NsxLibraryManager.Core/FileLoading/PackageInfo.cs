@@ -1,4 +1,7 @@
-﻿namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+﻿using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.FileLoading.Interface;
+
+namespace NsxLibraryManager.Core.FileLoading;
 
 public class PackageInfo : IPackageInfo
 {
@@ -9,13 +12,7 @@ public class PackageInfo : IPackageInfo
     public PackageType PackageType { get; init; }
 }
 
-public enum AccuratePackageType
-{
-    NSP,
-    NSZ,
-    XCI,
-    XCZ
-}
+
 
 
 
