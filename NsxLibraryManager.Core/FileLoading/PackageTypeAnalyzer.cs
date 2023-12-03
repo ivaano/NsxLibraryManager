@@ -1,15 +1,17 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Logging;
+using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.FileLoading.Interface;
 
 namespace NsxLibraryManager.Core.FileLoading;
 
 public class PackageTypeAnalyzer : IPackageTypeAnalyzer
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<IPackageTypeAnalyzer> _logger;
 
-    public PackageTypeAnalyzer(ILoggerFactory loggerFactory)
+    public PackageTypeAnalyzer(ILogger<IPackageTypeAnalyzer> logger)
     {
-        _logger = (loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory))).CreateLogger(this.GetType());
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public PackageType GetType(string filePath)

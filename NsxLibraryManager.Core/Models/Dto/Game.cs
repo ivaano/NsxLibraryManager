@@ -1,5 +1,5 @@
 using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+using NsxLibraryManager.Core.FileLoading;
 
 namespace NsxLibraryManager.Core.Models.Dto;
 

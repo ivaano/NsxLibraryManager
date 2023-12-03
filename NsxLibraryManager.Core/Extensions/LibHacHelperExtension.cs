@@ -14,6 +14,16 @@ namespace NsxLibraryManager.Core.Extensions;
 
 public static class LibHacHelperExtension
 {
+    public static int GetPatchNumber(this TitleVersion titleVersion)
+    {
+        return titleVersion.Minor;
+    }
+}
+
+/*
+public static class LibHacHelperExtension
+{
+    
     public static IEnumerable<PartitionFileEntry> FindCnmtEntries(this PartitionFileSystem fileSystem)
     {
         foreach (var partitionFileEntry in fileSystem.Files)
@@ -112,7 +122,7 @@ public static class LibHacHelperExtension
         }
     }
 }
-
+*/
 public class FoundEntry
 {
     public FoundEntry(IFileSystem sectionFileSystem, DirectoryEntryEx entry)

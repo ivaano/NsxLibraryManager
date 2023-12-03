@@ -2,9 +2,10 @@
 using LibHac.Tools.FsSystem.NcaUtils;
 using LibHac.Tools.Ncm;
 using NsxLibraryManager.Core.Extensions;
+using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Utils;
 
-namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+namespace NsxLibraryManager.Core.FileLoading;
 
 /// <summary>
 /// A Nintendo Switch package (XCI, NSP, ...) can contain a single content or multiple contents (known as SuperXCI or SuperNSP).
@@ -23,6 +24,8 @@ public class Content : IContent
     public ContentMetaType Type => _cnmt.Type;
 
     public string TitleId => _cnmt.TitleId.ToStrId();
+    public string Name { get; set; } = string.Empty;
+    public string Publisher { get; set; } = string.Empty;
 
     public string ApplicationTitleId => _cnmt.ApplicationTitleId.ToStrId();
 
@@ -30,10 +33,7 @@ public class Content : IContent
 
     public TitleVersion MinimumApplicationVersion => _cnmt.MinimumApplicationVersion;
 
-    public NacpData? NacpData { get; set; }
-
     public TitleVersion Version => _cnmt.TitleVersion;
 
     public int PatchNumber => _cnmt.TitleVersion.GetPatchNumber();
-
 }

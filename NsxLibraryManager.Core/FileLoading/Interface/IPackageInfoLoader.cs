@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Core.FileLoading.QuickFileInfoLoading;
+﻿namespace NsxLibraryManager.Core.FileLoading.Interface;
 
 public interface IPackageInfoLoader
 {
