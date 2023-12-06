@@ -17,7 +17,7 @@ public partial class RefreshPatchesProgressDialog
     {
         if (firstRender)
         {
-            await TitleLibraryService.AddOwnedUpdateToTitlesAsync();
+            await TitleLibraryService.ProcessAllTitlesUpdates();
             DialogService.Close();
         }
         

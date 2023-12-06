@@ -16,4 +16,10 @@ public class TitleLibraryRepository : BaseRepository<LibraryTitle>, ITitleLibrar
     {
         return Collection.AsQueryable();
     }
+
+    public bool DeleteTitle(string titleId)
+    {
+        var id = Collection.FindOne(x => x.TitleId == titleId)?.Id;
+        return Collection.Delete(id);
+    }
 }

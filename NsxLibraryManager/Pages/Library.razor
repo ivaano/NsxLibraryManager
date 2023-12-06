@@ -27,6 +27,7 @@
                                     PageSizeOptions="@pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
                         <HeaderTemplate>
                             <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                            <RadzenButton Click="@(args => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
                             <RadzenText TextStyle="TextStyle.Caption">Last updated @lastUpdated</RadzenText>
 
                         </HeaderTemplate>
