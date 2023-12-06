@@ -6,6 +6,7 @@ using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
+using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 

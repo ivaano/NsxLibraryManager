@@ -74,8 +74,6 @@ public class DataService : IDataService
             var regionTitleRepository = RegionRepository(region);
             return await Task.Run(() => regionTitleRepository.All());
         });
-//        var regionTitleRepository = RegionRepository(region);
-//        return await Task.Run(() => regionTitleRepository.All());
     }
 
     public async Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId)
@@ -115,10 +113,15 @@ public class DataService : IDataService
     {
         _titleLibraryRepository.Update(libraryTitle);
     }
-
-    public async Task AddLibraryTitleAsync(LibraryTitle libraryTitle)
+    
+    public bool DeleteLibraryTitle(string titleId)
     {
-        await Task.Run(() => _titleLibraryRepository.Create(libraryTitle));
+        return _titleLibraryRepository.DeleteTitle(titleId);
+    }
+
+    public async Task AddLibraryTitleAsync(LibraryTitle? libraryTitle)
+    {
+        await Task.Run(() => libraryTitle is not null ? _titleLibraryRepository.Create(libraryTitle) : null);
     }
 
     public bool DropDbCollection(string collectionName)

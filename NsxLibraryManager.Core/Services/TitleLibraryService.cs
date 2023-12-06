@@ -37,10 +37,11 @@ public class TitleLibraryService : ITitleLibraryService
     }
 
 
-    private LibraryTitle AggregateLibraryTitle(LibraryTitle libraryTitle, RegionTitle? regionTitle,
+    private LibraryTitle? AggregateLibraryTitle(LibraryTitle? libraryTitle, RegionTitle? regionTitle,
             IEnumerable<PackagedContentMeta> packagedContentMetas)
     {
         if (regionTitle is null) return libraryTitle;
+        if (libraryTitle is null) return libraryTitle;
 
         if (libraryTitle.Type != TitleLibraryType.Base)
         {
@@ -107,59 +108,127 @@ public class TitleLibraryService : ITitleLibraryService
         return null;
     }
 
-    public async Task<bool> ProcessFileAsync(string file)
+    public async Task<LibraryTitle?> ProcessFileAsync(string file)
     {
         try
         {
             var libraryTitle = await _fileInfoService.GetFileInfo(file);
+            if (libraryTitle is null) return libraryTitle;
             var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
             var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
             libraryTitle = AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
             await _dataService.AddLibraryTitleAsync(libraryTitle);
-
-            return true;
+            return libraryTitle;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, $"Error processing file: {file}");
-            return false;
+            _logger.LogError(e, "Error processing file: {file}", file);
+            return null;
         }
     }
 
-    public Task AddOwnedUpdateToTitlesAsync()
+    public bool AddOwnedUpdatesToTitle(LibraryTitle title)
+    {
+        var versions = _dataService.GetTitleDbVersions(title.TitleId);
+        var ownedVersions = new List<int>();
+        uint lastOwnedVersion = 0;
+        foreach (var version in versions)
+        {
+            var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
+            var patchTitle = libraryTitles.
+                    Where(x => x.ApplicationTitleId == version.TitleId).Where(x => x.PatchNumber == version.VersionShifted).
+                    Where(x => x.Type == TitleLibraryType.Update).
+                    FirstOrDefault();
+            if (patchTitle is null) continue;
+            _ = DateTime.TryParseExact((string?)version.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
+                    out var parsedDate)
+                    ? parsedDate
+                    : new DateTime();
+            patchTitle.ReleaseDate = parsedDate;
+            var patchVersion = Convert.ToUInt32(version.VersionShifted);
+            if (lastOwnedVersion < patchVersion)
+            {
+                lastOwnedVersion = patchVersion;
+            }
+            _dataService.UpdateLibraryTitleAsync(patchTitle);
+            ownedVersions.Add(version.VersionShifted);
+        }
+        title.OwnedUpdates = ownedVersions;
+        title.LastOwnedVersion = lastOwnedVersion;
+        _dataService.UpdateLibraryTitleAsync(title);
+        return true;
+    }
+
+    public bool AddOwnedDlcsToTitle(LibraryTitle title)
+    {
+        if (title.AvailableDlcs == null) return true;
+        var ownedDlc = new List<string>();
+        foreach (var dlc in title.AvailableDlcs)
+        {
+            //var titleFound = libraryTitles.FirstOrDefault(x => x.TitleId == dlc);
+            var titleFound = _dataService.GetLibraryTitleById(dlc);
+            if (titleFound is null) continue;
+            ownedDlc.Add(dlc);
+        }
+
+        if (!ownedDlc.Any()) return true;
+        title.OwnedDlcs = ownedDlc;
+        _dataService.UpdateLibraryTitleAsync(title);
+        return true;
+    }
+    
+    public Task<string> ProcessTitleDlcs(LibraryTitle title)
+    {
+        var updatedTitleId = string.Empty;
+        if (title.Type == TitleLibraryType.Base)
+        {
+            AddOwnedDlcsToTitle(title);
+            updatedTitleId = title.TitleId;
+        }
+        else
+        {
+            var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
+            var baseTitle = libraryTitles.
+                    Where(x => x.TitleId == title.ApplicationTitleId).
+                    Where(x => x.Type == TitleLibraryType.Base).
+                    FirstOrDefault();
+            if (baseTitle is null) return Task.FromResult(string.Empty);
+            AddOwnedDlcsToTitle(baseTitle);
+            updatedTitleId = baseTitle.TitleId;
+        }
+        return Task.FromResult(updatedTitleId);
+    }
+    
+    public Task<string> ProcessTitleUpdates(LibraryTitle title)
+    {
+        var updatedTitleId = string.Empty;
+        if (title.Type == TitleLibraryType.Base)
+        {
+            AddOwnedUpdatesToTitle(title);
+            updatedTitleId = title.TitleId;
+        }
+        else
+        {
+            var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
+            var baseTitle = libraryTitles.
+                    Where(x => x.TitleId == title.ApplicationTitleId).
+                    Where(x => x.Type == TitleLibraryType.Base).
+                    FirstOrDefault();
+            if (baseTitle is null) return Task.FromResult(string.Empty);
+            AddOwnedUpdatesToTitle(baseTitle);
+            updatedTitleId = baseTitle.TitleId;
+        }
+        return Task.FromResult(updatedTitleId);
+    }
+    
+    public Task ProcessAllTitlesUpdates()
     {
         var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
-        var gamesWithUpdates = Queryable.Where(libraryTitles, x => x.AvailableVersion > 0);
+        var gamesWithUpdates = libraryTitles.Where(x => x.AvailableVersion > 0);
 
         foreach (var title in gamesWithUpdates)
         {
-            var versions = _dataService.GetTitleDbVersions(title.TitleId);
-            var ownedVersions = new List<int>();
-            uint lastOwnedVersion = 0;
-            foreach (var version in versions)
-            {
-                libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
-                var patchTitle = Queryable.Where(Queryable
-                                .Where(libraryTitles, x => x.ApplicationTitleId == version.TitleId), x => x.PatchNumber == version.VersionShifted)
-                        .Where(x => x.Type == TitleLibraryType.Update)
-                        .FirstOrDefault();
-                if (patchTitle is null) continue;
-                _ = DateTime.TryParseExact((string?)version.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
-                        out var parsedDate)
-                        ? parsedDate
-                        : new DateTime();
-                patchTitle.ReleaseDate = parsedDate;
-                var patchVersion = Convert.ToUInt32(version.VersionShifted);
-                if (lastOwnedVersion < patchVersion)
-                {
-                    lastOwnedVersion = patchVersion;
-                }
-                _dataService.UpdateLibraryTitleAsync(patchTitle);
-                ownedVersions.Add(version.VersionShifted);
-            }
-            title.OwnedUpdates = ownedVersions;
-            title.LastOwnedVersion = lastOwnedVersion;
-            _dataService.UpdateLibraryTitleAsync(title);
+            AddOwnedUpdatesToTitle(title);
         }
 
         return Task.CompletedTask;
@@ -167,30 +236,17 @@ public class TitleLibraryService : ITitleLibraryService
 
 
     //
-    // Summary: This method should be called after the library has been refreshed
+    // Summary: This method should be called after the library has been reloaded
     //          to add any owned DLCs to the library, it must be done after all the tiles are in the db
     //          otherwise we would have to do a lot of lookups to see if the DLC is already in the library
-    public Task AddOwnedDlcToTitlesAsync()
+    public Task ProcessAllTitlesDlc()
     {
         var libraryTitles = _dataService.GetLibraryTitlesQueryableAsync();
-        var gamesWithDlc = Queryable.Where(libraryTitles, x => x.AvailableDlcs != null && Enumerable.Any(x.AvailableDlcs));
-
+        var gamesWithDlc = libraryTitles.Where(x => x.AvailableDlcs != null && x.AvailableDlcs.Any());
 
         foreach (var dlcGame in gamesWithDlc)
         {
-            if (dlcGame.AvailableDlcs == null) continue;
-            var ownedDlc = new List<string>();
-            foreach (var dlc in dlcGame.AvailableDlcs)
-            {
-                //var titleFound = libraryTitles.FirstOrDefault(x => x.TitleId == dlc);
-                var titleFound = _dataService.GetLibraryTitleById(dlc);
-                if (titleFound is null) continue;
-                ownedDlc.Add(dlc);
-            }
-
-            if (!ownedDlc.Any()) continue;
-            dlcGame.OwnedDlcs = ownedDlc;
-            _dataService.UpdateLibraryTitleAsync(dlcGame);
+            AddOwnedDlcsToTitle(dlcGame);
         }
 
         return Task.CompletedTask;
@@ -206,5 +262,33 @@ public class TitleLibraryService : ITitleLibraryService
         var files = await _fileInfoService.GetFileNames(_configuration.LibraryPath,
                                                                         _configuration.Recursive);
         return files;
+    }
+    
+    public Task<LibraryTitle> DeleteTitleAsync(string titleId)
+    {
+        var title = _dataService.GetLibraryTitleById(titleId);
+        if (title is null) return Task.FromResult(new LibraryTitle
+        {
+                FileName = string.Empty,
+                TitleId = titleId
+        });
+        var result = _dataService.DeleteLibraryTitle(titleId);
+        if (title.Type != TitleLibraryType.Update) return Task.FromResult(title);
+        var baseTitle = _dataService.GetLibraryTitleById(title.ApplicationTitleId ?? string.Empty);
+        return Task.FromResult(baseTitle ?? title);
+    }
+
+    public async Task<(IEnumerable<string> filesToAdd,  IEnumerable<string> titlesToRemove)> GetDeltaFilesInLibraryAsync()
+    {
+        var files = await GetFilesAsync();
+        var pathFileList = files.ToList();
+        var libraryTitles = await _dataService.GetLibraryTitlesAsync();
+        var libraryList = libraryTitles.ToList();
+        var libraryTitlesDict = libraryList.ToDictionary(x => x.FileName, x => x.TitleId);
+        var libraryFiles = libraryList.Select(x => x.FileName).ToList(); 
+        var filesToAdd = pathFileList.Except(libraryFiles);
+        var filesToRemove = libraryFiles.Except(pathFileList);
+        var titlesToRemove = filesToRemove.Select(fileName => libraryTitlesDict[fileName]).ToList();
+        return (filesToAdd, titlesToRemove);
     }
 }

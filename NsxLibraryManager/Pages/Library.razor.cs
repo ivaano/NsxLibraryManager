@@ -91,7 +91,7 @@ public partial class Library
     private async Task RefreshLibrary()
     {
         var confirmationResult = await DialogService.Confirm(
-            "Are you sure?", "Refresh Library",
+            "This will only add/delete new titles since last refresh Are you sure?", "Refresh Library",
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
         if (confirmationResult is true)
         {
@@ -102,6 +102,42 @@ public partial class Library
                     { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<RefreshLibraryProgressDialog>(
                     "Refreshing library...", paramsDialog, dialogOptions);
+            /*
+            await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
+                    "Processing Updates", paramsDialog, dialogOptions);
+            await DialogService.OpenAsync<RefreshDlcProgressDialog>(
+                    "Processing Dlcs", paramsDialog, dialogOptions);
+            */
+            await LoadData();
+            switch (selectedTabIndex)
+            {
+                case 0:
+                    await Grid.Reload();
+                    break;
+                case 1:
+                    await DlcGrid.Reload();
+                    break;
+                case 2:
+                    await UpdatesGrid.Reload();
+                    break;
+            }
+        }
+    }
+
+    private async Task ReloadLibrary()
+    {
+        var confirmationResult = await DialogService.Confirm(
+                "This will reload all titles to the db Are you sure?", "Reload Library",
+                new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (confirmationResult is true)
+        {
+            DialogService.Close();
+            StateHasChanged();
+            var paramsDialog = new Dictionary<string, object>() { };
+            var dialogOptions = new DialogOptions()
+                    { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
+            await DialogService.OpenAsync<ReloadLibraryProgressDialog>(
+                    "Reloading library...", paramsDialog, dialogOptions);
             await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
                     "Processing Updates", paramsDialog, dialogOptions);
             await DialogService.OpenAsync<RefreshDlcProgressDialog>(

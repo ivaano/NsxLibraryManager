@@ -13,15 +13,16 @@ public interface IDataService : IDisposable
     public int ImportTitleDbCnmts(List<PackagedContentMeta> packagedContentMeta);
     public int ImportTitleDbVersions(List<GameVersions> gameVersions);
     public IEnumerable<GameVersions> GetTitleDbVersions(string titleTitleId);
+    public Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region);
     public Task<IEnumerable<RegionTitle>?> GetTitleDbRegionTitlesAsync(string region);
     public Task<RegionTitle?> GetTitleDbRegionTitleByIdAsync(string region, string titleId);
     public IEnumerable<PackagedContentMeta> GetTitleDbCnmtsForTitle(string titleId);
     public Task<IEnumerable<LibraryTitle>> GetLibraryTitlesAsync();
     public IQueryable<LibraryTitle> GetLibraryTitlesQueryableAsync();
-    public Task<IQueryable<RegionTitle>> GetTitleDbRegionTitlesQueryableAsync(string region);
     public LibraryTitle? GetLibraryTitleById(string titleId);
     public void UpdateLibraryTitleAsync(LibraryTitle libraryTitle);
-    public Task AddLibraryTitleAsync(LibraryTitle libraryTitle);
+    public bool DeleteLibraryTitle(string titleId);
+    public Task AddLibraryTitleAsync(LibraryTitle? libraryTitle);
     public bool DropDbCollection(string collectionName);
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default);
     

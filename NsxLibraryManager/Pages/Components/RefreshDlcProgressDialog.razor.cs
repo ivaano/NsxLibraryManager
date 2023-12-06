@@ -16,7 +16,7 @@ partial class RefreshDlcProgressDialog
     {
         if (firstRender)
         {
-            await TitleLibraryService.AddOwnedDlcToTitlesAsync();
+            await TitleLibraryService.ProcessAllTitlesDlc();
             DialogService.Close();
         }
         

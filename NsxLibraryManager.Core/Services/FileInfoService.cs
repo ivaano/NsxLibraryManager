@@ -62,8 +62,10 @@ public class FileInfoService : IFileInfoService
     public async Task<IEnumerable<string>> GetRecursiveFiles(string filePath)
     {
         var files = Directory.GetFiles(filePath);
-        _directoryFiles = _directoryFiles.Concat(files.ToList());
-        
+        var fileList = files.Select(Path.GetFullPath).ToList();
+
+        _directoryFiles = _directoryFiles.Concat(fileList);
+       
         var subdirectoryEntries = Directory.GetDirectories(filePath);
         foreach (var subdirectory in subdirectoryEntries)
         {
@@ -73,7 +75,7 @@ public class FileInfoService : IFileInfoService
         return _directoryFiles.ToList();
     }
     
-    public async Task<LibraryTitle> GetFileInfo(string filePath)
+    public async Task<LibraryTitle?> GetFileInfo(string filePath)
     {
         var packageInfo = _packageInfoLoader.GetPackageInfo(filePath);
 

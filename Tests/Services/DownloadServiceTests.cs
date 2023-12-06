@@ -63,7 +63,7 @@ public class MockHttpMessageHandler : HttpMessageHandler
     private readonly string _response;
     private readonly HttpStatusCode _statusCode;
 
-    public string Input { get; private set; }
+    public string? Input { get; private set; }
     public int NumberOfCalls { get; private set; }
 
     public MockHttpMessageHandler(string response, HttpStatusCode statusCode)
