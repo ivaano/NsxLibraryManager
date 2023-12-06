@@ -77,6 +77,6 @@ public class TitleLibraryServiceTest
         
         //Assert
         Assert.Equal(new List<string> { "file5.nsp", "tango.nsp" }, result.filesToAdd);
-        Assert.Equal(new List<string> { "file0.nsp", "file2.nsp", "file3.nsp" }, result.titlesToRemove);
+        Assert.Equal(libraryTitles.Where(x => x.FileName is "file0.nsp" or "file2.nsp" or "file3.nsp").Select(x => x.TitleId), result.titlesToRemove);
     }
 }

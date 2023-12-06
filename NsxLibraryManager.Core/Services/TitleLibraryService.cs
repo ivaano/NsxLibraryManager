@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -42,6 +41,7 @@ public class TitleLibraryService : ITitleLibraryService
             IEnumerable<PackagedContentMeta> packagedContentMetas)
     {
         if (regionTitle is null) return libraryTitle;
+        if (libraryTitle is null) return libraryTitle;
 
         if (libraryTitle.Type != TitleLibraryType.Base)
         {
@@ -113,6 +113,7 @@ public class TitleLibraryService : ITitleLibraryService
         try
         {
             var libraryTitle = await _fileInfoService.GetFileInfo(file);
+            if (libraryTitle is null) return libraryTitle;
             var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
             var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
             libraryTitle = AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
@@ -273,7 +274,7 @@ public class TitleLibraryService : ITitleLibraryService
         });
         var result = _dataService.DeleteLibraryTitle(titleId);
         if (title.Type != TitleLibraryType.Update) return Task.FromResult(title);
-        var baseTitle = _dataService.GetLibraryTitleById(title.ApplicationTitleId);
+        var baseTitle = _dataService.GetLibraryTitleById(title.ApplicationTitleId ?? string.Empty);
         return Task.FromResult(baseTitle ?? title);
     }
 

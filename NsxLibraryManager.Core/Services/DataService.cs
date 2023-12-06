@@ -121,7 +121,7 @@ public class DataService : IDataService
 
     public async Task AddLibraryTitleAsync(LibraryTitle? libraryTitle)
     {
-        await Task.Run(() => _titleLibraryRepository.Create(libraryTitle));
+        await Task.Run(() => libraryTitle is not null ? _titleLibraryRepository.Create(libraryTitle) : null);
     }
 
     public bool DropDbCollection(string collectionName)
