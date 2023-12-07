@@ -17,11 +17,11 @@ namespace NsxLibraryManager.Core.Services;
 public class DataService : IDataService
 {
     private readonly string _connStr;
-    private ILiteDatabase? _db;
+    private LiteDatabase? _db;
     private bool _disposed;
     private Dictionary<string, IRegionRepository>? _regionRepository;
-    private ITitleLibraryRepository _titleLibraryRepository;
-    private ITitleDbCnmtsRepository _titleDbCnmtsRepository;
+    private readonly ITitleLibraryRepository _titleLibraryRepository;
+    private readonly ITitleDbCnmtsRepository _titleDbCnmtsRepository;
     private ITitleDbVersionsRepository _titleDbVersionsRepository;
     //private ISettingsRepository _settingsRepository;
     private readonly IMapper _mapper;
