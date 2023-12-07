@@ -8,7 +8,7 @@ public static class PathHelper
     {
         try
         {
-            CurrentAppDir = AppDomain.CurrentDomain.BaseDirectory ?? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? Directory.GetCurrentDirectory();
+            CurrentAppDir = AppDomain.CurrentDomain.BaseDirectory;
         }
         catch
         {
