@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Models.Stats;
 using NsxLibraryManager.Core.Repository.Interface;
 
 namespace NsxLibraryManager.Core.Services.Interface;
@@ -25,8 +26,11 @@ public interface IDataService : IDisposable
     public Task AddLibraryTitleAsync(LibraryTitle? libraryTitle);
     public bool DropDbCollection(string collectionName);
     public DateTime? GetRegionLastUpdate(string region, CancellationToken cancellationToken = default);
-    
+    public ContentDistribution GetContentDistribution();
+    public PackageDistribution GetPackageDistribution();
+    public LibraryStats GetLibraryTitlesStats();
     //public Task SaveDataGridStateAsync(string name, DataGridSettings settings);
 
     //public Task<DataGridSettings?> LoadDataGridStateAsync(string name);
 }
+

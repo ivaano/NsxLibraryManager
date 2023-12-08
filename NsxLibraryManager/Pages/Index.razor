@@ -1,6 +1,67 @@
 ﻿@page "/"
-<h3>Dashboard</h3>
+<PageTitle>Dashboard</PageTitle>
+<RadzenRow>
+    <RadzenColumn Size="12">
+        <RadzenText Text="Dashboard" TextStyle="TextStyle.H3" TagName="TagName.H1"/>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow Gap="5px">
+    <RadzenColumn Size="6" class="bg-body bg-opacity-10">
+        <RadzenText TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" Style="margin-bottom: 0">Games by Category</RadzenText>
+        <RadzenChart style="height: 400px">
+            <RadzenBarSeries Data="@_categories" CategoryProperty="Category" LineType="LineType.Dashed" ValueProperty="Count" Title="Games">
+                <RadzenLegend Visible="false"/>
+                <RadzenSeriesDataLabels Visible="@ShowDataLabels"/>
+            </RadzenBarSeries>
+            <RadzenValueAxis>
+                <RadzenGridLines Visible="true"/>
 
-@code {
-    
-}
+            </RadzenValueAxis>
+            <RadzenBarOptions Radius="5"/>
+        </RadzenChart>
+    </RadzenColumn>
+    <RadzenColumn Size="6" class="bg-body bg-opacity-10">
+        <RadzenText TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" Style="margin-bottom: 0">Content Distribution</RadzenText>
+
+        <RadzenChart ColorScheme="@ColorScheme.Divergent" style="height: 400px">
+            <RadzenPieSeries Data="@_contentDistribution" Title="Content" CategoryProperty="Type" ValueProperty="Count">
+                <RadzenSeriesDataLabels Visible="true"/>
+            </RadzenPieSeries>
+        </RadzenChart>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow Gap="5px" style="margin-top: 5px">
+    <RadzenColumn Size="6" class="bg-body bg-opacity-10">
+        <RadzenChart ColorScheme="ColorScheme.Monochrome" style="height: 400px">
+            <RadzenDonutSeries Data="@_packageDistribution" CategoryProperty="Type" ValueProperty="Count" TotalAngle="360" StartAngle="180">
+                <TooltipTemplate Context="data">
+                    <div>
+                        @data.Type: <strong>@data.Count</strong>
+                    </div>
+                </TooltipTemplate>
+                <ChildContent>
+                    <RadzenSeriesDataLabels Visible="false"/>
+                </ChildContent>
+                <TitleTemplate>
+                    <div class="rz-donut-content">
+                        <div>Package Type Distribution</div>
+                    </div>
+                </TitleTemplate>
+            </RadzenDonutSeries>
+        </RadzenChart>
+    </RadzenColumn>
+    <RadzenColumn Size="6" class="bg-body bg-opacity-10">
+        <RadzenText TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" Style="margin-bottom: 0">Top Publishers</RadzenText>
+        <RadzenChart ColorScheme="ColorScheme.Divergent" style="height: 400px">
+
+                <RadzenBarSeries Data="@_publishers" CategoryProperty="Publisher" LineType="LineType.Dashed" ValueProperty="Count" Title="Games">
+                    <RadzenLegend Visible="false"/>
+                    <RadzenSeriesDataLabels Visible="@ShowDataLabels"/>
+                </RadzenBarSeries>
+            <RadzenValueAxis>
+                <RadzenGridLines Visible="true"/>
+            </RadzenValueAxis>
+
+        </RadzenChart>
+    </RadzenColumn>
+</RadzenRow>

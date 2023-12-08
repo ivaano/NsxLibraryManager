@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Models.Stats;
 using NsxLibraryManager.Core.Repository;
 using NsxLibraryManager.Core.Repository.Interface;
 using NsxLibraryManager.Core.Services.Interface;
@@ -17,11 +18,11 @@ namespace NsxLibraryManager.Core.Services;
 public class DataService : IDataService
 {
     private readonly string _connStr;
-    private ILiteDatabase? _db;
+    private LiteDatabase? _db;
     private bool _disposed;
     private Dictionary<string, IRegionRepository>? _regionRepository;
-    private ITitleLibraryRepository _titleLibraryRepository;
-    private ITitleDbCnmtsRepository _titleDbCnmtsRepository;
+    private readonly ITitleLibraryRepository _titleLibraryRepository;
+    private readonly ITitleDbCnmtsRepository _titleDbCnmtsRepository;
     private ITitleDbVersionsRepository _titleDbVersionsRepository;
     //private ISettingsRepository _settingsRepository;
     private readonly IMapper _mapper;
@@ -135,7 +136,96 @@ public class DataService : IDataService
         var firstTitle = regionTitleRepository.FindOne(o => true);
         return firstTitle?.CreatedTime;
     }
-/*
+    
+    public ContentDistribution GetContentDistribution()
+    {
+        var library = _titleLibraryRepository.GetTitlesAsQueryable();
+        var libraryList = library.ToList();
+        var baseGames = libraryList.Where(o => o.Type == TitleLibraryType.Base);
+        var updates = libraryList.Where(o => o.Type == TitleLibraryType.Update);
+        var dlcs = libraryList.Where(o => o.Type == TitleLibraryType.DLC);
+        var contentDistribution = new ContentDistribution
+        {
+                Base = baseGames.Count(),
+                Updates = updates.Count(),
+                Dlcs = dlcs.Count()
+        };
+        return contentDistribution;
+    }
+
+    public PackageDistribution GetPackageDistribution()
+    {
+        var library = _titleLibraryRepository.GetTitlesAsQueryable();
+        var libraryList = library.ToList();
+        var nsp = libraryList.Where(o => o.PackageType == AccuratePackageType.NSP);
+        var nsz = libraryList.Where(o => o.PackageType == AccuratePackageType.NSZ);
+        var xci = libraryList.Where(o => o.PackageType == AccuratePackageType.XCI);
+        var xcz = libraryList.Where(o => o.PackageType == AccuratePackageType.XCZ);
+        var packageDistribution = new PackageDistribution
+        {
+                NSP = nsp.Count(),
+                NSZ = nsz.Count(),
+                XCI = xci.Count(),
+                XCZ = xcz.Count()
+        };
+        return packageDistribution;
+    }
+    
+    public Dictionary<string, int> GetPublisherDistribution()
+    {
+        var library = _titleLibraryRepository.GetTitlesAsQueryable();
+        var baseGames = library.Where(o => o.Type == TitleLibraryType.Base);
+        var publishers = new Dictionary<string, int>();
+        foreach (var game in baseGames)
+        {
+            if (game.Publisher is null) continue;
+            if (publishers.TryGetValue(game.Publisher, out var value))
+            {
+                publishers[game.Publisher] = value + 1;
+            }
+            else
+            {
+                publishers.Add(game.Publisher, 1);
+            }
+        }
+
+        var sortedPublishers = publishers.OrderByDescending(o => o.Value);
+        return sortedPublishers.ToDictionary();
+    }
+
+    public LibraryStats GetLibraryTitlesStats()
+    {
+        var library = _titleLibraryRepository.GetTitlesAsQueryable();
+        var baseGames = library.Where(o => o.Type == TitleLibraryType.Base);
+        var categories = new Dictionary<string, int>();
+        foreach (var game in baseGames)
+        {
+            if (game.Category is null) continue;
+            foreach (var category in game.Category)
+            {
+                if (categories.TryGetValue(category, out var value))
+                {
+                    categories[category] = value + 1;
+                }
+                else
+                {
+                    categories.Add(category, 1);
+                }
+            }
+        }
+
+        var sortedCategories = categories.OrderByDescending(o => o.Value);
+        var stats = new LibraryStats
+        {
+                CategoriesGames = sortedCategories.ToDictionary(),
+                ContentDistribution = GetContentDistribution(),
+                PackageDistribution = GetPackageDistribution(),
+                PublisherGames = GetPublisherDistribution()
+        };
+        return stats;
+    }
+
+    /*
     public async Task SaveDataGridStateAsync(string name, DataGridSettings settings)
     {
         await _settingsRepository.SaveDataGridStateAsync(name, settings);
