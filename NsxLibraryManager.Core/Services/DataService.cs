@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Core.Models.Stats;
 using NsxLibraryManager.Core.Repository;
 using NsxLibraryManager.Core.Repository.Interface;
 using NsxLibraryManager.Core.Services.Interface;
@@ -152,6 +153,46 @@ public class DataService : IDataService
         return contentDistribution;
     }
 
+    public PackageDistribution GetPackageDistribution()
+    {
+        var library = _titleLibraryRepository.GetTitlesAsQueryable();
+        var libraryList = library.ToList();
+        var nsp = libraryList.Where(o => o.PackageType == AccuratePackageType.NSP);
+        var nsz = libraryList.Where(o => o.PackageType == AccuratePackageType.NSZ);
+        var xci = libraryList.Where(o => o.PackageType == AccuratePackageType.XCI);
+        var xcz = libraryList.Where(o => o.PackageType == AccuratePackageType.XCZ);
+        var packageDistribution = new PackageDistribution
+        {
+                NSP = nsp.Count(),
+                NSZ = nsz.Count(),
+                XCI = xci.Count(),
+                XCZ = xcz.Count()
+        };
+        return packageDistribution;
+    }
+    
+    public Dictionary<string, int> GetPublisherDistribution()
+    {
+        var library = _titleLibraryRepository.GetTitlesAsQueryable();
+        var baseGames = library.Where(o => o.Type == TitleLibraryType.Base);
+        var publishers = new Dictionary<string, int>();
+        foreach (var game in baseGames)
+        {
+            if (game.Publisher is null) continue;
+            if (publishers.TryGetValue(game.Publisher, out var value))
+            {
+                publishers[game.Publisher] = value + 1;
+            }
+            else
+            {
+                publishers.Add(game.Publisher, 1);
+            }
+        }
+
+        var sortedPublishers = publishers.OrderByDescending(o => o.Value);
+        return sortedPublishers.ToDictionary();
+    }
+
     public LibraryStats GetLibraryTitlesStats()
     {
         var library = _titleLibraryRepository.GetTitlesAsQueryable();
@@ -177,7 +218,9 @@ public class DataService : IDataService
         var stats = new LibraryStats
         {
                 CategoriesGames = sortedCategories.ToDictionary(),
-                ContentDistribution = GetContentDistribution()
+                ContentDistribution = GetContentDistribution(),
+                PackageDistribution = GetPackageDistribution(),
+                PublisherGames = GetPublisherDistribution()
         };
         return stats;
     }

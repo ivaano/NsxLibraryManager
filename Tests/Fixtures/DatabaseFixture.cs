@@ -16,7 +16,81 @@ public class DatabaseFixture : IDisposable
         {
             AddCnmt(db);
             AddRegionTitleDbTitle(db);
+            AddLibraryTitles(db);
         }
+    }
+
+    private static void AddLibraryTitles(ILiteDatabase db)
+    {
+        var col = db.GetCollection<LibraryTitle>(AppConstants.LibraryCollectionName);
+
+        var titles = new List<LibraryTitle>
+        {
+                new()
+                {
+                        Type = TitleLibraryType.Base,
+                        TitleId = "B1",
+                        FileName = "B1.nsp",
+                        PackageType = AccuratePackageType.NSP,
+                        Category = new List<string> { "Action", "Adventure" },
+                },
+                new()
+                {
+                        Type = TitleLibraryType.Base,
+                        TitleId = "B2",
+                        FileName = "B2.nsz",
+                        PackageType = AccuratePackageType.NSZ,
+                        Category = new List<string> { "Action", "Puzzle" },
+                },
+                new()
+                {
+                        Type = TitleLibraryType.Base,
+                        TitleId = "B3",
+                        FileName = "B3.nsz",
+                        PackageType = AccuratePackageType.XCZ,
+                        Category = new List<string> { "Figthing", "Action" },
+                },
+                new()
+                {
+                        Type = TitleLibraryType.Base,
+                        TitleId = "B4",
+                        FileName = "B4.nsz",
+                        PackageType = AccuratePackageType.XCZ,
+                        Category = new List<string> { "Platformer", "Action" },
+                },
+                new()
+                {
+                        Type = TitleLibraryType.Update,
+                        TitleId = "U1",
+                        FileName = "U1.nsz",
+                        PackageType = AccuratePackageType.NSZ
+                },
+                new()
+                {
+                        Type = TitleLibraryType.DLC,
+                        TitleId = "D1",
+                        FileName = "D1.nsz",
+                        PackageType = AccuratePackageType.NSZ,
+                },
+                new()
+                {
+                        Type = TitleLibraryType.DLC,
+                        TitleId = "D2",
+                        FileName = "D2.nsz",
+                        PackageType = AccuratePackageType.NSZ,
+                },
+                new()
+                {
+                        Type = TitleLibraryType.DLC,
+                        TitleId = "D3",
+                        FileName = "D3.nsz",
+                        PackageType = AccuratePackageType.NSZ,
+                }
+        };
+        
+        col.InsertBulk(titles);
+        col.EnsureIndex(x => x.TitleId);
+        db.Commit();
     }
 
     private static void AddRegionTitleDbTitle(ILiteDatabase db)

@@ -33,13 +33,18 @@
 <RadzenRow Gap="5px" style="margin-top: 5px">
     <RadzenColumn Size="6" class="bg-body bg-opacity-10">
         <RadzenChart ColorScheme="ColorScheme.Monochrome" style="height: 400px">
-            <RadzenDonutSeries Data="@_contentDistribution" CategoryProperty="Type" ValueProperty="Count" TotalAngle="360" StartAngle="180">
+            <RadzenDonutSeries Data="@_packageDistribution" CategoryProperty="Type" ValueProperty="Count" TotalAngle="360" StartAngle="180">
+                <TooltipTemplate Context="data">
+                    <div>
+                        @data.Type: <strong>@data.Count</strong>
+                    </div>
+                </TooltipTemplate>
                 <ChildContent>
-                    <RadzenSeriesDataLabels Visible="@ShowDataLabels"/>
+                    <RadzenSeriesDataLabels Visible="false"/>
                 </ChildContent>
                 <TitleTemplate>
                     <div class="rz-donut-content">
-                        <div>File Type Distribution</div>
+                        <div>Package Type Distribution</div>
                     </div>
                 </TitleTemplate>
             </RadzenDonutSeries>
@@ -47,17 +52,16 @@
     </RadzenColumn>
     <RadzenColumn Size="6" class="bg-body bg-opacity-10">
         <RadzenText TextStyle="TextStyle.Subtitle1" TextAlign="TextAlign.Center" Style="margin-bottom: 0">Top Publishers</RadzenText>
-        <RadzenChart style="height: 400px">
-            <RadzenBarSeries Data="@_categories" CategoryProperty="Category" LineType="LineType.Dashed" ValueProperty="Count" Title="Games">
-                <RadzenLegend Visible="false"/>
+        <RadzenChart ColorScheme="ColorScheme.Divergent" style="height: 400px">
 
-                <RadzenSeriesDataLabels Visible="@ShowDataLabels"/>
-            </RadzenBarSeries>
+                <RadzenBarSeries Data="@_publishers" CategoryProperty="Publisher" LineType="LineType.Dashed" ValueProperty="Count" Title="Games">
+                    <RadzenLegend Visible="false"/>
+                    <RadzenSeriesDataLabels Visible="@ShowDataLabels"/>
+                </RadzenBarSeries>
             <RadzenValueAxis>
                 <RadzenGridLines Visible="true"/>
-
             </RadzenValueAxis>
-            <RadzenBarOptions Radius="5"/>
+
         </RadzenChart>
     </RadzenColumn>
 </RadzenRow>

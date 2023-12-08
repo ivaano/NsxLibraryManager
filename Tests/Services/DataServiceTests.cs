@@ -78,4 +78,42 @@ public class DataServiceTests : IClassFixture<DatabaseFixture>, IDisposable
         _dataService.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    [Fact]
+    public void GetContentDistribution_ReturnsCorrectDistribution()
+    {
+        // Act
+        var result = _dataService.GetContentDistribution();
+
+        // Assert
+        Assert.Equal(4, result.Base);
+        Assert.Equal(1, result.Updates);
+        Assert.Equal(3, result.Dlcs);        
+    }
+    
+    [Fact]
+    public void GetLibraryTitlesStats_ReturnsCorrectStats()
+    {
+        // Act
+        var result = _dataService.GetLibraryTitlesStats();
+
+        // Assert
+        Assert.Equal(4, result.CategoriesGames["Action"]);     
+        Assert.Equal(1, result.CategoriesGames["Adventure"]);     
+        Assert.Equal(1, result.CategoriesGames["Puzzle"]);
+        Assert.Equal(4, result.ContentDistribution.Base);
+        Assert.Equal(3, result.ContentDistribution.Dlcs);
+    }
+    
+    [Fact]
+    public void GetPackageDistribution_ReturnsCorrectDistribution()
+    {
+        // Act
+        var result = _dataService.GetPackageDistribution();
+
+        // Assert
+        Assert.Equal(5, result.NSZ);
+        Assert.Equal(1, result.NSP);
+       
+    }
 }

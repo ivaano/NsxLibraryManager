@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Core.Models;
+﻿namespace NsxLibraryManager.Core.Models.Stats;
 
 public record ContentDistribution
 {
