@@ -18,28 +18,20 @@ public partial class Library
    
     [Inject]
     protected DialogService DialogService { get; set; }
-    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30, 50, 100 };
-    
-    public IEnumerable<LibraryTitle> LibraryTitles;
-    public IEnumerable<LibraryTitle> MissingDlcs;
-    public IEnumerable<LibraryTitle> MissingUpdates;
-    public RadzenDataGrid<LibraryTitle> Grid;
-    public RadzenDataGrid<LibraryTitle> UpdatesGrid;
-    public RadzenDataGrid<LibraryTitle> DlcGrid;
-    private string lastUpdated;
-    public int AppCount = 0;
-    public int PatchCount = 0;
-    public int DlcCount = 0;
-    public string LibraryPath = string.Empty;
-    public Dictionary<string, string> GridColumns = new()
-    {
-        { "TitleId", "Title ID" },
-        { "Name", "Name" },
-        { "Type", "Type" },
-        { "Version", "Version" },
-        { "Date", "Date" }
-    };
-    private int selectedTabIndex = 0;
+
+    private readonly IEnumerable<int> _pageSizeOptions = new[] { 10, 20, 30, 50, 100 };
+    private IEnumerable<LibraryTitle> _libraryTitles;
+    private IEnumerable<LibraryTitle> _missingDlcs;
+    private IEnumerable<LibraryTitle> _missingUpdates;
+    private RadzenDataGrid<LibraryTitle> _grid;
+    private RadzenDataGrid<LibraryTitle> _updatesGrid;
+    private RadzenDataGrid<LibraryTitle> _dlcGrid;
+    private string _lastUpdated;
+    private int _appCount;
+    private int _patchCount;
+    private int _dlcCount;
+    private string _libraryPath = string.Empty;
+    private int _selectedTabIndex;
     
     protected override async Task OnInitializedAsync()
     {
@@ -48,17 +40,17 @@ public partial class Library
 
     private async Task LoadData()
     {
-        LibraryTitles = await DataService.GetLibraryTitlesAsync();
-        LibraryPath = TitleLibraryService.GetLibraryPath();
+        _libraryTitles = await DataService.GetLibraryTitlesAsync();
+        _libraryPath = TitleLibraryService.GetLibraryPath();
         CalculateCounts();
         UpdateLastUpdate();
         var titles = DataService.GetLibraryTitlesQueryableAsync();
-        MissingDlcs = titles
+        _missingDlcs = titles
                 .Where(x => x.Type == TitleLibraryType.Base)
                 .Where(x => x.AvailableDlcs != x.OwnedDlcs)
                 .ToList();
         titles = DataService.GetLibraryTitlesQueryableAsync();
-        MissingUpdates = titles
+        _missingUpdates = titles
                 .Where(x => x.Type == TitleLibraryType.Base)
                 .Where(x => x.AvailableVersion != x.LastOwnedVersion)
                 .ToList();
@@ -66,24 +58,24 @@ public partial class Library
 
     private void UpdateLastUpdate()
     {
-        var first = LibraryTitles.FirstOrDefault()?.LastUpdated.ToString("g");
-        lastUpdated = first ?? "never";
+        var first = _libraryTitles.FirstOrDefault()?.LastUpdated.ToString("g");
+        _lastUpdated = first ?? "never";
     }
     
     private void CalculateCounts()
     {
         try
         {
-            var libTitleList = LibraryTitles.ToList();
+            var libTitleList = _libraryTitles.ToList();
         
-            AppCount = libTitleList.Count(x => x.Type == TitleLibraryType.Base);
-            PatchCount = libTitleList.Count(x => x.Type == TitleLibraryType.Update);
-            DlcCount = libTitleList.Count(x => x.Type == TitleLibraryType.DLC);
+            _appCount = libTitleList.Count(x => x.Type == TitleLibraryType.Base);
+            _patchCount = libTitleList.Count(x => x.Type == TitleLibraryType.Update);
+            _dlcCount = libTitleList.Count(x => x.Type == TitleLibraryType.DLC);
         } catch (Exception)
         {
-            AppCount = 0;
-            PatchCount = 0;
-            DlcCount = 0;
+            _appCount = 0;
+            _patchCount = 0;
+            _dlcCount = 0;
         }
 
     }
@@ -97,28 +89,22 @@ public partial class Library
         {
             DialogService.Close();
             StateHasChanged();
-            var paramsDialog = new Dictionary<string, object>() { };
+            var paramsDialog = new Dictionary<string, object>();
             var dialogOptions = new DialogOptions()
                     { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<RefreshLibraryProgressDialog>(
                     "Refreshing library...", paramsDialog, dialogOptions);
-            /*
-            await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
-                    "Processing Updates", paramsDialog, dialogOptions);
-            await DialogService.OpenAsync<RefreshDlcProgressDialog>(
-                    "Processing Dlcs", paramsDialog, dialogOptions);
-            */
             await LoadData();
-            switch (selectedTabIndex)
+            switch (_selectedTabIndex)
             {
                 case 0:
-                    await Grid.Reload();
+                    await _grid.Reload();
                     break;
                 case 1:
-                    await DlcGrid.Reload();
+                    await _dlcGrid.Reload();
                     break;
                 case 2:
-                    await UpdatesGrid.Reload();
+                    await _updatesGrid.Reload();
                     break;
             }
         }
@@ -133,7 +119,7 @@ public partial class Library
         {
             DialogService.Close();
             StateHasChanged();
-            var paramsDialog = new Dictionary<string, object>() { };
+            var paramsDialog = new Dictionary<string, object>();
             var dialogOptions = new DialogOptions()
                     { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<ReloadLibraryProgressDialog>(
@@ -143,16 +129,16 @@ public partial class Library
             await DialogService.OpenAsync<RefreshDlcProgressDialog>(
                     "Processing Dlcs", paramsDialog, dialogOptions);
             await LoadData();
-            switch (selectedTabIndex)
+            switch (_selectedTabIndex)
             {
                 case 0:
-                    await Grid.Reload();
+                    await _grid.Reload();
                     break;
                 case 1:
-                    await DlcGrid.Reload();
+                    await _dlcGrid.Reload();
                     break;
                 case 2:
-                    await UpdatesGrid.Reload();
+                    await _updatesGrid.Reload();
                     break;
             }
         }
