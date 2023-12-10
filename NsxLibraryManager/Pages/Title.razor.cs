@@ -9,19 +9,18 @@ namespace NsxLibraryManager.Pages;
 public partial class Title
 {
     [Inject]
-    protected IDataService DataService { get; set; } = default!;
-    [Inject]
     protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
     [Inject]
     protected ITitleDbService TitleDbService { get; set; } = default!;
     [Parameter]
     public string? TitleId { get; set; }
-    public IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
-    public IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
 
-    public LibraryTitle? LibraryTitle { get; set; }
-    public string GameFileSize { get; set; } = string.Empty;
-    public string HtmlDescription { get; set; } = string.Empty;
+    private IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
+    private IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
+
+    private LibraryTitle? LibraryTitle { get; set; }
+    private string GameFileSize { get; set; } = string.Empty;
+    private string HtmlDescription { get; set; } = string.Empty;
 
     
     protected override async Task OnParametersSetAsync()
@@ -43,15 +42,11 @@ public partial class Title
             foreach (var patch in titlePatches)
             {
                 if (LibraryTitle.OwnedUpdates == null) continue;
-                try
-                {
-                    var esta = LibraryTitle.OwnedUpdates.First(s => s.Equals(patch.VersionShifted));
-                    patch.Owned = true;
-                } 
-                catch (Exception)
-                {
-                    patch.Owned = false;
-                }
+                var query = from o in LibraryTitle.OwnedUpdates
+                        where o == patch.VersionShifted
+                        select o;
+                patch.Owned = query.Any();
+
                 titlePatchesList.Add(patch);
             }
             GameVersions = titlePatchesList;
@@ -66,31 +61,22 @@ public partial class Title
                     titleDlcList.Add(dlc);
                     continue;
                 }
-                
-                try
-                {
-                    var esta = LibraryTitle.OwnedDlcs.First(s => s.Equals(dlc.TitleId, StringComparison.InvariantCultureIgnoreCase));
-                    dlc.Owned = true;
-                } 
-                catch (Exception)
-                {
-                    dlc.Owned = false;
-                }
+                var query = from o in LibraryTitle.OwnedDlcs
+                        where o == dlc.TitleId
+                        select o;
+                dlc.Owned =  query.Any();
+
                 titleDlcList.Add(dlc);
             }
             GameDlcs = titleDlcList;
         } 
         else
         {
-            LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId);
-            if (LibraryTitle is null)
+            LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId) ?? new LibraryTitle
             {
-                LibraryTitle = new LibraryTitle
-                {
-                        TitleId = TitleId,
-                        Size = 0,
-                        FileName = string.Empty
-                };
+                    TitleId = TitleId,
+                    Size = 0,
+                    FileName = string.Empty
             };
         }
     }
