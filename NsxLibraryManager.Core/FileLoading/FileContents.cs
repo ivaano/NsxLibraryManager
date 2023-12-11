@@ -6,4 +6,6 @@ public class FileContents
 {
     public IEnumerable<DirectoryEntryEx>? FileSystemFiles { get; init; }
     public IOrderedEnumerable<Title>? Titles { get; init; }
+    
+    public byte[]? Icon { get; set; } = null;
 }
