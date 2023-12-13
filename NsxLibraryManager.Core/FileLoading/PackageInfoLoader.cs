@@ -22,11 +22,10 @@ public class PackageInfoLoader : IPackageInfoLoader
             keySetProviderService ?? throw new ArgumentNullException(nameof(keySetProviderService));
     }
 
-    public PackageInfo GetPackageInfo(string filePath)
+    public PackageInfo GetPackageInfo(string filePath, bool detailed)
     {
         var keySet = _keySetProviderService.GetKeySet();
 
-        AccuratePackageType accuratePackageType;
         FileContents fileContents;
         switch (_packageTypeAnalyzer.GetType(filePath))
         {
@@ -34,11 +33,11 @@ public class PackageInfoLoader : IPackageInfoLoader
                 throw new FileNotSupportedException(filePath);
 
             case PackageType.XCI:
-                fileContents = LoadXciContents(filePath, keySet, out accuratePackageType);
+                fileContents = LoadXciContents(filePath, keySet, detailed);
                 break;
                 
             case PackageType.NSP:
-                fileContents = LoadNspContents(filePath, keySet, out accuratePackageType);
+                fileContents = LoadNspContents(filePath, keySet, detailed);
 
                 break;
             default:
@@ -48,7 +47,7 @@ public class PackageInfoLoader : IPackageInfoLoader
         var packageInfo = new PackageInfo
         {
             PackageType = _packageTypeAnalyzer.GetType(filePath),
-            AccuratePackageType = accuratePackageType,
+            AccuratePackageType = fileContents.AccuratePackageType,
             Contents = FileContentsSummary(fileContents)
         };
 
@@ -76,11 +75,13 @@ public class PackageInfoLoader : IPackageInfoLoader
 
     }
   
-    private static FileContents LoadNspContents(string nspFilePath, KeySet keySet,
-        out AccuratePackageType accuratePackageType)
+    private static FileContents LoadNspContents(string nspFilePath, KeySet keySet, bool detailed)
     {
-        var fileContents = new FileContents();
-        accuratePackageType = AccuratePackageType.NSP;
+        var fileContents = new FileContents
+        {
+                AccuratePackageType = AccuratePackageType.NSP
+        };
+
         using var file = new LocalStorage(nspFilePath, FileAccess.Read);
         using var pfs = new UniqueRef<PartitionFileSystem>();
         using var hfs = new UniqueRef<Sha256PartitionFileSystem>();
@@ -90,9 +91,9 @@ public class PackageInfoLoader : IPackageInfoLoader
         if (res.IsSuccess())
         {
             var fileSystem = pfs.Get;
-            fileContents = ProcessAppFs.Process(fileSystem, keySet);
+            fileContents = ProcessAppFs.Process(fileSystem, keySet, detailed);
             var containsNcz = fileContents.FileSystemFiles is not null && fileContents.FileSystemFiles.Any(entry => entry.Name.EndsWith(".ncz", StringComparison.OrdinalIgnoreCase));
-            accuratePackageType = containsNcz ? AccuratePackageType.NSZ : AccuratePackageType.NSP;
+            fileContents.AccuratePackageType = containsNcz ? AccuratePackageType.NSZ : AccuratePackageType.NSP;
 
         }        
         else if (!ResultFs.PartitionSignatureVerificationFailed.Includes(res))
@@ -115,24 +116,25 @@ public class PackageInfoLoader : IPackageInfoLoader
             }
 
             var fileSystem = hfs.Get;
-            fileContents = ProcessAppFs.Process(fileSystem, keySet);
+            fileContents = ProcessAppFs.Process(fileSystem, keySet, detailed);
         }
 
         return fileContents;
     }
     
-    private static FileContents LoadXciContents(string xciFilePath, KeySet keySet,
-        out AccuratePackageType accuratePackageType)
+    private static FileContents LoadXciContents(string xciFilePath, KeySet keySet, bool detailed)
     {
-        accuratePackageType = AccuratePackageType.XCI;
         using var file = new LocalStorage(xciFilePath, FileAccess.Read);
         var xci = new Xci(keySet, file);
-        var fileContents = new FileContents();
+        var fileContents = new FileContents
+        {
+                AccuratePackageType = AccuratePackageType.XCI
+        };
         if (xci.HasPartition(XciPartitionType.Secure))
         {
-            fileContents = ProcessAppFs.Process(xci.OpenPartition(XciPartitionType.Secure), keySet);
+            fileContents = ProcessAppFs.Process(xci.OpenPartition(XciPartitionType.Secure), keySet, detailed);
             var containsNcz = fileContents.FileSystemFiles is not null && fileContents.FileSystemFiles.Any(entry => entry.Name.EndsWith(".ncz", StringComparison.OrdinalIgnoreCase));
-            accuratePackageType = containsNcz ? AccuratePackageType.XCZ : AccuratePackageType.XCI;
+            fileContents.AccuratePackageType = containsNcz ? AccuratePackageType.XCZ : AccuratePackageType.XCI;
 
         }
 

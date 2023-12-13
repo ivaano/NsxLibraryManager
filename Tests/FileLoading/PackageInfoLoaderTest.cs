@@ -44,11 +44,25 @@ public class PackageInfoLoaderTest
         var packageInfoLoader = new PackageInfoLoader(_packageTypeAnalyzer, _keySetProviderService);
         
         //Act
-        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test.nsz");
+        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test.nsz", false);
         
         //Assert
         Assert.NotNull(result);
     }
+    
+    [Fact]
+    public void Should_Load_Nsz_FilePackageInfo_WithIcon()
+    {
+        //Arrange
+        var packageInfoLoader = new PackageInfoLoader(_packageTypeAnalyzer, _keySetProviderService);
+        
+        //Act
+        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\testa\Asterix & Obelix Slap Them All! 2 [01003AF01B188000][v0].nsz", true);
+        //var result = packageInfoLoader.GetPackageInfo(@"N:\roms\testa\A Little to the Left [0100354017668800][v655360].nsz");
+        
+        //Assert
+        Assert.NotNull(result);
+    }    
     
     [Fact]
     public void Should_Load_Failed_Nsz_FilePackageInfo()
@@ -57,7 +71,7 @@ public class PackageInfoLoaderTest
         var packageInfoLoader = new PackageInfoLoader(_packageTypeAnalyzer, _keySetProviderService);
         
         //Act
-        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test-fail.nsz");
+        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test-fail.nsz", false);
         
         //Assert
         Assert.NotNull(result);
@@ -70,7 +84,7 @@ public class PackageInfoLoaderTest
         var packageInfoLoader = new PackageInfoLoader(_packageTypeAnalyzer, _keySetProviderService);
         
         //Act
-        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test.xcz");
+        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test.xcz", false);
         
         //Assert
         Assert.NotNull(result);

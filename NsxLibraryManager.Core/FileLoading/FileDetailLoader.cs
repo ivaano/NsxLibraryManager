@@ -99,7 +99,7 @@ public class FileDetailLoader
         if (res.IsSuccess())
         {
             var fileSystem = pfs.Get;
-            fileContents = ProcessAppFs.Process(fileSystem, keySet, loadIcon: true);
+            fileContents = ProcessAppFs.Process(fileSystem, keySet, true);
             var containsNcz = fileContents.FileSystemFiles is not null && fileContents.FileSystemFiles.Any(entry => entry.Name.EndsWith(".ncz", StringComparison.OrdinalIgnoreCase));
             accuratePackageType = containsNcz ? AccuratePackageType.NSZ : AccuratePackageType.NSP;
 
@@ -124,7 +124,7 @@ public class FileDetailLoader
             }
 
             var fileSystem = hfs.Get;
-            fileContents = ProcessAppFs.Process(fileSystem, keySet, loadIcon: true);
+            fileContents = ProcessAppFs.Process(fileSystem, keySet, true);
         }
 
         return fileContents;

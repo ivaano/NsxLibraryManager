@@ -10,7 +10,7 @@ namespace NsxLibraryManager.Core.FileLoading;
 
 public static class ProcessAppFs
 {
-    public static FileContents Process(IFileSystem fileSystem, KeySet keySet, bool loadIcon = false)
+    public static FileContents Process(IFileSystem fileSystem, KeySet keySet, bool detailed = false)
     {
         var fsFiles = fileSystem.EnumerateEntries();
         var switchFs = SwitchFs.OpenNcaDirectory(keySet, fileSystem);
@@ -22,7 +22,7 @@ public static class ProcessAppFs
             Titles = titles
         };
         
-        if (loadIcon)
+        if (detailed)
             fileContents.Icon = LoadIcon(switchFs);
     
         return fileContents;

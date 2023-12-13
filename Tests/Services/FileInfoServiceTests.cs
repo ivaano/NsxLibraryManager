@@ -39,10 +39,10 @@ public class FileInfoServiceTests
         const string fileName = "testFile.nsp";
         var contents = GetBaseContents();
         var packageInfo = GetBasePackageInfo(content: contents);
-        _packageInfoLoader.GetPackageInfo(Arg.Any<string>()).Returns(packageInfo);
+        _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), false).Returns(packageInfo);
         
         //Act
-        var result = await _fileInfoService.GetFileInfo(fileName);
+        var result = await _fileInfoService.GetFileInfo(fileName, false);
         
         //Assert
         Assert.NotNull(result);
@@ -67,10 +67,10 @@ public class FileInfoServiceTests
                 AccuratePackageType = AccuratePackageType.NSP,
                 Contents = null
         };
-        _packageInfoLoader.GetPackageInfo(Arg.Any<string>()).Returns(packageInfo);
+        _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), false).Returns(packageInfo);
         
         //Act
-        var result = await Assert.ThrowsAsync<Exception>(() => _fileInfoService.GetFileInfo("testFile.nsp"));
+        var result = await Assert.ThrowsAsync<Exception>(() => _fileInfoService.GetFileInfo("testFile.nsp", false));
 
         //Assert
         Assert.Equal("No contents found in the package", result.Message);

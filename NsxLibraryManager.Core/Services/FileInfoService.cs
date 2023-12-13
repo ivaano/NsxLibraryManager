@@ -75,9 +75,9 @@ public class FileInfoService : IFileInfoService
         return _directoryFiles.ToList();
     }
     
-    public async Task<LibraryTitle?> GetFileInfo(string filePath)
+    public async Task<LibraryTitle?> GetFileInfo(string filePath, bool detailed)
     {
-        var packageInfo = _packageInfoLoader.GetPackageInfo(filePath);
+        var packageInfo = _packageInfoLoader.GetPackageInfo(filePath, detailed);
 
         if (packageInfo.Contents is null)
             throw new Exception("No contents found in the package");
@@ -108,4 +108,5 @@ public class FileInfoService : IFileInfoService
 
         return title;
     }
+
 }
