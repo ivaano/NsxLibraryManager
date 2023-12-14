@@ -40,7 +40,14 @@ public class TitleLibraryService : ITitleLibraryService
     private async Task<LibraryTitle> AggregateLibraryTitle(LibraryTitle libraryTitle, RegionTitle? regionTitle,
             IEnumerable<PackagedContentMeta> packagedContentMetas)
     {
-        if (regionTitle is null) return libraryTitle;
+        if (regionTitle is null)
+        {
+            var iconUri = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
+            libraryTitle.Size = await _fileInfoService.GetFileSize(libraryTitle.FileName);
+
+            libraryTitle.IconUrl = iconUri;
+            return libraryTitle;
+        }
 
         if (libraryTitle.Type != TitleLibraryType.Base)
         {
@@ -49,8 +56,13 @@ public class TitleLibraryService : ITitleLibraryService
         
         if (regionTitle.IconUrl is null)
         {
-            var fileDetails = await _fileInfoService.GetFileInfo(libraryTitle.FileName, detailed: true);
-            //libraryTitle.IconUrl = libraryTitle.IconUrl.;
+            var iconUri = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
+            libraryTitle.IconUrl = iconUri;
+        }
+        
+        if (regionTitle.Size is null)
+        {
+            libraryTitle.Size = await _fileInfoService.GetFileSize(libraryTitle.FileName);
         }
 
         // prefer the title name from the file

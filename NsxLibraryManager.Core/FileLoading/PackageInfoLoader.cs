@@ -69,7 +69,9 @@ public class PackageInfoLoader : IPackageInfoLoader
         var content = new Content(firstTitle.Metadata)
         {
                 Name = firstTitle.Name,
-                Publisher = publisher
+                Publisher = publisher,
+                Icon = fileContents.Icon
+                
         };
         return content;
 

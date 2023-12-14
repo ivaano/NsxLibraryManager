@@ -55,6 +55,23 @@ public class FileInfoServiceTests
         Assert.Equal(TitleLibraryType.Base, result.Type);
         Assert.Equal(AccuratePackageType.NSP, result.PackageType);
     }
+
+    [Fact]
+    public async Task Should_Return_File_Icon()
+    {
+        //Arrange
+        const string fileName = "testFile.nsp";
+        var contents = GetBaseContents();
+        var packageInfo = GetBasePackageInfo(content: contents);
+        _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), true).Returns(packageInfo);
+        
+        //Act
+        var result = await _fileInfoService.GetFileIcon(fileName);
+        
+        //Assert
+        Assert.NotNull(result);
+
+    }
     
     
     [Fact]
@@ -155,6 +172,7 @@ public class FileInfoServiceTests
         contents.PatchTitleId.Returns(TestPatchTitleId);
         contents.Name.Returns(TestTitleName);
         contents.Publisher.Returns(TestPublisher);
+        contents.Icon.Returns(new byte[] {0x00, 0x01, 0x02});
         return contents;
     }    
 }

@@ -11,6 +11,7 @@ public interface IFileInfoService
     Task<IEnumerable<string>> GetRecursiveFiles(string filePath);
 
     Task<LibraryTitle?> GetFileInfo(string filePath, bool detailed);
-    
-   
+
+    Task<long?> GetFileSize(string filePath);
+    Task<string?> GetFileIcon(string filePath);
 }

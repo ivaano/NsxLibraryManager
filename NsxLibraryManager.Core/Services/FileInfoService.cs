@@ -26,6 +26,7 @@ public class FileInfoService : IFileInfoService
         _logger = logger;
     }
     
+   
     public  async Task<IEnumerable<string>> GetFileNames(
             string filePath, 
             bool recursive = false)
@@ -73,6 +74,31 @@ public class FileInfoService : IFileInfoService
         }
 
         return _directoryFiles.ToList();
+    }
+    
+    public Task<long?> GetFileSize(string filePath)
+    {
+        var size =  new FileInfo(filePath).Length;
+        return Task.FromResult<long?>(size);
+    }
+
+    public async Task<string?> GetFileIcon(string filePath)
+    {
+        var packageInfo = _packageInfoLoader.GetPackageInfo(filePath, true);
+        var iconUri = string.Empty;
+        
+        if (packageInfo.Contents is null)
+            throw new Exception("No contents found in the package");
+
+        if (packageInfo.Contents.Icon is not null)
+        {
+            var fileName = Guid.NewGuid() + ".jpg";
+            var path = Path.Combine("images", "icon");
+            var iconPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", path, fileName);
+            await File.WriteAllBytesAsync(iconPath, packageInfo.Contents.Icon);
+            iconUri = $"images/icon/{fileName}";
+        }
+        return iconUri;
     }
     
     public async Task<LibraryTitle?> GetFileInfo(string filePath, bool detailed)
