@@ -15,11 +15,13 @@ public static class ProcessAppFs
         var fsFiles = fileSystem.EnumerateEntries();
         var switchFs = SwitchFs.OpenNcaDirectory(keySet, fileSystem);
         var titles = switchFs.Titles.Values.OrderBy(x => x.Id);
+        var applications = switchFs.Applications.Values.OrderBy(x => x.Name);
         
         var fileContents = new FileContents
         {
             FileSystemFiles = fsFiles,
-            Titles = titles
+            Titles = titles,
+            Applications = applications,
         };
         
         if (detailed)
@@ -30,8 +32,9 @@ public static class ProcessAppFs
     private static byte[]? LoadIcon(SwitchFs switchFs)
     {
         var contentTitles = switchFs.Titles.Values.OrderBy(x => x.Id);
-        if (switchFs.Titles.TryGetValue(contentTitles.First().Id, out var title))
+        if (!switchFs.Titles.TryGetValue(contentTitles.First().Id, out var title)) return null;
         {
+            if (title.ControlNca is null) return null;
             //Move this to config later
             var languageName = new List<string> { "AmericanEnglish", "BritishEnglish"};
                     

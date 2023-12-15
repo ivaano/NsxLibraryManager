@@ -42,10 +42,13 @@ public class TitleLibraryService : ITitleLibraryService
     {
         if (regionTitle is null)
         {
-            var iconUri = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
+            if (libraryTitle.Type == TitleLibraryType.Base)
+            {
+                libraryTitle.IconUrl = await _fileInfoService.GetFileIcon(libraryTitle.FileName);    
+            }
+            
             libraryTitle.Size = await _fileInfoService.GetFileSize(libraryTitle.FileName);
 
-            libraryTitle.IconUrl = iconUri;
             return libraryTitle;
         }
 
@@ -54,10 +57,9 @@ public class TitleLibraryService : ITitleLibraryService
             libraryTitle.ApplicationTitleName = regionTitle.Name;
         }
         
-        if (regionTitle.IconUrl is null)
+        if (regionTitle.IconUrl is null && libraryTitle.Type == TitleLibraryType.Base)
         {
-            var iconUri = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
-            libraryTitle.IconUrl = iconUri;
+            libraryTitle.IconUrl = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
         }
         
         if (regionTitle.Size is null)
