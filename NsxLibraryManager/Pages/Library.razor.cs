@@ -143,6 +143,13 @@ public partial class Library
             }
         }
     }
+    
+    public async Task OpenDetails(LibraryTitle title)
+    {
+        await DialogService.OpenAsync<Title>($"{title.TitleName}",
+                new Dictionary<string, object>() { { "TitleId", title.TitleId } },
+                new DialogOptions() { Width = "80%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true });
+    }
 
     private void TabOnChange(int index)
     {
