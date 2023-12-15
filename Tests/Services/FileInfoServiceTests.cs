@@ -39,10 +39,10 @@ public class FileInfoServiceTests
         const string fileName = "testFile.nsp";
         var contents = GetBaseContents();
         var packageInfo = GetBasePackageInfo(content: contents);
-        _packageInfoLoader.GetPackageInfo(Arg.Any<string>()).Returns(packageInfo);
+        _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), false).Returns(packageInfo);
         
         //Act
-        var result = await _fileInfoService.GetFileInfo(fileName);
+        var result = await _fileInfoService.GetFileInfo(fileName, false);
         
         //Assert
         Assert.NotNull(result);
@@ -54,6 +54,23 @@ public class FileInfoServiceTests
         Assert.Equal(Path.GetFullPath(fileName), result.FileName);
         Assert.Equal(TitleLibraryType.Base, result.Type);
         Assert.Equal(AccuratePackageType.NSP, result.PackageType);
+    }
+
+    [Fact]
+    public async Task Should_Return_File_Icon()
+    {
+        //Arrange
+        const string fileName = "testFile.nsp";
+        var contents = GetBaseContents();
+        var packageInfo = GetBasePackageInfo(content: contents);
+        _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), true).Returns(packageInfo);
+        
+        //Act
+        var result = await _fileInfoService.GetFileIcon(fileName);
+        
+        //Assert
+        Assert.NotNull(result);
+
     }
     
     
@@ -67,10 +84,10 @@ public class FileInfoServiceTests
                 AccuratePackageType = AccuratePackageType.NSP,
                 Contents = null
         };
-        _packageInfoLoader.GetPackageInfo(Arg.Any<string>()).Returns(packageInfo);
+        _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), false).Returns(packageInfo);
         
         //Act
-        var result = await Assert.ThrowsAsync<Exception>(() => _fileInfoService.GetFileInfo("testFile.nsp"));
+        var result = await Assert.ThrowsAsync<Exception>(() => _fileInfoService.GetFileInfo("testFile.nsp", false));
 
         //Assert
         Assert.Equal("No contents found in the package", result.Message);
@@ -155,6 +172,7 @@ public class FileInfoServiceTests
         contents.PatchTitleId.Returns(TestPatchTitleId);
         contents.Name.Returns(TestTitleName);
         contents.Publisher.Returns(TestPublisher);
+        contents.Icon.Returns(new byte[] {0x00, 0x01, 0x02});
         return contents;
     }    
 }

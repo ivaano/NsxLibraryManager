@@ -37,15 +37,34 @@ public class TitleLibraryService : ITitleLibraryService
     }
 
 
-    private LibraryTitle? AggregateLibraryTitle(LibraryTitle? libraryTitle, RegionTitle? regionTitle,
+    private async Task<LibraryTitle> AggregateLibraryTitle(LibraryTitle libraryTitle, RegionTitle? regionTitle,
             IEnumerable<PackagedContentMeta> packagedContentMetas)
     {
-        if (regionTitle is null) return libraryTitle;
-        if (libraryTitle is null) return libraryTitle;
+        if (regionTitle is null)
+        {
+            if (libraryTitle.Type == TitleLibraryType.Base)
+            {
+                libraryTitle.IconUrl = await _fileInfoService.GetFileIcon(libraryTitle.FileName);    
+            }
+            
+            libraryTitle.Size = await _fileInfoService.GetFileSize(libraryTitle.FileName);
+
+            return libraryTitle;
+        }
 
         if (libraryTitle.Type != TitleLibraryType.Base)
         {
             libraryTitle.ApplicationTitleName = regionTitle.Name;
+        }
+        
+        if (regionTitle.IconUrl is null && libraryTitle.Type == TitleLibraryType.Base)
+        {
+            libraryTitle.IconUrl = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
+        }
+        
+        if (regionTitle.Size is null)
+        {
+            libraryTitle.Size = await _fileInfoService.GetFileSize(libraryTitle.FileName);
         }
 
         // prefer the title name from the file
@@ -57,8 +76,6 @@ public class TitleLibraryService : ITitleLibraryService
         libraryTitle.Nsuid = regionTitle.Id;
         libraryTitle.NumberOfPlayers = regionTitle.NumberOfPlayers;
         libraryTitle.ReleaseDate = regionTitle.ReleaseDate;
-
-
         libraryTitle.Category = regionTitle.Category;
         libraryTitle.Developer = regionTitle.Developer;
         libraryTitle.Description = regionTitle.Description;
@@ -112,11 +129,11 @@ public class TitleLibraryService : ITitleLibraryService
     {
         try
         {
-            var libraryTitle = await _fileInfoService.GetFileInfo(file);
+            var libraryTitle = await _fileInfoService.GetFileInfo(file, detailed: false);
             if (libraryTitle is null) return libraryTitle;
             var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
             var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
-            libraryTitle = AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
+            libraryTitle = await AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
             await _dataService.AddLibraryTitleAsync(libraryTitle);
             return libraryTitle;
         }

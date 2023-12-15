@@ -8,7 +8,7 @@ using Radzen;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class GameLibrary
+public partial class GameList
 {
     [Inject] protected IDataService DataService { get; set; } = default!;
 

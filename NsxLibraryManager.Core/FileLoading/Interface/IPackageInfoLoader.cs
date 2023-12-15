@@ -2,5 +2,5 @@
 
 public interface IPackageInfoLoader
 {
-    PackageInfo GetPackageInfo(string filePath);
+    PackageInfo GetPackageInfo(string filePath, bool detailed);
 }

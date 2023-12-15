@@ -23,4 +23,6 @@ public interface IContent
     public TitleVersion Version { get; }
 
     public int PatchNumber { get; }
+    
+    public byte[]? Icon { get; set; }
 }

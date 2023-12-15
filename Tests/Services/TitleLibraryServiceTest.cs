@@ -79,4 +79,34 @@ public class TitleLibraryServiceTest
         Assert.Equal(new List<string> { "file5.nsp", "tango.nsp" }, result.filesToAdd);
         Assert.Equal(libraryTitles.Where(x => x.FileName is "file0.nsp" or "file2.nsp" or "file3.nsp").Select(x => x.TitleId), result.titlesToRemove);
     }
+    
+    [Fact]
+    public async Task ProcessFileAsync_ReturnsLibraryTitle_WhenFileIsValid()
+    {
+        // Arrange
+        var file = "validFile";
+        var libraryTitle = new LibraryTitle
+        {
+                TitleId = "001",
+                FileName = "test.nsp"
+        };
+        var regionTitle = new RegionTitle
+        {
+                TitleId = "001",
+                Name = "Test",
+                Region = "US"
+        };
+        var titleDbCnmt = new List<PackagedContentMeta> { new() { TitleType = 128 } };
+        _fileInfoService.GetFileInfo(file, false).Returns(libraryTitle);
+        _titleDbService.GetTitle(libraryTitle.TitleId).Returns(regionTitle);
+        _titleDbService.GetTitleCnmts(libraryTitle.TitleId).Returns(titleDbCnmt);
+        _dataService.AddLibraryTitleAsync(libraryTitle).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _titleLibraryService.ProcessFileAsync(file);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(libraryTitle, result);
+    }
 }
