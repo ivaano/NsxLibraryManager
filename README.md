@@ -38,8 +38,11 @@ that I could run on a server and access it from any device.
   - `Regions`: List of regions to download.
   - `ProdKeys`: Path to your prod.keys file, if this value is not set, program will look in the same folder as the executable, or you can put them in `$HOME/.switch/prod.keys`.
 
+> [!WARNING]
+> Be sure that the paths you put on `appsettings.json` exists the application doesn't create the paths if they don't exists, and if the paths are not correct an error will be throw if the path is unavailable.
+
 > [!NOTE]  
-> Be sure that the paths you put on `appsettings.json` exists the application doesn't create the paths if they don't exists, also please use absolute paths, relative paths might not work as expected because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`._
+> Please use absolute paths, relative paths might not work because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`
 
  ## Usage
 - Run the `NsxLibraryManager.exe` file.
@@ -48,6 +51,9 @@ that I could run on a server and access it from any device.
 - After that, go to Library and click on **Reload Library**
 - If new files are added to your library, you can use the **Refresh Library** button to update the database.
 - Reload Library will drop the table and create it again.
+
+> [!TIP]
+> To setup the port or the listening address, you can use the `--urls` parameter, for example `./NsxLibraryManager.exe --urls http://*:6666` will listen on any interface on port 6666.
 
 ## Screenshots
 ![Dashboard](./screenshots/dashboard.png)
