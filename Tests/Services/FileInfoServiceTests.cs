@@ -60,7 +60,7 @@ public class FileInfoServiceTests
     public async Task Should_Return_File_Icon()
     {
         //Arrange
-        const string fileName = "testFile.nsp";
+        const string fileName = @"N:\roms\prueba\test.nsz";
         var contents = GetBaseContents();
         var packageInfo = GetBasePackageInfo(content: contents);
         _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), true).Returns(packageInfo);

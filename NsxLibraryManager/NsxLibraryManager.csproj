@@ -9,6 +9,7 @@
         <UserSecretsId>eea14e5f-4e4c-4f80-9ff5-0c48075f0367</UserSecretsId>
         <AssemblyVersion>0.1.0</AssemblyVersion>
         <FileVersion>0.1.0</FileVersion>
+        <DebugType>embedded</DebugType>
     </PropertyGroup>
 
     <ItemGroup>

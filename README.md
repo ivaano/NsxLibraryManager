@@ -2,7 +2,8 @@
 
 ## Description
 This project helps to manage and visualize a nintendo switch library, organizing the files and creating a database with all the information.
-I built this because I wanted to have a data grid that I could easily filter and sort to list my games.
+I built this because I wanted to have a data grid that I could easily filter and sort my games,
+that I could run on a server and access it from any device.
 
 ## Features
 - Web interface.
@@ -20,11 +21,12 @@ I built this because I wanted to have a data grid that I could easily filter and
 
 ## Requirements
 - dotnet 8.0
+- a recent browser (didn't worked on Edge 13)
 - prod.keys
 
 ## Install
 - Download the latest release
-- Extract the zip file
+- Extract the zip/gz file
 - Open `appsettings.json` and customize it to your needs:
   - `TitleDatabase`: Path where the db file is going to be stored, this is required and must end with `.db`. **Use a fast drive for this file, like a NVMe**.
   - `LibraryPath`: Path to your library.
@@ -36,9 +38,22 @@ I built this because I wanted to have a data grid that I could easily filter and
   - `Regions`: List of regions to download.
   - `ProdKeys`: Path to your prod.keys file, if this value is not set, program will look in the same folder as the executable, or you can put them in `$HOME/.switch/prod.keys`.
 
+> [!WARNING]
+> Be sure that the paths you put on `appsettings.json` exists the application doesn't create the paths if they don't exists, and if the paths are not correct an error will be throw if the path is unavailable.
+
+> [!NOTE]  
+> Please use absolute paths, relative paths might not work because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`
+
  ## Usage
 - Run the `NsxLibraryManager.exe` file.
 - Open your browser and go to [http://localhost:5000](http://localhost:5000).
+- On first run you will need to update titledb, go to Titledb and click on **Update Titledb** button.
+- After that, go to Library and click on **Reload Library**
+- If new files are added to your library, you can use the **Refresh Library** button to update the database.
+- Reload Library will drop the table and create it again.
+
+> [!TIP]
+> To setup the port or the listening address, you can use the `--urls` parameter, for example `./NsxLibraryManager.exe --urls http://*:6666` will listen on any interface on port 6666.
 
 ## Screenshots
 ![Dashboard](./screenshots/dashboard.png)
@@ -50,9 +65,14 @@ I built this because I wanted to have a data grid that I could easily filter and
 ![MissingDLC](./screenshots/missingdlc.png)
 ![MissingUpdates](./screenshots/missingupdates.png)
 
+## TODO
+- [ ] Ability to add custom information to each title (favorite, rating).
+- [ ] Implement the file organizer.
+- [ ] Ability to download and store banners and screenshots locally.
+
 
 ## Credits
 - [Libhac](https://github.com/Thealexbarney/LibHac) For the amazing library to read nintendo switch files.
-- [Titledb](https://github.com/blawar/titledb) For the amazing database with all the information.
+- [Titledb](https://github.com/blawar/titledb) For the excellent database with all the information.
 - [LiteDb](https://www.litedb.org) 
-- [Radzen.Blazor](https://github.com/radzenhq/radzen-blazor) 
+- [Radzen.Blazor](https://github.com/radzenhq/radzen-blazor)
