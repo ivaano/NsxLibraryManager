@@ -4,7 +4,7 @@ namespace NsxLibraryManager.Core.Settings;
 
 public class AppSettings
 {
-    [Required]
+    [Required, FileExtensions(Extensions = "db")]
     public required string TitleDatabase { get; init; } = string.Empty;
     [Required]
     public required string LibraryPath { get; init; } = string.Empty;

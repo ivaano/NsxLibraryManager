@@ -11,8 +11,8 @@ public class KeySetProviderService : IKeySetProviderService
 
     private readonly AppSettings _configuration;
     private readonly object _lock = new();
+    private readonly ILogger<IKeySetProviderService> _logger;
     private KeySet? _keySet;
-    private ILogger<IKeySetProviderService> _logger;
 
 
     public KeySetProviderService(IOptions<AppSettings> configuration, ILogger<IKeySetProviderService> logger)
@@ -116,7 +116,6 @@ public class KeySetProviderService : IKeySetProviderService
     {
 
         // 1. Check from settings (if defined)
-        
         if (!string.IsNullOrWhiteSpace(keysFilePathRawFromSettings))
         {
             var keysFilePathTemp = keysFilePathRawFromSettings.ToFullPath();
@@ -139,7 +138,7 @@ public class KeySetProviderService : IKeySetProviderService
         }
         
         if (keysFileName == "prods.keys")
-            _logger.LogWarning($"Prod Keys File Not Found {keysFilePathRawFromSettings}");
+            _logger.LogWarning("Prod Keys File Not Found {keysFilePathRawFromSettings}", keysFilePathRawFromSettings);
 
         return null;
     }

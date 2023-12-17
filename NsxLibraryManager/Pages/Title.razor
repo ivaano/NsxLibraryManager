@@ -244,10 +244,13 @@
             </HeaderTemplate>
             <ChildContent>
                 <RadzenRow>
-                    <RadzenColumn Size="10">
+                    <RadzenColumn Size="2">
+                        <RadzenText TextStyle="TextStyle.H6">TitleId</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="8">
                         <RadzenText TextStyle="TextStyle.H6">Name</RadzenText>
                     </RadzenColumn>
-                    <RadzenColumn Size="1" >
+                    <RadzenColumn Size="1">
                         <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
                     </RadzenColumn>
                     <RadzenColumn Size="1">
@@ -257,10 +260,13 @@
                 @foreach (var dlc in GameDlcs)
                 {
                     <RadzenRow>
-                    <RadzenColumn Size="10">
-                        <RadzenLink Path="@($"/Title/{dlc.TitleId}")" Text="@dlc.TitleName"/>
-                    </RadzenColumn>
-                        <RadzenColumn Size="1" Style="text-align: center" >@dlc.TitleVersion.VersionShifted()</RadzenColumn>
+                        <RadzenColumn Size="2">
+                            @dlc.TitleId.ToUpper()
+                        </RadzenColumn>
+                        <RadzenColumn Size="8">
+                            <RadzenLink Path="@($"/Title/{dlc.TitleId}")" Text="@dlc.TitleName"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="1" Style="text-align: center">@dlc.TitleVersion.VersionShifted()</RadzenColumn>
                         @if (@dlc.Owned)
                         {
                             <RadzenColumn Size="1" class="rz-background-color-success-lighter">Owned</RadzenColumn>
@@ -285,8 +291,11 @@
             </HeaderTemplate>
             <ChildContent>
                 <RadzenRow>
-                    <RadzenColumn Size="8">
+                    <RadzenColumn Size="4">
                         <RadzenText TextStyle="TextStyle.H6">Date</RadzenText>
+                    </RadzenColumn>                    
+                    <RadzenColumn Size="4">
+                        <RadzenText TextStyle="TextStyle.H6">TitleId</RadzenText>
                     </RadzenColumn>
                     <RadzenColumn Size="2" Style="text-align: center">
                         <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
@@ -298,9 +307,12 @@
                 @foreach (var version in GameVersions.Reverse())
                 {
                     <RadzenRow>
-                        <RadzenColumn Size="8">
+                        <RadzenColumn Size="4">
                             <RadzenLink Path="@($"/Title/{version.TitleId}")" Text="@version.Date"/>
                         </RadzenColumn>
+                        <RadzenColumn Size="4">
+                            @version.TitleId.ToUpper()
+                        </RadzenColumn>                        
                         <RadzenColumn Size="2" Style="text-align: center">@version.Version.VersionShifted()</RadzenColumn>
                         @if (@version.Owned)
                         {
