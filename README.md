@@ -37,9 +37,9 @@ that I could run on a server and access it from any device.
   - `VersionUrl`: Url to download the version file.
   - `Regions`: List of regions to download.
   - `ProdKeys`: Path to your prod.keys file, if this value is not set, program will look in the same folder as the executable, or you can put them in `$HOME/.switch/prod.keys`.
-    
-[!NOTE]
-Be sure that the paths you put on `appsettings.json` exists the application doesn't create the paths if they don't exists, also please use absolute paths, relative paths might not work as expected because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`._
+
+> [!NOTE]  
+> Be sure that the paths you put on `appsettings.json` exists the application doesn't create the paths if they don't exists, also please use absolute paths, relative paths might not work as expected because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`._
 
  ## Usage
 - Run the `NsxLibraryManager.exe` file.
