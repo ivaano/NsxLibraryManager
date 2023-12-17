@@ -6,35 +6,24 @@ using NsxLibraryManager.Core.Services.Interface;
 
 namespace NsxLibraryManager.Controllers;
 
-public class GamesController : ODataController
+public class GamesController(IDataService dataService) : ODataController
 {
-    private readonly IDataService _dataService;
-
-    public GamesController(IDataService dataService)
-    {
-        _dataService = dataService;
-    }
-
     [EnableQuery]
     public async Task<ActionResult<IEnumerable<Game>>> Get()
     {
-        var libTitles = await _dataService.GetLibraryTitlesAsync();
+        var libTitles = await dataService.GetLibraryTitlesAsync();
 
-        var games = new List<Game>();
-        
-        foreach (var libTitle in libTitles)
-        {
-            var game = new Game
-            {
-                TitleId = libTitle.TitleId,
-                FileName = libTitle.FileName,
-                TitleName = libTitle.TitleName,
-                Type = libTitle.Type,
-                TitleVersion = libTitle.TitleVersion,
-                Publisher = libTitle.Publisher
-            };
-            games.Add(game);
-        }
+        var games = libTitles.Select(libTitle => new Game
+                {
+                        TitleId = libTitle.TitleId,
+                        FileName = libTitle.FileName,
+                        TitleName = libTitle.TitleName,
+                        Type = libTitle.Type,
+                        TitleVersion = libTitle.TitleVersion,
+                        Publisher = libTitle.Publisher
+                })
+                .ToList();
+
         return Ok(games);
     }
     
