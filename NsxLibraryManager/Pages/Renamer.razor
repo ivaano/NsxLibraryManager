@@ -1,0 +1,172 @@
+﻿@page "/renamer"
+<PageTitle>Renamer</PageTitle>
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Renamer">
+            Configure Renamer First.
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Configuration">
+            <RadzenStack Style="padding-bottom: .5rem ">
+
+                <RenamerFieldSet Text="Basic Info" AllowCollapse="true" Visible="true">
+                    <RadzenRow Gap="1rem">
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <RenamerFieldSet Text="Input">
+                                <RadzenFormField Text="Input Path" Variant="@variant" Style="width: 100%; padding: 1px">
+                                    <RadzenTextBox @bind-Value="@inputPath"  Style="font-family: monospace;" />
+
+                                </RadzenFormField>
+                                <div class="rz-text-align-right">
+                                    <RadzenCheckBox Name="Recusive" @bind-Value="@recursive"/>
+                                    <RadzenLabel Text="Recursive Subdirectories" Component="Recusive" Style="margin-left: 8px; vertical-align: middle;"/>
+                                </div>
+                            </RenamerFieldSet>
+                            <RenamerFieldSet Text="Output">
+                                <RadzenFormField Text="Base Path" Variant="@variant" Style="width: 100%; padding: 1px">
+                                    <RadzenTextBox @bind-Value="@outputBasePath" Style="font-family: monospace;" />
+                                </RadzenFormField>
+                            </RenamerFieldSet>
+
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <RenamerFieldSet Text="Template Fields">
+                                <RadzenRow Gap="0.1rem" Style="padding-bottom: .1rem">
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@BasePathField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.BasePath, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.BasePath, args ))" 
+                                                      ButtonStyle="ButtonStyle.Info" Style="width: 100%; height: 100%;"/>
+                                    </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@TitleNameField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.TitleName, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.TitleName, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>
+                                    </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@TitleIdField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.TitleId, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.TitleId, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>                                        
+                                    </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@VersionField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.Version, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.Version, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>                                           
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow Gap="0.1rem">
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@ExtensionField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.Extension, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.Extension, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>   
+                                    </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@AppNameField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.AppName, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.AppName, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>                                        
+                                    </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@PatchIdField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.PatchId, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.PatchId, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>                                            
+                                    </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@PatchNumField" Shade="Shade.Lighter" 
+                                                      Click="@(args => TemplateFieldClick(TemplateField.PatchNum, args))" 
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.PatchNum, args))" 
+                                                      ButtonStyle="ButtonStyle.Info" 
+                                                      Style="width: 100%; height: 100%;"/>                                           
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RenamerFieldSet>
+                            <RadzenRow Gap="0.1rem">
+                                <RadzenText Style="font-family: monospace;" Text="Before: N:\roms validados\nsz\base\0X0 minimalist [01001E3013FC4000][v0].nsz"/>
+                            </RadzenRow>
+                            <RadzenRow Gap="0.1rem">
+                                <RadzenText Style="font-family: monospace;" Text="After: N:\roms validados\nsz\base\0X0 minimalist [01001E3013FC4000][v0].nsz"/>
+                            </RadzenRow>
+                            <RadzenRow Gap="0.1rem" JustifyContent="JustifyContent.End">
+                                <RadzenButton>Save Configuration</RadzenButton>
+                            </RadzenRow>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RenamerFieldSet>
+            </RadzenStack>
+
+
+            <div Class="rz-p-0">
+                <RadzenRow Gap="1rem">
+                    <RadzenColumn Size="12" SizeSM="6">
+                        <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+                            NSP Paths
+                            <RadzenFormField Text="Base" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@nspBase" Style="font-family: monospace;" @onclick="args => TemplateTextboxChange(TextBoxType.NspBase, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="DLC" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@nspDlc" Style="font-family: monospace;"  @onclick="args => TemplateTextboxChange(TextBoxType.NspDlc, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="Update" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@nspUpdate" Style="font-family: monospace;"  @onclick="args => TemplateTextboxChange(TextBoxType.NspUpdate, args)"/>
+                            </RadzenFormField>
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeSM="6">
+                        <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+                            NSZ Paths
+                            <RadzenFormField Text="Base" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@nszBase" @onclick="args => TemplateTextboxChange(TextBoxType.NszBase, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="DLC" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@nszDlc" @onclick="args => TemplateTextboxChange(TextBoxType.NszDlc, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="Update" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@nszUpdate" @onclick="args => TemplateTextboxChange(TextBoxType.NszUpdate, args)"/>
+                            </RadzenFormField>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow Gap="1rem">
+                    <RadzenColumn Size="12" SizeSM="6">
+                        <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+                            XCI Paths
+                            <RadzenFormField Text="Base" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@xciBase" @onclick="args => TemplateTextboxChange(TextBoxType.XciBase, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="DLC" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@xciDlc" @onclick="args => TemplateTextboxChange(TextBoxType.XciDlc, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="Update" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@xciUpdate" @onclick="args => TemplateTextboxChange(TextBoxType.XciUpdate, args)"/>
+                            </RadzenFormField>
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeSM="6">
+                        <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+                            NSZ Paths
+                            <RadzenFormField Text="Base" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@xczBase" @onclick="args => TemplateTextboxChange(TextBoxType.XczBase, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="DLC" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@xczDlc" @onclick="args => TemplateTextboxChange(TextBoxType.XczDlc, args)"/>
+                            </RadzenFormField>
+                            <RadzenFormField Text="Update" Variant="@variant">
+                                <RadzenTextBox @bind-Value="@xczUpdate" @onclick="args => TemplateTextboxChange(TextBoxType.XczUpdate, args)"/>
+                            </RadzenFormField>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </div>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>

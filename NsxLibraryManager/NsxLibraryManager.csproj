@@ -26,10 +26,6 @@
         <PackageReference Include="Radzen.Blazor" Version="4.23.3" />
 
     </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="wwwroot\images\icon\" />
-    </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\NsxLibraryManager.Core\NsxLibraryManager.Core.csproj" />
