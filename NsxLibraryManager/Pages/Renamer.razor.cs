@@ -1,137 +1,186 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using Radzen;
 
 namespace NsxLibraryManager.Pages;
 
 public partial class Renamer
 {
-    [Inject] 
-    TooltipService tooltipService { get; set; } = default!;
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
-    private readonly Variant variant = Variant.Outlined;
-    private string inputPath;
-    private string nspBase;
-    private string nspDlc;
-    private string nspUpdate;
-    private string nszBase;
-    private string nszDlc;
-    private string nszUpdate;
-    private string xciBase;
-    private string xciDlc;
-    private string xciUpdate;
-    private string xczBase;
-    private string xczDlc;
-    private string xczUpdate;
-    private bool recursive;
-    private string outputBasePath;
-    private TextBoxType currentTextBox = TextBoxType.None;
-    private const string BasePathField = "{BasePath}";
-    private const string TitleNameField = "{TitleName}";
-    private const string TitleIdField = "{TitleId}";
-    private const string VersionField = "{Version}";
-    private const string ExtensionField = "{Extension}";
-    private const string AppNameField = "{AppName}";
-    private const string PatchIdField = "{PatchId}";
-    private const string PatchNumField = "{PatchNum}";
-    
+    [Inject] private TooltipService TooltipService { get; set; } = default!;
+
+    private readonly Variant _variant = Variant.Outlined;
+    private string _inputPath = string.Empty;
+    private string _nspBase = string.Empty;
+    private string _nspDlc = string.Empty;
+    private string _nspUpdate = string.Empty;
+    private string _nszBase = string.Empty;
+    private string _nszDlc = string.Empty;
+    private string _nszUpdate = string.Empty;
+    private string _xciBase  = string.Empty;
+    private string _xciDlc = string.Empty;
+    private string _xciUpdate = string.Empty;
+    private string _xczBase = string.Empty;
+    private string _xczDlc = string.Empty;
+    private string _xczUpdate = string.Empty;
+    private string _sampleResultLabel = "Sample Result";
+    private readonly Dictionary<TextBoxType, TemplateFieldInfo> _templateFields = new();
+    private Dictionary<TextBoxType, Action<string>> _textBoxTypeActions = new();
+
+    private readonly Dictionary<TemplateField, string> _templateFieldMappings = new()
+    {
+        { TemplateField.BasePath, "{BasePath}" },
+        { TemplateField.TitleName, "{TitleName}" },
+        { TemplateField.TitleId, "{TitleId}" },
+        { TemplateField.Version, "{Version}" },
+        { TemplateField.Extension, "{Extension}" },
+        { TemplateField.AppName, "{AppName}" },
+        { TemplateField.PatchId, "{PatchId}" },
+        { TemplateField.PatchNum, "{PatchNum}" },
+    };
+
+    private bool _recursive = true;
+    private string _outputBasePath = string.Empty;
+    private TextBoxType _currentTextBox = TextBoxType.None;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeTemplateFields();
+        InitializeTextBoxTypeActions();
+        await base.OnInitializedAsync();
+    }
+
+    private void InitializeTemplateFields()
+    {
+        var textBoxTypes = new[]
+        {
+            TextBoxType.NspBase,
+            TextBoxType.NspDlc,
+            TextBoxType.NspUpdate,
+            TextBoxType.NszBase,
+            TextBoxType.NszDlc,
+            TextBoxType.NszUpdate,
+            TextBoxType.XciBase,
+            TextBoxType.XciDlc,
+            TextBoxType.XciUpdate,
+            TextBoxType.XczBase,
+            TextBoxType.XczDlc,
+            TextBoxType.XczUpdate
+        };
+
+        foreach (var textBoxType in textBoxTypes)
+        {
+            _templateFields[textBoxType] = CreateTemplateFieldInfo(textBoxType);
+        }
+    }
+
+    private void InitializeTextBoxTypeActions()
+    {
+        _textBoxTypeActions = new Dictionary<TextBoxType, Action<string>>
+        {
+            { TextBoxType.NspBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nspBase) },
+            { TextBoxType.NspDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nspDlc) },
+            { TextBoxType.NspUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nspUpdate) },
+            { TextBoxType.NszBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nszBase) },
+            { TextBoxType.NszDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nszDlc) },
+            { TextBoxType.NszUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nszUpdate) },
+            { TextBoxType.XciBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xciBase) },
+            { TextBoxType.XciDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xciDlc) },
+            { TextBoxType.XciUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xciUpdate) },
+            { TextBoxType.XczBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xczBase) },
+            { TextBoxType.XczDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xczDlc) },
+            { TextBoxType.XczUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xczUpdate) },
+        };
+    }
+
+    private static TemplateFieldInfo CreateTemplateFieldInfo(TextBoxType fieldType)
+    {
+        return new TemplateFieldInfo
+        {
+            FieldType = fieldType,
+            Value = string.Empty
+        };
+    }
 
     private void ShowTooltip(TemplateField templateField, ElementReference elementReference)
     {
-        string? content;
         var options = new TooltipOptions()
         {
                 Delay = 200,
                 Position = TooltipPosition.Top,
         };
-        
-        if (templateField is TemplateField.Extension or TemplateField.AppName or TemplateField.PatchId or TemplateField.PatchNum)
+
+        if (templateField is TemplateField.Extension or TemplateField.AppName or TemplateField.PatchId
+            or TemplateField.PatchNum)
             options.Position = TooltipPosition.Bottom;
 
-        content = templateField switch
+        var content = templateField switch
         {
-                TemplateField.BasePath => "Path from the output field Base Path",
-                TemplateField.TitleName =>
-                        "The first name among the list of declared titles, or the one coming from titledb",
-                TemplateField.TitleId => "The title id eg [0100F2200C984000]",
-                TemplateField.Version => "The version of the title eg 65536",
-                TemplateField.Extension => "The extension of the file based on its contents eg .nsp",
-                TemplateField.AppName => "The name the corresponding Application, useful in updates and dlc to see the Application they belong to",
-                TemplateField.PatchId => "If content is an Application, this value is equal to the id of the corresponding Patch content, otherwise empty",
-                TemplateField.PatchNum => "If content is an Application, this value is equal to the number of patches available for the corresponding Application, otherwise empty",
-                _ => string.Empty
+            TemplateField.BasePath => "Path from the output field Base Path",
+            TemplateField.TitleName =>
+                    "The first name among the list of declared titles, or the one coming from titledb",
+            TemplateField.TitleId   => "The title id eg [0100F2200C984000]",
+            TemplateField.Version   => "The version of the title eg 65536",
+            TemplateField.Extension => "The extension of the file based on its contents eg .nsp",
+            TemplateField.AppName =>
+                    "The name the corresponding Application, useful in updates and dlc to see the Application they belong to",
+            TemplateField.PatchId =>
+                    "If content is an Application, this value is equal to the id of the corresponding Patch content, otherwise empty",
+            TemplateField.PatchNum =>
+                    "If content is an Application, this value is equal to the number of patches available for the corresponding Application, otherwise empty",
+            _ => string.Empty
         };
 
-        tooltipService.Open(elementReference, content, options);
+        TooltipService.Open(elementReference, content, options);
+    }
+
+    private void UpdateTemplateFieldRecord(string templateField, ref string currentValue)
+    {
+        var pos = _templateFields[_currentTextBox].CursorPosition;
+        var fieldContent = pos > 0 ? currentValue.Insert(pos, templateField) : templateField;
+        _templateFields[_currentTextBox].CursorPosition += templateField.Length;
+        _templateFields[_currentTextBox].Value = fieldContent;
+        currentValue = fieldContent;
     }
 
 
-    private async Task TemplateFieldClick(TemplateField type, MouseEventArgs args)
+    private async Task TemplateFieldClick(TemplateField templateFieldType, MouseEventArgs args)
     {
-        var templateField = type switch
+        if (_templateFieldMappings.TryGetValue(templateFieldType, out var templateField) &&
+            _textBoxTypeActions.TryGetValue(_currentTextBox, out var action))
         {
-                TemplateField.BasePath => BasePathField,
-                TemplateField.TitleName => TitleNameField,
-                TemplateField.TitleId => TitleIdField,
-                TemplateField.Version => VersionField,
-                TemplateField.Extension => ExtensionField,
-                TemplateField.AppName => AppNameField,
-                TemplateField.PatchId => PatchIdField,
-                TemplateField.PatchNum => PatchNumField,
-                _ => string.Empty
-        };
-
-        switch (currentTextBox)
-        {
-            case TextBoxType.NspBase:
-                nspBase += templateField;
-                break;
-            case TextBoxType.NspDlc:
-                nspDlc += templateField;
-                break;
-            case TextBoxType.NspUpdate:
-                nspUpdate += templateField;
-                break;
-            case TextBoxType.NszBase:
-                nszBase += templateField;
-                break;
-            case TextBoxType.NszDlc:
-                nszDlc += templateField;
-                break;
-            case TextBoxType.NszUpdate:
-                nszUpdate += templateField;
-                break;
-            case TextBoxType.XciBase:
-                xciBase += templateField;
-                break;
-            case TextBoxType.XciDlc:
-                xciDlc += templateField;
-                break;
-            case TextBoxType.XciUpdate:
-                xciUpdate += templateField;
-                break;
-            case TextBoxType.XczBase:
-                xczBase += templateField;
-                break;
-            case TextBoxType.XczDlc:
-                xczDlc += templateField;
-                break;
-            case TextBoxType.XczUpdate:
-                xczUpdate += templateField;
-                break;
-            case TextBoxType.None:
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
+            action(templateField);
         }
+
+
+        if (_currentTextBox != TextBoxType.None)
+            await JsRuntime.InvokeVoidAsync("setFocus", _currentTextBox.ToString(), " {0}");
     }
 
-    private async Task TemplateTextboxChange(TextBoxType type, MouseEventArgs args)
+
+    private async Task TemplateTextboxUpdate(TextBoxType type)
     {
-        currentTextBox = type;
-    }
+        _currentTextBox = type;
+        _sampleResultLabel = _currentTextBox.ToString();
+        if (type == TextBoxType.None)
+        {
+            _sampleResultLabel = "Sample Result";
+            return;
+        }
+        _templateFields[type].CursorPosition =
+                await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
 
- 
+    }
+}
+
+public record TemplateFieldInfo
+{
+    public required TextBoxType FieldType { get; init; }
+    public int CursorPosition { get; set; }
+    public required string Value { get; set; }
 }
 
 public enum TextBoxType
@@ -161,5 +210,4 @@ public enum TemplateField
     AppName,
     PatchId,
     PatchNum
-    
 }
