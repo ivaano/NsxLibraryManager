@@ -8,6 +8,8 @@ using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Core.Validators;
+using FluentValidation;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +34,8 @@ builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
 builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
 builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
 builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
+builder.Services.AddScoped<IRenamerService, RenamerService>();
+builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();
 //radzen services
 builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();

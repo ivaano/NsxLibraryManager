@@ -1,5 +1,7 @@
 ﻿@page "/renamer"
+@using NsxLibraryManager.Core.Enums
 <PageTitle>Renamer</PageTitle>
+
 <RadzenTabs>
 <Tabs>
 <RadzenTabsItem Text="Renamer">
@@ -12,30 +14,39 @@
         <RadzenRow Gap="1rem">
             <RadzenColumn Size="12" SizeSM="6">
                 <RenamerFieldSet Text="Input">
-                    <RadzenFormField Text="Input Path" Variant="@_variant" Style="width: 100%; padding: 1px">
-                    <RadzenTextBox @bind-Value="@_inputPath" id="InputPath" Name="InputPath"
-                                   Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.None)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.None)"/>
+                    <RadzenFormField Text="Input Path" Variant="@Variant" Style="width: 100%; padding: 1px">
+                        <ChildContent>
+                            <RadzenTextBox @bind-Value="@_settings.InputPath" id="InputPath" Name="InputPath"
+                                           Style="font-family: monospace;"
+                                           @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.None)"
+                                           @onclick="_ => TemplateTextboxUpdate(PackageTitleType.None)"/>
+                        </ChildContent>
+                        <Helper>
+                            <div class="rz-message rz-messages-error ">@_validationErrors["InputPath"]</div>
+                        </Helper>
                     </RadzenFormField>
                     <div class="rz-text-align-right">
-                        <RadzenCheckBox Name="Recusive" @bind-Value="@_recursive"/>
+                        <RadzenCheckBox Name="Recusive" @bind-Value="@_settings.Recursive"/>
                         <RadzenLabel Text="Recursive Subdirectories" Component="Recusive" Style="margin-left: 8px; vertical-align: middle;"/>
                     </div>
                 </RenamerFieldSet>
                 <RenamerFieldSet Text="Output">
-                    <RadzenFormField Text="Base Path" Variant="@_variant" Style="width: 100%; padding: 1px">
-
-                    <RadzenTextBox @bind-Value="@_outputBasePath" id="OutpatPath" Name="OutpatPath"
-                                   Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.None)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.None)"/>                        
+                    <RadzenFormField Text="Base Path" Variant="@Variant" Style="width: 100%; padding: 1px">
+                        <ChildContent>
+                            <RadzenTextBox @bind-Value="@_settings.OutputBasePath" id="OutputBasePath" Name="OutputBasePath"
+                                           Style="font-family: monospace;"
+                                           @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.None)"
+                                           @onclick="_ => TemplateTextboxUpdate(PackageTitleType.None)"/>
+                        </ChildContent>
+                        <Helper>
+                            <div class="rz-message rz-messages-error ">@_validationErrors["OutputBasePath"]</div>
+                        </Helper>
                     </RadzenFormField>
                 </RenamerFieldSet>
-                    <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
-                        <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Success" class="rz-ripple">Validate Configuration</RadzenButton>
-                        <RadzenButton Variant="Variant.Outlined" class="rz-ripple">Save Configuration</RadzenButton>
-                    </RadzenRow>
+                <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
+                    <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Success" Click="@ValidateConfiguration" class="rz-ripple">Validate Configuration</RadzenButton>
+                    <RadzenButton Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+                </RadzenRow>
             </RadzenColumn>
             <RadzenColumn Size="12" SizeSM="6">
                 <RenamerFieldSet Text="Template Fields">
@@ -103,13 +114,13 @@
                     <RadzenRow Gap="0.1rem">
                         <RadzenColumn Size="2">Before:</RadzenColumn>
                         <RadzenColumn Size="10">
-                            <RadzenText Style="font-family: monospace; font-size: .7rem" Text=" N:\roms validados\nsz\base\0X0 minimalist [01001E3013FC4000][v0][01001E3013FC4000][v0][01001E3013FC4000][v0][01001E3013FC4000][v0][01001E3013FC4000][v0][01001E3013FC4000][v0][01001E3013FC4000][v0].nsz"/>
+                            <RadzenText Style="font-family: monospace; font-size: .7rem" Text="@_sampleBefore"/>
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow Gap="0.1rem">
                         <RadzenColumn Size="2">After:</RadzenColumn>
                         <RadzenColumn Size="10">
-                            <RadzenText Style="font-family: monospace; font-size: .7rem" Text=" N:\roms validados\nsz\base\0X0 minimalist [01001E3013FC4000][v0].nsz"/>
+                            <RadzenText Style="font-family: monospace; font-size: .7rem" Text="@_sampleAfter"/>
                         </RadzenColumn>
                     </RadzenRow>
                 </RenamerFieldSet>
@@ -124,98 +135,96 @@
 <div Class="rz-p-0">
     <RadzenRow Gap="1rem">
         <RadzenColumn Size="12" SizeSM="6">
-            <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-                NSP Paths
-                <RadzenFormField Text="Base" Variant="@_variant">
+            <RenamerFieldSet Text="NSP Paths">
+                <RadzenFormField Text="Base" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspBase" id="NspBase" Name="NspBase"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.NspBase)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.NspBase)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NspBase)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NspBase)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="DLC" Variant="@_variant">
+                <RadzenFormField Text="DLC" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspDlc" id="NspDlc" Name="NspDlc"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.NspDlc)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.NspDlc)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NspDlc)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NspDlc)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="Update" Variant="@_variant">
+                <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspUpdate" id="NspUpdate" Name="NspUpdate"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.NspUpdate)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.NspUpdate)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NspUpdate)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NspUpdate)"/>
                 </RadzenFormField>
-            </RadzenStack>
+            </RenamerFieldSet>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
-            <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-                NSZ Paths
-                <RadzenFormField Text="Base" Variant="@_variant">
+            <RenamerFieldSet Text="NSZ Paths">
+
+                <RadzenFormField Text="Base" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nszBase" id="NszBase" Name="NszBase"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.NszBase)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.NszBase)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NszBase)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NszBase)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="DLC" Variant="@_variant">
+                <RadzenFormField Text="DLC" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nszDlc" id="NszDlc" Name="NszDlc"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.NszDlc)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.NszDlc)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NszDlc)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NszDlc)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="Update" Variant="@_variant">
+                <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nszUpdate" id="NszUpdate" Name="NszUpdate"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.NszUpdate)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.NszUpdate)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NszUpdate)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NszUpdate)"/>
                 </RadzenFormField>
-            </RadzenStack>
+            </RenamerFieldSet>
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow Gap="1rem">
         <RadzenColumn Size="12" SizeSM="6">
-            <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-                XCI Paths
-                <RadzenFormField Text="Base" Variant="@_variant">
+            <RenamerFieldSet Text="XCI Paths">
+                <RadzenFormField Text="Base" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_xciBase" id="XciBase" Name="XciBase"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.XciBase)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.XciBase)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.XciBase)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.XciBase)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="DLC" Variant="@_variant">
+                <RadzenFormField Text="DLC" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_xciDlc" id="XciDlc" Name="XciDlc"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.XciDlc)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.XciDlc)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.XciDlc)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.XciDlc)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="Update" Variant="@_variant">
+                <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_xciUpdate" id="XciUpdate" Name="XciUpdate"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.XciUpdate)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.XciUpdate)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.XciUpdate)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.XciUpdate)"/>
                 </RadzenFormField>
-            </RadzenStack>
+            </RenamerFieldSet>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
-            <RadzenStack Gap="0.1rem" Class="rz-p-2 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
-                NSZ Paths
-                <RadzenFormField Text="Base" Variant="@_variant">
+            <RenamerFieldSet Text="XCZ Paths">
+
+                <RadzenFormField Text="Base" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_xczBase" id="XczBase" Name="XczBase"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.XczBase)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.XczBase)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.XczBase)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.XczBase)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="DLC" Variant="@_variant">
+                <RadzenFormField Text="DLC" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_xczDlc" id="XczDlc" Name="XczDlc"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.XczDlc)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.XczDlc)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.XczDlc)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.XczDlc)"/>
                 </RadzenFormField>
-                <RadzenFormField Text="Update" Variant="@_variant">
+                <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_xczUpdate" id="XczUpdate" Name="XczUpdate"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(TextBoxType.XczUpdate)"
-                                   @onclick="_ => TemplateTextboxUpdate(TextBoxType.XczUpdate)"/>
+                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.XczUpdate)"
+                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.XczUpdate)"/>
                 </RadzenFormField>
-            </RadzenStack>
+            </RenamerFieldSet>
         </RadzenColumn>
     </RadzenRow>
 </div>
