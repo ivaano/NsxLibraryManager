@@ -10,4 +10,7 @@ public class RenamerSettings
     public string NspBasePath { get; set; } = string.Empty;
     public string NspDlcPath { get; set; } = string.Empty;
     public string NspUpdatePath { get; set; } = string.Empty;
+    public string NszBasePath { get; set; } = string.Empty;
+    public string NszDlcPath { get; set; } = string.Empty;
+    public string NszUpdatePath { get; set; } = string.Empty;
 }

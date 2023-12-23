@@ -30,7 +30,7 @@ public class RenamerService : IRenamerService
 
     private async Task<string> TemplateReplaceAsync(string renameTemplate, LibraryTitle fileInfo)
     {
-        var newPath = string.Empty;
+        var newPath = renameTemplate;
         foreach (var (key, pattern) in RenamerTemplateFields.TemplateFieldMappings)
         {
             var match = Regex.Match(renameTemplate, pattern, RegexOptions.IgnoreCase);
@@ -115,9 +115,10 @@ public class RenamerService : IRenamerService
         {
             PackageType = AccuratePackageType.NSP,
             Type = libraryType,
-            TitleName = "Som Title Name",
+            TitleName = "Some Title Name",
             TitleId = "0010000",
-            FileName = inputFile
+            FileName = inputFile,
+            ApplicationTitleName = "Some App Name",
         };
         var filePath = "c:/test/algo.nsp";
         return await TemplateReplaceAsync(templateText, fileInfo);

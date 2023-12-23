@@ -139,15 +139,16 @@
                 <RadzenFormField Text="Base" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspBase" id="NspBase" Name="NspBase"
                                    Style="font-family: monospace;"
-                                   @onkeydown="_ => UpdateSampleBox(PackageTitleType.NspBase)"
-                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NspBase)"
-                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NspBase)"/>
+                                   @oninput="@(args => OnTemplateFieldInput(PackageTitleType.NspBase, args.Value?.ToString()))"
+                                   @onclick="@(args => OnTemplateFieldClick(PackageTitleType.NspBase, args))">
+                    </RadzenTextBox>
                 </RadzenFormField>
                 <RadzenFormField Text="DLC" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspDlc" id="NspDlc" Name="NspDlc"
                                    Style="font-family: monospace;"
-                                   @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NspDlc)"
-                                   @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NspDlc)"/>
+                                   @oninput="@(args => OnTemplateFieldInput(PackageTitleType.NspDlc, args.Value?.ToString()))"
+                                   @onclick="@(args => OnTemplateFieldClick(PackageTitleType.NspDlc, args))">
+                    </RadzenTextBox>                    
                 </RadzenFormField>
                 <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspUpdate" id="NspUpdate" Name="NspUpdate"

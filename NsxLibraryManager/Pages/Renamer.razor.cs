@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -66,6 +67,14 @@ public partial class Renamer
         _nspBase = _settings.NspBasePath;
         _nspDlc = _settings.NspDlcPath;
         _nspUpdate = _settings.NspUpdatePath;
+        _nszBase = _settings.NszBasePath;
+        
+        _templateFields[PackageTitleType.NspBase].Value = _nspBase;
+        _templateFields[PackageTitleType.NspDlc].Value = _nspDlc;
+        _templateFields[PackageTitleType.NspUpdate].Value = _nspUpdate;
+        _templateFields[PackageTitleType.NszBase].Value = _nszBase;
+        _templateFields[PackageTitleType.NszDlc].Value = _nszDlc;
+        _templateFields[PackageTitleType.NszUpdate].Value = _nszUpdate;
     }
 
     private void InitializeTemplateFields()
@@ -115,6 +124,116 @@ public partial class Renamer
         };
     }
 
+    private void UpdateTemplateFieldRecord(string templateField, ref string currentValue)
+    {
+        var pos = _templateFields[_currentPackageTitle].CursorPosition;
+        var fieldContent = pos > 0 ? currentValue.Insert(pos, templateField) : templateField;
+        _templateFields[_currentPackageTitle].CursorPosition += templateField.Length;
+        _templateFields[_currentPackageTitle].Value = fieldContent;
+        currentValue = fieldContent;
+        var task = UpdateSampleBox(_currentPackageTitle, currentValue);
+        Task.Run(async () => await task);
+    }
+
+
+    private async Task TemplateFieldClick(TemplateField templateFieldType, MouseEventArgs args)
+    {
+        if (_templateFieldMappings.TryGetValue(templateFieldType, out var templateField) &&
+            _textBoxTypeActions.TryGetValue(_currentPackageTitle, out var action))
+        {
+            action(templateField);
+        }
+
+        if (_currentPackageTitle != PackageTitleType.None)
+            await JsRuntime.InvokeVoidAsync("setFocus", _currentPackageTitle.ToString(), " {0}");
+    }
+
+    private async Task TemplateTextboxUpdate(PackageTitleType type)
+    {
+        _currentPackageTitle = type;
+        var labelParts = Regex.Split(_currentPackageTitle.ToString(), "(?<!^)(?=[A-Z])");
+        _sampleResultLabel = string.Join(" ", labelParts);
+        if (type == PackageTitleType.None)
+        {
+            _sampleResultLabel = "Sample Result";
+            return;
+        }
+        
+        _templateFields[type].CursorPosition =
+            await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
+    }
+    private async Task UpdateSampleBox(PackageTitleType type, string templateValue)
+    {
+        _sampleBefore = $"c:\\dump\\lucas-game.nsp";
+        _sampleAfter = await RenamerService.CalculateSampleFileName(templateValue, type, "inputFile.nsp", "basePath");
+    }
+    
+    private async Task OnTemplateFieldClick(PackageTitleType type, MouseEventArgs args)
+    {
+        await TemplateTextboxUpdate(type);
+        await UpdateSampleBox(_currentPackageTitle, _templateFields[_currentPackageTitle].Value);
+    }
+    
+    private async Task OnTemplateFieldInput(PackageTitleType type, string? value)
+    {
+        if (value is not null)
+        {
+            _templateFields[type].Value = value;
+            await TemplateTextboxUpdate(PackageTitleType.NspDlc);
+            await UpdateSampleBox(_currentPackageTitle, value);
+        }
+    }
+
+
+    private async Task SaveConfiguration()
+    {
+        var isValid = await ValidateConfiguration();
+        if (!isValid)
+            return;
+        var savedSettings = await RenamerService.SaveRenamerSettingsAsync(_settings);
+
+        var notificationMessage = new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Configuration Saved",
+            Duration = 4000
+        };
+        NotificationService.Notify(notificationMessage);
+    }
+
+    #region UI Helpers
+    
+    private async Task<bool> ValidateConfiguration()
+    {
+        Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
+        var validationResult = await RenamerService.ValidateRenamerSettingsAsync(_settings);
+
+        var notificationMessage = new NotificationMessage
+        {
+            Severity = validationResult.IsValid ? NotificationSeverity.Success : NotificationSeverity.Error,
+            Summary = validationResult.IsValid ? "Success Validation" : "Validation Failed",
+            Detail = validationResult.IsValid ? "All good!" : "Please check the fields!",
+            Duration = 4000
+        };
+
+        if (!validationResult.IsValid)
+        {
+            foreach (var failure in validationResult.Errors)
+            {
+                _validationErrors[failure.PropertyName] =
+                    _validationErrors.TryGetValue(failure.PropertyName, out var value)
+                        ? $"{value} {failure.ErrorMessage}"
+                        : failure.ErrorMessage;
+            }
+        }
+
+        _settings.NspBasePath = _nspBase;
+        _settings.NspDlcPath = _nspDlc;
+        _settings.NspUpdatePath = _nspUpdate;
+        NotificationService.Notify(notificationMessage);
+        return validationResult.IsValid;
+    }
+    
     private void ShowTooltip(TemplateField templateField, ElementReference elementReference)
     {
         var options = new TooltipOptions()
@@ -148,97 +267,8 @@ public partial class Renamer
 
         TooltipService.Open(elementReference, content, options);
     }
+    #endregion
 
-    private void UpdateTemplateFieldRecord(string templateField, ref string currentValue)
-    {
-        var pos = _templateFields[_currentPackageTitle].CursorPosition;
-        var fieldContent = pos > 0 ? currentValue.Insert(pos, templateField) : templateField;
-        _templateFields[_currentPackageTitle].CursorPosition += templateField.Length;
-        _templateFields[_currentPackageTitle].Value = fieldContent;
-        currentValue = fieldContent;
-    }
-
-
-    private async Task TemplateFieldClick(TemplateField templateFieldType, MouseEventArgs args)
-    {
-        if (_templateFieldMappings.TryGetValue(templateFieldType, out var templateField) &&
-            _textBoxTypeActions.TryGetValue(_currentPackageTitle, out var action))
-        {
-            action(templateField);
-        }
-
-        if (_currentPackageTitle != PackageTitleType.None)
-            await JsRuntime.InvokeVoidAsync("setFocus", _currentPackageTitle.ToString(), " {0}");
-    }
-
-    private async Task UpdateSampleBox(PackageTitleType type)
-    {
-        _sampleBefore = $"c:\\dump\\lucas-game.nsp";
-        _sampleAfter = await RenamerService.CalculateSampleFileName(_templateFields[_currentPackageTitle].Value, type, "inputFile.nsp", "basePath");
-    }
-
-    private async Task TemplateTextboxUpdate(PackageTitleType type)
-    {
-        _currentPackageTitle = type;
-        var labelParts = Regex.Split(_currentPackageTitle.ToString(), "(?<!^)(?=[A-Z])");
-        _sampleResultLabel = string.Join(" ", labelParts);
-        if (type == PackageTitleType.None)
-        {
-            _sampleResultLabel = "Sample Result";
-            return;
-        }
-
-        //await UpdateSampleBox(type);
-        _templateFields[type].CursorPosition =
-            await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
-    }
-
-    private async Task<bool> ValidateConfiguration()
-    {
-        Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
-        var validationResult = await RenamerService.ValidateRenamerSettingsAsync(_settings);
-
-        var notificationMessage = new NotificationMessage
-        {
-            Severity = validationResult.IsValid ? NotificationSeverity.Success : NotificationSeverity.Error,
-            Summary = validationResult.IsValid ? "Success Validation" : "Validation Failed",
-            Detail = validationResult.IsValid ? "All good!" : "Please check the fields!",
-            Duration = 4000
-        };
-
-        if (!validationResult.IsValid)
-        {
-            foreach (var failure in validationResult.Errors)
-            {
-                _validationErrors[failure.PropertyName] =
-                    _validationErrors.TryGetValue(failure.PropertyName, out var value)
-                        ? $"{value} {failure.ErrorMessage}"
-                        : failure.ErrorMessage;
-            }
-        }
-
-        _settings.NspBasePath = _nspBase;
-        _settings.NspDlcPath = _nspDlc;
-        _settings.NspUpdatePath = _nspUpdate;
-        NotificationService.Notify(notificationMessage);
-        return validationResult.IsValid;
-    }
-
-    private async Task SaveConfiguration()
-    {
-        var isValid = await ValidateConfiguration();
-        if (!isValid)
-            return;
-        var savedSettings = await RenamerService.SaveRenamerSettingsAsync(_settings);
-
-        var notificationMessage = new NotificationMessage
-        {
-            Severity = NotificationSeverity.Success,
-            Summary = "Configuration Saved",
-            Duration = 4000
-        };
-        NotificationService.Notify(notificationMessage);
-    }
 }
 
 public record TemplateFieldInfo
