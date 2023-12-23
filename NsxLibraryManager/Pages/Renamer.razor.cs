@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using Radzen;
@@ -14,12 +15,10 @@ public partial class Renamer
     [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
     [Inject] private TooltipService TooltipService { get; set; } = default!;
-    
-    [Inject]
-    private IRenamerService RenamerService { get; set; } = default!;
-    
-    [Inject]
-    private NotificationService NotificationService { get; set; } = default!;
+
+    [Inject] private IRenamerService RenamerService { get; set; } = default!;
+
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private const Variant Variant = Radzen.Variant.Outlined;
     private string _nspBase = string.Empty;
@@ -28,7 +27,7 @@ public partial class Renamer
     private string _nszBase = string.Empty;
     private string _nszDlc = string.Empty;
     private string _nszUpdate = string.Empty;
-    private string _xciBase  = string.Empty;
+    private string _xciBase = string.Empty;
     private string _xciDlc = string.Empty;
     private string _xciUpdate = string.Empty;
     private string _xczBase = string.Empty;
@@ -37,27 +36,20 @@ public partial class Renamer
     private string _sampleBefore = string.Empty;
     private string _sampleAfter = string.Empty;
     private string _sampleResultLabel = "Sample Result";
+    private PackageTitleType _currentPackageTitle = PackageTitleType.None;
     private readonly Dictionary<PackageTitleType, TemplateFieldInfo> _templateFields = new();
-    private readonly Dictionary<TemplateField, string> _templateFieldMappings = new()
-    {
-        { TemplateField.BasePath, "{BasePath}" },
-        { TemplateField.TitleName, "{TitleName}" },
-        { TemplateField.TitleId, "{TitleId}" },
-        { TemplateField.Version, "{Version}" },
-        { TemplateField.Extension, "{Extension}" },
-        { TemplateField.AppName, "{AppName}" },
-        { TemplateField.PatchId, "{PatchId}" },
-        { TemplateField.PatchNum, "{PatchNum}" },
-    };
+
+    private readonly Dictionary<TemplateField, string> _templateFieldMappings =
+        RenamerTemplateFields.TemplateFieldMappings;
+
+    private Dictionary<PackageTitleType, Action<string>> _textBoxTypeActions = new();
+
     private readonly Dictionary<string, string> _validationErrors = new()
-    { 
+    {
         { "InputPath", string.Empty },
         { "OutputBasePath", string.Empty }
     };
-    private Dictionary<PackageTitleType, Action<string>> _textBoxTypeActions = new();
 
-
-    private PackageTitleType _currentPackageTitle = PackageTitleType.None;
     private RenamerSettings _settings = default!;
 
     protected override async Task OnInitializedAsync()
@@ -98,8 +90,8 @@ public partial class Renamer
         {
             _templateFields[textBoxType] = new TemplateFieldInfo
             {
-                    FieldType = textBoxType,
-                    Value = string.Empty
+                FieldType = textBoxType,
+                Value = string.Empty
             };
         }
     }
@@ -127,10 +119,10 @@ public partial class Renamer
     {
         var options = new TooltipOptions()
         {
-                Delay = 300,
-                Duration = 5000,
-                Position = TooltipPosition.Top,
-                CloseTooltipOnDocumentClick = true
+            Delay = 300,
+            Duration = 5000,
+            Position = TooltipPosition.Top,
+            CloseTooltipOnDocumentClick = true
         };
 
         if (templateField is TemplateField.Extension or TemplateField.AppName or TemplateField.PatchId
@@ -141,16 +133,16 @@ public partial class Renamer
         {
             TemplateField.BasePath => "Path from the output field Base Path",
             TemplateField.TitleName =>
-                    "The first name among the list of declared titles, or the one coming from titledb",
+                "The first name among the list of declared titles, or the one coming from titledb",
             TemplateField.TitleId   => "The title id eg [0100F2200C984000]",
             TemplateField.Version   => "The version of the title eg 65536",
             TemplateField.Extension => "The extension of the file based on its contents eg .nsp",
             TemplateField.AppName =>
-                    "The name the corresponding Application, useful in updates and dlc to see the Application they belong to",
+                "The name the corresponding Application, useful in updates and dlc to see the Application they belong to",
             TemplateField.PatchId =>
-                    "If content is an Application, this value is equal to the id of the corresponding Patch content, otherwise empty",
+                "If content is an Application, this value is equal to the id of the corresponding Patch content, otherwise empty",
             TemplateField.PatchNum =>
-                    "If content is an Application, this value is equal to the number of patches available for the corresponding Application, otherwise empty",
+                "If content is an Application, this value is equal to the number of patches available for the corresponding Application, otherwise empty",
             _ => string.Empty
         };
 
@@ -182,8 +174,7 @@ public partial class Renamer
     private async Task UpdateSampleBox(PackageTitleType type)
     {
         _sampleBefore = $"c:\\dump\\lucas-game.nsp";
-        _sampleAfter = await RenamerService.CalculateSampleFileName(type, "inputFile", "basePath");
-        
+        _sampleAfter = await RenamerService.CalculateSampleFileName(_templateFields[_currentPackageTitle].Value, type, "inputFile.nsp", "basePath");
     }
 
     private async Task TemplateTextboxUpdate(PackageTitleType type)
@@ -199,7 +190,7 @@ public partial class Renamer
 
         await UpdateSampleBox(type);
         _templateFields[type].CursorPosition =
-                await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
+            await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
     }
 
     private async Task<bool> ValidateConfiguration()
@@ -209,26 +200,26 @@ public partial class Renamer
 
         var notificationMessage = new NotificationMessage
         {
-                Severity = validationResult.IsValid ? NotificationSeverity.Success : NotificationSeverity.Error,
-                Summary = validationResult.IsValid ? "Success Validation" : "Validation Failed",
-                Detail = validationResult.IsValid ? "All good!" : "Please check the fields!",
-                Duration = 4000
+            Severity = validationResult.IsValid ? NotificationSeverity.Success : NotificationSeverity.Error,
+            Summary = validationResult.IsValid ? "Success Validation" : "Validation Failed",
+            Detail = validationResult.IsValid ? "All good!" : "Please check the fields!",
+            Duration = 4000
         };
 
         if (!validationResult.IsValid)
         {
             foreach (var failure in validationResult.Errors)
             {
-                _validationErrors[failure.PropertyName] = _validationErrors.TryGetValue(failure.PropertyName, out var value)
+                _validationErrors[failure.PropertyName] =
+                    _validationErrors.TryGetValue(failure.PropertyName, out var value)
                         ? $"{value} {failure.ErrorMessage}"
                         : failure.ErrorMessage;
             }
         }
-        
+
         _settings.NspBasePath = _nspBase;
         _settings.NspDlcPath = _nspDlc;
         _settings.NspUpdatePath = _nspUpdate;
-
         NotificationService.Notify(notificationMessage);
         return validationResult.IsValid;
     }
@@ -239,12 +230,12 @@ public partial class Renamer
         if (!isValid)
             return;
         var savedSettings = await RenamerService.SaveRenamerSettingsAsync(_settings);
-        
+
         var notificationMessage = new NotificationMessage
         {
-                Severity = NotificationSeverity.Success,
-                Summary = "Configuration Saved",
-                Duration = 4000
+            Severity = NotificationSeverity.Success,
+            Summary = "Configuration Saved",
+            Duration = 4000
         };
         NotificationService.Notify(notificationMessage);
     }
