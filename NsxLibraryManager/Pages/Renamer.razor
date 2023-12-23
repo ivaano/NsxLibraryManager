@@ -139,6 +139,7 @@
                 <RadzenFormField Text="Base" Variant="@Variant" Style="width: 100%; padding: 1px">
                     <RadzenTextBox @bind-Value="@_nspBase" id="NspBase" Name="NspBase"
                                    Style="font-family: monospace;"
+                                   @onkeydown="_ => UpdateSampleBox(PackageTitleType.NspBase)"
                                    @onkeyup="_ => TemplateTextboxUpdate(PackageTitleType.NspBase)"
                                    @onclick="_ => TemplateTextboxUpdate(PackageTitleType.NspBase)"/>
                 </RadzenFormField>

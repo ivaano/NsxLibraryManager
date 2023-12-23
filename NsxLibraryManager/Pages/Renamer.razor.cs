@@ -188,7 +188,7 @@ public partial class Renamer
             return;
         }
 
-        await UpdateSampleBox(type);
+        //await UpdateSampleBox(type);
         _templateFields[type].CursorPosition =
             await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
     }
