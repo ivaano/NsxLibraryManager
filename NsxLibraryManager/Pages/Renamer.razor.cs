@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -22,18 +21,6 @@ public partial class Renamer
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private const Variant Variant = Radzen.Variant.Outlined;
-    private string _nspBase = string.Empty;
-    private string _nspDlc = string.Empty;
-    private string _nspUpdate = string.Empty;
-    private string _nszBase = string.Empty;
-    private string _nszDlc = string.Empty;
-    private string _nszUpdate = string.Empty;
-    private string _xciBase = string.Empty;
-    private string _xciDlc = string.Empty;
-    private string _xciUpdate = string.Empty;
-    private string _xczBase = string.Empty;
-    private string _xczDlc = string.Empty;
-    private string _xczUpdate = string.Empty;
     private string _sampleBefore = string.Empty;
     private string _sampleAfter = string.Empty;
     private string _sampleResultLabel = "Sample Result";
@@ -43,20 +30,18 @@ public partial class Renamer
     private readonly Dictionary<TemplateField, string> _templateFieldMappings =
         RenamerTemplateFields.TemplateFieldMappings;
 
-    private Dictionary<PackageTitleType, Action<string>> _textBoxTypeActions = new();
-
     private readonly Dictionary<string, string> _validationErrors = new()
     {
         { "InputPath", string.Empty },
         { "OutputBasePath", string.Empty }
     };
 
+    private bool _fragmentButtonDisabled = true;
     private RenamerSettings _settings = default!;
 
     protected override async Task OnInitializedAsync()
     {
         InitializeTemplateFields();
-        InitializeTextBoxTypeActions();
         await InitializeSettings();
         await base.OnInitializedAsync();
     }
@@ -64,17 +49,19 @@ public partial class Renamer
     private async Task InitializeSettings()
     {
         _settings = await RenamerService.LoadRenamerSettingsAsync();
-        _nspBase = _settings.NspBasePath;
-        _nspDlc = _settings.NspDlcPath;
-        _nspUpdate = _settings.NspUpdatePath;
-        _nszBase = _settings.NszBasePath;
-        
-        _templateFields[PackageTitleType.NspBase].Value = _nspBase;
-        _templateFields[PackageTitleType.NspDlc].Value = _nspDlc;
-        _templateFields[PackageTitleType.NspUpdate].Value = _nspUpdate;
-        _templateFields[PackageTitleType.NszBase].Value = _nszBase;
-        _templateFields[PackageTitleType.NszDlc].Value = _nszDlc;
-        _templateFields[PackageTitleType.NszUpdate].Value = _nszUpdate;
+
+        _templateFields[PackageTitleType.NspBase].Value = _settings.NspBasePath;
+        _templateFields[PackageTitleType.NspDlc].Value = _settings.NspDlcPath;
+        _templateFields[PackageTitleType.NspUpdate].Value = _settings.NspUpdatePath;
+        _templateFields[PackageTitleType.NszBase].Value = _settings.NszBasePath;
+        _templateFields[PackageTitleType.NszDlc].Value = _settings.NszDlcPath;
+        _templateFields[PackageTitleType.NszUpdate].Value = _settings.NszUpdatePath;
+        _templateFields[PackageTitleType.XciBase].Value = _settings.XciBasePath;
+        _templateFields[PackageTitleType.XciDlc].Value = _settings.XciDlcPath;
+        _templateFields[PackageTitleType.XciUpdate].Value = _settings.XciUpdatePath;
+        _templateFields[PackageTitleType.XczBase].Value = _settings.XczBasePath;
+        _templateFields[PackageTitleType.XczDlc].Value = _settings.XczDlcPath;
+        _templateFields[PackageTitleType.XczUpdate].Value = _settings.XczUpdatePath;
     }
 
     private void InitializeTemplateFields()
@@ -105,50 +92,54 @@ public partial class Renamer
         }
     }
 
-    private void InitializeTextBoxTypeActions()
+    private async Task UpdateSampleBox(PackageTitleType type, string templateValue)
     {
-        _textBoxTypeActions = new Dictionary<PackageTitleType, Action<string>>
-        {
-            { PackageTitleType.NspBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nspBase) },
-            { PackageTitleType.NspDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nspDlc) },
-            { PackageTitleType.NspUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nspUpdate) },
-            { PackageTitleType.NszBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nszBase) },
-            { PackageTitleType.NszDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nszDlc) },
-            { PackageTitleType.NszUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _nszUpdate) },
-            { PackageTitleType.XciBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xciBase) },
-            { PackageTitleType.XciDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xciDlc) },
-            { PackageTitleType.XciUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xciUpdate) },
-            { PackageTitleType.XczBase, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xczBase) },
-            { PackageTitleType.XczDlc, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xczDlc) },
-            { PackageTitleType.XczUpdate, (templateField) => UpdateTemplateFieldRecord(templateField, ref _xczUpdate) },
-        };
+        _sampleBefore = $"c:\\dump\\lucas-game.nsp";
+        _sampleAfter = await RenamerService.CalculateSampleFileName(templateValue, type, "inputFile.nsp", "basePath");
     }
 
-    private void UpdateTemplateFieldRecord(string templateField, ref string currentValue)
+    private async Task TemplateFragmentClick(TemplateField templateFieldType, MouseEventArgs args)
     {
-        var pos = _templateFields[_currentPackageTitle].CursorPosition;
-        var fieldContent = pos > 0 ? currentValue.Insert(pos, templateField) : templateField;
-        _templateFields[_currentPackageTitle].CursorPosition += templateField.Length;
-        _templateFields[_currentPackageTitle].Value = fieldContent;
-        currentValue = fieldContent;
-        var task = UpdateSampleBox(_currentPackageTitle, currentValue);
-        Task.Run(async () => await task);
-    }
-
-
-    private async Task TemplateFieldClick(TemplateField templateFieldType, MouseEventArgs args)
-    {
-        if (_templateFieldMappings.TryGetValue(templateFieldType, out var templateField) &&
-            _textBoxTypeActions.TryGetValue(_currentPackageTitle, out var action))
-        {
-            action(templateField);
-        }
-
         if (_currentPackageTitle != PackageTitleType.None)
+        {
+            UpdateTemplateFieldRecord(templateFieldType, _currentPackageTitle);
             await JsRuntime.InvokeVoidAsync("setFocus", _currentPackageTitle.ToString(), " {0}");
+        }
     }
 
-    private async Task TemplateTextboxUpdate(PackageTitleType type)
+
+    private void UpdateTemplateFieldRecord(TemplateField templateField, PackageTitleType type)
+    {
+        var templateFieldInfo = _templateFields[_currentPackageTitle];
+        var templateFieldValue = _templateFieldMappings[templateField];
+
+        templateFieldInfo.Value = templateFieldInfo.CursorPosition > 0
+            ? templateFieldInfo.Value.Insert(templateFieldInfo.CursorPosition, templateFieldValue)
+            : templateFieldValue;
+
+        templateFieldInfo.CursorPosition += templateFieldValue.Length;
+
+        Task.Run(() => UpdateSampleBox(_currentPackageTitle, templateFieldInfo.Value));
+    }
+
+
+    private async Task OnTemplateFieldClick(PackageTitleType type, MouseEventArgs args)
+    {
+        await TemplateTextboxUpdateNew(type);
+        await UpdateSampleBox(_currentPackageTitle, _templateFields[_currentPackageTitle].Value);
+    }
+
+    private async Task OnTemplateFieldInput(PackageTitleType type, string? value)
+    {
+        if (value is not null)
+        {
+            _templateFields[type].Value = value;
+            await TemplateTextboxUpdateNew(type);
+            await UpdateSampleBox(_currentPackageTitle, value);
+        }
+    }
+
+    private async Task TemplateTextboxUpdateNew(PackageTitleType type)
     {
         _currentPackageTitle = type;
         var labelParts = Regex.Split(_currentPackageTitle.ToString(), "(?<!^)(?=[A-Z])");
@@ -156,32 +147,13 @@ public partial class Renamer
         if (type == PackageTitleType.None)
         {
             _sampleResultLabel = "Sample Result";
+            _fragmentButtonDisabled = true;
             return;
         }
-        
+
+        _fragmentButtonDisabled = false;
         _templateFields[type].CursorPosition =
             await JsRuntime.InvokeAsync<int>("getCursorLocation", type.ToString(), " {0}");
-    }
-    private async Task UpdateSampleBox(PackageTitleType type, string templateValue)
-    {
-        _sampleBefore = $"c:\\dump\\lucas-game.nsp";
-        _sampleAfter = await RenamerService.CalculateSampleFileName(templateValue, type, "inputFile.nsp", "basePath");
-    }
-    
-    private async Task OnTemplateFieldClick(PackageTitleType type, MouseEventArgs args)
-    {
-        await TemplateTextboxUpdate(type);
-        await UpdateSampleBox(_currentPackageTitle, _templateFields[_currentPackageTitle].Value);
-    }
-    
-    private async Task OnTemplateFieldInput(PackageTitleType type, string? value)
-    {
-        if (value is not null)
-        {
-            _templateFields[type].Value = value;
-            await TemplateTextboxUpdate(PackageTitleType.NspDlc);
-            await UpdateSampleBox(_currentPackageTitle, value);
-        }
     }
 
 
@@ -202,7 +174,7 @@ public partial class Renamer
     }
 
     #region UI Helpers
-    
+
     private async Task<bool> ValidateConfiguration()
     {
         Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
@@ -227,13 +199,23 @@ public partial class Renamer
             }
         }
 
-        _settings.NspBasePath = _nspBase;
-        _settings.NspDlcPath = _nspDlc;
-        _settings.NspUpdatePath = _nspUpdate;
+        _settings.NspBasePath = _templateFields[PackageTitleType.NspBase].Value;
+        _settings.NspDlcPath = _templateFields[PackageTitleType.NspDlc].Value;
+        _settings.NspUpdatePath = _templateFields[PackageTitleType.NspUpdate].Value;
+        _settings.NszBasePath = _templateFields[PackageTitleType.NszBase].Value;
+        _settings.NszDlcPath = _templateFields[PackageTitleType.NszDlc].Value;
+        _settings.NszUpdatePath = _templateFields[PackageTitleType.NszUpdate].Value;
+        _settings.XciBasePath = _templateFields[PackageTitleType.XciBase].Value;
+        _settings.XciDlcPath = _templateFields[PackageTitleType.XciDlc].Value;
+        _settings.XciUpdatePath = _templateFields[PackageTitleType.XciUpdate].Value;
+        _settings.XczBasePath = _templateFields[PackageTitleType.XczBase].Value;
+        _settings.XczDlcPath = _templateFields[PackageTitleType.XczDlc].Value;
+        _settings.XczUpdatePath = _templateFields[PackageTitleType.XczUpdate].Value;
+
         NotificationService.Notify(notificationMessage);
         return validationResult.IsValid;
     }
-    
+
     private void ShowTooltip(TemplateField templateField, ElementReference elementReference)
     {
         var options = new TooltipOptions()
@@ -267,8 +249,8 @@ public partial class Renamer
 
         TooltipService.Open(elementReference, content, options);
     }
-    #endregion
 
+    #endregion
 }
 
 public record TemplateFieldInfo

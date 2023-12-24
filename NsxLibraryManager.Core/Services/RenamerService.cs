@@ -119,6 +119,8 @@ public class RenamerService : IRenamerService
             TitleId = "0010000",
             FileName = inputFile,
             ApplicationTitleName = "Some App Name",
+            PatchNumber = 1,
+            PatchTitleId = "0000001",
         };
         var filePath = "c:/test/algo.nsp";
         return await TemplateReplaceAsync(templateText, fileInfo);
