@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Core.Models.Dto;
+﻿namespace NsxLibraryManager.Core.Models;
 
 public record Settings
 {

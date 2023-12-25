@@ -3,7 +3,7 @@ using NsxLibraryManager.Core.Repository.Interface;
 using NsxLibraryManager.Core.Settings;
 namespace NsxLibraryManager.Core.Repository;
 
-public sealed class SettingsRepository : BaseRepository<Models.Dto.Settings>, ISettingsRepository
+public sealed class SettingsRepository : BaseRepository<Models.Settings>, ISettingsRepository
 {
     public SettingsRepository(ILiteDatabase db) : base(db, collectionName: AppConstants.SettingsCollectionName)
     {
@@ -14,7 +14,7 @@ public sealed class SettingsRepository : BaseRepository<Models.Dto.Settings>, IS
         SetCollection(collection);
     }
     
-    public override Models.Dto.Settings Create(Models.Dto.Settings entity)
+    public override Models.Settings Create(Models.Settings entity)
     {
         Collection.Insert(entity);
         Collection.EnsureIndex(x => x.Name);
@@ -32,7 +32,7 @@ public sealed class SettingsRepository : BaseRepository<Models.Dto.Settings>, IS
     public RenamerSettings LoadRenamerSettings()
     {
         var renamerSettings = Collection.FindOne(o => o.Name == AppConstants.RenamerSettingsName) 
-                              ?? new Models.Dto.Settings { Name = AppConstants.RenamerSettingsName, Value = System.Text.Json.JsonSerializer.Serialize(new RenamerSettings()) };
+                              ?? new Models.Settings { Name = AppConstants.RenamerSettingsName, Value = System.Text.Json.JsonSerializer.Serialize(new RenamerSettings()) };
 
         if (renamerSettings.Id == 0)
             Create(renamerSettings);

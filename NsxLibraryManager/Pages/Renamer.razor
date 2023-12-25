@@ -1,11 +1,32 @@
 ﻿@page "/renamer"
 @using NsxLibraryManager.Core.Enums
+@using NsxLibraryManager.Core.Models
 <PageTitle>Renamer</PageTitle>
 
-<RadzenTabs>
+<RadzenTabs @bind-SelectedIndex=@selectedTabIndex>
 <Tabs>
 <RadzenTabsItem Text="Renamer">
-    Configure Renamer First.
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+    <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                    AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true" 
+                    IsLoading=@isLoading AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
+        <HeaderTemplate>
+            <RadzenButton Text="Scan Again" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+            <RadzenButton Text="Rename Files" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn TItem="RenameTitle" Property="SourceFileName" Title="Source File" Width="200px"/>
+            <RadzenDataGridColumn TItem="RenameTitle" Property="DestinationFileName" Title="Destination" Width="200px"/>
+            <RadzenDataGridColumn TItem="RenameTitle" Property="TitleId" Title="Title Id" Width="200px"/>
+            <RadzenDataGridColumn TItem="RenameTitle" Property="TitleName" Title="Name" Width="200px"/>
+            <RadzenDataGridColumn TItem="RenameTitle" Property="Error" Title="Error" Width="200px"/>
+
+        </Columns>
+    </RadzenDataGrid>
+    </RadzenStack>
+    
+    
 </RadzenTabsItem>
 <RadzenTabsItem Text="Configuration">
 <RadzenStack Style="padding-bottom: .5rem ">

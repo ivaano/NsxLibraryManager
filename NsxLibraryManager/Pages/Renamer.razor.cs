@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Mapping;
+using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using Radzen;
+using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 
@@ -26,7 +28,7 @@ public partial class Renamer
     private string _sampleResultLabel = "Sample Result";
     private PackageTitleType _currentPackageTitle = PackageTitleType.None;
     private readonly Dictionary<PackageTitleType, TemplateFieldInfo> _templateFields = new();
-
+    private int selectedTabIndex = 0;
     private readonly Dictionary<TemplateField, string> _templateFieldMappings =
         RenamerTemplateFields.TemplateFieldMappings;
 
@@ -38,12 +40,40 @@ public partial class Renamer
 
     private bool _fragmentButtonDisabled = true;
     private RenamerSettings _settings = default!;
-
+    private IEnumerable<RenameTitle> _renameTitles = default!;
+    private RadzenDataGrid<RenameTitle> _renameGrid;
+    private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    
+    private bool isLoading = false;
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+        await ShowLoading();
         InitializeTemplateFields();
         await InitializeSettings();
-        await base.OnInitializedAsync();
+
+        await SelectConfigurationTab();
+    }
+
+    private async Task ShowLoading()
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        isLoading = false;
+    }
+    
+    private async Task SelectConfigurationTab()
+    {
+        if (_settings.InputPath == string.Empty)
+        {
+            selectedTabIndex = 1;
+            return;
+        }
+        isLoading = true;   
+        var files = await RenamerService.GetFilesToRenameAsync(_settings.InputPath, _settings.Recursive);
+        _renameTitles = files;
+        isLoading = false;
     }
 
     private async Task InitializeSettings()

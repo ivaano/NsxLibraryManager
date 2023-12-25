@@ -55,6 +55,34 @@ public class RenamerService : IRenamerService
         return newPath;
     }
 
+    public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(string inputPath, bool recursive = false)
+    {
+        var files = await _fileInfoService.GetFileNames(inputPath, recursive);
+        var fileList = new List<RenameTitle>();
+        
+        foreach (var file in files)
+        {
+
+            var fileInfo = await _fileInfoService.GetFileInfo(file, false);
+            var error = false;
+            var newPath = string.Empty;
+            try
+            {
+                newPath = await BuildNewFileNameAsync(fileInfo, file);    
+            } catch (Exception e)
+            {
+                _logger.LogError(e, "Error building new file name");
+                error = true;
+            }
+            
+            
+            var newRenameTitle = new RenameTitle(file, newPath, fileInfo.TitleId, fileInfo.TitleName, error);
+            fileList.Add(newRenameTitle);
+        }
+        
+        return fileList;
+    }
+
     public async Task<string> BuildNewFileNameAsync(LibraryTitle fileInfo, string filePath)
     {
         //var fileInfo = await _fileInfoService.GetFileInfo(filePath, false);
@@ -70,6 +98,27 @@ public class RenamerService : IRenamerService
                 TitleLibraryType.Base   => _settings.NspBasePath,
                 TitleLibraryType.Update => _settings.NspUpdatePath,
                 TitleLibraryType.DLC    => _settings.NspDlcPath,
+                _                       => string.Empty
+            },
+            AccuratePackageType.NSZ => fileInfo.Type switch
+            {
+                TitleLibraryType.Base   => _settings.NszBasePath,
+                TitleLibraryType.Update => _settings.NszUpdatePath,
+                TitleLibraryType.DLC    => _settings.NszDlcPath,
+                _                       => string.Empty
+            },
+            AccuratePackageType.XCI => fileInfo.Type switch
+            {
+                TitleLibraryType.Base   => _settings.XciBasePath,
+                TitleLibraryType.Update => _settings.XciUpdatePath,
+                TitleLibraryType.DLC    => _settings.XciDlcPath,
+                _                       => string.Empty
+            },
+            AccuratePackageType.XCZ => fileInfo.Type switch
+            {
+                TitleLibraryType.Base   => _settings.XczBasePath,
+                TitleLibraryType.Update => _settings.XczUpdatePath,
+                TitleLibraryType.DLC    => _settings.XczDlcPath,
                 _                       => string.Empty
             },
             _ => throw new Exception("Unknown package type")
