@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
@@ -16,16 +17,18 @@ public class RenamerService : IRenamerService
     private readonly IDataService _dataService;
     private readonly IValidator<RenamerSettings> _validator;
     private readonly IFileInfoService _fileInfoService;
+    private readonly ITitleDbService _titleDbService;
 
     public RenamerService(ILogger<RenamerService> logger,
         IDataService dataService,
         IValidator<RenamerSettings> validator,
-        IFileInfoService fileInfoService)
+        IFileInfoService fileInfoService, ITitleDbService titleDbService)
     {
         _logger = logger;
         _dataService = dataService;
         _validator = validator;
         _fileInfoService = fileInfoService;
+        _titleDbService = titleDbService;
     }
 
     private async Task<string> TemplateReplaceAsync(string renameTemplate, LibraryTitle fileInfo)
@@ -64,7 +67,27 @@ public class RenamerService : IRenamerService
         {
 
             var fileInfo = await _fileInfoService.GetFileInfo(file, false);
+            if (string.IsNullOrEmpty(fileInfo?.TitleName))
+            {
+                var titledbTitle = await _titleDbService.GetTitle(fileInfo.TitleId);
+                if (titledbTitle is not null)
+                {
+                    fileInfo.TitleName = titledbTitle.Name;
+                    if (fileInfo.ApplicationTitleId != null && titledbTitle.Type != TitleLibraryType.Base)
+                    {
+                        var appTitledbTitle = await _titleDbService.GetTitle(fileInfo.ApplicationTitleId);
+                        if (appTitledbTitle is not null)
+                        {
+                            fileInfo.ApplicationTitleName = appTitledbTitle.Name;
+                        }
+                    }
+                }
+            }
+            
+            
+
             var error = false;
+            var errorMessage = string.Empty;
             var newPath = string.Empty;
             try
             {
@@ -73,10 +96,13 @@ public class RenamerService : IRenamerService
             {
                 _logger.LogError(e, "Error building new file name");
                 error = true;
+                errorMessage = e.Message;
             }
             
             
-            var newRenameTitle = new RenameTitle(file, newPath, fileInfo.TitleId, fileInfo.TitleName, error);
+            var newRenameTitle = new RenameTitle(
+                file, newPath, fileInfo.TitleId, 
+                fileInfo.TitleName, error, errorMessage);
             fileList.Add(newRenameTitle);
         }
         
@@ -143,6 +169,9 @@ public class RenamerService : IRenamerService
             };
 
 
+            if (replacement is null)
+                throw new InvalidPathException($"No replacement for {key} template value most likely due to missing titledb entry");
+                
             newPath = TokenReplace(renameTemplate, pattern, replacement);
             renameTemplate = newPath;
         }

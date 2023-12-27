@@ -57,9 +57,7 @@ public partial class Renamer
     private async Task ShowLoading()
     {
         isLoading = true;
-
         await Task.Yield();
-
         isLoading = false;
     }
     
@@ -70,9 +68,13 @@ public partial class Renamer
             selectedTabIndex = 1;
             return;
         }
-        isLoading = true;   
-        var files = await RenamerService.GetFilesToRenameAsync(_settings.InputPath, _settings.Recursive);
-        _renameTitles = files;
+
+    }
+    
+    private async Task LoadFiles()
+    {
+        isLoading = true;
+        _renameTitles = await RenamerService.GetFilesToRenameAsync(_settings.InputPath, _settings.Recursive);
         isLoading = false;
     }
 

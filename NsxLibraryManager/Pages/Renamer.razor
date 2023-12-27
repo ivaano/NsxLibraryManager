@@ -10,9 +10,9 @@
     <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                     AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true" 
-                    IsLoading=@isLoading AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
+                    IsLoading="@isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
         <HeaderTemplate>
-            <RadzenButton Text="Scan Again" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+            <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
             <RadzenButton Text="Rename Files" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
         </HeaderTemplate>
         <Columns>
