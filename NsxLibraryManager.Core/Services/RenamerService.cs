@@ -31,7 +31,7 @@ public class RenamerService : IRenamerService
         _titleDbService = titleDbService;
     }
 
-    private async Task<string> TemplateReplaceAsync(string renameTemplate, LibraryTitle fileInfo)
+    private Task<string> TemplateReplaceAsync(string renameTemplate, LibraryTitle fileInfo)
     {
         var newPath = renameTemplate;
         foreach (var (key, pattern) in RenamerTemplateFields.TemplateFieldMappings)
@@ -52,69 +52,104 @@ public class RenamerService : IRenamerService
                 _                       => string.Empty
             };
             
+            if (replacement is null)
+                throw new InvalidPathException($"No replacement for {key} value most likely due to missing titledb entry");
+            
             newPath = TokenReplace(renameTemplate, pattern, replacement);
             renameTemplate = newPath;
         }
-        return newPath;
+        return Task.FromResult(newPath);
     }
 
     public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(string inputPath, bool recursive = false)
     {
         var files = await _fileInfoService.GetFileNames(inputPath, recursive);
         var fileList = new List<RenameTitle>();
-        
+
         foreach (var file in files)
         {
-
             var fileInfo = await _fileInfoService.GetFileInfo(file, false);
-            if (string.IsNullOrEmpty(fileInfo?.TitleName))
+            
+            if (fileInfo?.Error == true)
+            {
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, fileInfo.Error, fileInfo.ErrorMessage));
+                continue;
+            }
+            
+            // clean up this mess later
+            if (fileInfo is not null && string.IsNullOrEmpty(fileInfo.TitleName))
             {
                 var titledbTitle = await _titleDbService.GetTitle(fileInfo.TitleId);
-                if (titledbTitle is not null)
+                if (titledbTitle != null)
                 {
                     fileInfo.TitleName = titledbTitle.Name;
                     if (fileInfo.ApplicationTitleId != null && titledbTitle.Type != TitleLibraryType.Base)
                     {
                         var appTitledbTitle = await _titleDbService.GetTitle(fileInfo.ApplicationTitleId);
-                        if (appTitledbTitle is not null)
+                        if (appTitledbTitle != null)
                         {
                             fileInfo.ApplicationTitleName = appTitledbTitle.Name;
                         }
                     }
                 }
             }
-            
-            
 
-            var error = false;
-            var errorMessage = string.Empty;
-            var newPath = string.Empty;
-            try
+
+            var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file);
+            
+            if (error)
             {
-                newPath = await BuildNewFileNameAsync(fileInfo, file);    
-            } catch (Exception e)
-            {
-                _logger.LogError(e, "Error building new file name");
-                error = true;
-                errorMessage = e.Message;
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, error, errorMessage));
+                continue;
             }
             
-            
-            var newRenameTitle = new RenameTitle(
-                file, newPath, fileInfo.TitleId, 
-                fileInfo.TitleName, error, errorMessage);
-            fileList.Add(newRenameTitle);
+            (newPath, error, errorMessage) = await ValidateDestinationFileAsync(file, newPath);
+            fileList.Add(new RenameTitle(file, newPath, fileInfo.TitleId, fileInfo.TitleName, error, errorMessage));
         }
-        
+
         return fileList;
     }
+    
+    private async Task<(string, bool, string)> ValidateDestinationFileAsync(string file, string newPath)
+    {
+        if (string.IsNullOrEmpty(newPath))
+        {
+            _logger.LogError("Error building new file name for {file} - {message}", file, "New path is empty");
+            return (string.Empty, true, "New path is empty");
+        }
 
+        if (file == newPath)
+        {
+            _logger.LogError("Error building new file name for {file} - {message}", file, "New path is the same as the old path");
+            return (string.Empty, true, "New path is the same as the old path");
+        }
+
+        if (File.Exists(newPath))
+        {
+            _logger.LogError("Error building new file name for {file} - {message}", file, "New path already exists");
+            return (string.Empty, true, "New path already exists");
+        }
+
+        return (newPath, false, string.Empty);
+    }
+
+    private async Task<(string, bool, string)> TryBuildNewFileNameAsync(LibraryTitle fileInfo, string file)
+    {
+        try
+        {
+            var newPath = await BuildNewFileNameAsync(fileInfo, file);
+            return (newPath, false, string.Empty);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error building new file name for {file} - {message}", file, e.Message);
+            return (string.Empty, true, e.Message);
+        }
+    }
+    
     public async Task<string> BuildNewFileNameAsync(LibraryTitle fileInfo, string filePath)
     {
-        //var fileInfo = await _fileInfoService.GetFileInfo(filePath, false);
         fileInfo.FileName = filePath;
-
-        var newPath = string.Empty;
 
         // No demo support for now
         var renameTemplate = fileInfo.PackageType switch
@@ -150,32 +185,8 @@ public class RenamerService : IRenamerService
             _ => throw new Exception("Unknown package type")
         };
         
-        foreach (var (key, pattern) in RenamerTemplateFields.TemplateFieldMappings)
-        {
-            var match = Regex.Match(renameTemplate, pattern, RegexOptions.IgnoreCase);
-            if (!match.Success) continue;
-            
-            var replacement = key switch
-            {
-                TemplateField.BasePath  => _settings.OutputBasePath,
-                TemplateField.TitleName => fileInfo.TitleName,
-                TemplateField.TitleId   => fileInfo.TitleId,
-                TemplateField.Version   => fileInfo.TitleVersion.ToString(),
-                TemplateField.Extension => fileInfo.PackageType.ToString().ToLower(),
-                TemplateField.AppName   => fileInfo.ApplicationTitleName,
-                TemplateField.PatchId   => fileInfo.PatchTitleId,
-                TemplateField.PatchNum  => fileInfo.PatchNumber.ToString(),
-                _                       => string.Empty
-            };
+        return await TemplateReplaceAsync(renameTemplate, fileInfo);
 
-
-            if (replacement is null)
-                throw new InvalidPathException($"No replacement for {key} template value most likely due to missing titledb entry");
-                
-            newPath = TokenReplace(renameTemplate, pattern, replacement);
-            renameTemplate = newPath;
-        }
-        return newPath;
     }
 
 
@@ -200,7 +211,6 @@ public class RenamerService : IRenamerService
             PatchNumber = 1,
             PatchTitleId = "0000001",
         };
-        var filePath = "c:/test/algo.nsp";
         return await TemplateReplaceAsync(templateText, fileInfo);
     }
 

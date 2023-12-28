@@ -103,7 +103,24 @@ public class FileInfoService : IFileInfoService
     
     public async Task<LibraryTitle?> GetFileInfo(string filePath, bool detailed)
     {
-        var packageInfo = _packageInfoLoader.GetPackageInfo(filePath, detailed);
+        PackageInfo packageInfo;
+        try
+        {
+            packageInfo = _packageInfoLoader.GetPackageInfo(filePath, detailed);
+        } 
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting package info");
+            var titleError = new LibraryTitle
+            {
+                TitleId = "0000000000000000",
+                FileName = Path.GetFullPath(filePath),
+                LastWriteTime = File.GetLastWriteTime(filePath),
+                Error = true,
+                ErrorMessage = e.Message
+            };
+            return titleError;
+        }
 
         if (packageInfo.Contents is null)
             throw new Exception("No contents found in the package");
