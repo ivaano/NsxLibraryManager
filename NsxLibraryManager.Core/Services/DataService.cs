@@ -24,7 +24,7 @@ public class DataService : IDataService
     private readonly ITitleLibraryRepository _titleLibraryRepository;
     private readonly ITitleDbCnmtsRepository _titleDbCnmtsRepository;
     private ITitleDbVersionsRepository _titleDbVersionsRepository;
-    //private ISettingsRepository _settingsRepository;
+    private ISettingsRepository _settingsRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<DataService> _logger;
     
@@ -34,7 +34,8 @@ public class DataService : IDataService
     }
     public IMemoryCache MemoryCache { get; }
 
-    public DataService(IOptions<AppSettings> configuration, IMapper mapper, ILogger<DataService> logger, IMemoryCache memoryCache)
+    public DataService(IOptions<AppSettings> configuration, IMapper mapper, ILogger<DataService> logger, 
+            IMemoryCache memoryCache)
     {
         _logger = logger;
         _mapper = mapper;
@@ -43,7 +44,7 @@ public class DataService : IDataService
         _titleDbCnmtsRepository = new TitleDbCnmtsRepository(Db);
         _titleDbVersionsRepository = new TitleDbVersionsRepository(Db);
         _titleLibraryRepository = new TitleLibraryRepository(Db);
-        //_settingsRepository = new SettingsRepository(Db);
+        _settingsRepository = new SettingsRepository(Db);
         MemoryCache = memoryCache;
     }
     
@@ -224,18 +225,17 @@ public class DataService : IDataService
         };
         return stats;
     }
-
-    /*
-    public async Task SaveDataGridStateAsync(string name, DataGridSettings settings)
+    
+    public RenamerSettings SaveRenamerSettings(RenamerSettings settings)
     {
-        await _settingsRepository.SaveDataGridStateAsync(name, settings);
+        return _settingsRepository.SaveRenamerSettings(settings);
     }
 
-    public async Task<DataGridSettings?> LoadDataGridStateAsync(string name)
+    public RenamerSettings GetRenamerSettings()
     {
-        return await _settingsRepository.LoadDataGridStateAsync(name);
+        return _settingsRepository.LoadRenamerSettings();
     }
-*/
+
     public IEnumerable<GameVersions> GetTitleDbVersions(string titleTitleId)
     {
         return _titleDbVersionsRepository.FindByTitleId(titleTitleId);

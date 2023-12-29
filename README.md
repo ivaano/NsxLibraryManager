@@ -66,8 +66,8 @@ that I could run on a server and access it from any device.
 ![MissingUpdates](./screenshots/missingupdates.png)
 
 ## TODO
-- [ ] Ability to add custom information to each title (favorite, rating).
 - [ ] Implement the file organizer.
+- [ ] Ability to add custom information to each title (favorite, rating).
 - [ ] Ability to download and store banners and screenshots locally.
 
 

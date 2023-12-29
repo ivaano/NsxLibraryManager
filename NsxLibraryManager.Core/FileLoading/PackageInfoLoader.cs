@@ -30,7 +30,7 @@ public class PackageInfoLoader : IPackageInfoLoader
         switch (_packageTypeAnalyzer.GetType(filePath))
         {
             case PackageType.UNKNOWN:
-                throw new FileNotSupportedException(filePath);
+                throw new FileNotSupportedException("Unable to determine the package type of the file.", filePath);
 
             case PackageType.XCI:
                 fileContents = LoadXciContents(filePath, keySet, detailed);
