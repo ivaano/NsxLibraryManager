@@ -16,10 +16,11 @@ public class RenamerServiceTests
     private readonly IDataService _dataService = Substitute.For<IDataService>();
     private readonly IValidator<RenamerSettings> _validator = Substitute.For<IValidator<RenamerSettings>>();
     private readonly ILogger<RenamerService> _logger = Substitute.For<ILogger<RenamerService>>();
+    private readonly ITitleDbService _titleDbService = Substitute.For<ITitleDbService>();
     
     public RenamerServiceTests()
     {
-        _renamerService = new RenamerService(_logger, _dataService, _validator, _fileInfoService);
+        _renamerService = new RenamerService(_logger, _dataService, _validator, _fileInfoService, _titleDbService);
     }
     
     

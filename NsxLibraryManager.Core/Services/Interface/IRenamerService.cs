@@ -11,5 +11,6 @@ public interface IRenamerService
     Task<string> CalculateSampleFileName(string templateText, PackageTitleType type, string inputFile, string basePath);
     Task<RenamerSettings> SaveRenamerSettingsAsync(RenamerSettings settings);
     Task<RenamerSettings> LoadRenamerSettingsAsync();
+    Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename);
     Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(RenamerSettings settings);
 }

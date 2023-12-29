@@ -5,5 +5,6 @@ public record RenameTitle(
     string? DestinationFileName,
     string? TitleId, 
     string? TitleName, 
+    bool RenamedSuccessfully,
     bool Error,
     string? ErrorMessage);

@@ -22,6 +22,8 @@ public partial class Renamer
 
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
+    [Inject] private DialogService DialogService { get; set; } = default!;
+    
     private const Variant Variant = Radzen.Variant.Outlined;
     private string _sampleBefore = string.Empty;
     private string _sampleAfter = string.Empty;
@@ -41,7 +43,7 @@ public partial class Renamer
     private bool _fragmentButtonDisabled = true;
     private RenamerSettings _settings = default!;
     private IEnumerable<RenameTitle> _renameTitles = default!;
-    private RadzenDataGrid<RenameTitle> _renameGrid;
+    private RadzenDataGrid<RenameTitle> _renameGrid = default!;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    
     private bool isLoading = false;
     protected override async Task OnInitializedAsync()
@@ -61,13 +63,11 @@ public partial class Renamer
         isLoading = false;
     }
     
-    private async Task SelectConfigurationTab()
+    private Task SelectConfigurationTab()
     {
-        if (_settings.InputPath == string.Empty)
-        {
-            selectedTabIndex = 1;
-            return;
-        }
+        if (_settings.InputPath != string.Empty) return Task.CompletedTask;
+        selectedTabIndex = 1;
+        return Task.CompletedTask;
 
     }
     
@@ -76,6 +76,28 @@ public partial class Renamer
         isLoading = true;
         _renameTitles = await RenamerService.GetFilesToRenameAsync(_settings.InputPath, _settings.Recursive);
         isLoading = false;
+    }
+    
+    private async Task RenameFiles()
+    {
+        if (_renameTitles is null)
+            return;
+        var fileList = _renameTitles.ToList();
+        var countFiles = fileList.Count(x => x.Error == false);
+        
+        var confirmationResult = await DialogService.Confirm(
+            $"This action will rename {countFiles} file(s), do you want to continue?", "Rename Files",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (confirmationResult is true && fileList.Any())
+        {
+            isLoading = true;
+            _renameTitles = await RenamerService.RenameFilesAsync(fileList);
+            //await LoadFiles();
+            await _renameGrid.Reload();
+            isLoading = false;
+        }
+
     }
 
     private async Task InitializeSettings()

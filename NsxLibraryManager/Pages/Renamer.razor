@@ -13,7 +13,7 @@
                     IsLoading="@isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
         <HeaderTemplate>
             <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
-            <RadzenButton Text="Rename Files" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+            <RadzenButton Text="Rename Files" Click="@RenameFiles" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
         </HeaderTemplate>
         <Columns>
             <RadzenDataGridColumn TItem="RenameTitle" Property="SourceFileName" Title="Source File" Width="200px"/>

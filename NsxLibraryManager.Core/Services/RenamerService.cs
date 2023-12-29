@@ -65,18 +65,18 @@ public class RenamerService : IRenamerService
     {
         var files = await _fileInfoService.GetFileNames(inputPath, recursive);
         var fileList = new List<RenameTitle>();
-
+        
+        // clean up this mess later
         foreach (var file in files)
         {
             var fileInfo = await _fileInfoService.GetFileInfo(file, false);
             
             if (fileInfo?.Error == true)
             {
-                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, fileInfo.Error, fileInfo.ErrorMessage));
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, fileInfo.Error, fileInfo.ErrorMessage));
                 continue;
             }
-            
-            // clean up this mess later
+
             if (fileInfo is not null && string.IsNullOrEmpty(fileInfo.TitleName))
             {
                 var titledbTitle = await _titleDbService.GetTitle(fileInfo.TitleId);
@@ -94,43 +94,117 @@ public class RenamerService : IRenamerService
                 }
             }
 
-
-            var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file);
-            
-            if (error)
+            if (fileInfo is null)
             {
-                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, error, errorMessage));
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, true,
+                    "Unable to get file info"));
                 continue;
             }
             
+            var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file);
+            if (error)
+            {
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, error,
+                    errorMessage));
+                continue;
+            }
+
             (newPath, error, errorMessage) = await ValidateDestinationFileAsync(file, newPath);
-            fileList.Add(new RenameTitle(file, newPath, fileInfo.TitleId, fileInfo.TitleName, error, errorMessage));
+            if (error)
+            {
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, error,
+                    errorMessage));
+                continue;
+            }
+
+            fileList.Add(new RenameTitle(file, newPath, fileInfo.TitleId, fileInfo.TitleName, false, error,
+                errorMessage));
         }
 
         return fileList;
     }
     
-    private async Task<(string, bool, string)> ValidateDestinationFileAsync(string file, string newPath)
+    private Task<(string, bool, string)> ValidateDestinationFileAsync(string file, string newPath)
     {
         if (string.IsNullOrEmpty(newPath))
         {
             _logger.LogError("Error building new file name for {file} - {message}", file, "New path is empty");
-            return (string.Empty, true, "New path is empty");
+            return Task.FromResult((string.Empty, true, "New path is empty"));
         }
 
         if (file == newPath)
         {
             _logger.LogError("Error building new file name for {file} - {message}", file, "New path is the same as the old path");
-            return (string.Empty, true, "New path is the same as the old path");
+            return Task.FromResult((string.Empty, true, "New path is the same as the old path"));
         }
 
         if (File.Exists(newPath))
         {
-            _logger.LogError("Error building new file name for {file} - {message}", file, "New path already exists");
-            return (string.Empty, true, "New path already exists");
+            _logger.LogError("Error building new file name for {file} - {message}", file, "File already exists");
+            return Task.FromResult((string.Empty, true, "File already exists"));
+        }
+        
+        var invalidFileNameChars = Path.GetInvalidFileNameChars();
+        var invalidCharReplacement = string.Empty;
+        var newFileName = Path.GetFileName(newPath);
+        newFileName = invalidFileNameChars.Aggregate(newFileName, (current, invalidFileNameChar) => current.Replace(invalidFileNameChar.ToString(), invalidCharReplacement));
+
+        var invalidDirNameChars = Path.GetInvalidPathChars();
+        var invalidDirCharReplacement = string.Empty;
+        var newDirName =Path.GetDirectoryName(newPath);
+        newDirName = invalidDirNameChars.Aggregate(newDirName, (current, invalidDirNameChar) => current?.Replace(invalidDirNameChar.ToString(), invalidDirCharReplacement));
+
+        if (newDirName is null)
+        {
+            _logger.LogError("Error building new file name for {file} - {message}", file, "New path is empty");
+            return Task.FromResult((string.Empty, true, "New path is empty"));
+        }
+        
+        newPath = Path.Combine(newDirName, newFileName);
+        
+
+        return Task.FromResult((newPath, false, string.Empty));
+    }
+    
+    public Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename)
+    {
+        var renamedFiles = new List<RenameTitle>();
+        foreach (var file in filesToRename)
+        {
+            if (file.Error || file.RenamedSuccessfully)
+            {
+                renamedFiles.Add(file);
+                continue;
+            }
+            
+            try
+            {
+                if (file.DestinationFileName is not null)
+                {
+                    File.Move(file.SourceFileName, file.DestinationFileName);
+                    renamedFiles.Add(file);
+                }
+                else
+                {
+                    var renameTitle = file with { Error = true, ErrorMessage = "Empty destination file name" };
+                    renamedFiles.Add(renameTitle);
+                }
+                
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Error renaming file {file} - {message}", file.SourceFileName, e.Message);
+                renamedFiles.Add(file with
+                {
+                    RenamedSuccessfully = false,
+                    Error = true,
+                    ErrorMessage = e.Message
+                });
+            }
         }
 
-        return (newPath, false, string.Empty);
+        return Task.FromResult(renamedFiles.AsEnumerable());
     }
 
     private async Task<(string, bool, string)> TryBuildNewFileNameAsync(LibraryTitle fileInfo, string file)
