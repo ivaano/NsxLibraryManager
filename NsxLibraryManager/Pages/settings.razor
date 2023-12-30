@@ -1,0 +1,74 @@
+﻿@page "/settings"
+
+<PageTitle>Settings</PageTitle>
+<RadzenRow>
+    <RadzenColumn Size="12">
+        <RadzenText Text="Settings" TextStyle="TextStyle.H3" TagName="TagName.H1" />
+    </RadzenColumn>
+</RadzenRow>
+        <RadzenFieldset Text="Library">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="12">
+<RadzenStack>
+
+        <RadzenFormField Text="Library Path">
+            <RadzenTextBox></RadzenTextBox>
+        </RadzenFormField>
+                      <div class="rz-text-align-right   ; ">
+    <RadzenCheckBox  @bind-Value=@value Name="CheckBox1" />
+    <RadzenLabel Text="Recursive" Component="CheckBox1" Style="margin-left: 8px; vertical-align: middle;" />
+</div>
+</RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+        </RadzenFieldset>
+
+<RadzenFieldset Text="Download Settings">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="TitleDb Path">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="Timeout">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="12">
+            <RadzenStack>
+                <RadzenFormField Text="RegionUrl">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenFormField Text="CnmtsUrl">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenFormField Text="VersionsUrl">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+            <RadzenStack>
+                <div class="rz-p-sm-12 rz-text-align-center">
+                    <RadzenListBox @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID"
+                                   Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px; height: 200px"
+                                   InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select products" }})" />
+                </div>
+            </RadzenStack>
+        </RadzenColumn>
+
+    </RadzenRow>
+</RadzenFieldset>
+
+@code {
+    
+}
