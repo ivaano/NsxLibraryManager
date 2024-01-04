@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using NsxLibraryManager.Core.Settings
 @using Microsoft.Extensions.Options
+@using NsxLibraryManager.Core.Validators
 <h3>Index</h3>
 
 @code {
@@ -10,17 +11,7 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        
-        if (AppSettings.Value.TitleDatabase != string.Empty)
-        {
-            NavigationManager.NavigateTo("/dashboard");
-        }
-        /*
-        else
-        {
-            NavigationManager.NavigateTo("/setup");
-        }
-        */
-        
+
+        NavigationManager.NavigateTo(ConfigValidator.Validate(AppSettings) ? "/dashboard" : "/settings");
     }
 }

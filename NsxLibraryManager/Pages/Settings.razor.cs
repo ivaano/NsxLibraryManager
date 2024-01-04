@@ -10,7 +10,8 @@ namespace NsxLibraryManager.Pages;
 public partial class Settings
 {
     
-    [Inject] private IOptions<AppSettings> AppSettings { get; set; } = default!;
+    [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
+    [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     
     private bool _recursive = true;
     private IEnumerable<string> _regionsValue = new string[] { "US" };
@@ -47,6 +48,12 @@ public partial class Settings
     {
         _config = AppSettings.Value;
         return Task.CompletedTask;
+    }
+
+    private async Task ReloadApp()
+    {
+        ApplicationLifetime.StopApplication();
+        //return Task.CompletedTask;
     }
 }
 

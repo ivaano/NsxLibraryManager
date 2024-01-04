@@ -26,14 +26,17 @@ builder.Services
 builder.Configuration
     .AddJsonFile(AppConstants.ConfigFileName,
         optional: true,
-        reloadOnChange: false);
+        reloadOnChange: true);
+
+
+var validConfig = ConfigValidator.Validate(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //nsx services
-if (builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null)
+if (validConfig)
 {
     builder.Services.AddSingleton<IDataService, DataService>();
     builder.Services.AddSingleton<ITitleLibraryService, TitleLibraryService>();

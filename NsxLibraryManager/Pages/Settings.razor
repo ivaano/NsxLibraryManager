@@ -10,8 +10,8 @@
     <RadzenRow Gap="1rem">
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenStack>
-                <RadzenFormField Text="Library Path">
-                    <RadzenTextBox @bind-Value="@_config.TitleDatabase" Name="LibraryPath"/>
+                <RadzenFormField Text="Database Path">
+                    <RadzenTextBox @bind-Value="@_config.TitleDatabase" Name="DatabasePath"/>
                 </RadzenFormField>
                 <RadzenFormField Text="Library Path">
                     <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
@@ -82,6 +82,7 @@
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
                 <RadzenButton Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+                <RadzenButton Variant="Variant.Outlined" Click="@ReloadApp" class="rz-ripple">Reload Application</RadzenButton>
 
             </RadzenRow>
         </RadzenColumn>
