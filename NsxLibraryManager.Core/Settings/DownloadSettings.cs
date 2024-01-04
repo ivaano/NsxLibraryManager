@@ -2,8 +2,8 @@
 
 public class DownloadSettings
 {
-    public required int TimeoutInSeconds { get; init; }
-    public required string TitleDbPath { get; init; }
+    public required int TimeoutInSeconds { get; set; }
+    public required string TitleDbPath { get; set; }
     public required string RegionUrl { get; init; }
     public required string CnmtsUrl { get; init; }
     public required string VersionsUrl { get; init; }

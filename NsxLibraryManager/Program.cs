@@ -20,30 +20,35 @@ var builder = WebApplication.CreateBuilder(args);
 // configuration.
 builder.Services
     .AddOptions<AppSettings>()
-    .BindConfiguration("NsxLibraryManager")
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .BindConfiguration(AppConstants.AppSettingsSectionName);
+    //.ValidateDataAnnotations()
+    //.ValidateOnStart();
+builder.Configuration
+    .AddJsonFile(AppConstants.ConfigFileName,
+        optional: true,
+        reloadOnChange: false);
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddRadzenComponents();
 //nsx services
-builder.Services.AddSingleton<IDataService, DataService>();
-builder.Services.AddSingleton<ITitleLibraryService, TitleLibraryService>();
-builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
-builder.Services.AddSingleton<IDownloadService, DownloadService>();
-builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
-builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
-builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
-builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
-builder.Services.AddScoped<IRenamerService, RenamerService>();
-builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();
+if (builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null)
+{
+    builder.Services.AddSingleton<IDataService, DataService>();
+    builder.Services.AddSingleton<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
+    builder.Services.AddSingleton<IDownloadService, DownloadService>();
+    builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
+    builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
+    builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
+    builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
+    builder.Services.AddScoped<IRenamerService, RenamerService>();
+    builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();    
+}
+
 //radzen services
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
+builder.Services.AddRadzenComponents();
 
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<Game>("Games");
@@ -68,8 +73,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-
 
 //app.UseHttpsRedirection();
 

@@ -1,0 +1,89 @@
+﻿@page "/settings"
+
+<PageTitle>Settings</PageTitle>
+<RadzenRow>
+    <RadzenColumn Size="12">
+        <RadzenText Text="Settings" TextStyle="TextStyle.H3" TagName="TagName.H1"/>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenFieldset Text="Library">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="12">
+            <RadzenStack>
+                <RadzenFormField Text="Library Path">
+                    <RadzenTextBox @bind-Value="@_config.TitleDatabase" Name="LibraryPath"/>
+                </RadzenFormField>
+                <RadzenFormField Text="Library Path">
+                    <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
+                </RadzenFormField>
+                <div class="rz-text-align-right   ; ">
+                    <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
+                    <RadzenLabel Text="Recursive" Component="Recursive" Style="margin-left: 8px; vertical-align: middle;"/>
+                </div>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenFieldset>
+
+<RadzenFieldset Text="Download Settings" Style="background-color: #38474e">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="TitleDb Path">
+                    <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbPath"></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="Timeout">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="12">
+            <RadzenStack>
+                <RadzenFormField Text="RegionUrl">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenFormField Text="CnmtsUrl">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenFormField Text="VersionsUrl">
+                    <RadzenTextBox></RadzenTextBox>
+                </RadzenFormField>
+            </RadzenStack>
+            <RadzenStack>
+
+            </RadzenStack>
+        </RadzenColumn>
+
+    </RadzenRow>
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenStack>
+                <RadzenFormField Text="Regions">
+                    <div class="rz-p-sm-12 rz-text-align-left">
+                        <RadzenListBox @bind-Value="@_regionsValue" Data="@_regions" TextProperty="Name" ValueProperty="Name"
+                                       Multiple="true" AllowClear="false" Placeholder="Select regions" Style="width: 100%; max-width: 400px; height: 200px"
+                                       InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select all regions" } })">
+
+                        </RadzenListBox>
+                    </div>
+                </RadzenFormField>
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeSM="6">
+            <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
+                <RadzenButton Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+
+            </RadzenRow>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenFieldset>

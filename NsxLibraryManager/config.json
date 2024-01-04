@@ -1,0 +1,17 @@
+﻿{
+  "NsxLibraryManager": {
+    "TitleDatabase": "I:/titledb/titles.db",
+    "LibraryPath": "N:/roms validados",
+    "Recursive": true,
+    "DownloadSettings": {
+      "TimeoutInSeconds": 100,
+      "TitleDbPath": "I:/titledb/",
+      "RegionUrl": "https://raw.githubusercontent.com/blawar/titledb/master/{region}.en.json",
+      "CnmtsUrl": "https://raw.githubusercontent.com/blawar/titledb/master/cnmts.json",
+      "VersionsUrl": "https://raw.githubusercontent.com/blawar/titledb/master/versions.json",
+      "Regions": [
+        "US"
+      ]
+    }
+  }
+}

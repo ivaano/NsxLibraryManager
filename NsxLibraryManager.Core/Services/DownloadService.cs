@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.Services.Interface;
@@ -6,18 +7,13 @@ using NsxLibraryManager.Core.Settings;
 
 namespace NsxLibraryManager.Core.Services;
 
-public sealed class DownloadService : IDownloadService
+public sealed class DownloadService(
+    IOptions<AppSettings> appSettings,
+    IHttpClientFactory httpClientFactory,
+    ILogger<DownloadService> logger)
+    : IDownloadService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    private readonly DownloadSettings _downloadSettings;
-    private readonly ILogger<DownloadService> _logger;
-
-    public DownloadService(
-            IOptions<AppSettings> configuration,
-            IHttpClientFactory httpClientFactory,
-            ILogger<DownloadService> logger) =>
-            (_downloadSettings, _httpClientFactory, _logger) = (configuration.Value.DownloadSettings, httpClientFactory, logger);
-
+    private readonly DownloadSettings _downloadSettings = appSettings.Value.DownloadSettings;
 
     public async Task<string> GetRegionFile(string region, CancellationToken cancellationToken = default)
     {
@@ -26,7 +22,7 @@ public sealed class DownloadService : IDownloadService
         var url = _downloadSettings.RegionUrl.Replace("{region}", region) ??
                   throw new InvalidOperationException("DownloadRegionUrl is needed in config");
         var destFilePath = Path.Combine(_downloadSettings.TitleDbPath, $"{region}.en.json");
-        _logger.LogInformation($"Downloading region {region} from {url} to {destFilePath}");
+        logger.LogInformation($"Downloading region {region} from {url} to {destFilePath}");
         await DownloadFileAsync(url, destFilePath, cancellationToken);
         return destFilePath;
     }
@@ -51,7 +47,7 @@ public sealed class DownloadService : IDownloadService
 
     public async Task DownloadFileAsync(string url, string destFilePath, CancellationToken cancellationToken)
     {
-        using var client = _httpClientFactory.CreateClient();
+        using var client = httpClientFactory.CreateClient();
         client.Timeout = TimeSpan.FromSeconds(_downloadSettings.TimeoutInSeconds);
         try
         {
@@ -69,11 +65,11 @@ public sealed class DownloadService : IDownloadService
         }
         catch (SimpleHttpResponseException e)
         {
-            _logger.LogError(e, "{Url} returned {EStatusCode} with message {EMessage}", url, e.StatusCode, e.Message);
+            logger.LogError(e, "{Url} returned {EStatusCode} with message {EMessage}", url, e.StatusCode, e.Message);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error saving file {DestFilePath} with message {EMessage}", destFilePath, e.Message);
+            logger.LogError(e, "Error saving file {DestFilePath} with message {EMessage}", destFilePath, e.Message);
         }
     }
 }
