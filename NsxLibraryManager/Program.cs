@@ -15,6 +15,7 @@ using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // configuration.
@@ -28,8 +29,12 @@ builder.Configuration
         optional: true,
         reloadOnChange: true);
 
-
 var validConfig = ConfigValidator.Validate(builder.Configuration);
+builder.Configuration.AddInMemoryCollection(
+    new Dictionary<string, string?>
+    {
+        { "IsConfigValid", validConfig.ToString() }
+    });
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
@@ -87,5 +92,6 @@ app.MapControllers();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
 
 app.Run();

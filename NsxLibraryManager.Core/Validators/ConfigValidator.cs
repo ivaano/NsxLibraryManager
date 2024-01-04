@@ -8,13 +8,17 @@ public static class ConfigValidator
 {
     public static bool Validate(ConfigurationManager configurationManager)
     {
-        //builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null
+        if (configurationManager["NsxLibraryManager:LibraryPath"] != string.Empty || configurationManager["NsxLibraryManager:LibraryPath"] is not null)
+        {
+            return true;
+        }
+        
         return false;
     }
     
     public static bool Validate(IOptions<AppSettings> configAppSettings)
     {
         //builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null
-        return false;
+        return true;
     }
 }
