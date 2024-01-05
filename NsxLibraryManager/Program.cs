@@ -15,30 +15,21 @@ using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
 
+// if no config.json file exists, create one with default values
+var configBuilder = new ConfigurationBuilder()
+    .AddJsonFile(AppConstants.ConfigFileName, optional: true, reloadOnChange: false);
+var configurationRoot = configBuilder.Build();
 
-var builderConfig = WebApplication.CreateBuilder(args);
-builderConfig.Services
-    .AddOptions<AppSettings>()
-    .BindConfiguration(AppConstants.AppSettingsSectionName);
-//.ValidateDataAnnotations()
-//.ValidateOnStart();
-builderConfig.Configuration
-    .AddJsonFile(AppConstants.ConfigFileName,
-        optional: true,
-        reloadOnChange: true);
-
-var valid = ConfigValidator.Validate(builderConfig.Configuration);
+var valid = ConfigValidator.Validate(configurationRoot);
 
 if (valid)
 {
     var builder = WebApplication.CreateBuilder(args);
-
     // configuration.
     builder.Services
         .AddOptions<AppSettings>()
         .BindConfiguration(AppConstants.AppSettingsSectionName);
-        //.ValidateDataAnnotations()
-        //.ValidateOnStart();
+
     builder.Configuration
         .AddJsonFile(Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigFileName),
             optional: true,

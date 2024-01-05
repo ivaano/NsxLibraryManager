@@ -8,20 +8,12 @@ namespace NsxLibraryManager.Core.Validators;
 
 public static class ConfigValidator
 {
-    public static bool Validate(ConfigurationManager configurationManager)
+    public static bool Validate(IConfigurationRoot configurationManager)
     {
         if (File.Exists(configurationManager["NsxLibraryManager:TitleDatabase"]))
             return true;
         
         CreateDefaultConfigFile(AppConstants.ConfigFileName);
-/*
-        if (configurationManager["NsxLibraryManager:LibraryPath"] != string.Empty 
-            || configurationManager["NsxLibraryManager:LibraryPath"] is not null)
-        {
-            if (File.Exists(configurationManager["NsxLibraryManager:TitleDatabase"]))
-            return true;
-        }
-*/   
         return true;
     }
     
