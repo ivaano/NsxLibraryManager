@@ -13,6 +13,8 @@ public partial class Settings
     [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+    
     private bool _recursive = true;
     private IEnumerable<string> _regionsValue = new string[] { "US" };
     private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" }, new() { Name = "MX" } };

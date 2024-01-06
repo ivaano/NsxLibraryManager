@@ -6,6 +6,15 @@
         <RadzenText Text="Settings" TextStyle="TextStyle.H3" TagName="TagName.H1"/>
     </RadzenColumn>
 </RadzenRow>
+<RadzenRow>
+    <RadzenColumn Size="12">
+        @if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
+        {
+            <RadzenText Text="Default configuration created" />
+        }
+
+    </RadzenColumn>
+</RadzenRow>
 <RadzenFieldset Text="Library">
     <RadzenRow Gap="1rem">
         <RadzenColumn Size="12" SizeSM="12">
