@@ -33,7 +33,7 @@ public static class ConfigValidator
 
         var appSettings = new AppSettings()
         {
-            TitleDatabase = Path.Combine(AppContext.BaseDirectory, "title.db"),
+            TitleDatabase = Path.Combine(AppContext.BaseDirectory, "NsxlibraryManager.db"),
             LibraryPath = Path.Combine(AppContext.BaseDirectory, "library"),
             DownloadSettings = new DownloadSettings()
             {

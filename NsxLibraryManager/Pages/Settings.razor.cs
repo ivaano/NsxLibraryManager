@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using LibHac.FsSrv;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
+using Radzen;
 
 namespace NsxLibraryManager.Pages;
 
@@ -12,9 +12,9 @@ public partial class Settings
     
     [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
-    
     [Inject] private IConfiguration Configuration { get; set; } = default!;
-    
+    [Inject] private NotificationService NotificationService { get; set; } = default!;
+
     private bool _recursive = true;
     private IEnumerable<string> _regionsValue = new string[] { "US" };
     private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" }, new() { Name = "MX" } };
@@ -24,6 +24,10 @@ public partial class Settings
     {
         await base.OnInitializedAsync();
         await LoadConfiguration();
+        if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths and restart the application.", Duration = 60000 });
+        }
     }
     
     private Task SaveConfiguration()
@@ -52,10 +56,15 @@ public partial class Settings
         return Task.CompletedTask;
     }
 
-    private async Task ReloadApp()
+    private Task ReloadApp()
     {
         ApplicationLifetime.StopApplication();
-        //return Task.CompletedTask;
+        return Task.CompletedTask;
+    }
+
+    private void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
     }
 }
 

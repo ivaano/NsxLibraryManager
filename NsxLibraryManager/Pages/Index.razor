@@ -7,11 +7,16 @@
 @code {
     [Inject] private IOptions<AppSettings> AppSettings { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+
     
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-
+        if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
+        {
+            NavigationManager.NavigateTo("/settings");
+        }
         NavigationManager.NavigateTo(ConfigValidator.Validate(AppSettings) ? "/dashboard" : "/settings");
     }
 }
