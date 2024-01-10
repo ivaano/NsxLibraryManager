@@ -1,8 +1,10 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace NsxLibraryManager.Core.Validators;
 
@@ -54,7 +56,16 @@ public static class ConfigValidator
         var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
         var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigFileName);
         File.WriteAllText(appSettingsPath, newJson);
-        
+        //create an empty db file and default folders
+        _ = new LiteDatabase(appSettings.TitleDatabase);
+        if (!Directory.Exists(appSettings.LibraryPath))
+        {
+            Directory.CreateDirectory(appSettings.LibraryPath);
+        }
+        if (!Directory.Exists(appSettings.DownloadSettings.TitleDbPath))
+        {
+            Directory.CreateDirectory(appSettings.DownloadSettings.TitleDbPath);
+        }
         return false;
     }
 }

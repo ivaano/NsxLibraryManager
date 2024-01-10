@@ -20,7 +20,22 @@
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenStack>
                 <RadzenFormField Text="Database Path">
-                    <RadzenTextBox @bind-Value="@_config.TitleDatabase" Name="DatabasePath"/>
+                                <ChildContent>
+                    <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="DatabasePath"/>
+                                </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            @if (_databaseFieldDisabled)
+                            {
+                                <text>Can't change database while app is running, change it in config.json and restart the app.</text>
+                            }
+                            else
+                            {
+                                <text>* required</text>    
+                            }
+                            
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
                 <RadzenFormField Text="Library Path">
                     <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>

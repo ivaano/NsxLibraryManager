@@ -17,8 +17,9 @@ public partial class Settings
 
     private bool _recursive = true;
     private IEnumerable<string> _regionsValue = new string[] { "US" };
-    private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" }, new() { Name = "MX" } };
+    private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" } };
     private AppSettings _config = default!;
+    private bool _databaseFieldDisabled = true;
     
     protected override async Task OnInitializedAsync()
     {
@@ -26,6 +27,7 @@ public partial class Settings
         await LoadConfiguration();
         if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
         {
+            _databaseFieldDisabled = false;
             ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths and restart the application.", Duration = 60000 });
         }
     }
