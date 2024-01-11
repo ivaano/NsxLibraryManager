@@ -11,6 +11,7 @@ using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
+using LibHac.FsSystem;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;

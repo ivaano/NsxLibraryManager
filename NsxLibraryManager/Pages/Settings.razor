@@ -37,23 +37,23 @@
                         </RadzenText>
                     </Helper>
                 </RadzenFormField>
-                                <RadzenFormField Text="Prod Keys File">
-                                    <ChildContent>
-                                        <RadzenTextBox @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
-                                    </ChildContent>
-                                    <Helper>
-                                        <RadzenText TextStyle="TextStyle.Caption">
-                                        Location to prod.keys file, if no location is given the app will look in ~/.switch folder.
-                                        </RadzenText>
-                                    </Helper>
-                                </RadzenFormField>
+                <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Location to prod.keys file, if no location is given the app will look in ~/.switch folder.
+                        </RadzenText>
+                    </Helper>
+                </RadzenFormField>
                 <RadzenFormField Text="Library Path">
                     <ChildContent>
                         <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
                     </ChildContent>
                     <Helper>
                         <RadzenText TextStyle="TextStyle.Caption">
-                        Folder where the library files are located.
+                            Folder where the library files are located.
                         </RadzenText>
                     </Helper>
                 </RadzenFormField>
@@ -67,7 +67,7 @@
 </RadzenFieldset>
 
 <RadzenFieldset Text="Download Settings" Style="background-color: #38474e">
-    <RadzenRow Gap="1rem">
+    <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
                 <RadzenFormField Text="TitleDb Path">
@@ -85,9 +85,9 @@
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
                 <RadzenFormField Text="Timeout">
-                                        <ChildContent>
-                                        <RadzenNumeric @bind-Value="@_config.DownloadSettings.TimeoutInSeconds"></RadzenNumeric>
-                                        </ChildContent>
+                    <ChildContent>
+                        <RadzenNumeric @bind-Value="@_config.DownloadSettings.TimeoutInSeconds"></RadzenNumeric>
+                    </ChildContent>
                     <Helper>
                         <RadzenText TextStyle="TextStyle.Caption">
                             Timeout for the download in seconds.
@@ -97,28 +97,42 @@
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
-    <RadzenRow Gap="1rem">
+    <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenStack>
                 <RadzenFormField Text="RegionUrl">
                     <ChildContent>
                         <RadzenTextBox @bind-Value="@_config.DownloadSettings.RegionUrl"></RadzenTextBox>
                     </ChildContent>
-                                        <Helper>
-                                            <RadzenText TextStyle="TextStyle.Caption">
-                                                Url where we are going to fetch titledb region files, the {region} placeholder will be replaced with the selected regions.
-                                            </RadzenText>
-                                        </Helper>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Url where we are going to fetch titledb region files, the {region} placeholder will be replaced with the selected regions.
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
             </RadzenStack>
             <RadzenStack>
                 <RadzenFormField Text="CnmtsUrl">
-                    <RadzenTextBox @bind-Value="@_config.DownloadSettings.CnmtsUrl"></RadzenTextBox>
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.CnmtsUrl"></RadzenTextBox>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Url where we are going to fetch the cnmts.json file.
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
             </RadzenStack>
             <RadzenStack>
                 <RadzenFormField Text="VersionsUrl">
-                    <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionsUrl"></RadzenTextBox>
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionsUrl"></RadzenTextBox>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Url where we are going to fetch the versions.json file.
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
             </RadzenStack>
             <RadzenStack>
@@ -127,17 +141,26 @@
         </RadzenColumn>
 
     </RadzenRow>
-    <RadzenRow Gap="1rem">
+    <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
                 <RadzenFormField Text="Regions">
-                    <div class="rz-p-sm-12 rz-text-align-left">
-                        <RadzenListBox @bind-Value="@_regionsValue" Data="@_regions" TextProperty="Name" ValueProperty="Name"
-                                       Multiple="true" AllowClear="false" Placeholder="Select regions" Style="width: 100%; max-width: 400px; height: 200px"
-                                       InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select all regions" } })">
+                    <ChildContent>
+                        <div class="rz-p-sm-12 rz-text-align-left">
 
-                        </RadzenListBox>
-                    </div>
+                            <RadzenListBox @bind-Value="@_regionsValue" Data="@_regions" TextProperty="Name" ValueProperty="Name"
+                                           Multiple="true" AllowClear="false" Placeholder="Select regions" Style="width: 100%; max-width: 400px; height: 200px"
+                                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select all regions" } })">
+
+                            </RadzenListBox>
+                        </div>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Regions we are going to fetch, for now only US region.
+                        </RadzenText>
+                    </Helper>
+
                 </RadzenFormField>
             </RadzenStack>
         </RadzenColumn>

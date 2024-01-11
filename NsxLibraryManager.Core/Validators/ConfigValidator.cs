@@ -26,7 +26,7 @@ public static class ConfigValidator
 
     }
     
-    public static bool Validate(IOptions<AppSettings> configAppSettings)
+    public static bool Validate(IOptionsSnapshot<AppSettings> configAppSettings)
     {
         //builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null
         return true;

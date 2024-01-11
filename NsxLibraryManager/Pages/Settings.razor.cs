@@ -13,6 +13,8 @@ public partial class Settings
     [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
+    
+    //[Inject] private IConfigurationManager ConfigurationRoot { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private IEnumerable<string> _regionsValue = new string[] { "US" };
@@ -24,7 +26,8 @@ public partial class Settings
     {
         await base.OnInitializedAsync();
         await LoadConfiguration();
-        if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
+        bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
+        if (isDefaultConfigCreated)
         {
             _databaseFieldDisabled = false;
             ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths and restart the application.", Duration = 60000 });
@@ -47,7 +50,9 @@ public partial class Settings
         var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
         var appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.ConfigFileName);
         File.WriteAllText(appSettingsPath, newJson);
-       
+        //var caco = (IConfigurationRoot) Configuration;
+        //caco.Reload();
+        //ConfigurationRoot.GetSection(AppConstants.AppSettingsSectionName);
         return Task.CompletedTask;
     }
     
