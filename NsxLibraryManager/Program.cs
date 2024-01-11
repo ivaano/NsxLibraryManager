@@ -41,7 +41,7 @@ builder.Configuration.AddInMemoryCollection(
         { "IsConfigValid", validatorResult.valid.ToString() },
         { "IsDefaultConfigCreated", validatorResult.defaultConfigCreated.ToString()}
     });
-
+//builder.Services.AddSingleton<IConfigurationManager, builder.Configuration>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
@@ -50,7 +50,7 @@ builder.Services.AddServerSideBlazor();
 if (validatorResult.valid)
 {
     builder.Services.AddSingleton<IDataService, DataService>();
-    builder.Services.AddSingleton<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
     builder.Services.AddSingleton<IDownloadService, DownloadService>();
     builder.Services.AddSingleton<IFileInfoService, FileInfoService>();

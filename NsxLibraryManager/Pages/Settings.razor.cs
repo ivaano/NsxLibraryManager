@@ -14,7 +14,7 @@ public partial class Settings
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     
-    //[Inject] private IConfigurationManager ConfigurationRoot { get; set; } = default!;
+    //[Inject] private IConfigurationManager ConfigurationManager { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private IEnumerable<string> _regionsValue = new string[] { "US" };
@@ -50,9 +50,9 @@ public partial class Settings
         var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
         var appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.ConfigFileName);
         File.WriteAllText(appSettingsPath, newJson);
-        //var caco = (IConfigurationRoot) Configuration;
-        //caco.Reload();
-        //ConfigurationRoot.GetSection(AppConstants.AppSettingsSectionName);
+
+        var configurationRoot = (IConfigurationRoot)Configuration;
+        configurationRoot.Reload();
         return Task.CompletedTask;
     }
     

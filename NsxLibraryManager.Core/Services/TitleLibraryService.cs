@@ -24,13 +24,13 @@ public class TitleLibraryService : ITitleLibraryService
             IDataService dataService,
             IFileInfoService fileInfoService,
             ITitleDbService titleDbService,
-            IOptions<AppSettings> configuration,
+            IOptionsMonitor<AppSettings> configuration,
             IMapper mapper,
             ILogger<TitleLibraryService> logger)
     {
         _dataService = dataService;
         _fileInfoService = fileInfoService;
-        _configuration = configuration.Value;
+        _configuration = configuration.CurrentValue;
         _logger = logger;
         _titleDbService = titleDbService;
         _mapper = mapper;
