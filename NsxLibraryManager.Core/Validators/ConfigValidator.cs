@@ -14,9 +14,16 @@ public static class ConfigValidator
     {
         if (File.Exists(configurationRoot["NsxLibraryManager:TitleDatabase"]))
             return (true, false);
-        
-        CreateDefaultConfigFile(AppConstants.ConfigFileName);
-        return (true, true);
+
+        if (configurationRoot["NsxLibraryManager:TitleDatabase"] is null)
+        {
+            CreateDefaultConfigFile(AppConstants.ConfigFileName); 
+            return (true, true);
+        }
+
+        _ = new LiteDatabase(configurationRoot["NsxLibraryManager:TitleDatabase"]);
+        return (true, false);
+
     }
     
     public static bool Validate(IOptions<AppSettings> configAppSettings)

@@ -15,7 +15,6 @@ public partial class Settings
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
-    private bool _recursive = true;
     private IEnumerable<string> _regionsValue = new string[] { "US" };
     private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" } };
     private AppSettings _config = default!;

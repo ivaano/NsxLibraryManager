@@ -10,7 +10,7 @@
     <RadzenColumn Size="12">
         @if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
         {
-            <RadzenText Text="Default configuration created" />
+            <RadzenText Text="Default configuration created"/>
         }
 
     </RadzenColumn>
@@ -20,9 +20,9 @@
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenStack>
                 <RadzenFormField Text="Database Path">
-                                <ChildContent>
-                    <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="DatabasePath"/>
-                                </ChildContent>
+                    <ChildContent>
+                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="DatabasePath"/>
+                    </ChildContent>
                     <Helper>
                         <RadzenText TextStyle="TextStyle.Caption">
                             @if (_databaseFieldDisabled)
@@ -31,14 +31,31 @@
                             }
                             else
                             {
-                                <text>* required</text>    
+                                <text>* required</text>
                             }
-                            
+
                         </RadzenText>
                     </Helper>
                 </RadzenFormField>
+                                <RadzenFormField Text="Prod Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
+                                    </ChildContent>
+                                    <Helper>
+                                        <RadzenText TextStyle="TextStyle.Caption">
+                                        Location to prod.keys file, if no location is given the app will look in ~/.switch folder.
+                                        </RadzenText>
+                                    </Helper>
+                                </RadzenFormField>
                 <RadzenFormField Text="Library Path">
-                    <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                        Folder where the library files are located.
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
                 <div class="rz-text-align-right   ; ">
                     <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
@@ -54,14 +71,28 @@
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
                 <RadzenFormField Text="TitleDb Path">
-                    <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbPath"></RadzenTextBox>
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbPath"></RadzenTextBox>
+                    </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Folder where Title Db files will be downloaded.
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
             </RadzenStack>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
                 <RadzenFormField Text="Timeout">
-                    <RadzenTextBox></RadzenTextBox>
+                                        <ChildContent>
+                                        <RadzenNumeric @bind-Value="@_config.DownloadSettings.TimeoutInSeconds"></RadzenNumeric>
+                                        </ChildContent>
+                    <Helper>
+                        <RadzenText TextStyle="TextStyle.Caption">
+                            Timeout for the download in seconds.
+                        </RadzenText>
+                    </Helper>
                 </RadzenFormField>
             </RadzenStack>
         </RadzenColumn>
@@ -70,17 +101,24 @@
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenStack>
                 <RadzenFormField Text="RegionUrl">
-                    <RadzenTextBox></RadzenTextBox>
+                    <ChildContent>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.RegionUrl"></RadzenTextBox>
+                    </ChildContent>
+                                        <Helper>
+                                            <RadzenText TextStyle="TextStyle.Caption">
+                                                Url where we are going to fetch titledb region files, the {region} placeholder will be replaced with the selected regions.
+                                            </RadzenText>
+                                        </Helper>
                 </RadzenFormField>
             </RadzenStack>
             <RadzenStack>
                 <RadzenFormField Text="CnmtsUrl">
-                    <RadzenTextBox></RadzenTextBox>
+                    <RadzenTextBox @bind-Value="@_config.DownloadSettings.CnmtsUrl"></RadzenTextBox>
                 </RadzenFormField>
             </RadzenStack>
             <RadzenStack>
                 <RadzenFormField Text="VersionsUrl">
-                    <RadzenTextBox></RadzenTextBox>
+                    <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionsUrl"></RadzenTextBox>
                 </RadzenFormField>
             </RadzenStack>
             <RadzenStack>
