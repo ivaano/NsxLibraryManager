@@ -1,16 +1,72 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using LiteDB;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace NsxLibraryManager.Core.Validators;
 
-public static class ConfigValidator
+public class ConfigValidator : AbstractValidator<AppSettings>
 {
-    public static (bool valid, bool defaultConfigCreated) Validate(IConfigurationRoot configurationRoot)
+    public ConfigValidator()
+    {
+        RuleFor(x => x.TitleDatabase)
+            .NotEmpty().WithMessage("Title database path cannot be empty.");
+
+        RuleFor(x => x.TitleDatabase)
+            .Custom((path, context) =>
+            {
+                if (!File.Exists(path))
+                {
+                    context.AddFailure("Title database does not exist.");
+                }
+            });
+
+        RuleFor(x => x.LibraryPath)
+            .NotEmpty().WithMessage("Library path cannot be empty.");
+
+        RuleFor(x => x.LibraryPath)
+            .Custom((path, context) =>
+            {
+                if (!Directory.Exists(path))
+                {
+                    context.AddFailure("Library path does not exist.");
+                }
+            });
+
+        RuleFor(x => x.DownloadSettings)
+            .NotNull().WithMessage("Download settings cannot be null.");
+
+        RuleFor(x => x.DownloadSettings.TitleDbPath)
+            .NotEmpty().WithMessage("TitleDb path cannot be empty.");
+
+        RuleFor(x => x.DownloadSettings.TitleDbPath)
+            .Custom((path, context) =>
+            {
+                if (!Directory.Exists(path))
+                {
+                    context.AddFailure("TitleDb path does not exist.");
+                }
+            });
+
+        RuleFor(x => x.DownloadSettings.TimeoutInSeconds)
+            .GreaterThan(0).WithMessage("Timeout must be greater than 0.");
+
+        RuleFor(x => x.DownloadSettings.RegionUrl)
+            .NotEmpty().WithMessage("Region url cannot be empty.");
+
+        RuleFor(x => x.DownloadSettings.CnmtsUrl)
+            .NotEmpty().WithMessage("Cnmts url cannot be empty.");
+
+        RuleFor(x => x.DownloadSettings.VersionsUrl)
+            .NotEmpty().WithMessage("Versions url cannot be empty.");
+
+        RuleFor(x => x.DownloadSettings.Regions)
+            .NotEmpty().WithMessage("Regions cannot be empty.");
+    }
+    
+    public static (bool valid, bool defaultConfigCreated) ValidateRootConfig(IConfigurationRoot configurationRoot)
     {
         if (File.Exists(configurationRoot["NsxLibraryManager:TitleDatabase"]))
             return (true, false);
@@ -26,12 +82,6 @@ public static class ConfigValidator
 
     }
     
-    public static bool Validate(IOptionsSnapshot<AppSettings> configAppSettings)
-    {
-        //builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null
-        return true;
-    }
-
     private static bool CreateDefaultConfigFile(string configFileName)
     {
         var jsonWriteOptions = new JsonSerializerOptions
@@ -60,7 +110,7 @@ public static class ConfigValidator
             { AppConstants.AppSettingsSectionName, appSettings }
         };
         
-        var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
+        var newJson = System.Text.Json.JsonSerializer.Serialize(sectionName, jsonWriteOptions);
         var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigFileName);
         File.WriteAllText(appSettingsPath, newJson);
         //create an empty db file and default folders

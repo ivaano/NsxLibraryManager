@@ -21,7 +21,8 @@ var configBuilder = new ConfigurationBuilder()
     .AddJsonFile(AppConstants.ConfigFileName, optional: true, reloadOnChange: false);
 var configurationRoot = configBuilder.Build();
 
-var validatorResult = ConfigValidator.Validate(configurationRoot);
+
+var validatorResult = ConfigValidator.ValidateRootConfig(configurationRoot);
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +60,7 @@ if (validatorResult.valid)
     builder.Services.AddTransient<IDownloadService, DownloadService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();
     builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();    
+    builder.Services.AddScoped<IValidator<AppSettings>, ConfigValidator>();    
 }
 
 //radzen services

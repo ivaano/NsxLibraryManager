@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
@@ -13,8 +14,7 @@ public partial class Settings
     [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
-    
-    //[Inject] private IConfigurationManager ConfigurationManager { get; set; } = default!;
+    [Inject] private IValidator<AppSettings> ConfigValidator { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private IEnumerable<string> _regionsValue = new string[] { "US" };
@@ -26,6 +26,7 @@ public partial class Settings
     {
         await base.OnInitializedAsync();
         await LoadConfiguration();
+        var configResult = await ConfigValidator.ValidateAsync(_config);
         bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
         if (isDefaultConfigCreated)
         {

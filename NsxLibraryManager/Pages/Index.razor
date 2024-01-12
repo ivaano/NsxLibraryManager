@@ -1,13 +1,14 @@
 ﻿@page "/"
 @using NsxLibraryManager.Core.Settings
 @using Microsoft.Extensions.Options
-@using NsxLibraryManager.Core.Validators
+@using FluentValidation
 <h3>Index</h3>
 
 @code {
     [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
+    [Inject] private IValidator<AppSettings> ConfigValidator { get; set; } = default!;
 
     
     protected override async Task OnInitializedAsync()
@@ -18,6 +19,7 @@
         {
             NavigationManager.NavigateTo("/settings");
         }
-        NavigationManager.NavigateTo(ConfigValidator.Validate(AppSettings) ? "/dashboard" : "/settings");
+        var validationResult = await ConfigValidator.ValidateAsync(AppSettings.Value);
+        NavigationManager.NavigateTo(validationResult.IsValid ? "/dashboard" : "/settings");
     }
 }
