@@ -1,4 +1,5 @@
 ﻿@page "/settings"
+@using Microsoft.Extensions.Configuration.UserSecrets
 
 <PageTitle>Settings</PageTitle>
 <RadzenRow>
@@ -39,11 +40,19 @@
                 </RadzenFormField>
                 <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
+                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
                     </ChildContent>
                     <Helper>
                         <RadzenText TextStyle="TextStyle.Caption">
-                            Location to prod.keys file, if no location is given the app will look in ~/.switch folder.
+                            @if (_databaseFieldDisabled)
+                            {
+                                <text>Can't change prod keys file while app is running, change it in config.json and restart the app.</text>
+                            }
+                            else
+                            {
+                                <text>Location to prod.keys file, if no location is given the app will look in</text> @NsxLibraryManager.Utils.PathHelper.HomeUserDir <text>folder.</text>
+                            }
+                            
                         </RadzenText>
                     </Helper>
                 </RadzenFormField>
@@ -157,7 +166,7 @@
                     </ChildContent>
                     <Helper>
                         <RadzenText TextStyle="TextStyle.Caption">
-                            Regions we are going to fetch, for now only US region.
+                            Regions we are going to fetch, for now only US region has been tested.
                         </RadzenText>
                     </Helper>
 

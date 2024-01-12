@@ -53,6 +53,8 @@ public partial class Settings
 
         var configurationRoot = (IConfigurationRoot)Configuration;
         configurationRoot.Reload();
+        ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Configuration Saved!", Detail = "Settings have been saved to config.json.", Duration = 4000 });
+
         return Task.CompletedTask;
     }
     

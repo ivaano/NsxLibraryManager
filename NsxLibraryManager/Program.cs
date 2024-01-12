@@ -50,13 +50,13 @@ builder.Services.AddServerSideBlazor();
 if (validatorResult.valid)
 {
     builder.Services.AddSingleton<IDataService, DataService>();
-    builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
-    builder.Services.AddSingleton<IDownloadService, DownloadService>();
     builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
-    builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
     builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
     builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
+    builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
+    builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddTransient<IDownloadService, DownloadService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();
     builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();    
 }

@@ -31,8 +31,8 @@ public static class ConfigValidator
         //builder.Configuration["NsxLibraryManager:LibraryPath"] != string.Empty || builder.Configuration["NsxLibraryManager:LibraryPath"] is not null
         return true;
     }
-    
-    public static bool CreateDefaultConfigFile(string configFileName)
+
+    private static bool CreateDefaultConfigFile(string configFileName)
     {
         var jsonWriteOptions = new JsonSerializerOptions
         {

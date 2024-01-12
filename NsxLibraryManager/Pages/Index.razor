@@ -13,7 +13,8 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
+        bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
+        if (isDefaultConfigCreated)
         {
             NavigationManager.NavigateTo("/settings");
         }
