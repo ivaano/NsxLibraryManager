@@ -26,17 +26,34 @@ public partial class Settings
     {
         await base.OnInitializedAsync();
         await LoadConfiguration();
-        var configResult = await ConfigValidator.ValidateAsync(_config);
         bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
         if (isDefaultConfigCreated)
         {
             _databaseFieldDisabled = false;
             ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths and restart the application.", Duration = 60000 });
         }
+
+        await ValidateFields();
+    }
+
+    private async Task<bool> ValidateFields()
+    {
+        var configResult = await ConfigValidator.ValidateAsync(_config);
+        if (!configResult.IsValid)
+        {
+            foreach (var error in configResult.Errors)
+            {
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Configuration Error", Detail = error.ErrorMessage, Duration = 3000 });
+            }
+        }
+        return configResult.IsValid;
     }
     
-    private Task SaveConfiguration()
+    private async Task SaveConfiguration()
     {
+        var validateFields =await ValidateFields();
+        if (!validateFields) return;
+        
         var jsonWriteOptions = new JsonSerializerOptions
         {
             WriteIndented = true
@@ -55,8 +72,6 @@ public partial class Settings
         var configurationRoot = (IConfigurationRoot)Configuration;
         configurationRoot.Reload();
         ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Configuration Saved!", Detail = "Settings have been saved to config.json.", Duration = 4000 });
-
-        return Task.CompletedTask;
     }
     
     private Task LoadConfiguration()

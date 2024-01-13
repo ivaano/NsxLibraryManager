@@ -58,9 +58,11 @@
                 </RadzenFormField>
                 <RadzenFormField Text="Library Path">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
+                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath" class="invalid" />
                     </ChildContent>
                     <Helper>
+                    <div style="position: absolute" class="rz-message rz-messages-error rz-message-popup">First name is required</div>
+
                         <RadzenText TextStyle="TextStyle.Caption">
                             Folder where the library files are located.
                         </RadzenText>

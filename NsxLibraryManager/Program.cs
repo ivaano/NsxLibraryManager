@@ -42,7 +42,6 @@ builder.Configuration.AddInMemoryCollection(
         { "IsConfigValid", validatorResult.valid.ToString() },
         { "IsDefaultConfigCreated", validatorResult.defaultConfigCreated.ToString()}
     });
-//builder.Services.AddSingleton<IConfigurationManager, builder.Configuration>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
