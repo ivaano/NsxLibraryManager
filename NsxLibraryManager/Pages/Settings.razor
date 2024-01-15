@@ -22,10 +22,14 @@
             <RadzenStack>
                 <RadzenFormField Text="Database Path">
                     <ChildContent>
-                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="DatabasePath"/>
+                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="TitleDatabase"/>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["TitleDatabase"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["TitleDatabase"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             @if (_databaseFieldDisabled)
                             {
                                 <text>Can't change database while app is running, change it in config.json and restart the app.</text>
@@ -34,8 +38,7 @@
                             {
                                 <text>* required</text>
                             }
-
-                        </RadzenText>
+                        </div>                        
                     </Helper>
                 </RadzenFormField>
                 <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
@@ -43,27 +46,36 @@
                         <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["ProdKeys"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["TitleDatabase"]</div>    
+                        }
+                        <div class="rz-text-caption">  
                             @if (_databaseFieldDisabled)
                             {
                                 <text>Can't change prod keys file while app is running, change it in config.json and restart the app.</text>
                             }
                             else
                             {
-                                <text>Location to prod.keys file, if no location is given the app will look in</text> @NsxLibraryManager.Utils.PathHelper.HomeUserDir <text>folder.</text>
-                            }
-                            
-                        </RadzenText>
+                                <text>Location to prod.keys file, if no location is given the app will look in</text>
+                                @NsxLibraryManager.Utils.PathHelper.HomeUserDir
+                                <text>folder.</text>
+                            }                            
+                        </div>
                     </Helper>
                 </RadzenFormField>
                 <RadzenFormField Text="Library Path">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath" class="invalid" />
+                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath" />
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["LibraryPath"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["LibraryPath"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Folder where the library files are located.
-                        </RadzenText>
+                        </div>
                     </Helper>
                 </RadzenFormField>
                 <div class="rz-text-align-right   ; ">
@@ -84,9 +96,13 @@
                         <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbPath"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["DownloadSettings.TitleDbPath"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TitleDbPath"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Folder where Title Db files will be downloaded.
-                        </RadzenText>
+                        </div>                        
                     </Helper>
                 </RadzenFormField>
             </RadzenStack>
@@ -98,9 +114,13 @@
                         <RadzenNumeric @bind-Value="@_config.DownloadSettings.TimeoutInSeconds"></RadzenNumeric>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["DownloadSettings.TimeoutInSeconds"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TimeoutInSeconds"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Timeout for the download in seconds.
-                        </RadzenText>
+                        </div>                            
                     </Helper>
                 </RadzenFormField>
             </RadzenStack>
@@ -114,9 +134,13 @@
                         <RadzenTextBox @bind-Value="@_config.DownloadSettings.RegionUrl"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["DownloadSettings.RegionUrl"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.RegionUrl"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Url where we are going to fetch titledb region files, the {region} placeholder will be replaced with the selected regions.
-                        </RadzenText>
+                        </div>                           
                     </Helper>
                 </RadzenFormField>
             </RadzenStack>
@@ -126,9 +150,13 @@
                         <RadzenTextBox @bind-Value="@_config.DownloadSettings.CnmtsUrl"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["DownloadSettings.CnmtsUrl"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.CnmtsUrl"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Url where we are going to fetch the cnmts.json file.
-                        </RadzenText>
+                        </div>                          
                     </Helper>
                 </RadzenFormField>
             </RadzenStack>
@@ -138,9 +166,13 @@
                         <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionsUrl"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["DownloadSettings.VersionsUrl"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.VersionsUrl"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Url where we are going to fetch the versions.json file.
-                        </RadzenText>
+                        </div>                             
                     </Helper>
                 </RadzenFormField>
             </RadzenStack>
@@ -165,9 +197,13 @@
                         </div>
                     </ChildContent>
                     <Helper>
-                        <RadzenText TextStyle="TextStyle.Caption">
+                        @if (@_validationErrors["DownloadSettings.Regions"] != string.Empty)
+                        {
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.Regions"]</div>    
+                        }
+                        <div class="rz-text-caption">
                             Regions we are going to fetch, for now only US region has been tested.
-                        </RadzenText>
+                        </div>                           
                     </Helper>
 
                 </RadzenFormField>
@@ -175,9 +211,8 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
-                <RadzenButton Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+                <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
                 <RadzenButton Variant="Variant.Outlined" Click="@ReloadApp" class="rz-ripple">Shut Down Application</RadzenButton>
-
             </RadzenRow>
         </RadzenColumn>
     </RadzenRow>

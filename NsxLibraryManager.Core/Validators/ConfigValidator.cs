@@ -22,6 +22,14 @@ public class ConfigValidator : AbstractValidator<AppSettings>
                     context.AddFailure("Title database does not exist.");
                 }
             });
+        RuleFor(x => x.ProdKeys)
+            .Custom((path, context) =>
+            {
+                if (path != string.Empty && !File.Exists(path))
+                {
+                    context.AddFailure("prod.keys file must exist or leave empty to look in home folder.");
+                }
+            });        
 
         RuleFor(x => x.LibraryPath)
             .NotEmpty().WithMessage("Library path cannot be empty.");

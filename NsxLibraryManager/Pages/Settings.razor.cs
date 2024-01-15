@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
@@ -21,6 +22,20 @@ public partial class Settings
     private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" } };
     private AppSettings _config = default!;
     private bool _databaseFieldDisabled = true;
+    private ValidationResult? _validationResult;
+
+    private readonly Dictionary<string, string> _validationErrors = new()
+    {
+        { "TitleDatabase", string.Empty },
+        { "ProdKeys", string.Empty},
+        { "LibraryPath", string.Empty },
+        { "DownloadSettings.TitleDbPath", string.Empty },
+        { "DownloadSettings.RegionUrl", string.Empty },
+        { "DownloadSettings.CnmtsUrl", string.Empty },
+        { "DownloadSettings.VersionsUrl", string.Empty },
+        { "DownloadSettings.TimeoutInSeconds", string.Empty },
+        { "DownloadSettings.Regions", string.Empty }
+    };
     
     protected override async Task OnInitializedAsync()
     {
@@ -38,15 +53,20 @@ public partial class Settings
 
     private async Task<bool> ValidateFields()
     {
-        var configResult = await ConfigValidator.ValidateAsync(_config);
-        if (!configResult.IsValid)
+        Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
+        _validationResult = await ConfigValidator.ValidateAsync(_config);
+        if (!_validationResult.IsValid)
         {
-            foreach (var error in configResult.Errors)
+            foreach (var failure in _validationResult.Errors)
             {
-                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Configuration Error", Detail = error.ErrorMessage, Duration = 3000 });
+                _validationErrors[failure.PropertyName] =
+                    _validationErrors.TryGetValue(failure.PropertyName, out var value)
+                        ? $"{value} {failure.ErrorMessage}"
+                        : failure.ErrorMessage;
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Configuration Error", Detail = failure.ErrorMessage, Duration = 3000 });
             }
         }
-        return configResult.IsValid;
+        return _validationResult.IsValid;
     }
     
     private async Task SaveConfiguration()
@@ -67,7 +87,7 @@ public partial class Settings
 
         var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
         var appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.ConfigFileName);
-        File.WriteAllText(appSettingsPath, newJson);
+        await File.WriteAllTextAsync(appSettingsPath, newJson);
 
         var configurationRoot = (IConfigurationRoot)Configuration;
         configurationRoot.Reload();
