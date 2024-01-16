@@ -131,6 +131,11 @@ public class ConfigValidator : AbstractValidator<AppSettings>
         {
             Directory.CreateDirectory(appSettings.DownloadSettings.TitleDbPath);
         }
+        var keysPath = Path.Combine(AppContext.BaseDirectory, "keys");
+        if (!Directory.Exists(keysPath))
+        {
+            Directory.CreateDirectory(keysPath);
+        }
         return false;
     }
 }
