@@ -11,39 +11,59 @@ using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
+using LibHac.FsSystem;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
 
-var builder = WebApplication.CreateBuilder(args);
+// if no config.json file exists, create one with default values
+var configBuilder = new ConfigurationBuilder()
+    .AddJsonFile(AppConstants.ConfigFileName, optional: true, reloadOnChange: false);
+var configurationRoot = configBuilder.Build();
 
+
+var validatorResult = ConfigValidator.ValidateRootConfig(configurationRoot);
+
+
+var builder = WebApplication.CreateBuilder(args);
 // configuration.
 builder.Services
     .AddOptions<AppSettings>()
-    .BindConfiguration("NsxLibraryManager")
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+    .BindConfiguration(AppConstants.AppSettingsSectionName);
+
+builder.Configuration
+    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigFileName),
+        optional: true,
+        reloadOnChange: true);
+
+builder.Configuration.AddInMemoryCollection(
+    new Dictionary<string, string?>
+    {
+        { "IsConfigValid", validatorResult.valid.ToString() },
+        { "IsDefaultConfigCreated", validatorResult.defaultConfigCreated.ToString()}
+    });
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddRadzenComponents();
 //nsx services
-builder.Services.AddSingleton<IDataService, DataService>();
-builder.Services.AddSingleton<ITitleLibraryService, TitleLibraryService>();
-builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
-builder.Services.AddSingleton<IDownloadService, DownloadService>();
-builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
-builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
-builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
-builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
-builder.Services.AddScoped<IRenamerService, RenamerService>();
-builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();
+if (validatorResult.valid)
+{
+    builder.Services.AddSingleton<IDataService, DataService>();
+    builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
+    builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
+    builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
+    builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
+    builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
+    builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddTransient<IDownloadService, DownloadService>();
+    builder.Services.AddScoped<IRenamerService, RenamerService>();
+    builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();    
+    builder.Services.AddScoped<IValidator<AppSettings>, ConfigValidator>();    
+}
+
 //radzen services
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
+builder.Services.AddRadzenComponents();
 
 var modelBuilder = new ODataConventionModelBuilder();
 modelBuilder.EntitySet<Game>("Games");
@@ -69,8 +89,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
-
 //app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -82,4 +100,6 @@ app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-app.Run();
+
+app.Run();    
+

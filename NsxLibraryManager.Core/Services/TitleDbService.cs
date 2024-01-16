@@ -139,8 +139,9 @@ public class TitleDbService : ITitleDbService
         var packagedContentMetas = GetTitleCnmts(titleTitleId);
         var dlcVal = (int) TitleLibraryType.DLC;
         var cnmts = packagedContentMetas
-                .OrderByDescending(p => p.Version)
-                .Where(p => p.TitleType == dlcVal);
+            .Where(p => p.TitleType == dlcVal)
+            .OrderByDescending(p => p.Version);
+                
 
         var dlcList = new List<Dlc>();        
         foreach (var cnmt in cnmts)

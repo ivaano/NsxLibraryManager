@@ -6,7 +6,7 @@
 
         <RadzenDataGrid @ref="_grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" Data="@_regionTitles" LoadData="@LoadData"
                         PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)"
-                        Count="@_count" IsLoading="@_isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true"
+                        Count="@_count" IsLoading="@_isLoading" TItem="RegionTitle" AllowSorting="true" AllowPaging="true" AllowVirtualization="false"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                         ShowPagingSummary="true" style="height: 90vh">
@@ -19,11 +19,19 @@
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Type" Title="Type" Width="80px"/>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Name" Title="Name" Width="300px">
                     <Template Context="regionTitle">
-                        <RadzenLink Path="@($"/TitleDbTitle/{regionTitle.TitleId}")" Text="@regionTitle.Name"/>
+                        <RadzenLink Path="javascript:void(0)" Text="@regionTitle.Name" @onclick="_ => OpenDetails(regionTitle)"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Publisher" Title="Publisher" Width="180px" />
-                <RadzenDataGridColumn TItem="RegionTitle" Property="IsDemo" Title="Is Demo" Width="100px" />
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Category" Title="Category" Width="180px" Visible="false" Sortable="false" Filterable="false">
+                    <Template Context="regionTitle">
+                        @string.Join(", ", regionTitle.Category)
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Developer" Title="Developer" Width="180px" Visible="false"/>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="NumberOfPlayers" Title="Players" Width="180px" Visible="false"/>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Rating" Title="Rating Age" Width="180px" Visible="false"/>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="IsDemo" Title="Is Demo" Width="100px" Visible="false" />
                 
                 <RadzenDataGridColumn TItem="RegionTitle" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
             </Columns>

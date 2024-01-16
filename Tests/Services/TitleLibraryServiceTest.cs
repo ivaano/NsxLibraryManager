@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -38,7 +39,11 @@ public class TitleLibraryServiceTest
         
         var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
         var mapper = mapperConfig.CreateMapper();
-        _titleLibraryService = new TitleLibraryService(_dataService, _fileInfoService, _titleDbService, Options.Create(appSettings), mapper, _logger);
+
+        var optionsMonitor = Substitute.For<IOptionsMonitor<AppSettings>>();
+        optionsMonitor.CurrentValue.Returns(appSettings);
+        
+        _titleLibraryService = new TitleLibraryService(_dataService, _fileInfoService, _titleDbService, optionsMonitor, mapper, _logger);
     }
     
     [Fact]

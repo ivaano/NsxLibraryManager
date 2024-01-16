@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Models.Stats;
 using NsxLibraryManager.Core.Services.Interface;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class Index
+public partial class Dashboard
 {
     [Inject]
     protected IDataService DataService { get; set; } = default!;
