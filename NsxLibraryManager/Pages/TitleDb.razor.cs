@@ -132,6 +132,13 @@ public partial class TitleDb
         await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", SettingsParamaterName, JsonSerializer.Serialize(Settings));
     }
 
+    private async Task OpenDetails(RegionTitle title)
+    {
+        await DialogService.OpenAsync<TitleDbTitle>($"{title.Name}",
+            new Dictionary<string, object>() { { "TitleId", title.TitleId } },
+            new DialogOptions() { Width = "80%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true });
+    }
+    
     private async Task RefreshTitleDb()
     {
         var confirmationResult = await DialogService.Confirm(
@@ -141,6 +148,7 @@ public partial class TitleDb
         {
             DialogService.Close();
             await DialogService.OpenAsync<RefreshTitleDbProgressDialog>("Refreshing titledb...");
+            await _grid.Reload();
             StateHasChanged();
         }
     }
