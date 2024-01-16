@@ -14,5 +14,7 @@ RUN dotnet publish "NsxLibraryManager.csproj" -c Release -o /app/publish /p:UseA
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+RUN chown app:app /app
+COPY --chown=app:app --from=publish /app/publish .
+USER app
 ENTRYPOINT ["dotnet", "NsxLibraryManager.dll"]
