@@ -256,6 +256,7 @@ public class DataService : IDataService
         var regionTitleRepository = RegionRepository(region);
         var entities = new List<RegionTitle>();
         var currentDateTime = DateTime.Now;
+        var titlesCount = titles.Count;
         foreach (var title in titles)
         {
             if (title.Value is null || title.Value.ToString() == "{}") continue;
@@ -276,9 +277,17 @@ public class DataService : IDataService
             }
 
             entities.Add(regionTitle);
+            if (entities.Count == 1000)
+            {
+                regionTitleRepository.InsertBulk(entities);
+                entities.Clear();
+            }
             _logger.LogDebug("{Message}", regionTitle.Name);
         }
-        return regionTitleRepository.InsertBulk(entities);
+        
+        if (entities.Count > 0)
+            regionTitleRepository.InsertBulk(entities);
+        return titlesCount;
     }
 
     public void Dispose()
