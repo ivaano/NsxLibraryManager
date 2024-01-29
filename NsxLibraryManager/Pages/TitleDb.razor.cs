@@ -10,7 +10,7 @@ using NsxLibraryManager.Core.Services.Interface;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class TitleDb
+public partial class TitleDb : IDisposable
 {
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = default!;
@@ -150,6 +150,22 @@ public partial class TitleDb
             await DialogService.OpenAsync<RefreshTitleDbProgressDialog>("Refreshing titledb...");
             await _grid.Reload();
             StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+
+    }
+    
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _grid.Dispose();
+            _regionTitles = default!;
         }
     }
 }

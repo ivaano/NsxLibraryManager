@@ -46,6 +46,5 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
     
     public void Dispose()
     {
-        
-    }
+        DialogService.Dispose();    }
 }

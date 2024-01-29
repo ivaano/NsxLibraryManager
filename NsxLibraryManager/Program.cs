@@ -49,12 +49,12 @@ builder.Services.AddServerSideBlazor();
 //nsx services
 if (validatorResult.valid)
 {
+    builder.Services.AddTransient<ITitleDbService, TitleDbService>();
     builder.Services.AddSingleton<IDataService, DataService>();
-    builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
-    builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
-    builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
-    builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
-    builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
+    builder.Services.AddTransient<IFileInfoService, FileInfoService>();
+    builder.Services.AddTransient<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
+    builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
+    builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
     builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();

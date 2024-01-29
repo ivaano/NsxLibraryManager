@@ -274,6 +274,15 @@ public class DataService : IDataService
                         130 => TitleLibraryType.DLC,
                         _ => TitleLibraryType.Unknown
                 };
+
+
+            } 
+            else
+            {
+                if (regionTitle.TitleId is not null && regionTitle.TitleId.EndsWith("000"))
+                {
+                    regionTitle.Type = TitleLibraryType.Base;
+                }
             }
 
             entities.Add(regionTitle);

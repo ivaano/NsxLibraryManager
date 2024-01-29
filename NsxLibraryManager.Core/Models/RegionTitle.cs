@@ -5,7 +5,7 @@ namespace NsxLibraryManager.Core.Models;
 public class RegionTitle
 {
     public long Id { get; set; }
-    public required string TitleId { get; set; }
+    public string? TitleId { get; set; }
     public List<string>? Ids { get; set; }
     public string? BannerUrl { get; set; }
     public List<string>? Category { get; set; }

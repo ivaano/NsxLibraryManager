@@ -29,6 +29,7 @@ public class TitleDbService : ITitleDbService
     
     public async Task ImportRegionAsync(string region)
     {
+        //var destFilePath = "I:\\titledb\\test.json";
         var destFilePath = await _downloadService.GetRegionFile(region, CancellationToken.None);
         var titles = JObject.Parse(await File.ReadAllTextAsync(destFilePath));
         _dataService.DropDbCollection(region);
@@ -37,6 +38,7 @@ public class TitleDbService : ITitleDbService
 
     public async Task ImportCnmtsAsync()
     {
+        //var destFilePath = "I:\\titledb\\cnmts.json";
         var destFilePath = await _downloadService.GetCnmtsFile(CancellationToken.None);
         var json = await File.ReadAllTextAsync(@destFilePath);
         var packagedContentMeta = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, PackagedContentMeta>>>(json);
@@ -58,6 +60,7 @@ public class TitleDbService : ITitleDbService
 
     public async Task ImportVersionsAsync()
     {
+        //var destFilePath = "I:\\titledb\\versions.json";
         var destFilePath = await _downloadService.GetVersionsFile(CancellationToken.None);
         var json = await File.ReadAllTextAsync(@destFilePath);
         var gameVersions  = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
