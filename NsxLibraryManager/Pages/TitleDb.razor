@@ -23,11 +23,7 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Publisher" Title="Publisher" Width="180px" />
-                <RadzenDataGridColumn TItem="RegionTitle" Property="Category" Title="Category" Width="180px" Visible="false" Sortable="false" Filterable="false">
-                    <Template Context="regionTitle">
-                        @string.Join(", ", regionTitle.Category)
-                    </Template>
-                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="RegionTitle" Property="Categories" Title="Categories" Width="180px" Visible="false" Sortable="false" Filterable="true" />
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Developer" Title="Developer" Width="180px" Visible="false"/>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="NumberOfPlayers" Title="Players" Width="180px" Visible="false"/>
                 <RadzenDataGridColumn TItem="RegionTitle" Property="Rating" Title="Rating Age" Width="180px" Visible="false"/>

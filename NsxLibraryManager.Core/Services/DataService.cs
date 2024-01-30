@@ -264,6 +264,8 @@ public class DataService : IDataService
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
             regionTitle.Region = region;
             regionTitle.CreatedTime = currentDateTime;
+            if (regionTitle.Category is not null)
+                regionTitle.Categories = string.Join(", ", regionTitle.Category);
             var cnmt = _titleDbCnmtsRepository.FindOne(x => x.TitleId == regionTitle.TitleId);
             if (cnmt != null)
             {
