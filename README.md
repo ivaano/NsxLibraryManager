@@ -27,7 +27,7 @@ that I could run on a server and access it from any device.
 ## Install
 - Download the latest release
 - Extract the zip/gz file
-- Create `config.json` and customize it to your needs:
+- Create `titledb\config.json` and customize it to your needs:
   - `TitleDatabase`: Path where the db file is going to be stored, this is required and must end with `.db`. **Use a fast drive for this file, like a NVMe**.
   - `LibraryPath`: Path to your library.
   - `Recursive`: If true, it will search recursively in the library path.
@@ -37,10 +37,10 @@ that I could run on a server and access it from any device.
   - `VersionUrl`: Url to download the version file.
   - `Regions`: List of regions to download.
   - `ProdKeys`: Path to your prod.keys file, if this value is not set, program will look in the same folder as the executable, or you can put them in `$HOME/.switch/prod.keys`.
-- Alternative to creating the file manually run the application once and it will create the file with default values.
+- Alternative to creating the file manually, run the application once and it will create a default config file you can use the the browser to edit it.
 
 > [!WARNING]
-> Be sure that the paths you put on `appsettings.json` exists the application doesn't create the paths if they don't exists, and if the paths are not correct an error will be throw if the path is unavailable.
+> Be sure that the paths you put on `config.json` are valid, the application doesn't create the paths if they don't exists.
 
 > [!NOTE]  
 > Please use absolute paths, relative paths might not work because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`
@@ -49,7 +49,7 @@ that I could run on a server and access it from any device.
 - Download the latest release
 - Extract the zip/gz file
 - build the image `docker build -t nsxlibrarymanager .`
-- you can mount the keys and library folders to the container, for example:
+- you can mount the keys, titledb and library folders to the container, for example:
   -`docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/nsxlib/keys,target=/app/keys --mount type=bind,source=/home/ivan/nsxlib/library,target=/app/library nsxlibrarymanager`
 
 

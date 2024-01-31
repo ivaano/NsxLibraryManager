@@ -129,8 +129,13 @@ public class TitleLibraryService : ITitleLibraryService
     {
         try
         {
+            _logger.LogDebug("Processing file: {file}", file);
             var libraryTitle = await _fileInfoService.GetFileInfo(file, detailed: false);
-            if (libraryTitle is null) return libraryTitle;
+            if (libraryTitle is null)
+            {
+                _logger.LogDebug("Unable to get File Information from file : {file}", file);
+                return libraryTitle;
+            }
             var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
             var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
             libraryTitle = await AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);

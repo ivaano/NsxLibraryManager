@@ -134,6 +134,7 @@ public partial class TitleDb : IDisposable
 
     private async Task OpenDetails(RegionTitle title)
     {
+        if (title.TitleId is null) return;
         await DialogService.OpenAsync<TitleDbTitle>($"{title.Name}",
             new Dictionary<string, object>() { { "TitleId", title.TitleId } },
             new DialogOptions() { Width = "80%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true });

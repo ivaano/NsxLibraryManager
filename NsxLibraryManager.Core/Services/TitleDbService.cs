@@ -170,7 +170,7 @@ public class TitleDbService : ITitleDbService
                 }
             }
 
-            if (!alreadyInList)
+            if (!alreadyInList && regionTitle.TitleId is not null)
             {
                 var dlc = new Dlc
                 {
