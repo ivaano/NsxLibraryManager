@@ -119,7 +119,13 @@ public class ConfigValidator : AbstractValidator<AppSettings>
         };
         
         var newJson = System.Text.Json.JsonSerializer.Serialize(sectionName, jsonWriteOptions);
-        var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigFileName);
+        var configFolder = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory);
+        if (!Directory.Exists(configFolder))
+        {
+            Directory.CreateDirectory(configFolder);
+        }
+
+        var appSettingsPath = Path.Combine(configFolder, AppConstants.ConfigFileName);
         File.WriteAllText(appSettingsPath, newJson);
         //create an empty db file and default folders
         _ = new LiteDatabase(appSettings.TitleDatabase);

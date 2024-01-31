@@ -4,7 +4,7 @@ using NsxLibraryManager.Core.FileLoading;
 
 namespace NsxLibraryManager.Core.Models;
 
-public record LibraryTitle
+public class LibraryTitle
 {
     public int Id { get; set; }
     public required string TitleId { get; init; }

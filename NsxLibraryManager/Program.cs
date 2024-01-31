@@ -11,19 +11,18 @@ using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
-using LibHac.FsSystem;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
 
 // if no config.json file exists, create one with default values
+var configFile = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory, AppConstants.ConfigFileName);
+
 var configBuilder = new ConfigurationBuilder()
-    .AddJsonFile(AppConstants.ConfigFileName, optional: true, reloadOnChange: false);
+    .AddJsonFile(configFile, optional: true, reloadOnChange: false);
 var configurationRoot = configBuilder.Build();
 
-
 var validatorResult = ConfigValidator.ValidateRootConfig(configurationRoot);
-
 
 var builder = WebApplication.CreateBuilder(args);
 // configuration.
@@ -32,7 +31,7 @@ builder.Services
     .BindConfiguration(AppConstants.AppSettingsSectionName);
 
 builder.Configuration
-    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigFileName),
+    .AddJsonFile(configFile,
         optional: true,
         reloadOnChange: true);
 
@@ -49,12 +48,12 @@ builder.Services.AddServerSideBlazor();
 //nsx services
 if (validatorResult.valid)
 {
+    builder.Services.AddTransient<ITitleDbService, TitleDbService>();
     builder.Services.AddSingleton<IDataService, DataService>();
-    builder.Services.AddSingleton<ITitleDbService, TitleDbService>();
-    builder.Services.AddSingleton<IFileInfoService, FileInfoService>();
-    builder.Services.AddSingleton<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
-    builder.Services.AddSingleton<IPackageInfoLoader, PackageInfoLoader>();
-    builder.Services.AddSingleton<IKeySetProviderService, KeySetProviderService>();
+    builder.Services.AddTransient<IFileInfoService, FileInfoService>();
+    builder.Services.AddTransient<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
+    builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
+    builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
     builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();

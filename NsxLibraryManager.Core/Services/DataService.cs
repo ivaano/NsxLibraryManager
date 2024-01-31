@@ -264,6 +264,8 @@ public class DataService : IDataService
             var regionTitle = _mapper.Map<RegionTitle>(titleDbTitle);
             regionTitle.Region = region;
             regionTitle.CreatedTime = currentDateTime;
+            if (regionTitle.Category is not null)
+                regionTitle.Categories = string.Join(", ", regionTitle.Category);
             var cnmt = _titleDbCnmtsRepository.FindOne(x => x.TitleId == regionTitle.TitleId);
             if (cnmt != null)
             {
@@ -274,6 +276,15 @@ public class DataService : IDataService
                         130 => TitleLibraryType.DLC,
                         _ => TitleLibraryType.Unknown
                 };
+
+
+            } 
+            else
+            {
+                if (regionTitle.TitleId is not null && regionTitle.TitleId.EndsWith("000"))
+                {
+                    regionTitle.Type = TitleLibraryType.Base;
+                }
             }
 
             entities.Add(regionTitle);

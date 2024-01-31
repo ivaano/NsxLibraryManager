@@ -20,10 +20,12 @@
                 </RadzenStack>
 
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-                    <RadzenDataGrid @ref="_grid" Data="@_libraryTitles" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                    <RadzenDataGrid @ref="_grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings"  Data="@_libraryTitles" LoadData="@LoadData" 
+                                    PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)" 
+                                    Count="@_count"  IsLoading="@_isLoading" TItem="LibraryTitle" AllowSorting="true" AllowPaging="true" 
                                     AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                     AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
-                                    PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
+                                    ShowPagingSummary="true" style="height: 95vh">
                         <HeaderTemplate>
                             <RadzenButton Click="@(args => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
                             <RadzenButton Click="@(args => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
