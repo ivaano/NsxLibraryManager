@@ -30,6 +30,20 @@ public class RenamerService : IRenamerService
         _fileInfoService = fileInfoService;
         _titleDbService = titleDbService;
     }
+    
+    public static char[] GetInvalidAdditionalChars() => new char[]
+    {
+        '™', '©', '®', '~', '#', '%', '&'
+    };
+    
+    public static string RemoveIllegalCharacters(string input)
+    {
+        var invalidChars = Path.GetInvalidFileNameChars()
+            .Union(Path.GetInvalidPathChars())
+            .Union(GetInvalidAdditionalChars()).ToArray();
+
+        return invalidChars.Aggregate(input, (current, c) => current.Replace(c.ToString(), ""));
+    }
 
     private Task<string> TemplateReplaceAsync(string renameTemplate, LibraryTitle fileInfo)
     {
@@ -38,15 +52,26 @@ public class RenamerService : IRenamerService
         {
             var match = Regex.Match(renameTemplate, pattern, RegexOptions.IgnoreCase);
             if (!match.Success) continue;
-
+            var safeTitleName = string.Empty;
+            var safeAppTitleName = string.Empty;
+            if (fileInfo.TitleName is not null)
+            {
+                safeTitleName = RemoveIllegalCharacters(fileInfo.TitleName);    
+            }
+            if (fileInfo.ApplicationTitleName is not null)
+            {
+                safeAppTitleName = RemoveIllegalCharacters(fileInfo.ApplicationTitleName);
+            }
+            
+            
             var replacement = key switch
             {
                 TemplateField.BasePath  => _settings.OutputBasePath,
-                TemplateField.TitleName => fileInfo.TitleName,
+                TemplateField.TitleName => safeTitleName,
                 TemplateField.TitleId   => fileInfo.TitleId,
                 TemplateField.Version   => fileInfo.TitleVersion.ToString(),
                 TemplateField.Extension => fileInfo.PackageType.ToString().ToLower(),
-                TemplateField.AppName   => fileInfo.ApplicationTitleName,
+                TemplateField.AppName   => safeAppTitleName,
                 TemplateField.PatchId   => fileInfo.PatchTitleId,
                 TemplateField.PatchNum  => fileInfo.PatchNumber.ToString(),
                 _                       => string.Empty
@@ -124,7 +149,7 @@ public class RenamerService : IRenamerService
         return fileList;
     }
     
-    private Task<(string, bool, string)> ValidateDestinationFileAsync(string file, string newPath)
+    public Task<(string, bool, string)> ValidateDestinationFileAsync(string file, string newPath)
     {
         if (string.IsNullOrEmpty(newPath))
         {
@@ -143,26 +168,11 @@ public class RenamerService : IRenamerService
             _logger.LogError("Error building new file name for {file} - {message}", file, "File already exists");
             return Task.FromResult((string.Empty, true, "File already exists"));
         }
-        
-        var invalidFileNameChars = Path.GetInvalidFileNameChars();
-        var invalidCharReplacement = string.Empty;
-        var newFileName = Path.GetFileName(newPath);
-        newFileName = invalidFileNameChars.Aggregate(newFileName, (current, invalidFileNameChar) => current.Replace(invalidFileNameChar.ToString(), invalidCharReplacement));
-
-        var invalidDirNameChars = Path.GetInvalidPathChars();
-        var invalidDirCharReplacement = string.Empty;
-        var newDirName =Path.GetDirectoryName(newPath);
-        newDirName = invalidDirNameChars.Aggregate(newDirName, (current, invalidDirNameChar) => current?.Replace(invalidDirNameChar.ToString(), invalidDirCharReplacement));
-
-        if (newDirName is null)
-        {
-            _logger.LogError("Error building new file name for {file} - {message}", file, "New path is empty");
-            return Task.FromResult((string.Empty, true, "New path is empty"));
+        var newDirName = Path.GetDirectoryName(newPath);
+        if (!Path.Exists(newDirName) && newDirName is not null)
+        { 
+            Directory.CreateDirectory(newDirName);
         }
-        
-        newPath = Path.Combine(newDirName, newFileName);
-        
-
         return Task.FromResult((newPath, false, string.Empty));
     }
     

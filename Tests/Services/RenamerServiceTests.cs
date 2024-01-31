@@ -54,6 +54,21 @@ public class RenamerServiceTests
         // Assert
         Assert.Equal($"{settings.OutputBasePath}/base/{fileInfo.TitleName}.nsp", result);
     }
+    
+    [Fact]
+    public async Task ValidateDestinationPathAsync_ReturnsTrue_WhenPathIsValid()
+    {
+        // Arrange
+        var file = "somefile.nsp";
+        var path = "/home/user/test";
+
+
+        // Act
+        var (newPath, error, errorMessage)  = await _renamerService.ValidateDestinationFileAsync(file, path);
+
+        // Assert
+        Assert.False(error);
+    }
 
 
 }

@@ -93,7 +93,10 @@ public partial class Renamer
         {
             isLoading = true;
             _renameTitles = await RenamerService.RenameFilesAsync(fileList);
-            //await LoadFiles();
+            var stats = _renameTitles.ToList();
+            var errors = stats.Count(x => x.Error);
+            var success = stats.Count(x => x.RenamedSuccessfully);
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Rename Process Finished!", Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 4000 });
             await _renameGrid.Reload();
             isLoading = false;
         }
