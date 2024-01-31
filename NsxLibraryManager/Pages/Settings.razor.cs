@@ -86,7 +86,7 @@ public partial class Settings
         };
 
         var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
-        var appSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppConstants.ConfigFileName);
+        var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory, AppConstants.ConfigFileName);
         await File.WriteAllTextAsync(appSettingsPath, newJson);
 
         var configurationRoot = (IConfigurationRoot)Configuration;
