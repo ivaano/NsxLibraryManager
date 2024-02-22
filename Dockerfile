@@ -17,4 +17,5 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 RUN chown app:app /app
 USER app
+RUN mkdir -p /app/titledb
 ENTRYPOINT ["dotnet", "NsxLibraryManager.dll"]
