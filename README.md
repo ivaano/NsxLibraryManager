@@ -46,6 +46,11 @@ that I could run on a server and access it from any device.
 > Please use absolute paths, relative paths might not work because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`
 
 ## Docker
+### GHCR
+- you can mount the keys, titledb and library folders to the container, for example:
+  -`docker run 'ghcr.io/ivaano/nsxlibrarymanager:master' -p 8080:8080 --mount type=bind,source=/home/ivan/nsxlib/keys,target=/app/keys --mount type=bind,source=/home/ivan/nsxlib/library,target=/app/library nsxlibrarymanager`
+
+### Manual
 - Download the latest release
 - Extract the zip/gz file
 - build the image `docker build -t nsxlibrarymanager .`
