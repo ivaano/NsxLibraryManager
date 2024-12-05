@@ -33,7 +33,7 @@ public class RenamerService : IRenamerService
     
     public static char[] GetInvalidAdditionalChars() => new char[]
     {
-        '™', '©', '®', '~', '#', '%', '&'
+        '™', '©', '®', '~', '#', '%', '&', ':'
     };
     
     public static string RemoveIllegalCharacters(string input)
