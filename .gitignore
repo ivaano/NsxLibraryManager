@@ -3,5 +3,4 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-.vscode/tasks.json
-.vscode/launch.json
+.vscode/
