@@ -17,7 +17,7 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1"/>
         <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.4" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
-        <PackageReference Include="Radzen.Blazor" Version="4.24.3" />
+        <PackageReference Include="Radzen.Blazor" Version="5.6.14" />
     </ItemGroup>
     
     <ItemGroup>

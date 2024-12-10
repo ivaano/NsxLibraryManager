@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Radzen.Blazor
 @namespace NsxLibraryManager.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -10,9 +12,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
-    <link href="_content/Radzen.Blazor/css/dark.css" rel="stylesheet" />    <link rel="icon" href="favicon.png" />
+    <link rel="icon" href="favicon.png" />
+
+
     <link href="css/site.css" rel="stylesheet" />
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <component type="typeof(RadzenTheme)" render-mode="ServerPrerendered" param-Theme="@("dark")" />
+
 </head>
 <body>
     <component type="typeof(App)" render-mode="ServerPrerendered" />
@@ -31,6 +36,7 @@
 <script src="_framework/blazor.server.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
 <script src="js/nsxlibrarymanager.js"></script>
-<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+
 </body>
 </html>
