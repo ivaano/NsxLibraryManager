@@ -1,0 +1,23 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace NsxLibraryManager.Models;
+
+[PrimaryKey("Id")]
+public class CategoryLanguage
+{
+    public int Id { get; set; }
+    [Column(TypeName = "VARCHAR")]
+    [StringLength(2)]
+    public string Region { get; set; }
+    [Column(TypeName = "VARCHAR")]
+    [StringLength(2)]
+    public string Language { get; set; }
+    [Column(TypeName = "VARCHAR")]
+    [StringLength(30)]
+    public string Name { get; set; }
+    public int CategoryId { get; set; }
+    
+    public Category Category { get; set; }
+}

@@ -1,0 +1,19 @@
+﻿@page "/sqltitledb"
+@using NsxLibraryManager.Utils
+@using TitleModel = NsxLibraryManager.Models.Title;
+
+<PageTitle>Title From DbTitle</PageTitle>
+<RadzenRow>
+    <RadzenColumn Size="12" SizeMD="6">
+    </RadzenColumn>
+    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="100" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                    Data="@_titles" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@_selectedTitles>
+        <Columns>
+            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ApplicationId)" Title="TitleId" Width="100px" />
+            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ContentType)" Title="Type" Width="80px"/>
+            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.TitleName)" Title="Name" Width="300px" />
+
+        </Columns>
+    
+    </RadzenDataGrid>
+</RadzenRow>

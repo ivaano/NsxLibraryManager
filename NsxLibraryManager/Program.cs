@@ -11,6 +11,8 @@ using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using NsxLibraryManager.Data;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -43,6 +45,11 @@ builder.Configuration.AddInMemoryCollection(
     });
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
+builder.Services.AddDbContext<SqliteDbContext>(options =>
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection"));
+    // options.EnableSensitiveDataLogging(true);
+});
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //nsx services
