@@ -36,7 +36,7 @@
                             }
                             else
                             {
-                                <text>* required</text>
+                                <span style="color:var(--primary)">* Required</span>
                             }
                         </div>                        
                     </Helper>
@@ -53,13 +53,15 @@
                         <div class="rz-text-caption">  
                             @if (_databaseFieldDisabled)
                             {
-                                <text>Can't change prod keys file while app is running, change it in config.json and restart the app.</text>
+                                <div class="rz-text-caption" style="color:var(--primary)">
+                                    Can't change prod keys file while app is running, change it in config.json and restart the app.
+                                </div>
                             }
                             else
                             {
-                                <text>Location to prod.keys file, if no location is given the app will look in</text>
-                                @NsxLibraryManager.Utils.PathHelper.HomeUserDir
-                                <text>folder.</text>
+                                <div class="rz-text-caption">
+                                    Location to <span style="color:var(--secondary)">prod.keys</span> file, if no location is given the app will look in '<span style="color:var(--secondary)">@NsxLibraryManager.Utils.PathHelper.HomeUserDir</span>' folder.
+                                </div>
                             }                            
                         </div>
                     </Helper>
@@ -101,7 +103,7 @@
                             <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TitleDbPath"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Folder where Title Db files will be downloaded.
+                            Folder where <span style="color:var(--secondary)">TitleDb</span> files will be downloaded.
                         </div>                        
                     </Helper>
                 </RadzenFormField>
@@ -139,7 +141,7 @@
                             <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.RegionUrl"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Url where we are going to fetch titledb region files, the {region} placeholder will be replaced with the selected regions.
+                            Url where we are going to fetch <span style="color:var(--secondary)">TitleDb</span> region files, the {region} placeholder will be replaced with the selected regions.
                         </div>                           
                     </Helper>
                 </RadzenFormField>
@@ -155,7 +157,7 @@
                             <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.CnmtsUrl"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Url where we are going to fetch the cnmts.json file.
+                            Url where we are going to fetch the <span style="color:var(--secondary)">cnmts.json</span> file.
                         </div>                          
                     </Helper>
                 </RadzenFormField>
@@ -171,7 +173,7 @@
                             <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.VersionsUrl"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Url where we are going to fetch the versions.json file.
+                            Url where we are going to fetch the <span style="color:var(--secondary)">versions.json</span> file.
                         </div>                             
                     </Helper>
                 </RadzenFormField>
