@@ -16,12 +16,14 @@ public partial class SqlTitleDb : IDisposable
     
     private IQueryable<TitleModel> _titles = default!;
     private IList<TitleModel> _selectedTitles = default!;
-    
+    private readonly IEnumerable<int> _pageSizeOptions = [25, 50, 100];
+    private int _pageSize = 100;
+
     
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _titles = DbContext.Titles.AsQueryable();
+        _titles = DbContext.Titles.AsQueryable().Where(t => t.TitleName != null).OrderBy(t => t.TitleName);
     }
     
     public void Dispose()

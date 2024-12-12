@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Models;
-using Version = NsxLibraryManager.Models.Version;
+using NsxLibraryManager.Core.Enums;
 
 namespace NsxLibraryManager.Models;
 
@@ -47,7 +46,7 @@ public sealed class Title
     [StringLength(50)]
     public string? Publisher { get; set; }
     
-    public DateOnly? ReleaseDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     
     public int? Rating { get; init; }
     public long? Size { get; init; }
@@ -58,9 +57,9 @@ public sealed class Title
     [StringLength(2)]
     public string? Region { get; init; }
     
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(15)]
-    public string? ContentType { get; set; }
+    public int? LatestVersion { get; set; }
+    
+    public TitleContentType ContentType { get; set; }
 
     [Column(TypeName = "VARCHAR")]
     [StringLength(20)]
