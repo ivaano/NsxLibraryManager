@@ -60,20 +60,16 @@ public class FileInfoService : IFileInfoService
         return files.ToList();
     }
     
-    public async Task<IEnumerable<string>> GetRecursiveFiles(string filePath)
+    public Task<IEnumerable<string>> GetRecursiveFiles(string filePath)
     {
-        var files = Directory.GetFiles(filePath);
-        var fileList = files.Select(Path.GetFullPath).ToList();
-
-        _directoryFiles = _directoryFiles.Concat(fileList);
-       
-        var subdirectoryEntries = Directory.GetDirectories(filePath);
-        foreach (var subdirectory in subdirectoryEntries)
-        {
-            await GetRecursiveFiles(subdirectory);
-        }
-
-        return _directoryFiles.ToList();
+        var extensions = new[] { ".nsp", ".nsz", ".xci", ".xcz" };
+        var files = Directory
+            .EnumerateFiles(filePath, "*", SearchOption.AllDirectories)
+            .Where(f => extensions.Contains(
+                Path.GetExtension(f), 
+                StringComparer.OrdinalIgnoreCase));
+        
+        return Task.FromResult<IEnumerable<string>>(files.ToList());
     }
     
     public Task<long?> GetFileSize(string filePath)
@@ -110,20 +106,12 @@ public class FileInfoService : IFileInfoService
         } 
         catch (Exception e)
         {
-            _logger.LogError(e, "Error getting package info");
-            var titleError = new LibraryTitle
-            {
-                TitleId = "0000000000000000",
-                FileName = Path.GetFullPath(filePath),
-                LastWriteTime = File.GetLastWriteTime(filePath),
-                Error = true,
-                ErrorMessage = e.Message
-            };
-            return titleError;
+            _logger.LogError("Error getting package info from file {filePath}", filePath);
+            return null;
         }
 
         if (packageInfo.Contents is null)
-            throw new Exception("No contents found in the package");
+            throw new Exception($"No contents found in the package of file {filePath}");
         
         var title = new LibraryTitle
         {

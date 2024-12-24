@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Models;
-using TitleModel = NsxLibraryManager.Models.Title;
+using TitleModel = NsxLibraryManager.Models.Titledb.Title;
 
 namespace NsxLibraryManager.Pages;
 
@@ -12,7 +14,8 @@ public partial class SqlTitleDb : IDisposable
     protected IJSRuntime JsRuntime { get; set; } = default!;
     
     [Inject]
-    protected SqliteDbContext DbContext { get; set; } = default!;
+    protected TitledbDbContext DbContext { get; set; } = default!;
+
     
     private IQueryable<TitleModel> _titles = default!;
     private IList<TitleModel> _selectedTitles = default!;
@@ -23,7 +26,7 @@ public partial class SqlTitleDb : IDisposable
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        _titles = DbContext.Titles.AsQueryable().Where(t => t.TitleName != null).OrderBy(t => t.TitleName);
+        _titles = DbContext.Titles.AsQueryable().Where(t => t.TitleName != null).OrderByDescending(t => t.ReleaseDate);
     }
     
     public void Dispose()

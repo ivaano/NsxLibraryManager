@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace NsxLibraryManager.Models;
+namespace NsxLibraryManager.Models.Titledb;
 
 public class Cnmt
 {

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace NsxLibraryManager.Models;
+namespace NsxLibraryManager.Models.Titledb;
 
 [PrimaryKey("Id")]
 public class CategoryLanguage

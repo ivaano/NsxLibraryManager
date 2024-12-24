@@ -1,13 +1,13 @@
 ﻿@page "/sqltitledb"
 @using NsxLibraryManager.Utils
-@using TitleModel = NsxLibraryManager.Models.Title;
+@using TitleModel = NsxLibraryManager.Models.Titledb.Title;
 
 <PageTitle>Title From DbTitle</PageTitle>
 <RadzenRow>
     <RadzenColumn Size="12" SizeMD="6">
     </RadzenColumn>
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" 
-                    FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                    FilterMode="FilterMode.Advanced" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
                     AllowSorting="true" PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" 
                     PageSizeChanged="@(args => _pageSize = args)" AllowPaging="true" 
                     PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true" Data="@_titles" 
@@ -30,6 +30,9 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.LatestVersion)" Title="Version" Width="110px"/>
             <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ReleaseDate)" Title="Release Date" FormatString="{0:d}" Width="110px"/>
+            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.UpdatesCount)" Title="Updates"  Width="50px"/>
+            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.DlcCount)" Title="DLCs"  Width="50px"/>
+            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.IsDemo)" Title="Demo"  Width="50px"/>
         </Columns>
     
     </RadzenDataGrid>

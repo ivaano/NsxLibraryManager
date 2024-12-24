@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Models;
+﻿namespace NsxLibraryManager.Models.Titledb;
 
 public class TitleRegion
 {

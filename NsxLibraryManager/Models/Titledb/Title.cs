@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Core.Enums;
 
-namespace NsxLibraryManager.Models;
+namespace NsxLibraryManager.Models.Titledb;
 
 [PrimaryKey("Id")]
 public sealed class Title
@@ -58,12 +58,17 @@ public sealed class Title
     public string? Region { get; init; }
     
     public int? LatestVersion { get; set; }
+    public int? UpdatesCount { get; set; }
+    public int? DlcCount { get; set; }
+    
+    public bool IsDemo { get; set; }
     
     public TitleContentType ContentType { get; set; }
 
     [Column(TypeName = "VARCHAR")]
     [StringLength(20)]
     public string? OtherApplicationId { get; set; }
+    public ICollection<Edition>? Editions { get; init; }
     public ICollection<Cnmt>? Cnmts { get; init; }
     public ICollection<Version>? Versions { get; init; }
     public ICollection<Language>? Languages { get; set; }

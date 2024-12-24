@@ -1,14 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-namespace NsxLibraryManager.Models;
+namespace NsxLibraryManager.Models.Titledb;
 
-public sealed class Language
+[PrimaryKey("Id")]
+public class RatingContent
 {
     public int Id { get; set; }
     [Column(TypeName = "VARCHAR")]
-    [StringLength(2)]
-    public string LanguageCode { get; set; }
-    public ICollection<Region> Regions { get; } = [];
+    [StringLength(30)]
+    public string Name { get; set; }
+   
     public ICollection<Title> Titles { get; } = [];
 }

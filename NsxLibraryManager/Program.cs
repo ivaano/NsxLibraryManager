@@ -45,9 +45,14 @@ builder.Configuration.AddInMemoryCollection(
     });
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
-builder.Services.AddDbContext<SqliteDbContext>(options =>
+builder.Services.AddDbContext<TitledbDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection"));
+    options.UseSqlite(builder.Configuration.GetConnectionString("TitledbDBConnection"));
+    // options.EnableSensitiveDataLogging(true);
+});
+builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("NsxLibraryDBConnection"));
     // options.EnableSensitiveDataLogging(true);
 });
 builder.Services.AddRazorPages();
