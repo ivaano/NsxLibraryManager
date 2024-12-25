@@ -1,23 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+﻿namespace NsxLibraryManager.Models.NsxLibrary;
 
-namespace NsxLibraryManager.Models.NsxLibrary;
 
-[PrimaryKey("Id")]
-public sealed class Title
+public sealed class Title : BaseTitle
 {
-    public int Id { get; init; }
+    public ICollection<Edition>? Editions { get; init; }
 
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(200)]
-    public long? NsuId { get; init; }
-    
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(20)]
-    public required string ApplicationId { get; init; }
-    
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(200)]
-    public string? TitleName { get; init; }
 }

@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Models.Titledb;
+﻿namespace NsxLibraryManager.Models.NsxLibrary;
 
 public sealed class Screenshot : BaseScreenshot
 {

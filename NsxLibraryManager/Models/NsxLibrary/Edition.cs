@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace NsxLibraryManager.Models.Titledb;
+﻿namespace NsxLibraryManager.Models.NsxLibrary;
 
 public class Edition : BaseEdition
 {
