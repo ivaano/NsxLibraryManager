@@ -1,8 +1,24 @@
-﻿namespace NsxLibraryManager.Models.NsxLibrary;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using NsxLibraryManager.Core.Enums;
+
+namespace NsxLibraryManager.Models.NsxLibrary;
 
 
 public sealed class Title : BaseTitle
 {
-    public ICollection<Edition>? Editions { get; init; }
+    public int? OwnedUpdates { get; set; }
+    public int? OwnedDlcs { get; set; }
+    
+    public int? Version { get; set; }
 
+    public AccuratePackageType PackageType { get; init; }
+    
+    [Column(TypeName = "VARCHAR")]
+    [StringLength(200)]
+    public required string FileName { get; set; }
+    
+    public ICollection<Edition>? Editions { get; init; }
+    
+    public DateTime? LastWriteTime { get; set; }
 }

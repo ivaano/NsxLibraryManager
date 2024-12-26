@@ -3,37 +3,45 @@
 @using TitleModel = NsxLibraryManager.Models.Titledb.Title;
 
 <PageTitle>Title From DbTitle</PageTitle>
-<RadzenRow>
-    <RadzenColumn Size="12" SizeMD="6">
-    </RadzenColumn>
-    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" 
-                    FilterMode="FilterMode.Advanced" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                    AllowSorting="true" PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" 
-                    PageSizeChanged="@(args => _pageSize = args)" AllowPaging="true" 
-                    PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true" Data="@_titles" 
-                    ColumnWidth="200px" LogicalFilterOperator="LogicalFilterOperator.And" 
-                    SelectionMode="DataGridSelectionMode.Single" @bind-Value=@_selectedTitles 
-                    style="height: 90vh">
-        <Columns>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ApplicationId)" Title="TitleId" Width="90px" />
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ContentType)" Title="Type" Width="80px"/>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.TitleName)" Title="Name" Width="300px" />
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.Region)" Title="Region" Width="50px" />
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.Size)" Title="Size" Width="50px">
-                <Template Context="libraryTitle">
-                    @if (libraryTitle.Size != null)
-                    {
-                        var sizeInBytes = libraryTitle.Size ?? 0;
-                        @sizeInBytes.ToHumanReadableBytes()
-                    }
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.LatestVersion)" Title="Version" Width="110px"/>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ReleaseDate)" Title="Release Date" FormatString="{0:d}" Width="110px"/>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.UpdatesCount)" Title="Updates"  Width="50px"/>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.DlcCount)" Title="DLCs"  Width="50px"/>
-            <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.IsDemo)" Title="Demo"  Width="50px"/>
-        </Columns>
-    
-    </RadzenDataGrid>
-</RadzenRow>
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+
+        <RadzenDataGrid @ref="_grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" IsLoading="@_isLoading"
+                        Data="@_titles" LoadData="@LoadData" Count="@_count" PageSize="@_pageSize" 
+                        PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)"
+                        @bind-Value=@_selectedTitles
+                        AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" 
+                        FilterMode="FilterMode.Advanced" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                        AllowSorting="true" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" 
+                        ShowPagingSummary="true" ColumnWidth="200px" AllowColumnPicking="true" 
+                        LogicalFilterOperator="LogicalFilterOperator.And" SelectionMode="DataGridSelectionMode.Single"  
+                        style="height: 90vh">
+            <HeaderTemplate>
+                <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
+                <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ApplicationId)" Title="TitleId" Width="90px" />
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ContentType)" Title="Type" Width="80px"/>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.TitleName)" Title="Name" Width="300px" />
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.Region)" Title="Region" Width="50px" />
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.Size)" Title="Size" Width="50px">
+                    <Template Context="libraryTitle">
+                        @if (libraryTitle.Size != null)
+                        {
+                            var sizeInBytes = libraryTitle.Size ?? 0;
+                            @sizeInBytes.ToHumanReadableBytes()
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.LatestVersion)" Title="Version" Width="110px"/>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ReleaseDate)" Title="Release Date" FormatString="{0:d}" Width="110px"/>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.UpdatesCount)" Title="Updates"  Width="50px"/>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.DlcCount)" Title="DLCs"  Width="50px"/>
+                <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.IsDemo)" Title="Demo"  Width="50px"/>
+            </Columns>
+        
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenStack>
