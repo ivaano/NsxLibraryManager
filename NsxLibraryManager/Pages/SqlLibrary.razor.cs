@@ -7,7 +7,7 @@ using NsxLibraryManager.Data;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq.Dynamic.Core;
-
+using NsxLibraryManager.Pages.Components;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 
 namespace NsxLibraryManager.Pages;
@@ -120,6 +120,36 @@ public partial class SqlLibrary : IDisposable
 
     private async Task ReloadLibrary()
     {
+        var confirmationResult = await DialogService.Confirm(
+            "This will reload all titles to the db Are you sure?", "Reload Library",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (confirmationResult is true)
+        {
+            DialogService.Close();
+            StateHasChanged();
+            var paramsDialog = new Dictionary<string, object>();
+            var dialogOptions = new DialogOptions()
+                { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
+            await DialogService.OpenAsync<SqlReloadLibraryProgressDialog>(
+                "Reloading library...", paramsDialog, dialogOptions);
+            await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
+                "Processing Updates", paramsDialog, dialogOptions);
+            await DialogService.OpenAsync<RefreshDlcProgressDialog>(
+                "Processing Dlcs", paramsDialog, dialogOptions);
+            await InitialLoad();
+            switch (_selectedTabIndex)
+            {
+                case 0:
+                    await _grid.Reload();
+                    break;
+                case 1:
+                    //await _dlcGrid.Reload();
+                    break;
+                case 2:
+                    //await _updatesGrid.Reload();
+                    break;
+            }
+        }
     }
     
     public async Task OpenDetails(TitleModel title)

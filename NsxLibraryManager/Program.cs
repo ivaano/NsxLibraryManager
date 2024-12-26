@@ -13,6 +13,8 @@ using NsxLibraryManager.Core.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Data;
+using NsxLibraryManager.Services;
+using NsxLibraryManager.Services.Interface;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -67,6 +69,7 @@ if (validatorResult.valid)
     builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
     builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
     builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddTransient<ISqlTitleLibraryService, SqlTitleLibraryService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();
     builder.Services.AddScoped<IValidator<RenamerSettings>, RenamerSettingsValidator>();    
