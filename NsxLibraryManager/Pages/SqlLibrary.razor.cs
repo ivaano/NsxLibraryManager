@@ -7,6 +7,7 @@ using NsxLibraryManager.Data;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq.Dynamic.Core;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 
@@ -26,7 +27,7 @@ public partial class SqlLibrary : IDisposable
     [Inject]
     protected DialogService DialogService { get; set; }
     
-    private static readonly string SettingsParamaterName = "SqlTitleDbGridSettings";
+    private static readonly string SettingsParamaterName = "SqlLibraryGridSettings";
 
     [CanBeNull] private DataGridSettings _settings;
     private IEnumerable<TitleModel> _libraryTitles;
@@ -42,7 +43,7 @@ public partial class SqlLibrary : IDisposable
     private int _pageSize = 100;
     private string _lastUpdated;
     
-    private readonly IEnumerable<int> _pageSizeOptions = new[] { 10, 20, 30, 50, 100 };
+    private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30, 50, 100];
     private DataGridSettings? Settings 
     { 
         get => _settings;
@@ -56,13 +57,49 @@ public partial class SqlLibrary : IDisposable
         }
     }
     
-    private Task InitialLoad()
+    protected override async Task OnInitializedAsync()
     {
-        _isLoading = true;
-        _libraryPath = TitleLibraryService.GetLibraryPath();
-        return Task.CompletedTask;
+        await base.OnInitializedAsync();
+        await InitialLoad();
     }
     
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadStateAsync();
+            await Task.Delay(1);
+            await _grid.Reload();
+            //StateHasChanged();    
+        }
+    }
+    
+    private Task InitialLoad()
+    {
+        _libraryPath = TitleLibraryService.GetLibraryPath();
+        CalculateCounts();
+        return Task.CompletedTask;
+    }
+
+    private void CalculateCounts()
+    {
+        try
+        {
+            _baseCount = DbContext.Titles
+                .Count(x => x.ContentType == TitleContentType.Base);
+            _patchCount = DbContext.Titles
+                .Count(x => x.ContentType == TitleContentType.Update);
+            _dlcCount = DbContext.Titles
+                .Count(x => x.ContentType == TitleContentType.DLC);  
+        }
+        catch (Exception)
+        {
+            _baseCount = 0;
+            _patchCount = 0;
+            _dlcCount = 0;
+        }
+    }
+
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
@@ -89,6 +126,21 @@ public partial class SqlLibrary : IDisposable
                 ToList());
 
         _isLoading = false;
+    }
+    
+    
+    private async Task LoadStateAsync()
+    {
+        var result = await JsRuntime.InvokeAsync<string>("window.localStorage.getItem", SettingsParamaterName);
+        if (!string.IsNullOrEmpty(result))
+        {
+            _settings = JsonSerializer.Deserialize<DataGridSettings>(result);
+            if (_settings is { PageSize: not null })
+            {
+                _pageSize = _settings.PageSize.Value;
+            }
+        }
+        await Task.CompletedTask;
     }
     
     private async Task SaveStateAsync()
@@ -132,10 +184,12 @@ public partial class SqlLibrary : IDisposable
                 { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<SqlReloadLibraryProgressDialog>(
                 "Reloading library...", paramsDialog, dialogOptions);
+            /*
             await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
                 "Processing Updates", paramsDialog, dialogOptions);
             await DialogService.OpenAsync<RefreshDlcProgressDialog>(
                 "Processing Dlcs", paramsDialog, dialogOptions);
+                */
             await InitialLoad();
             switch (_selectedTabIndex)
             {

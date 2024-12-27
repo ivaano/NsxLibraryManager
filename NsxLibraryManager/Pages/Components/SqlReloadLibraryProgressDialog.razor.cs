@@ -38,11 +38,24 @@ public partial class SqlReloadLibraryProgressDialog : IDisposable
                 {
                     await TitleLibraryService.DropLibrary();
                 }
+
+                var batchCount = 0;
                 foreach (var file in fileList)
                 {
                     var result = await TitleLibraryService.ProcessFileAsync(file);
+                    batchCount++;
+                    if (batchCount >= 100)
+                    {
+                        await TitleLibraryService.SaveDatabaseChangesAsync();
+                        batchCount = 0;
+                    }
                     ProgressCompleted++;
                     StateHasChanged();                    
+                }
+
+                if (batchCount > 0)
+                {
+                    await TitleLibraryService.SaveDatabaseChangesAsync();
                 }
 
             });

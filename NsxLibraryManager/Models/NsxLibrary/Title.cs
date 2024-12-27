@@ -12,7 +12,7 @@ public sealed class Title : BaseTitle
     
     public int? Version { get; set; }
 
-    public AccuratePackageType PackageType { get; init; }
+    public AccuratePackageType PackageType { get; set; }
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(200)]

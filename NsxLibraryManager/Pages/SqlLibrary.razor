@@ -32,7 +32,7 @@
                     </HeaderTemplate>
                     <Columns>
                         <RadzenDataGridColumn TItem="TitleModel" Property="ApplicationId" Title="Title Id" Width="150px"/>
-                        <RadzenDataGridColumn TItem="TitleModel" Property="TitleName" Title="Name" Width="300px">
+                        <RadzenDataGridColumn TItem="TitleModel" Property="TitleName" SortOrder="SortOrder.Ascending" Title="Name" Width="300px">
                             <Template Context="libraryTitle">
                                 <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" @onclick="_ => OpenDetails(libraryTitle)"/>
                             </Template>
@@ -41,7 +41,13 @@
                         <RadzenDataGridColumn TItem="TitleModel" Property="Publisher" Title="Publisher"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="ContentType" Title="Type" Width="80px"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="PackageType" Title="Package Type" Width="130px"/>
-                        <RadzenDataGridColumn TItem="TitleModel" Property="FileName" Title="Filename"/>
+                        <RadzenDataGridColumn TItem="TitleModel" Property="FileName" Title="Filename" Width="250px">
+                            <Template Context="libraryTitle">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @libraryTitle.FileName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="TitleModel" Property="Size" Title="Size" Width="100px">
                             <Template Context="libraryTitle">
                                 @if (libraryTitle.Size != null)
@@ -51,6 +57,7 @@
                                 }
                             </Template>
                         </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="TitleModel" Property="Region" Title="Region" Visible="false" Width="110px"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="LastWriteTime" Title="Date Modified" FormatString="{0:d}" Width="110px"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="NumberOfPlayers" Title="Players" Width="50px" Visible="false"/>

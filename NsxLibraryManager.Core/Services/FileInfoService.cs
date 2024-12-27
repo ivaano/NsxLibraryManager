@@ -1,7 +1,9 @@
-﻿using LibHac.Ncm;
+﻿using System.Text.RegularExpressions;
+using LibHac.Ncm;
 using Microsoft.Extensions.Logging;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
+using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Models;
@@ -15,7 +17,11 @@ public class FileInfoService : IFileInfoService
     private readonly ITitleDbService _titleDbService;
     private readonly ILogger<FileInfoService> _logger;
     private IEnumerable<string> _directoryFiles = new List<string>();
-   
+    private const string NszExtension = ".nsz";
+    private const string NspExtension = ".nsp";
+    private const string XciExtension = ".xci";
+    private const string XczExtension = ".xcz";
+    private const string TitleFilePattern = @"^(.*?)(?:\s*\[(DLC.*?)\])?\s*\[([0-9a-fA-F]+)\]\[v(\d+)\]";
     public FileInfoService(
             IPackageInfoLoader packageInfoLoader, 
             ITitleDbService titleDbService,
@@ -53,6 +59,73 @@ public class FileInfoService : IFileInfoService
         }
         return fileList;
     }
+
+    public async Task<LibraryTitle> GetFileInfoFromFileName(string fileName)
+    {
+        
+        //const string pattern = @"^(.*?)(?:\s*\[(DLC\s*(.*?))\])?\s*\[([0-9a-fA-F]+)\]\[v(\d+)\]";
+
+        var fileNameNoExt = Path.GetFileNameWithoutExtension(fileName); 
+        var directory = Path.GetDirectoryName(fileName); 
+        string extension = Path.GetExtension(fileName); 
+        
+        var match = Regex.Match(fileNameNoExt, TitleFilePattern);
+
+        if (!match.Success) throw new InvalidPathException(fileName);
+        
+        var name = match.Groups[1].Value.Trim();
+        var dlcName = match.Groups[2].Value.Trim();
+        var id = match.Groups[3].Value;
+        var version = match.Groups[4].Value;
+        var packageType = extension switch
+        {
+            _ when extension.Equals(NszExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.NSZ,
+            _ when extension.Equals(NspExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.NSP,
+            _ when extension.Equals(XciExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.XCI,
+            _ when extension.Equals(XczExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.XCZ,
+            _ => throw new ArgumentOutOfRangeException($"Unknown Extension for file {fileName}")
+        };
+        _ = int.TryParse(version, out var versionNumber) ? versionNumber : 0;
+
+        if (string.IsNullOrEmpty(id))
+        {
+            throw new InvalidPathException(fileName);
+        }
+            
+        var title = new LibraryTitle
+        {
+            TitleId = id,
+            TitleName = name,
+            TitleVersion = (uint)versionNumber,
+            FileName = Path.GetFullPath(fileName),
+            LastWriteTime = File.GetLastWriteTime(fileName),
+            PackageType = packageType,
+            Size = await GetFileSize(fileName),
+        };  
+
+        if (string.IsNullOrEmpty(dlcName) && versionNumber == 0)
+        {
+            title.Type = TitleLibraryType.Base;
+        } 
+            
+        if (string.IsNullOrEmpty(dlcName) && versionNumber > 0)
+        {
+            title.Type = TitleLibraryType.Update;
+        }
+            
+        if (!string.IsNullOrEmpty(dlcName))
+        {
+            if (dlcName.StartsWith("DLC", StringComparison.OrdinalIgnoreCase))
+            {
+                dlcName = dlcName[3..].Trim(); 
+            }
+            title.Type = TitleLibraryType.DLC;
+            title.TitleName = $"{title.TitleName} - {dlcName}"; 
+        }
+        
+        return title;
+    }
+
     
     public IEnumerable<string> GetDirectoryFiles(string filePath)
     {
@@ -127,8 +200,8 @@ public class FileInfoService : IFileInfoService
             LastWriteTime = File.GetLastWriteTime(filePath)
         };
 
-        var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);
-        title.AvailableVersion = availableVersion >> 16;
+        //var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);
+        //title.AvailableVersion = availableVersion >> 16;
         title.Type = packageInfo.Contents.Type switch
         {
                 ContentMetaType.Application => TitleLibraryType.Base,

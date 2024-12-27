@@ -59,7 +59,7 @@ public class BaseTitle
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(2)]
-    public string? Region { get; init; }
+    public string? Region { get; set; }
     
     public int? LatestVersion { get; set; }
     public int? UpdatesCount { get; set; }
