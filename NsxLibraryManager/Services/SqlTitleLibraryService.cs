@@ -55,6 +55,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         //await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM Titles");
 
         await _nsxLibraryDbContext.Titles.ExecuteDeleteAsync();
+        await _nsxLibraryDbContext.TitleCategory.ExecuteDeleteAsync();
         
         //await _nsxLibraryDbContext.Database.ExecuteSqlRawAsync($"DELETE FROM sqlite_sequence WHERE name = 'Titles'");
         //await _nsxLibraryDbContext.Database.ExecuteSqlRawAsync($"VACUUM");
@@ -86,17 +87,17 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
                     Name = category.Name,
                 };
                 _nsxLibraryDbContext.Categories.Add(libraryCategory);
-                await _nsxLibraryDbContext.SaveChangesAsync();
+                //await _nsxLibraryDbContext.SaveChangesAsync();
             }
-
+            
             var titleCategory = new TitleCategory
             {
-                TitleId = nsxLibraryTitle.Id,
-                CategoryId = libraryCategory.Id,
+                Title = nsxLibraryTitle,
+                Category = libraryCategory,
             };
             
-            
-            _nsxLibraryDbContext.TitleCategories.Add(titleCategory);
+            _nsxLibraryDbContext.TitleCategory.Add(titleCategory);
+
             //titleCategories.Add(libraryCategory);
             //await _nsxLibraryDbContext.SaveChangesAsync();
         }
@@ -252,7 +253,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
                 _nsxLibraryDbContext.Add(title);    
             }
             
-            //await _nsxLibraryDbContext.SaveChangesAsync();
+            await _nsxLibraryDbContext.SaveChangesAsync();
             /*
             var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
             var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);

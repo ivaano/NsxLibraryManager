@@ -7,6 +7,7 @@ using NsxLibraryManager.Data;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq.Dynamic.Core;
+using LiteDB.Queryable;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
@@ -105,7 +106,14 @@ public partial class SqlLibrary : IDisposable
         _isLoading = true;
         await Task.Yield();
 
-        var query = DbContext.Titles.AsQueryable();
+        var taco = DbContext
+            .Titles
+            .Include(c => c.Categories)
+            .ToList();
+        
+        var query = DbContext
+            .Titles
+            .Include(c => c.Categories).AsQueryable();
         
         if (!string.IsNullOrEmpty(args.Filter))
         {

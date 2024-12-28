@@ -1,4 +1,5 @@
 ﻿@page "/sqllibrary"
+@using NsxLibraryManager.Models.NsxLibrary
 @using NsxLibraryManager.Utils
 @using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 
@@ -49,6 +50,16 @@
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
+                        
+                        <RadzenDataGridColumn TItem="TitleModel" Property="Categories" FilterProperty="Category.Name" Title="Categories" Type="typeof(IEnumerable<Category>)" Sortable="false">
+                            <Template>
+                                @if (context.Categories != null)
+                                {
+                                    @string.Join(',', context.Categories.Select(c => c.Name))
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        
                         <RadzenDataGridColumn TItem="TitleModel" Property="Size" Title="Size" Width="100px">
                             <Template Context="libraryTitle">
                                 @if (libraryTitle.Size != null)

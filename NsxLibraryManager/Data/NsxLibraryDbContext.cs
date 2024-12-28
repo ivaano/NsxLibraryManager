@@ -11,7 +11,7 @@ public class NsxLibraryDbContext : DbContext
     public DbSet<Title> Titles { get; set; }
     public DbSet<Category> Categories { get; set; }
     
-    public DbSet<TitleCategory> TitleCategories { get; set; }
+    public DbSet<TitleCategory> TitleCategory { get; set; }
     public DbSet<Language> Languages { get; set; }
     public DbSet<Region> Regions { get; set; }
     public DbSet<Screenshot> Screenshots { get; set; }
@@ -50,13 +50,5 @@ public class NsxLibraryDbContext : DbContext
             .WithMany(e => e.Titles)
             .UsingEntity<TitleCategory>(); 
         
-        modelBuilder.Entity<TitleCategory>()
-            .HasKey(t => new { t.TitleId, t.CategoryId });
-        /*
-        modelBuilder.Entity<TitleCategory>()
-            .HasOne(c => c.Category)
-            .WithMany(t => t.Titles)
-            .HasForeignKey(c => c.CategoryId);
-            */
     }
 }

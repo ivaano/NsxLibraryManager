@@ -56,22 +56,23 @@ public partial class SqlReloadLibraryProgressDialog : IDisposable
                     {
                         dlcCounts[title.OtherApplicationId] = dlcCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
                     }
-                    
+                    /*
                     batchCount++;
                     if (batchCount >= 100)
                     {
                         await TitleLibraryService.SaveDatabaseChangesAsync();
                         batchCount = 0;
                     }
+                    */
                     ProgressCompleted++;
                     StateHasChanged();                    
                 }
-
+/*
                 if (batchCount > 0)
                 {
                     await TitleLibraryService.SaveDatabaseChangesAsync();
                 }
-                
+        */        
                 await TitleLibraryService.SaveContentCounts(updateCounts, TitleContentType.Update);
                 await TitleLibraryService.SaveContentCounts(dlcCounts, TitleContentType.DLC);
 
