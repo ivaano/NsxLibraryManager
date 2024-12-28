@@ -4,13 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NsxLibraryManager.Models.Titledb;
 
-[PrimaryKey("Id")]
-public class Region
+
+public sealed class Region : BaseRegion
 {
-    public int Id { get; set; }
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(2)]
-    public string Name { get; set; }
-    public virtual ICollection<Language>? Languages { get; set; }
+
+    public ICollection<Language>? Languages { get; set; }
     public ICollection<Title> Titles { get; } = [];
 }

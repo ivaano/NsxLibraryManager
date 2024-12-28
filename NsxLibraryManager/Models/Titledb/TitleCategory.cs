@@ -1,7 +1,6 @@
 ﻿namespace NsxLibraryManager.Models.Titledb;
 
-public class TitleCategory
+public class TitleCategory : BaseTitleCategory
 {
-    public int TitleId { get; set; }
-    public int CategoryId { get; set; }
+
 }

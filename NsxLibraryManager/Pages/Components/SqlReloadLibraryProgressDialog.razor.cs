@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
@@ -40,9 +41,22 @@ public partial class SqlReloadLibraryProgressDialog : IDisposable
                 }
 
                 var batchCount = 0;
+                var updateCounts = new Dictionary<string, int>();
+                var dlcCounts = new Dictionary<string, int>();
                 foreach (var file in fileList)
                 {
-                    var result = await TitleLibraryService.ProcessFileAsync(file);
+                    var title = await TitleLibraryService.ProcessFileAsync(file);
+
+                    if (title is { ContentType: TitleContentType.Update, OtherApplicationId: not null })
+                    {
+                        updateCounts[title.OtherApplicationId] = updateCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
+                    }
+                    
+                    if (title is { ContentType: TitleContentType.DLC, OtherApplicationId: not null })
+                    {
+                        dlcCounts[title.OtherApplicationId] = dlcCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
+                    }
+                    
                     batchCount++;
                     if (batchCount >= 100)
                     {
@@ -57,6 +71,9 @@ public partial class SqlReloadLibraryProgressDialog : IDisposable
                 {
                     await TitleLibraryService.SaveDatabaseChangesAsync();
                 }
+                
+                await TitleLibraryService.SaveContentCounts(updateCounts, TitleContentType.Update);
+                await TitleLibraryService.SaveContentCounts(dlcCounts, TitleContentType.DLC);
 
             });
         DialogService.Close();

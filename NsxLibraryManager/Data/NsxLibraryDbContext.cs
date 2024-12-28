@@ -9,7 +9,16 @@ public class NsxLibraryDbContext : DbContext
 {
     private readonly AppSettings _configuration;
     public DbSet<Title> Titles { get; set; }
+    public DbSet<Category> Categories { get; set; }
     
+    public DbSet<TitleCategory> TitleCategories { get; set; }
+    public DbSet<Language> Languages { get; set; }
+    public DbSet<Region> Regions { get; set; }
+    public DbSet<Screenshot> Screenshots { get; set; }
+
+    public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
+
+
     public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<AppSettings> configuration) :
         base(options)
     {
@@ -24,4 +33,30 @@ public class NsxLibraryDbContext : DbContext
         }
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Category>()
+            .HasMany(e => e.Languages)
+            .WithOne(e => e.Category)
+            .HasForeignKey(e => e.CategoryId);
+        
+        modelBuilder.Entity<Region>()
+            .HasMany(e => e.Languages)
+            .WithMany(e => e.Regions)
+            .UsingEntity<RegionLanguage>();
+        
+        modelBuilder.Entity<Title>()
+            .HasMany(e => e.Categories)
+            .WithMany(e => e.Titles)
+            .UsingEntity<TitleCategory>(); 
+        
+        modelBuilder.Entity<TitleCategory>()
+            .HasKey(t => new { t.TitleId, t.CategoryId });
+        /*
+        modelBuilder.Entity<TitleCategory>()
+            .HasOne(c => c.Category)
+            .WithMany(t => t.Titles)
+            .HasForeignKey(c => c.CategoryId);
+            */
+    }
 }

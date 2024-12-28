@@ -17,8 +17,10 @@ public sealed class Title : BaseTitle
     [Column(TypeName = "VARCHAR")]
     [StringLength(200)]
     public required string FileName { get; set; }
-    
-    public ICollection<Edition>? Editions { get; init; }
-    
     public DateTime? LastWriteTime { get; set; }
+   
+    public ICollection<Screenshot>? Screenshots { get; set; }
+
+    public ICollection<Category>? Categories { get; set; }
+
 }

@@ -3,12 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NsxLibraryManager.Models.Titledb;
 
-public sealed class Language
+public sealed class Language : BaseLanguage
 {
-    public int Id { get; set; }
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(2)]
-    public string LanguageCode { get; set; }
+
     public ICollection<Region> Regions { get; } = [];
     public ICollection<Title> Titles { get; } = [];
 }

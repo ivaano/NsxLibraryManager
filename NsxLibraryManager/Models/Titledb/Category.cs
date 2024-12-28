@@ -4,14 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NsxLibraryManager.Models.Titledb;
 
-[PrimaryKey("Id")]
-public class Category
+public sealed class Category : BaseCategory
 {
-    public int Id { get; set; }
-    [Column(TypeName = "VARCHAR")]
-    [StringLength(30)]
-    public string Name { get; set; }
-    
-    public virtual ICollection<CategoryLanguage> Languages { get; set; }
+    public ICollection<CategoryLanguage> Languages { get; set; }
     public ICollection<Title> Titles { get; } = [];
 }

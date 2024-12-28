@@ -32,6 +32,7 @@
                     </HeaderTemplate>
                     <Columns>
                         <RadzenDataGridColumn TItem="TitleModel" Property="ApplicationId" Title="Title Id" Width="150px"/>
+                        <RadzenDataGridColumn TItem="TitleModel" Property="OtherApplicationId" Title="Other Application Id" Width="150px" Visible="false"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="TitleName" SortOrder="SortOrder.Ascending" Title="Name" Width="300px">
                             <Template Context="libraryTitle">
                                 <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" @onclick="_ => OpenDetails(libraryTitle)"/>
@@ -61,10 +62,11 @@
                         <RadzenDataGridColumn TItem="TitleModel" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="LastWriteTime" Title="Date Modified" FormatString="{0:d}" Width="110px"/>
                         <RadzenDataGridColumn TItem="TitleModel" Property="NumberOfPlayers" Title="Players" Width="50px" Visible="false"/>
-                        <RadzenDataGridColumn TItem="TitleModel" Property="UpdatesCount" Title="Available Version" Filterable="false" Width="50px"/>
-                        <RadzenDataGridColumn TItem="TitleModel" Property="OwnedUpdates" Title="Latest Update" Filterable="false" Width="50px" Sortable="false" />
-                        <RadzenDataGridColumn TItem="TitleModel" Property="DlcCount" Title="Available DLC Count" Filterable="false" Width="50px" Sortable="false" />
-                        <RadzenDataGridColumn TItem="TitleModel" Property="OwnedDlcs" Title="Owned DLC Count" Filterable="false" Width="50px" Sortable="false" />
+                        <RadzenDataGridColumn TItem="TitleModel" Property="LatestVersion" Title="Latest Version" Width="50px"/>
+                        <RadzenDataGridColumn TItem="TitleModel" Property="UpdatesCount" Title="Available Updates" Width="50px"/>
+                        <RadzenDataGridColumn TItem="TitleModel" Property="DlcCount" Title="Available DLC Count" Width="50px" Sortable="false" />
+                        <RadzenDataGridColumn TItem="TitleModel" Property="OwnedUpdates" Title="Owned Updates" Width="50px" Sortable="false" />
+                        <RadzenDataGridColumn TItem="TitleModel" Property="OwnedDlcs" Title="Owned DLC" Width="50px" Sortable="false" />
                     </Columns>
                 </RadzenDataGrid>
             </RadzenStack>
