@@ -3,5 +3,8 @@
 public class Category : BaseCategory
 {
     public virtual ICollection<CategoryLanguage> Languages { get; set; }
+    
+    public ICollection<TitleCategory> TitleCategories { get; set; }
+
     public ICollection<Title> Titles { get; } = [];
 }

@@ -21,6 +21,7 @@ public sealed class Title : BaseTitle
    
     public ICollection<Screenshot>? Screenshots { get; set; }
 
+    public ICollection<TitleCategory> TitleCategories { get; set; }
     public ICollection<Category>? Categories { get; set; }
 
 }

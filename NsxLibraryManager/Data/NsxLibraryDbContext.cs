@@ -48,7 +48,16 @@ public class NsxLibraryDbContext : DbContext
         modelBuilder.Entity<Title>()
             .HasMany(e => e.Categories)
             .WithMany(e => e.Titles)
-            .UsingEntity<TitleCategory>(); 
+            .UsingEntity<TitleCategory>(
+                j => j
+                    .HasOne(tc => tc.Category)
+                    .WithMany(c => c.TitleCategories)
+                    .HasForeignKey(tc => tc.CategoryId),
+                j => j
+                    .HasOne(tc => tc.Title)
+                    .WithMany(t => t.TitleCategories)
+                    .HasForeignKey(tc => tc.TitleId)
+            );
         
     }
 }
