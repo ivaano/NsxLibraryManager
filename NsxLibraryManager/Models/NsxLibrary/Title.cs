@@ -23,5 +23,4 @@ public sealed class Title : BaseTitle
 
     public ICollection<TitleCategory> TitleCategories { get; set; }
     public ICollection<Category>? Categories { get; set; }
-
 }

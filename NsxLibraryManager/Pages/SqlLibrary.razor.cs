@@ -10,7 +10,9 @@ using System.Linq.Dynamic.Core;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using Microsoft.EntityFrameworkCore;
-
+using NsxLibraryManager.Models.DTO;
+using NsxLibraryManager.Models.NsxLibrary;
+using NsxLibraryManager.Utils;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 
 namespace NsxLibraryManager.Pages;
@@ -32,9 +34,11 @@ public partial class SqlLibrary : IDisposable
     private static readonly string SettingsParamaterName = "SqlLibraryGridSettings";
 
     [CanBeNull] private DataGridSettings _settings;
-    private IEnumerable<TitleModel> _libraryTitles;
-    private RadzenDataGrid<TitleModel> _grid;
+    private IEnumerable<GridTitle> _libraryTitles;
+    private RadzenDataGrid<GridTitle> _grid;
 
+    private IEnumerable<string> _selectedCategories;
+    private IEnumerable<string> _categories;
     private int _selectedTabIndex;
     private string _libraryPath = string.Empty;
     private bool _isLoading;
@@ -44,6 +48,8 @@ public partial class SqlLibrary : IDisposable
     private int _count;
     private int _pageSize = 100;
     private string _lastUpdated;
+    private List<FilterDescriptor> categoryFilters = [];
+
     
     private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30, 50, 100];
     private DataGridSettings? Settings 
@@ -72,18 +78,17 @@ public partial class SqlLibrary : IDisposable
             await LoadStateAsync();
             await Task.Delay(1);
             await _grid.Reload();
-            //StateHasChanged();    
         }
     }
     
-    private Task InitialLoad()
+    private async Task InitialLoad()
     {
         _libraryPath = TitleLibraryService.GetLibraryPath();
-        CalculateCounts();
-        return Task.CompletedTask;
+        _categories = DbContext.Categories.Select(s => s.Name);
+        await CalculateCounts();
     }
 
-    private void CalculateCounts()
+    private Task CalculateCounts()
     {
         try
         {
@@ -100,38 +105,85 @@ public partial class SqlLibrary : IDisposable
             _patchCount = 0;
             _dlcCount = 0;
         }
+
+        return Task.CompletedTask;
+    }
+    
+    private async Task OnSelectedCategoriesChange(object value)
+    {
+        categoryFilters.RemoveAll(f => f.Property == "CategoryNames");
+
+        if (_selectedCategories?.Any() == true)
+        {
+            foreach (var selectedCategory in _selectedCategories)
+            {
+                categoryFilters.Add(new FilterDescriptor
+                {
+                    Property = "CategoryNames",
+                    FilterValue = selectedCategory,
+                    FilterOperator = FilterOperator.Contains
+                });
+            }
+        }
+        await _grid.Reload();
     }
 
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
         await Task.Yield();
-
-        var query = DbContext
-            .Titles
-            .Include(x => x.Categories)            
-            //.Include(c => c.Categories)
-            //.OrderBy(t => t.Categories.Min(c => c.Name))
-            .AsQueryable();
         
-        if (!string.IsNullOrEmpty(args.Filter))
+        var queryT = DbContext.Titles.Include(x => x.Categories).AsQueryable();
+        
+        if (categoryFilters.Count > 0)
         {
-            query = query.Where(args.Filter);
+            queryT = categoryFilters
+                .Aggregate(queryT, (current, filter) => current.Where(t => t.Categories.Any(c => c.Name.ToLower().Contains(filter.FilterValue.ToString().ToLower()))));
+        }
+        
+        var finalQuery = queryT.Select(t => new GridTitle
+        {
+            ApplicationId = t.ApplicationId,
+            Categories = t.Categories,
+            ContentType = t.ContentType,
+            DlcCount = t.DlcCount,
+            FileName = t.FileName,
+            Id = t.Id,
+            Intro = t.Intro,
+            IsDemo = t.IsDemo,
+            LastWriteTime = t.LastWriteTime,
+            LatestVersion = t.LatestVersion,
+            NsuId = t.NsuId,
+            NumberOfPlayers = t.NumberOfPlayers,
+            OtherApplicationId = t.OtherApplicationId,
+            OwnedDlcs = t.OwnedDlcs,
+            OwnedUpdates = t.OwnedUpdates,
+            PackageType = t.PackageType,
+            Publisher = t.Publisher,
+            Region = t.Region,
+            ReleaseDate = t.ReleaseDate,
+            Size = t.Size,
+            TitleName = t.TitleName,
+            UpdatesCount = t.UpdatesCount,
+            Version = t.Version,
+        });
+        
+        if (args.Filters.Any())
+        {
+            finalQuery = finalQuery.Where(FilterBuilder.BuildFilterString(args.Filters));
         }
 
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
-            query = query.OrderBy(args.OrderBy);
+            finalQuery = finalQuery.OrderBy(args.OrderBy);
         }
 
-        _count = query.Count();
+        _count = finalQuery.Count();
 
-        _libraryTitles = await Task.FromResult(
-            query.
-                Skip(args.Skip.Value).
-                Take(args.Top.Value).
-                ToList());
-
+        _libraryTitles = await finalQuery.
+            Skip(args.Skip.Value).
+            Take(args.Top.Value).ToListAsync();
+        
         _isLoading = false;
     }
     
