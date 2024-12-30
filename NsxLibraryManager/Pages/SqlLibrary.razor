@@ -67,24 +67,12 @@
                             </Template>
                         </RadzenDataGridColumn>
                         
-                        <RadzenDataGridColumn TItem="GridTitle" Property="Categories" FilterProperty="CategoryNames"  Title="Categories" Sortable="false" >
+                        <RadzenDataGridColumn TItem="GridTitle" Property="Categories" Sortable="false" Filterable="false">
                             <HeaderTemplate>
-                                <div class="d-flex align-items-center">
-                                    <span>Categories</span>
-                                    @if (_selectedCategories?.Any() == true)
-                                    {
-                                        <RadzenIcon Icon="filter_list" Style="color: var(--rz-secondary); margin-left: 8px;" />
-                                    }
-                                    else
-                                    {
-                                        <RadzenIcon Icon="filter_list" Style="color: var(--rz-text-tertiary); margin-left: 8px;" />
-                                    }
-                                </div>
-                            </HeaderTemplate>
-                            <FilterTemplate>
                                 <RadzenDropDown @bind-Value="@_selectedCategories" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Category" }})"
                                                 Change=@OnSelectedCategoriesChange Data="@(_categories)" AllowClear="true" Multiple="true" />
-                            </FilterTemplate>
+                            </HeaderTemplate>
+
                             <Template>
                                 @if (context.Categories != null)
                                 {

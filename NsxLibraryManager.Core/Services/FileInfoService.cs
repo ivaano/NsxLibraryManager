@@ -170,17 +170,17 @@ public class FileInfoService : IFileInfoService
         return iconUri;
     }
     
-    public async Task<LibraryTitle?> GetFileInfo(string filePath, bool detailed)
+    public Task<LibraryTitle> GetFileInfo(string filePath, bool detailed)
     {
         PackageInfo packageInfo;
         try
         {
             packageInfo = _packageInfoLoader.GetPackageInfo(filePath, detailed);
         } 
-        catch (Exception e)
+        catch (Exception)
         {
             _logger.LogError("Error getting package info from file {filePath}", filePath);
-            return null;
+            throw new Exception($"Error getting package info from file {filePath}");
         }
 
         if (packageInfo.Contents is null)
@@ -210,7 +210,7 @@ public class FileInfoService : IFileInfoService
                 _ => title.Type
         };
 
-        return title;
+        return Task.FromResult(title);
     }
 
 }
