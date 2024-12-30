@@ -3,7 +3,7 @@ using NsxLibraryManager.Core.Settings;
 
 namespace NsxLibraryManager.Core.Validators;
 
-public class RenamerSettingsValidator : AbstractValidator<RenamerSettings>
+public class RenamerSettingsValidator : AbstractValidator<PackageRenamerSettings>
 {
     public RenamerSettingsValidator()
     {

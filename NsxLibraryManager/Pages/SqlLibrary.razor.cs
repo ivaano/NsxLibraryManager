@@ -11,7 +11,6 @@ using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Models.DTO;
-using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Utils;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 

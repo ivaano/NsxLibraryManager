@@ -4,7 +4,7 @@ namespace NsxLibraryManager.Core.Repository.Interface;
 
 public interface ISettingsRepository
 {
-    public RenamerSettings LoadRenamerSettings();
+    public PackageRenamerSettings LoadRenamerSettings();
     
-    public RenamerSettings SaveRenamerSettings(RenamerSettings settings);
+    public PackageRenamerSettings SaveRenamerSettings(PackageRenamerSettings settings);
 }

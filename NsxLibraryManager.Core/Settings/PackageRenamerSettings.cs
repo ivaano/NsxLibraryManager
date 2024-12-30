@@ -2,7 +2,7 @@
 
 namespace NsxLibraryManager.Core.Settings;
 
-public class RenamerSettings
+public class PackageRenamerSettings
 {
     public string InputPath { get; set; } = string.Empty;
     public bool Recursive { get; set; } = true;

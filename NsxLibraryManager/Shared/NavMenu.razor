@@ -12,8 +12,9 @@
     <RadzenPanelMenuItem Visible="@_initialConfig" Text="Sql Library" Icon="library_books" Path="sqllibrary"/>
     <RadzenPanelMenuItem Visible="@_initialConfig" Text="Sql Title DB" Icon="archive" Path="sqltitledb"/>
     <RadzenPanelMenuItem Visible="@_initialConfig" Text="Title DB" Icon="archive" Path="titledb"/>
-    <RadzenPanelMenuItem Visible="@_initialConfig" Text="Maintenance" Icon="engineering">
-        <RadzenPanelMenuItem Text="Rename Files" Icon="drive_file_move" Path="renamer"/>
+    <RadzenPanelMenuItem Visible="@_initialConfig" Text="File Organizer" Icon="engineering">
+        <RadzenPanelMenuItem Text="By Package Type" Icon="drive_file_move" Path="packageRenamer"/>
+        <RadzenPanelMenuItem Text="By Bundle" Icon="drive_file_move" Path="bundleRenamer"/>
         <RadzenPanelMenuItem Visible="false" Text="Cleaner" Icon="cleaning_services" Path="cleaner"/>
     </RadzenPanelMenuItem>
     <RadzenPanelMenuItem Text="Settings" Icon="settings" Path="settings"/>

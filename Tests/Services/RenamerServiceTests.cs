@@ -14,13 +14,13 @@ public class RenamerServiceTests
     private readonly RenamerService _renamerService;
     private readonly IFileInfoService _fileInfoService = Substitute.For<IFileInfoService>();
     private readonly IDataService _dataService = Substitute.For<IDataService>();
-    private readonly IValidator<RenamerSettings> _validator = Substitute.For<IValidator<RenamerSettings>>();
+    private readonly IValidator<PackageRenamerSettings> _validator = Substitute.For<IValidator<PackageRenamerSettings>>();
     private readonly ILogger<RenamerService> _logger = Substitute.For<ILogger<RenamerService>>();
     private readonly ITitleDbService _titleDbService = Substitute.For<ITitleDbService>();
     
     public RenamerServiceTests()
     {
-        _renamerService = new RenamerService(_logger, _dataService, _validator, _fileInfoService, _titleDbService);
+        _renamerService = new RenamerService(_logger, _validator, _fileInfoService, _titleDbService);
     }
     
     
@@ -38,7 +38,7 @@ public class RenamerServiceTests
             FileName = "filetest.nsp"
         };
         _fileInfoService.GetFileInfo(filePath, false).Returns(fileInfo);
-        var settings = new RenamerSettings
+        var settings = new PackageRenamerSettings
         {
             OutputBasePath = "/home/user/test",
             NspBasePath = "{BasePath}/base/{TitleName}.{Extension}",
@@ -48,7 +48,7 @@ public class RenamerServiceTests
         _dataService.GetRenamerSettings().Returns(settings);
 
         // Act
-        await _renamerService.LoadRenamerSettingsAsync();
+        await _renamerService.LoadRenamerSettingsAsync(settings);
         var result = await _renamerService.BuildNewFileNameAsync(fileInfo, filePath);
 
         // Assert

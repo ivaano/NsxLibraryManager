@@ -6,6 +6,6 @@ namespace NsxLibraryManager.Models.Titledb;
 
 public sealed class Category : BaseCategory
 {
-    public ICollection<CategoryLanguage> Languages { get; set; }
+    public ICollection<CategoryLanguage> Languages { get; set; } = null!;
     public ICollection<Title> Titles { get; } = [];
 }

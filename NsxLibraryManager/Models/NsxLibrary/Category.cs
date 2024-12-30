@@ -1,10 +1,10 @@
 ﻿namespace NsxLibraryManager.Models.NsxLibrary;
 
-public class Category : BaseCategory
+public sealed class Category : BaseCategory
 {
-    public virtual ICollection<CategoryLanguage> Languages { get; set; }
-    
-    public ICollection<TitleCategory> TitleCategories { get; set; }
+    public ICollection<CategoryLanguage> Languages { get; set; } = null!;
+
+    public ICollection<TitleCategory> TitleCategories { get; set; } = null!;
 
     public ICollection<Title> Titles { get; } = [];
 }

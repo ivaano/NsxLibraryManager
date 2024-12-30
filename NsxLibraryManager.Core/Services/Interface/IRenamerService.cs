@@ -9,8 +9,7 @@ public interface IRenamerService
     Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(string filePath, bool recursive = false);
     Task<string> BuildNewFileNameAsync(LibraryTitle fileInfo, string filePath);
     Task<string> CalculateSampleFileName(string templateText, PackageTitleType type, string inputFile, string basePath);
-    Task<RenamerSettings> SaveRenamerSettingsAsync(RenamerSettings settings);
-    Task<RenamerSettings> LoadRenamerSettingsAsync();
+    Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings);
     Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename);
-    Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(RenamerSettings settings);
+    Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings);
 }

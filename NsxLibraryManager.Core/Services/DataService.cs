@@ -226,12 +226,12 @@ public class DataService : IDataService
         return stats;
     }
     
-    public RenamerSettings SaveRenamerSettings(RenamerSettings settings)
+    public PackageRenamerSettings SaveRenamerSettings(PackageRenamerSettings settings)
     {
         return _settingsRepository.SaveRenamerSettings(settings);
     }
 
-    public RenamerSettings GetRenamerSettings()
+    public PackageRenamerSettings GetRenamerSettings()
     {
         return _settingsRepository.LoadRenamerSettings();
     }

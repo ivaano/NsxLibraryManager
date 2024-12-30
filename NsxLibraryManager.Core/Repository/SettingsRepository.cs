@@ -21,7 +21,7 @@ public sealed class SettingsRepository : BaseRepository<Models.Settings>, ISetti
         return Collection.Find(o => o.Name == entity.Name).FirstOrDefault() ?? throw new InvalidOperationException();
     }
 
-    public RenamerSettings SaveRenamerSettings(RenamerSettings settings)
+    public PackageRenamerSettings SaveRenamerSettings(PackageRenamerSettings settings)
     {
         var renamerSettings = Collection.FindOne(o => o.Name == AppConstants.RenamerSettingsName);
         renamerSettings.Value = System.Text.Json.JsonSerializer.Serialize(settings);
@@ -29,14 +29,14 @@ public sealed class SettingsRepository : BaseRepository<Models.Settings>, ISetti
         return LoadRenamerSettings();
     }
 
-    public RenamerSettings LoadRenamerSettings()
+    public PackageRenamerSettings LoadRenamerSettings()
     {
         var renamerSettings = Collection.FindOne(o => o.Name == AppConstants.RenamerSettingsName) 
-                              ?? new Models.Settings { Name = AppConstants.RenamerSettingsName, Value = System.Text.Json.JsonSerializer.Serialize(new RenamerSettings()) };
+                              ?? new Models.Settings { Name = AppConstants.RenamerSettingsName, Value = System.Text.Json.JsonSerializer.Serialize(new PackageRenamerSettings()) };
 
         if (renamerSettings.Id == 0)
             Create(renamerSettings);
 
-        return System.Text.Json.JsonSerializer.Deserialize<RenamerSettings>(renamerSettings.Value) ?? new RenamerSettings();        
+        return System.Text.Json.JsonSerializer.Deserialize<PackageRenamerSettings>(renamerSettings.Value) ?? new PackageRenamerSettings();        
     }
 }

@@ -13,30 +13,27 @@ namespace NsxLibraryManager.Core.Services;
 public class RenamerService : IRenamerService
 {
     private readonly ILogger<RenamerService> _logger;
-    private RenamerSettings _settings = default!;
-    private readonly IDataService _dataService;
-    private readonly IValidator<RenamerSettings> _validator;
+    private PackageRenamerSettings _settings = default!;
+    private readonly IValidator<PackageRenamerSettings> _validator;
     private readonly IFileInfoService _fileInfoService;
     private readonly ITitleDbService _titleDbService;
 
     public RenamerService(ILogger<RenamerService> logger,
-        IDataService dataService,
-        IValidator<RenamerSettings> validator,
+        IValidator<PackageRenamerSettings> validator,
         IFileInfoService fileInfoService, ITitleDbService titleDbService)
     {
         _logger = logger;
-        _dataService = dataService;
         _validator = validator;
         _fileInfoService = fileInfoService;
         _titleDbService = titleDbService;
     }
-    
-    public static char[] GetInvalidAdditionalChars() => new char[]
-    {
-        '™', '©', '®', '~', '#', '%', '&'
-    };
-    
-    public static string RemoveIllegalCharacters(string input)
+
+    private static char[] GetInvalidAdditionalChars() =>
+    [
+        '™', '©', '®', '~', '#', '%', '&', ':'
+    ];
+
+    private static string RemoveIllegalCharacters(string input)
     {
         var invalidChars = Path.GetInvalidFileNameChars()
             .Union(Path.GetInvalidPathChars())
@@ -298,19 +295,13 @@ public class RenamerService : IRenamerService
         return await TemplateReplaceAsync(templateText, fileInfo);
     }
 
-    public Task<RenamerSettings> SaveRenamerSettingsAsync(RenamerSettings settings)
+    public Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings)
     {
         _settings = settings;
-        return Task.FromResult(_dataService.SaveRenamerSettings(settings));
-    }
-
-    public Task<RenamerSettings> LoadRenamerSettingsAsync()
-    {
-        _settings = _dataService.GetRenamerSettings();
         return Task.FromResult(_settings);
     }
 
-    public async Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(RenamerSettings settings)
+    public async Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)
     {
         var validationResult = await _validator.ValidateAsync(settings);
         return validationResult;

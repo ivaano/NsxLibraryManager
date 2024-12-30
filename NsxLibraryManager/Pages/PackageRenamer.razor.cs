@@ -7,12 +7,13 @@ using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Services.Interface;
 using Radzen;
 using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class Renamer
+public partial class PackageRenamer
 {
     [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
 
@@ -22,6 +23,8 @@ public partial class Renamer
 
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
+    [Inject] private ISettingsService SettingsService { get; set; } = default!;
+    
     [Inject] private DialogService DialogService { get; set; } = default!;
     
     private const Variant Variant = Radzen.Variant.Outlined;
@@ -41,7 +44,7 @@ public partial class Renamer
     };
 
     private bool _fragmentButtonDisabled = true;
-    private RenamerSettings _settings = default!;
+    private PackageRenamerSettings _settings = default!;
     private IEnumerable<RenameTitle> _renameTitles = default!;
     private RadzenDataGrid<RenameTitle> _renameGrid = default!;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    
@@ -105,7 +108,8 @@ public partial class Renamer
 
     private async Task InitializeSettings()
     {
-        _settings = await RenamerService.LoadRenamerSettingsAsync();
+        _settings = await SettingsService.GetPackageRenamerSettings();
+        _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
 
         _templateFields[PackageTitleType.NspBase].Value = _settings.NspBasePath;
         _templateFields[PackageTitleType.NspDlc].Value = _settings.NspDlcPath;
@@ -219,8 +223,7 @@ public partial class Renamer
         var isValid = await ValidateConfiguration();
         if (!isValid)
             return;
-        var savedSettings = await RenamerService.SaveRenamerSettingsAsync(_settings);
-
+        var savedSettings = await SettingsService.SavePackageRenamerSettings(_settings);
         var notificationMessage = new NotificationMessage
         {
             Severity = NotificationSeverity.Success,

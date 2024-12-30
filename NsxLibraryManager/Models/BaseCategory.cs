@@ -12,5 +12,5 @@ public class BaseCategory
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(30)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 }

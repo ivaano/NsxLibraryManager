@@ -17,6 +17,7 @@ public class NsxLibraryDbContext : DbContext
     public DbSet<Screenshot> Screenshots { get; set; }
 
     public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
+    public DbSet<Settings> Settings { get; set; }
 
 
     public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<AppSettings> configuration) :

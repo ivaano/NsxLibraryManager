@@ -30,8 +30,8 @@ public interface IDataService : IDisposable
     public ContentDistribution GetContentDistribution();
     public PackageDistribution GetPackageDistribution();
     public LibraryStats GetLibraryTitlesStats();
-    public RenamerSettings GetRenamerSettings();
-    public RenamerSettings SaveRenamerSettings(RenamerSettings settings);
+    public PackageRenamerSettings GetRenamerSettings();
+    public PackageRenamerSettings SaveRenamerSettings(PackageRenamerSettings settings);
     //public Task SaveDataGridStateAsync(string name, DataGridSettings settings);
 
     //public Task<DataGridSettings?> LoadDataGridStateAsync(string name);
