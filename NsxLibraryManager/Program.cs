@@ -72,7 +72,7 @@ if (validatorResult.valid)
     builder.Services.AddTransient<ISqlTitleLibraryService, SqlTitleLibraryService>();
     builder.Services.AddTransient<ISettingsService, SettingsService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
-    builder.Services.AddScoped<IRenamerService, RenamerService>();
+    builder.Services.AddScoped<ISqlRenamerService, SqlRenamerService>();
     builder.Services.AddScoped<IValidator<PackageRenamerSettings>, RenamerSettingsValidator>();    
     builder.Services.AddScoped<IValidator<AppSettings>, ConfigValidator>();    
 }

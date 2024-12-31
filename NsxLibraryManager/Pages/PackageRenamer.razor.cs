@@ -19,7 +19,7 @@ public partial class PackageRenamer
 
     [Inject] private TooltipService TooltipService { get; set; } = default!;
 
-    [Inject] private IRenamerService RenamerService { get; set; } = default!;
+    [Inject] private ISqlRenamerService RenamerService { get; set; } = default!;
 
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
