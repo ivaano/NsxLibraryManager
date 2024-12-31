@@ -91,6 +91,10 @@
                                     />
                                 </RadzenFormField>                                
                             </RenamerFieldSet>
+                            <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
+                                <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Success" Click="@ValidateConfiguration" class="rz-ripple">Validate Configuration</RadzenButton>
+                                <RadzenButton Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+                            </RadzenRow>
                         </RadzenColumn>
                         <RadzenColumn Size="12" SizeSM="6">
                             <RenamerFieldSet Text="Template Fields">
@@ -154,9 +158,24 @@
                                     </RadzenColumn>                                    
                                 </RadzenRow>
                             </RenamerFieldSet>
+                            <RenamerFieldSet Text="@_sampleResultLabel">
+                                <RadzenRow Gap="0.1rem">
+                                    <RadzenColumn Size="1">Before:</RadzenColumn>
+                                    <RadzenColumn Size="11">
+                                        <RadzenText Style="font-family: monospace; font-size: .7rem" Text="@_sampleBefore"/>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                                <RadzenRow Gap="0.1rem">
+                                    <RadzenColumn Size="1">After:</RadzenColumn>
+                                    <RadzenColumn Size="11">
+                                        <RadzenText Style="font-family: monospace; font-size: .7rem" Text="@_sampleAfter"/>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RenamerFieldSet>
                         </RadzenColumn>
                     </RadzenRow>
                 </RenamerFieldSet>
+
             </RadzenStack>
         </RadzenTabsItem>
     </Tabs>
