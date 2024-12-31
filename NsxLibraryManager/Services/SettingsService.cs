@@ -19,11 +19,25 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext) : ISetting
             .Deserialize<PackageRenamerSettings>(renamerSettings.Value) ?? new PackageRenamerSettings();        
     }
     
+    private static BundleRenamerSettings MapToBundleRenamerSettings(Settings renamerSettings)
+    {
+        return System.Text.Json.JsonSerializer
+            .Deserialize<BundleRenamerSettings>(renamerSettings.Value) ?? new BundleRenamerSettings();        
+    }
+    
+    public async Task<BundleRenamerSettings> GetBundleRenamerSettings()
+    {
+        var setttings = await _nsxLibraryDbContext.Settings
+            .FirstOrDefaultAsync(c => c.Setting == Core.Enums.Settings.RenameBundle);
+        
+        return setttings == null ? new BundleRenamerSettings() : 
+            MapToBundleRenamerSettings(setttings);
+    }
+    
     public async Task<PackageRenamerSettings> GetPackageRenamerSettings()
     {
         var setttings = await _nsxLibraryDbContext.Settings
             .FirstOrDefaultAsync(c => c.Setting == Core.Enums.Settings.RenameType);
-            //.FirstOrDefaultAsync(c => c.Setting == Core.Enums.Settings.RenameType);
         
         return setttings == null ? new PackageRenamerSettings() : 
             MapToPackageRenamerSettings(setttings);
