@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Services.Interface;
-using Radzen;
 using Settings = NsxLibraryManager.Models.NsxLibrary.Settings;
 
 namespace NsxLibraryManager.Services;
@@ -12,60 +10,52 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext) : ISetting
 {
     private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
 
-
-    private static PackageRenamerSettings MapToPackageRenamerSettings(Settings renamerSettings)
+    private static T MapToSettings<T>(Settings settings) where T : new()
     {
-        return System.Text.Json.JsonSerializer
-            .Deserialize<PackageRenamerSettings>(renamerSettings.Value) ?? new PackageRenamerSettings();        
-    }
-    
-    private static BundleRenamerSettings MapToBundleRenamerSettings(Settings renamerSettings)
-    {
-        return System.Text.Json.JsonSerializer
-            .Deserialize<BundleRenamerSettings>(renamerSettings.Value) ?? new BundleRenamerSettings();        
-    }
-    
-    public async Task<BundleRenamerSettings> GetBundleRenamerSettings()
-    {
-        var setttings = await _nsxLibraryDbContext.Settings
-            .FirstOrDefaultAsync(c => c.Setting == Core.Enums.Settings.RenameBundle);
-        
-        return setttings == null ? new BundleRenamerSettings() : 
-            MapToBundleRenamerSettings(setttings);
-    }
-    
-    public async Task<PackageRenamerSettings> GetPackageRenamerSettings()
-    {
-        var setttings = await _nsxLibraryDbContext.Settings
-            .FirstOrDefaultAsync(c => c.Setting == Core.Enums.Settings.RenameType);
-        
-        return setttings == null ? new PackageRenamerSettings() : 
-            MapToPackageRenamerSettings(setttings);
+        return System.Text.Json.JsonSerializer.Deserialize<T>(settings.Value) ?? new T();
     }
 
-    public async Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings packageRenamerSettings)
-    { 
-        var serializedSettings = System.Text.Json.JsonSerializer.Serialize(packageRenamerSettings);
-        
-        var setttings = await _nsxLibraryDbContext.Settings
-            .FirstOrDefaultAsync(c => c.Setting == Core.Enums.Settings.RenameType);
+    private async Task<T> GetSettings<T>(Core.Enums.Settings settingType) where T : new()
+    {
+        var settings = await _nsxLibraryDbContext.Settings
+            .FirstOrDefaultAsync(c => c.Setting == settingType);
 
-        if (setttings is null)
+        return settings is not null ? MapToSettings<T>(settings) : new T();
+    }
+    
+    private async Task<T> SaveSettings<T>(T settings, Core.Enums.Settings settingType)
+    {
+        var serializedSettings = System.Text.Json.JsonSerializer.Serialize(settings);
+        var existingSettings = await _nsxLibraryDbContext.Settings
+            .FirstOrDefaultAsync(c => c.Setting == settingType);
+
+        if (existingSettings is null)
         {
-            var settingsInDb = new Settings
+            _nsxLibraryDbContext.Settings.Add(new Settings
             {
-                Setting = Core.Enums.Settings.RenameType,
+                Setting = settingType,
                 Value = serializedSettings
-            };
-            _nsxLibraryDbContext.Settings.Add(settingsInDb);
-
+            });
         }
         else
         {
-            setttings.Value = serializedSettings;
+            existingSettings.Value = serializedSettings;
         }
-        
+
         await _nsxLibraryDbContext.SaveChangesAsync();
-        return packageRenamerSettings;
+        return settings;
     }
+
+    public Task<BundleRenamerSettings> GetBundleRenamerSettings() =>
+        GetSettings<BundleRenamerSettings>(Core.Enums.Settings.RenameBundle);
+
+    public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
+        GetSettings<PackageRenamerSettings>(Core.Enums.Settings.RenameType);
+    
+    public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings settings) =>
+        SaveSettings(settings, Core.Enums.Settings.RenameBundle);
+
+    public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings settings) =>
+        SaveSettings(settings, Core.Enums.Settings.RenameType);
+
 }

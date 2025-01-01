@@ -71,11 +71,11 @@ public partial class BundleRenamer : ComponentBase
     private async Task InitializeSettings()
     {
         _settings = await SettingsService.GetBundleRenamerSettings();
-        //_ = await RenamerService.LoadRenamerSettingsAsync(_settings);
+        _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
 
-        _templateFields[PackageTitleType.NspBase].Value = _settings.BasePath;
-        _templateFields[PackageTitleType.NspDlc].Value = _settings.DlcPath;
-        _templateFields[PackageTitleType.NspUpdate].Value = _settings.UpdatePath;
+        _templateFields[PackageTitleType.BundleBase].Value = _settings.BundleBase;
+        _templateFields[PackageTitleType.BundleDlc].Value = _settings.BundleDlc;
+        _templateFields[PackageTitleType.BundleUpdate].Value = _settings.BundleUpdate;
     }
     
     private async Task ShowLoading()
@@ -89,18 +89,9 @@ public partial class BundleRenamer : ComponentBase
     {
         var textBoxTypes = new[]
         {
-            PackageTitleType.NspBase,
-            PackageTitleType.NspDlc,
-            PackageTitleType.NspUpdate,
-            PackageTitleType.NszBase,
-            PackageTitleType.NszDlc,
-            PackageTitleType.NszUpdate,
-            PackageTitleType.XciBase,
-            PackageTitleType.XciDlc,
-            PackageTitleType.XciUpdate,
-            PackageTitleType.XczBase,
-            PackageTitleType.XczDlc,
-            PackageTitleType.XczUpdate
+            PackageTitleType.BundleBase,
+            PackageTitleType.BundleDlc,
+            PackageTitleType.BundleUpdate,
         };
 
         foreach (var textBoxType in textBoxTypes)
@@ -154,6 +145,22 @@ public partial class BundleRenamer : ComponentBase
         TooltipService.Open(elementReference, content, options);
     }
     
+    private async Task OnTemplateFieldInput(PackageTitleType type, string? value)
+    {
+        if (value is not null)
+        {
+            _templateFields[type].Value = value;
+            await TemplateTextboxUpdateNew(type);
+            await UpdateSampleBox(_currentPackageTitle, value);
+        }
+    }
+    
+    private async Task OnTemplateFieldClick(PackageTitleType type, MouseEventArgs args)
+    {
+        await TemplateTextboxUpdateNew(type);
+        await UpdateSampleBox(_currentPackageTitle, _templateFields[_currentPackageTitle].Value);
+    }
+    
     private void UpdateTemplateFieldRecord(TemplateField templateField, PackageTitleType type)
     {
         var templateFieldInfo = _templateFields[_currentPackageTitle];
@@ -170,7 +177,7 @@ public partial class BundleRenamer : ComponentBase
     
     private async Task UpdateSampleBox(PackageTitleType type, string templateValue)
     {
-        _sampleBefore = $"c:\\dump\\lucas-game.nsp";
+        _sampleBefore = $"{_settings.InputPath}{Path.DirectorySeparatorChar}lucas-game.nsp";
         _sampleAfter = await RenamerService.CalculateSampleFileName(templateValue, type, "inputFile.nsp", "basePath");
     }
     
@@ -200,9 +207,36 @@ public partial class BundleRenamer : ComponentBase
         }
     }
 
-    private Task<bool> ValidateConfiguration()
+    private async Task<bool> ValidateConfiguration()
     {
-        return Task.FromResult(true);
+        Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
+        var validationResult = await RenamerService.ValidateRenamerSettingsAsync(_settings);
+
+        var notificationMessage = new NotificationMessage
+        {
+            Severity = validationResult.IsValid ? NotificationSeverity.Success : NotificationSeverity.Error,
+            Summary = validationResult.IsValid ? "Success Validation" : "Validation Failed",
+            Detail = validationResult.IsValid ? "All good!" : "Please check the fields!",
+            Duration = 4000
+        };
+        
+        if (!validationResult.IsValid)
+        {
+            foreach (var failure in validationResult.Errors)
+            {
+                _validationErrors[failure.PropertyName] =
+                    _validationErrors.TryGetValue(failure.PropertyName, out var value)
+                        ? $"{value} {failure.ErrorMessage}"
+                        : failure.ErrorMessage;
+            }
+        }
+        
+        _settings.BundleBase = _templateFields[PackageTitleType.BundleBase].Value;
+        _settings.BundleDlc = _templateFields[PackageTitleType.BundleDlc].Value;
+        _settings.BundleUpdate = _templateFields[PackageTitleType.BundleUpdate].Value;
+
+        NotificationService.Notify(notificationMessage);
+        return validationResult.IsValid;
     }
 
     private async Task SaveConfiguration()
@@ -210,7 +244,7 @@ public partial class BundleRenamer : ComponentBase
         var isValid = await ValidateConfiguration();
         if (!isValid)
             return;
-        //var savedSettings = await SettingsService.SavePackageRenamerSettings(_settings);
+        var savedSettings = await SettingsService.SaveBundleRenamerSettings(_settings);
         var notificationMessage = new NotificationMessage
         {
             Severity = NotificationSeverity.Success,

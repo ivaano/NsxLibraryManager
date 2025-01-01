@@ -16,14 +16,17 @@ namespace NsxLibraryManager.Services;
 public class SqlRenamerService(
     TitledbDbContext titledbDbContext, 
     IValidator<PackageRenamerSettings> validator,
+    IValidator<BundleRenamerSettings> validatorBundle,
     IFileInfoService fileInfoService,
     ILogger<SqlRenamerService> logger)
     : ISqlRenamerService
 {
     private readonly TitledbDbContext _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
     private readonly IValidator<PackageRenamerSettings> _validator = validator;
+    private readonly IValidator<BundleRenamerSettings> _validatorBundle = validatorBundle;
     private readonly IFileInfoService _fileInfoService = fileInfoService;
-    private PackageRenamerSettings _settings = null!;
+    private PackageRenamerSettings _packageRenamerSettings = null!;
+    private BundleRenamerSettings _bundleRenamerSettings = null!;
     private readonly ILogger<SqlRenamerService> _logger = logger;
     private static char[] GetInvalidAdditionalChars() =>
     [
@@ -106,7 +109,7 @@ public class SqlRenamerService(
             
             var replacement = key switch
             {
-                TemplateField.BasePath  => _settings.OutputBasePath,
+                TemplateField.BasePath  => _packageRenamerSettings.OutputBasePath,
                 TemplateField.TitleName => safeTitleName,
                 TemplateField.TitleId   => fileInfo.TitleId,
                 TemplateField.Version   => fileInfo.TitleVersion.ToString(),
@@ -201,30 +204,30 @@ public class SqlRenamerService(
         {
             AccuratePackageType.NSP => fileInfo.Type switch
             {
-                TitleLibraryType.Base   => _settings.NspBasePath,
-                TitleLibraryType.Update => _settings.NspUpdatePath,
-                TitleLibraryType.DLC    => _settings.NspDlcPath,
+                TitleLibraryType.Base   => _packageRenamerSettings.NspBasePath,
+                TitleLibraryType.Update => _packageRenamerSettings.NspUpdatePath,
+                TitleLibraryType.DLC    => _packageRenamerSettings.NspDlcPath,
                 _                       => string.Empty
             },
             AccuratePackageType.NSZ => fileInfo.Type switch
             {
-                TitleLibraryType.Base   => _settings.NszBasePath,
-                TitleLibraryType.Update => _settings.NszUpdatePath,
-                TitleLibraryType.DLC    => _settings.NszDlcPath,
+                TitleLibraryType.Base   => _packageRenamerSettings.NszBasePath,
+                TitleLibraryType.Update => _packageRenamerSettings.NszUpdatePath,
+                TitleLibraryType.DLC    => _packageRenamerSettings.NszDlcPath,
                 _                       => string.Empty
             },
             AccuratePackageType.XCI => fileInfo.Type switch
             {
-                TitleLibraryType.Base   => _settings.XciBasePath,
-                TitleLibraryType.Update => _settings.XciUpdatePath,
-                TitleLibraryType.DLC    => _settings.XciDlcPath,
+                TitleLibraryType.Base   => _packageRenamerSettings.XciBasePath,
+                TitleLibraryType.Update => _packageRenamerSettings.XciUpdatePath,
+                TitleLibraryType.DLC    => _packageRenamerSettings.XciDlcPath,
                 _                       => string.Empty
             },
             AccuratePackageType.XCZ => fileInfo.Type switch
             {
-                TitleLibraryType.Base   => _settings.XczBasePath,
-                TitleLibraryType.Update => _settings.XczUpdatePath,
-                TitleLibraryType.DLC    => _settings.XczDlcPath,
+                TitleLibraryType.Base   => _packageRenamerSettings.XczBasePath,
+                TitleLibraryType.Update => _packageRenamerSettings.XczUpdatePath,
+                TitleLibraryType.DLC    => _packageRenamerSettings.XczDlcPath,
                 _                       => string.Empty
             },
             _ => throw new Exception("Unknown package type")
@@ -234,13 +237,17 @@ public class SqlRenamerService(
 
     }
 
-    public async Task<string> CalculateSampleFileName(string templateText, PackageTitleType packageType, string inputFile, string basePath)
+    public async Task<string> CalculateSampleFileName(string templateText, 
+        PackageTitleType packageType, string inputFile, string basePath)
     {
         var libraryType = packageType switch
         {
             PackageTitleType.NspBase   => TitleLibraryType.Base,
             PackageTitleType.NspUpdate => TitleLibraryType.Update,
             PackageTitleType.NspDlc    => TitleLibraryType.DLC,
+            PackageTitleType.BundleBase => TitleLibraryType.Base,
+            PackageTitleType.BundleUpdate => TitleLibraryType.Update,
+            PackageTitleType.BundleDlc    => TitleLibraryType.DLC,
             _                          => TitleLibraryType.Unknown
         };
         
@@ -260,8 +267,14 @@ public class SqlRenamerService(
 
     public Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings)
     {
-        _settings = settings;
-        return Task.FromResult(_settings);
+        _packageRenamerSettings = settings;
+        return Task.FromResult(_packageRenamerSettings);
+    }
+
+    public Task<BundleRenamerSettings> LoadRenamerSettingsAsync(BundleRenamerSettings settings)
+    {
+        _bundleRenamerSettings = settings;
+        return Task.FromResult(_bundleRenamerSettings);
     }
 
     public Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename)
@@ -305,9 +318,15 @@ public class SqlRenamerService(
         return Task.FromResult(renamedFiles.AsEnumerable());
     }
 
-    public async Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)
+    public async Task<ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)
     {
         var validationResult = await _validator.ValidateAsync(settings);
+        return validationResult;
+    }
+    
+    public async Task<ValidationResult> ValidateRenamerSettingsAsync(BundleRenamerSettings settings)
+    {
+        var validationResult = await _validatorBundle.ValidateAsync(settings);
         return validationResult;
     }
 }

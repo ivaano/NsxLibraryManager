@@ -73,19 +73,20 @@
                                     </Helper>
                                 </RadzenFormField>
                                 <RadzenFormField Text="Application" Variant="@Variant" Style="width: 100%; padding: 1px">
-                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.NspBase].Value" id="NspBase" Name="NspBase"
+                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.BundleBase].Value" id="BundleBase" Name="BundleBase"
                                                    Style="font-family: monospace;"
-                                                   
+                                                   @oninput="@(args => OnTemplateFieldInput(PackageTitleType.BundleBase, args.Value?.ToString()))"
+                                                   @onclick="@(args => OnTemplateFieldClick(PackageTitleType.BundleBase, args))"
                                     />
                                 </RadzenFormField>
                                 <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
-                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.NspUpdate].Value" id="NspUpdate" Name="NspUpdate"
+                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.BundleUpdate].Value" id="BundleUpdate" Name="BundleUpdate"
                                                    Style="font-family: monospace;"
 
                                     />
                                 </RadzenFormField>
                                 <RadzenFormField Text="DLCs" Variant="@Variant" Style="width: 100%; padding: 1px">
-                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.NspDlc].Value" id="NspDlc" Name="NspDlc"
+                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.BundleDlc].Value" id="BundleDlc" Name="BundleDlc"
                                                    Style="font-family: monospace;"
 
                                     />

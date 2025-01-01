@@ -8,5 +8,6 @@ public interface ISettingsService
     public Task<BundleRenamerSettings> GetBundleRenamerSettings();
     public Task<PackageRenamerSettings> GetPackageRenamerSettings();
     public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings packageRenamerSettings);
+    public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings bundleRenamerSettings);
 
 }

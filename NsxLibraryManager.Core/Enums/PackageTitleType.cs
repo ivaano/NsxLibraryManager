@@ -14,5 +14,8 @@ public enum PackageTitleType
     XciUpdate,
     XczBase,
     XczDlc,
-    XczUpdate
+    XczUpdate,
+    BundleBase,
+    BundleUpdate,
+    BundleDlc,
 }
