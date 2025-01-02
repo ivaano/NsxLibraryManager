@@ -11,6 +11,7 @@ public interface ISqlRenamerService
     Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings);
     Task<BundleRenamerSettings> LoadRenamerSettingsAsync(BundleRenamerSettings settings);
     Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename);
+    Task<bool> DeleteEmptyFoldersAsync(string sourceFolder);
     Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings);
     Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(BundleRenamerSettings settings);
 }

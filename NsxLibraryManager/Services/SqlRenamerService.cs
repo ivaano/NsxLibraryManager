@@ -74,11 +74,7 @@ public class SqlRenamerService(
             _logger.LogError("Error building new file name for {file} - {message}", file, "File already exists");
             return Task.FromResult((newPath, true, "File already exists"));
         }
-        var newDirName = Path.GetDirectoryName(newPath);
-        if (!Path.Exists(newDirName) && newDirName is not null)
-        { 
-            Directory.CreateDirectory(newDirName);
-        }
+
         return Task.FromResult((newPath, false, string.Empty));
     }
     
@@ -101,25 +97,42 @@ public class SqlRenamerService(
         if (string.IsNullOrEmpty(input))
             return input;
         
-        //Roman numerals pattern
-        var romanPattern = @"\b(IX|IV|V?I{1,3}|X{1,3})\b";
+        const string romanPattern = @"\b(IX|IV|V?I{1,3}|X{1,3})\b";
+        const string ordinalPattern = @"\b\d+(st|nd|rd|th)\b";
 
-        //Store all Roman numerals with a temporary marker
-        var romanNums = new List<string>();
-        var markedText = Regex.Replace(input, romanPattern, match =>
-        {
-            romanNums.Add(match.Value.ToUpper());
-            return $"§§{romanNums.Count - 1}§§";
-        });
+        var specialTerms  = new List<string>();
+        
+        
+        var markedText = Regex.Replace(
+            input,
+            ordinalPattern,
+            match => {
+                // Ensure ordinal suffix is lowercase
+                var number = Regex.Match(match.Value, @"\d+").Value;
+                var suffix = Regex.Match(match.Value, @"(st|nd|rd|th)").Value.ToLower();
+                specialTerms.Add(number + suffix);
+                return $"§§{specialTerms.Count - 1}§§";
+            },
+            RegexOptions.IgnoreCase
+        );
+        
+        markedText = Regex.Replace(
+            markedText,
+            romanPattern,
+            match => {
+                specialTerms.Add(match.Value.ToUpper());
+                return $"§§{specialTerms.Count - 1}§§";
+            },
+            RegexOptions.IgnoreCase
+        );
 
         var textInfo = new CultureInfo("en-US", false).TextInfo;
         var titleCased = textInfo.ToTitleCase(markedText.ToLower());
 
-        // Restore Roman numerals
         var result = Regex.Replace(titleCased, @"§§(\d+)§§", match =>
         {
             var index = int.Parse(match.Groups[1].Value);
-            return romanNums[index];
+            return specialTerms [index];
         });
 
         return result;
@@ -397,6 +410,12 @@ public class SqlRenamerService(
             
             try
             {
+                var newDirName = Path.GetDirectoryName(file.DestinationFileName);
+                if (!Path.Exists(newDirName) && newDirName is not null)
+                { 
+                    Directory.CreateDirectory(newDirName);
+                }
+                
                 if (file.DestinationFileName is not null)
                 {
                     File.Move(file.SourceFileName, file.DestinationFileName);
@@ -407,8 +426,6 @@ public class SqlRenamerService(
                     var renameTitle = file with { Error = true, ErrorMessage = "Empty destination file name" };
                     renamedFiles.Add(renameTitle);
                 }
-                
-
             }
             catch (Exception e)
             {
@@ -423,6 +440,27 @@ public class SqlRenamerService(
         }
 
         return Task.FromResult(renamedFiles.AsEnumerable());
+    }
+
+    public async Task<bool> DeleteEmptyFoldersAsync(string sourceFolder)
+    {
+        var inputDirectories = Directory.EnumerateDirectories(sourceFolder, "*", SearchOption.AllDirectories);
+        var result = true;
+        foreach (var directoryName in inputDirectories)
+        {
+            var isEmpty = await _fileInfoService.IsDirectoryEmpty(directoryName);
+
+            if (!isEmpty) continue;
+            try
+            {
+                Directory.Delete(directoryName, true);
+            }
+            catch (Exception)
+            {
+                result = false;
+            }
+        }
+        return result;
     }
 
     public async Task<ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)

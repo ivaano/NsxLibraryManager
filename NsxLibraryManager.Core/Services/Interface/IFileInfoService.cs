@@ -6,6 +6,7 @@ public interface IFileInfoService
 {
     Task<IEnumerable<string>> GetFileNames(string filePath, bool recursive = false);
 
+    Task<bool> IsDirectoryEmpty(string? directoryPath);
     IEnumerable<string> GetDirectoryFiles(string filePath);
 
     Task<IEnumerable<string>> GetRecursiveFiles(string filePath);

@@ -49,6 +49,9 @@ public partial class BundleRenamer : ComponentBase
         { "OutputBasePath", string.Empty }
     };
     
+    private void ShowDeleteEmptyFoldersTooltip(ElementReference elementReference, TooltipOptions options = null) => 
+        TooltipService.Open(elementReference, "Once the rename process finishes, all empty folders inside input path will be removed.", options);
+
     
     protected override async Task OnInitializedAsync()
     {
@@ -122,7 +125,7 @@ public partial class BundleRenamer : ComponentBase
         }
     }
     
-    private void ShowTooltip(TemplateField templateField, ElementReference elementReference)
+    private void ShowDeleteEmptyFoldersTooltip(TemplateField templateField, ElementReference elementReference)
     {
         var options = new TooltipOptions()
         {
@@ -140,7 +143,7 @@ public partial class BundleRenamer : ComponentBase
         {
             TemplateField.BasePath => "Path from the output field Base Path",
             TemplateField.TitleName =>
-                "The first name among the list of declared titles, or the one coming from titledb",
+                "TitleName from TitleDb, otherwise used what is in the file",
             TemplateField.TitleId   => "The title id eg [0100F2200C984000]",
             TemplateField.Version   => "The version of the title eg [65536]",
             TemplateField.Extension => "The extension of the file based on its contents eg .nsp",
@@ -281,15 +284,43 @@ public partial class BundleRenamer : ComponentBase
             $"This action will rename {countFiles} file(s), do you want to continue?", "Rename Files",
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
 
-        if (confirmationResult is true && fileList.Any())
+        if (confirmationResult is true && fileList.Count > 0)
         {
             isLoading = true;
+            _renameTitles = default!;
+            StateHasChanged(); 
+            await Task.Delay(1); 
             _renameTitles = await RenamerService.RenameFilesAsync(fileList);
+            if (_settings.DeleteEmptyFolders)
+            {
+                var deleteFoldersResult = await RenamerService.DeleteEmptyFoldersAsync(_settings.InputPath);
+                if (!deleteFoldersResult)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Some Folders Couldn't be Deleted",
+                        Duration = 4000
+                    });
+                }
+            }
+            
+
             var stats = _renameTitles.ToList();
             var errors = stats.Count(x => x.Error);
-            var success = stats.Count(x => x.RenamedSuccessfully);   
+            var success = stats.Count(x => x.RenamedSuccessfully);
 
-            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Rename Process Finished!", Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 4000 });
+            NotificationService.Notify(errors > 0
+                ? new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error, Summary = "Rename process finished with som errors!",
+                    Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 6000
+                }
+                : new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success, Summary = "Rename process finished with success!",
+                    Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 4000
+                });
             await _renameGrid.Reload();
             isLoading = false;
         }

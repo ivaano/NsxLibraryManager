@@ -31,6 +31,23 @@ public class FileInfoService : IFileInfoService
         _titleDbService = titleDbService ?? throw new ArgumentNullException(nameof(titleDbService));
         _logger = logger;
     }
+
+    public Task<bool> IsDirectoryEmpty(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return Task.FromResult(false);
+        try
+        {
+            return Task.FromResult(!Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories).Any());
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Task.FromResult(false); 
+        }
+        catch (DirectoryNotFoundException)
+        {
+            return Task.FromResult(false); 
+        }
+    }
     
    
     public  async Task<IEnumerable<string>> GetFileNames(
