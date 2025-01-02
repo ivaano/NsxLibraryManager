@@ -11,8 +11,10 @@
                                 AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                                 IsLoading="@isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
                     <HeaderTemplate>
-                        <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
-                        <RadzenButton Text="Rename Files" Click="@RenameFiles" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" Disabled="@_scanInputButtonDisabled" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Rename Files" Click="@RenameFiles" ButtonStyle="ButtonStyle.Danger" Disabled="@_renameButtonDisabled" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Input Path: @inputPathDisplay</RadzenText> |
+                        <RadzenText TextStyle="TextStyle.Caption">Output Path: @outputPathDisplay </RadzenText>
                     </HeaderTemplate>
                     <Columns>
                         <RadzenDataGridColumn TItem="RenameTitle" Property="SourceFileName" Title="Source File" Width="200px">
@@ -68,8 +70,10 @@
                                 </RadzenFormField>
                                 <RadzenRow class="rz-text-align-center">
                                     <RadzenColumn Size="6">
-                                        <RadzenCheckBox Name="DeleteEmptyFolders" @bind-Value="@_settings.DeleteEmptyFolders" MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(args) )"/>
-                                        <RadzenLabel Text="Delete empty folders" Component="DeleteEmptyFolders" Style="margin-left: 8px; vertical-align: middle;"/>
+                                        <RadzenCheckBox Name="DeleteEmptyFolders" 
+                                                        @bind-Value="@_settings.DeleteEmptyFolders" 
+                                                        MouseEnter="@(args => ShowTooltip("Once the rename process finishes, all empty folders inside input path will be removed.", args) )"/>
+                                        <RadzenLabel Text="Delete empty folders after rename" Component="DeleteEmptyFolders" Style="margin-left: 8px; vertical-align: middle;"/>
                                     </RadzenColumn>
                                     <RadzenColumn Size="6">
                                         <RadzenCheckBox Name="Recusive" @bind-Value="@_settings.Recursive"/>
@@ -111,8 +115,12 @@
                                     />
                                 </RadzenFormField>
                                 <div class="rz-text-align-right">
-                                    <RadzenCheckBox Name="TitlesForceUppercase" @bind-Value="@_settings.TitlesForceUppercase"/>
-                                    <RadzenLabel Text="TitleName To TitleCase" Component="TitlesForceUppercase" Style="margin-left: 8px; vertical-align: middle;"/>
+                                    <RadzenCheckBox Name="TitlesForceUppercase"
+                                                    @bind-Value="@_settings.TitlesForceUppercase" 
+                                                    MouseEnter="@(args => ShowTooltip("Convert TitleName and AppName to Title Case when renaming.", args) )"/>
+                                    <RadzenLabel Text="TitleName and AppName to TitleCase" 
+                                                 Component="TitlesForceUppercase"
+                                                 Style="margin-left: 8px; vertical-align: middle;"/>
                                 </div>
                             </RenamerFieldSet>
                             <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
@@ -126,28 +134,28 @@
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.TitleName]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.TitleName, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.TitleName, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.TitleName, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.TitleId]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.TitleId, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.TitleId, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.TitleId, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.Version]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.Version, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.Version, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.Version, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.Region]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.Region, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.Region, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.Region, args))"
                                                       ButtonStyle="ButtonStyle.Info" Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                 </RadzenRow>
@@ -155,14 +163,14 @@
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.Extension]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.Extension, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.Extension, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.Extension, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.AppName]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.AppName, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.AppName, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.AppName, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
@@ -170,14 +178,14 @@
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.DlcCount]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.DlcCount, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.DlcCount, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.DlcCount, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.PatchCount]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.PatchCount, args))"
-                                                      MouseEnter="@(args => ShowDeleteEmptyFoldersTooltip(TemplateField.PatchCount, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.PatchCount, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>                                    

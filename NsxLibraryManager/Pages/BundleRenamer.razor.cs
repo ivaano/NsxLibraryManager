@@ -48,9 +48,11 @@ public partial class BundleRenamer : ComponentBase
         { "InputPath", string.Empty },
         { "OutputBasePath", string.Empty }
     };
-    
-    private void ShowDeleteEmptyFoldersTooltip(ElementReference elementReference, TooltipOptions options = null) => 
-        TooltipService.Open(elementReference, "Once the rename process finishes, all empty folders inside input path will be removed.", options);
+    private bool _scanInputButtonDisabled = false;
+    private bool _renameButtonDisabled = true;
+    private string inputPathDisplay = string.Empty;
+    private string outputPathDisplay = string.Empty;
+
 
     
     protected override async Task OnInitializedAsync()
@@ -74,6 +76,8 @@ public partial class BundleRenamer : ComponentBase
     private async Task InitializeSettings()
     {
         _settings = await SettingsService.GetBundleRenamerSettings();
+        inputPathDisplay = _settings.InputPath;
+        outputPathDisplay = _settings.OutputBasePath;
         _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
 
         _templateFields[TitlePackageType.BundleBase].Value = _settings.BundleBase;
@@ -117,6 +121,11 @@ public partial class BundleRenamer : ComponentBase
             await Task.Delay(1); // Ensure UI updates before heavy operation
             _renameTitles = await RenamerService.GetFilesToRenameAsync(
                 _settings.InputPath, RenameType.Bundle, _settings.Recursive);
+            if (_renameTitles.Any())
+            {
+                _renameButtonDisabled = false;
+            } 
+                
         }
         finally
         {
@@ -125,7 +134,10 @@ public partial class BundleRenamer : ComponentBase
         }
     }
     
-    private void ShowDeleteEmptyFoldersTooltip(TemplateField templateField, ElementReference elementReference)
+    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null) => 
+        TooltipService.Open(elementReference, message, options);
+    
+    private void ShowTooltip(TemplateField templateField, ElementReference elementReference)
     {
         var options = new TooltipOptions()
         {
@@ -277,6 +289,8 @@ public partial class BundleRenamer : ComponentBase
     {
         if (!_renameTitles.Any())
             return;
+        _renameButtonDisabled = true;
+        _scanInputButtonDisabled = true;
         var fileList = _renameTitles.ToList();
         var countFiles = fileList.Count(x => x.Error == false);
         
@@ -323,6 +337,7 @@ public partial class BundleRenamer : ComponentBase
                 });
             await _renameGrid.Reload();
             isLoading = false;
+            _scanInputButtonDisabled = false;
         }
 
     }
