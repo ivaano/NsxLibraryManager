@@ -9,4 +9,7 @@ public class BundleRenamerSettings
     public string BundleBase { get; set; } = string.Empty;
     public string BundleDlc { get; set; } = string.Empty;
     public string BundleUpdate { get; set; } = string.Empty;
+    
+    public string UnknownPlaceholder { get; set; } = "Unknown";
+    public bool TitlesForceUppercase { get; set ; } = true;
 }

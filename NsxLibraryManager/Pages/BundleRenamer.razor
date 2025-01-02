@@ -55,6 +55,17 @@
                                         <div class="rz-message rz-messages-error ">@_validationErrors["InputPath"]</div>
                                     </Helper>
                                 </RadzenFormField>
+                                <RadzenFormField Text="Unkown Placeholder" Variant="@Variant" Style="width: 100%; padding: 1px">
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value="@_settings.UnknownPlaceholder" id="UnknownPlaceholder" Name="UnknownPlaceholder"
+                                                       Style="font-family: monospace;"
+                                        />
+                                    </ChildContent>
+                                    <Helper>
+                                        <RadzenText TextStyle="TextStyle.Caption">This will be used to replace an empty TitleName or AppName when renaming files.</RadzenText>
+                                        
+                                    </Helper>
+                                </RadzenFormField>
                                 <div class="rz-text-align-right">
                                     <RadzenCheckBox Name="Recusive" @bind-Value="@_settings.Recursive"/>
                                     <RadzenLabel Text="Recursive Subdirectories" Component="Recusive" Style="margin-left: 8px; vertical-align: middle;"/>
@@ -92,7 +103,11 @@
                                                    @oninput="@(args => OnTemplateFieldInput(TitlePackageType.BundleDlc, args.Value?.ToString()))"
                                                    @onclick="@(args => OnTemplateFieldClick(TitlePackageType.BundleDlc, args))"
                                     />
-                                </RadzenFormField>                                
+                                </RadzenFormField>
+                                <div class="rz-text-align-right">
+                                    <RadzenCheckBox Name="TitlesForceUppercase" @bind-Value="@_settings.TitlesForceUppercase"/>
+                                    <RadzenLabel Text="Convert Names To TitleCase" Component="TitlesForceUppercase" Style="margin-left: 8px; vertical-align: middle;"/>
+                                </div>
                             </RenamerFieldSet>
                             <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
                                 <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Success" Click="@ValidateConfiguration" class="rz-ripple">Validate Configuration</RadzenButton>
@@ -160,6 +175,13 @@
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>                                    
+                                </RadzenRow>
+                            </RenamerFieldSet>
+                            <RenamerFieldSet Text="Additional Options">
+                                <RadzenRow Gap="0.1rem">
+                                </RadzenRow>
+                                <RadzenRow Gap="0.1rem">
+
                                 </RadzenRow>
                             </RenamerFieldSet>
                             <RenamerFieldSet Text="@_sampleResultLabel">

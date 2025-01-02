@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +31,15 @@ public class SqlRenamerService(
     private readonly ILogger<SqlRenamerService> _logger = logger;
     private static char[] GetInvalidAdditionalChars() =>
     [
-        '™', '©', '®', '~', '#', '%', '&', ':'
+        '™', '©', '®', '~', '#', '%', '&', ':',
+        '\'', '"', '"', '–', '—', '…', 
+        '′', '″', '‴', 
+        '¢', '¥', '€', '£', 
+        '±', '×', '÷', '≠', '≤', '≥', 
+        '¡', '¿', 
+        '\u200B', '\u200C', '\u200D', '\uFEFF' 
     ];
+    
     
     private async Task<(string, bool, string)> TryBuildNewFileNameAsync(LibraryTitle fileInfo, string file, RenameType renameType)
     {
@@ -64,7 +72,7 @@ public class SqlRenamerService(
         if (File.Exists(newPath))
         {
             _logger.LogError("Error building new file name for {file} - {message}", file, "File already exists");
-            return Task.FromResult((string.Empty, true, "File already exists"));
+            return Task.FromResult((newPath, true, "File already exists"));
         }
         var newDirName = Path.GetDirectoryName(newPath);
         if (!Path.Exists(newDirName) && newDirName is not null)
@@ -88,6 +96,35 @@ public class SqlRenamerService(
         return invalidChars.Aggregate(input, (current, c) => current.Replace(c.ToString(), ""));
     }
     
+    private static string CustomTitleCase(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+        
+        //Roman numerals pattern
+        var romanPattern = @"\b(IX|IV|V?I{1,3}|X{1,3})\b";
+
+        //Store all Roman numerals with a temporary marker
+        var romanNums = new List<string>();
+        var markedText = Regex.Replace(input, romanPattern, match =>
+        {
+            romanNums.Add(match.Value.ToUpper());
+            return $"§§{romanNums.Count - 1}§§";
+        });
+
+        var textInfo = new CultureInfo("en-US", false).TextInfo;
+        var titleCased = textInfo.ToTitleCase(markedText.ToLower());
+
+        // Restore Roman numerals
+        var result = Regex.Replace(titleCased, @"§§(\d+)§§", match =>
+        {
+            var index = int.Parse(match.Groups[1].Value);
+            return romanNums[index];
+        });
+
+        return result;
+    }
+    
     private Task<string> TemplateReplaceAsync(
         string renameTemplate, LibraryTitle fileInfo, RenameType renameType)
     {
@@ -98,13 +135,33 @@ public class SqlRenamerService(
             if (!match.Success) continue;
             var safeTitleName = string.Empty;
             var safeAppTitleName = string.Empty;
-            if (fileInfo.TitleName is not null)
+            
+            if (!string.IsNullOrEmpty(fileInfo.TitleName))
             {
+                if (renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase)
+                {
+                    fileInfo.TitleName = CustomTitleCase(fileInfo.TitleName);
+                }
                 safeTitleName = RemoveIllegalCharacters(fileInfo.TitleName);    
             }
-            if (fileInfo.ApplicationTitleName is not null)
+            else
             {
+                safeTitleName = (renameType == RenameType.Bundle) ? 
+                    _bundleRenamerSettings.UnknownPlaceholder : _packageRenamerSettings.UnknownPlaceholder;
+            }
+            
+            if (!string.IsNullOrEmpty(fileInfo.ApplicationTitleName))
+            {
+                if (renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase)
+                {
+                    fileInfo.ApplicationTitleName = CustomTitleCase(fileInfo.ApplicationTitleName);
+                }
                 safeAppTitleName = RemoveIllegalCharacters(fileInfo.ApplicationTitleName);
+            }
+
+            if (fileInfo is { Type: TitleLibraryType.Update, ApplicationTitleName: null })
+            {
+                safeAppTitleName = safeTitleName;
             }
             
             var replacement = key switch
@@ -116,7 +173,7 @@ public class SqlRenamerService(
                 TemplateField.Version   => fileInfo.TitleVersion.ToString(),
                 TemplateField.Extension => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName   => safeAppTitleName,
-                TemplateField.Region   => fileInfo.Region,
+                TemplateField.Region   =>  fileInfo.Region,
                 TemplateField.PatchId   => fileInfo.PatchTitleId,
                 TemplateField.PatchCount   => fileInfo.UpdatesCount.ToString(),
                 TemplateField.DlcCount   => fileInfo.DlcCount.ToString(),
@@ -137,7 +194,19 @@ public class SqlRenamerService(
         var fileInfo = await _fileInfoService.GetFileInfo(fileLocation, false);
         var titledbTitle =
                 await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == fileInfo.TitleId);
-        if (titledbTitle is null) return fileInfo;
+        if (titledbTitle is null)
+        {
+            //try to find OtherApplicationName in titledb
+            if (fileInfo.Type is TitleLibraryType.Update or TitleLibraryType.DLC
+                && string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleName) && !string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleId))
+            {
+                var otherApplication = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.OtherApplicationId == fileInfo.ApplicationTitleId);
+                if (otherApplication is null) return fileInfo;
+            
+                fileInfo.ApplicationTitleName = otherApplication.TitleName;
+            }
+            return fileInfo;
+        }
 
         //prefer Name  from titledb instead of the file
         fileInfo.TitleName = titledbTitle.TitleName;
@@ -149,8 +218,6 @@ public class SqlRenamerService(
 
         var parentTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == titledbTitle.OtherApplicationId);
         fileInfo.ApplicationTitleName = parentTitle?.TitleName;
-        
-
 
         return fileInfo;
     }
@@ -189,7 +256,7 @@ public class SqlRenamerService(
             (newPath, error, errorMessage) = await ValidateDestinationFileAsync(file, newPath);
             if (error)
             {
-                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, error,
+                fileList.Add(new RenameTitle(file, newPath, fileInfo.TitleId, fileInfo.TitleName, false, error,
                     errorMessage));
                 continue;
             }

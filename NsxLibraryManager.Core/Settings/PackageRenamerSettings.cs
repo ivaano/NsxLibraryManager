@@ -20,4 +20,6 @@ public class PackageRenamerSettings
     public string XczDlcPath { get; set; } = string.Empty;
     public string XczUpdatePath { get; set; } = string.Empty;
     
+    public string UnknownPlaceholder { get; set; } = "UnknownTitle";
+
 }
