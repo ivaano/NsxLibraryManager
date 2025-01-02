@@ -65,30 +65,32 @@
                                     <ChildContent>
                                         <RadzenTextBox @bind-Value="@_settings.OutputBasePath" id="OutputBasePath" Name="OutputBasePath"
                                                        Style="font-family: monospace;"
-                                                       @onkeyup="_ => TemplateTextboxUpdateNew(PackageTitleType.None)"
-                                                       @onclick="_ => TemplateTextboxUpdateNew(PackageTitleType.None)"/>
+                                                       @onkeyup="_ => TemplateTextboxUpdateNew(TitlePackageType.None)"
+                                                       @onclick="_ => TemplateTextboxUpdateNew(TitlePackageType.None)"/>
                                     </ChildContent>
                                     <Helper>
                                         <div class="rz-message rz-messages-error ">@_validationErrors["OutputBasePath"]</div>
                                     </Helper>
                                 </RadzenFormField>
                                 <RadzenFormField Text="Application" Variant="@Variant" Style="width: 100%; padding: 1px">
-                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.BundleBase].Value" id="BundleBase" Name="BundleBase"
+                                    <RadzenTextBox @bind-Value="@_templateFields[TitlePackageType.BundleBase].Value" id="BundleBase" Name="BundleBase"
                                                    Style="font-family: monospace;"
-                                                   @oninput="@(args => OnTemplateFieldInput(PackageTitleType.BundleBase, args.Value?.ToString()))"
-                                                   @onclick="@(args => OnTemplateFieldClick(PackageTitleType.BundleBase, args))"
+                                                   @oninput="@(args => OnTemplateFieldInput(TitlePackageType.BundleBase, args.Value?.ToString()))"
+                                                   @onclick="@(args => OnTemplateFieldClick(TitlePackageType.BundleBase, args))"
                                     />
                                 </RadzenFormField>
                                 <RadzenFormField Text="Update" Variant="@Variant" Style="width: 100%; padding: 1px">
-                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.BundleUpdate].Value" id="BundleUpdate" Name="BundleUpdate"
+                                    <RadzenTextBox @bind-Value="@_templateFields[TitlePackageType.BundleUpdate].Value" id="BundleUpdate" Name="BundleUpdate"
                                                    Style="font-family: monospace;"
-
+                                                   @oninput="@(args => OnTemplateFieldInput(TitlePackageType.BundleUpdate, args.Value?.ToString()))"
+                                                   @onclick="@(args => OnTemplateFieldClick(TitlePackageType.BundleUpdate, args))"
                                     />
                                 </RadzenFormField>
                                 <RadzenFormField Text="DLCs" Variant="@Variant" Style="width: 100%; padding: 1px">
-                                    <RadzenTextBox @bind-Value="@_templateFields[PackageTitleType.BundleDlc].Value" id="BundleDlc" Name="BundleDlc"
+                                    <RadzenTextBox @bind-Value="@_templateFields[TitlePackageType.BundleDlc].Value" id="BundleDlc" Name="BundleDlc"
                                                    Style="font-family: monospace;"
-
+                                                   @oninput="@(args => OnTemplateFieldInput(TitlePackageType.BundleDlc, args.Value?.ToString()))"
+                                                   @onclick="@(args => OnTemplateFieldClick(TitlePackageType.BundleDlc, args))"
                                     />
                                 </RadzenFormField>                                
                             </RenamerFieldSet>
@@ -100,12 +102,6 @@
                         <RadzenColumn Size="12" SizeSM="6">
                             <RenamerFieldSet Text="Template Fields">
                                 <RadzenRow Gap="0.1rem" Style="padding-bottom: .1rem">
-                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
-                                        <RadzenButton Text="@_templateFieldMappings[TemplateField.BasePath]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
-                                                      Click="@(args => TemplateFragmentClick(TemplateField.BasePath, args))"
-                                                      MouseEnter="@(args => ShowTooltip(TemplateField.BasePath, args))"
-                                                      ButtonStyle="ButtonStyle.Info" Style="width: 100%; height: 100%;"/>
-                                    </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
                                         <RadzenButton Text="@_templateFieldMappings[TemplateField.TitleName]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
                                                       Click="@(args => TemplateFragmentClick(TemplateField.TitleName, args))"
@@ -127,6 +123,12 @@
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
+                                    <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
+                                        <RadzenButton Text="@_templateFieldMappings[TemplateField.Region]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
+                                                      Click="@(args => TemplateFragmentClick(TemplateField.Region, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.Region, args))"
+                                                      ButtonStyle="ButtonStyle.Info" Style="width: 100%; height: 100%;"/>
+                                    </RadzenColumn>
                                 </RadzenRow>
                                 <RadzenRow Gap="0.1rem">
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
@@ -143,17 +145,18 @@
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
+
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
-                                        <RadzenButton Text="@_templateFieldMappings[TemplateField.PatchId]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
-                                                      Click="@(args => TemplateFragmentClick(TemplateField.PatchId, args))"
-                                                      MouseEnter="@(args => ShowTooltip(TemplateField.PatchId, args))"
+                                        <RadzenButton Text="@_templateFieldMappings[TemplateField.DlcCount]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
+                                                      Click="@(args => TemplateFragmentClick(TemplateField.DlcCount, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.DlcCount, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>
                                     <RadzenColumn class="rz-p-2" Style="text-align: center; padding: 0 !important;">
-                                        <RadzenButton Text="@_templateFieldMappings[TemplateField.PatchNum]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
-                                                      Click="@(args => TemplateFragmentClick(TemplateField.PatchNum, args))"
-                                                      MouseEnter="@(args => ShowTooltip(TemplateField.PatchNum, args))"
+                                        <RadzenButton Text="@_templateFieldMappings[TemplateField.PatchCount]" Shade="Shade.Lighter" Disabled="@_fragmentButtonDisabled"
+                                                      Click="@(args => TemplateFragmentClick(TemplateField.PatchCount, args))"
+                                                      MouseEnter="@(args => ShowTooltip(TemplateField.PatchCount, args))"
                                                       ButtonStyle="ButtonStyle.Info"
                                                       Style="width: 100%; height: 100%;"/>
                                     </RadzenColumn>                                    

@@ -70,7 +70,7 @@ public class RenamerService : IRenamerService
                 TemplateField.Extension => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName   => safeAppTitleName,
                 TemplateField.PatchId   => fileInfo.PatchTitleId,
-                TemplateField.PatchNum  => fileInfo.PatchNumber.ToString(),
+                TemplateField.PatchCount  => fileInfo.PatchNumber.ToString(),
                 _                       => string.Empty
             };
             
@@ -271,13 +271,13 @@ public class RenamerService : IRenamerService
     }
 
 
-    public async Task<string> CalculateSampleFileName(string templateText, PackageTitleType packageType, string inputFile, string basePath)
+    public async Task<string> CalculateSampleFileName(string templateText, TitlePackageType titlePackageType, string inputFile, string basePath)
     {
-        var libraryType = packageType switch
+        var libraryType = titlePackageType switch
         {
-            PackageTitleType.NspBase   => TitleLibraryType.Base,
-            PackageTitleType.NspUpdate => TitleLibraryType.Update,
-            PackageTitleType.NspDlc    => TitleLibraryType.DLC,
+            TitlePackageType.NspBase   => TitleLibraryType.Base,
+            TitlePackageType.NspUpdate => TitleLibraryType.Update,
+            TitlePackageType.NspDlc    => TitleLibraryType.DLC,
             _                          => TitleLibraryType.Unknown
         };
         

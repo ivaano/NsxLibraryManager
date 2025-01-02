@@ -1,6 +1,6 @@
 ﻿namespace NsxLibraryManager.Core.Enums;
 
-public enum PackageTitleType
+public enum TitlePackageType
 {
     None,
     NspBase,

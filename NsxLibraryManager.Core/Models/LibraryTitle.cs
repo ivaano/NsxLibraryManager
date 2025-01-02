@@ -32,6 +32,7 @@ public class LibraryTitle
     public string? FrontBoxArt { get; set; }
     public string? IconUrl { get; set; }
     public string? Intro { get; set; }
+    public string? Region { get; set; }
     public List<string>? Screenshots { get; set; }
     public List<string>? AvailableDlcs { get; set; }
     public List<string>? OwnedDlcs { get; set; }
@@ -42,6 +43,10 @@ public class LibraryTitle
     public List<string>? Languages { get; set; }
 
     public string? NewFileName { get; set; }
+    
+    public int? UpdatesCount { get; set; }
+    public int? DlcCount { get; set; }
+    
     public bool Error { get; set; } = false;
     public string ErrorMessage { get; set; } = string.Empty;
     [DisplayFormat(DataFormatString = @"{0:d MM\ddd\yyyy}")]

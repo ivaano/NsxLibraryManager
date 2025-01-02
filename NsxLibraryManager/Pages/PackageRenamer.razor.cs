@@ -31,8 +31,8 @@ public partial class PackageRenamer
     private string _sampleBefore = string.Empty;
     private string _sampleAfter = string.Empty;
     private string _sampleResultLabel = "Sample Result";
-    private PackageTitleType _currentPackageTitle = PackageTitleType.None;
-    private readonly Dictionary<PackageTitleType, TemplateFieldInfo> _templateFields = new();
+    private TitlePackageType _currentTitlePackage = TitlePackageType.None;
+    private readonly Dictionary<TitlePackageType, TemplateFieldInfo> _templateFields = new();
     private int selectedTabIndex = 0;
     private readonly Dictionary<TemplateField, string> _templateFieldMappings =
         RenamerTemplateFields.TemplateFieldMappings;
@@ -77,7 +77,8 @@ public partial class PackageRenamer
     private async Task LoadFiles()
     {
         isLoading = true;
-        _renameTitles = await RenamerService.GetFilesToRenameAsync(_settings.InputPath, _settings.Recursive);
+        _renameTitles = await RenamerService.GetFilesToRenameAsync(
+            _settings.InputPath, RenameType.PackageType, _settings.Recursive);
         isLoading = false;
     }
     
@@ -111,36 +112,36 @@ public partial class PackageRenamer
         _settings = await SettingsService.GetPackageRenamerSettings();
         _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
 
-        _templateFields[PackageTitleType.NspBase].Value = _settings.NspBasePath;
-        _templateFields[PackageTitleType.NspDlc].Value = _settings.NspDlcPath;
-        _templateFields[PackageTitleType.NspUpdate].Value = _settings.NspUpdatePath;
-        _templateFields[PackageTitleType.NszBase].Value = _settings.NszBasePath;
-        _templateFields[PackageTitleType.NszDlc].Value = _settings.NszDlcPath;
-        _templateFields[PackageTitleType.NszUpdate].Value = _settings.NszUpdatePath;
-        _templateFields[PackageTitleType.XciBase].Value = _settings.XciBasePath;
-        _templateFields[PackageTitleType.XciDlc].Value = _settings.XciDlcPath;
-        _templateFields[PackageTitleType.XciUpdate].Value = _settings.XciUpdatePath;
-        _templateFields[PackageTitleType.XczBase].Value = _settings.XczBasePath;
-        _templateFields[PackageTitleType.XczDlc].Value = _settings.XczDlcPath;
-        _templateFields[PackageTitleType.XczUpdate].Value = _settings.XczUpdatePath;
+        _templateFields[TitlePackageType.NspBase].Value = _settings.NspBasePath;
+        _templateFields[TitlePackageType.NspDlc].Value = _settings.NspDlcPath;
+        _templateFields[TitlePackageType.NspUpdate].Value = _settings.NspUpdatePath;
+        _templateFields[TitlePackageType.NszBase].Value = _settings.NszBasePath;
+        _templateFields[TitlePackageType.NszDlc].Value = _settings.NszDlcPath;
+        _templateFields[TitlePackageType.NszUpdate].Value = _settings.NszUpdatePath;
+        _templateFields[TitlePackageType.XciBase].Value = _settings.XciBasePath;
+        _templateFields[TitlePackageType.XciDlc].Value = _settings.XciDlcPath;
+        _templateFields[TitlePackageType.XciUpdate].Value = _settings.XciUpdatePath;
+        _templateFields[TitlePackageType.XczBase].Value = _settings.XczBasePath;
+        _templateFields[TitlePackageType.XczDlc].Value = _settings.XczDlcPath;
+        _templateFields[TitlePackageType.XczUpdate].Value = _settings.XczUpdatePath;
     }
 
     private void InitializeTemplateFields()
     {
         var textBoxTypes = new[]
         {
-            PackageTitleType.NspBase,
-            PackageTitleType.NspDlc,
-            PackageTitleType.NspUpdate,
-            PackageTitleType.NszBase,
-            PackageTitleType.NszDlc,
-            PackageTitleType.NszUpdate,
-            PackageTitleType.XciBase,
-            PackageTitleType.XciDlc,
-            PackageTitleType.XciUpdate,
-            PackageTitleType.XczBase,
-            PackageTitleType.XczDlc,
-            PackageTitleType.XczUpdate
+            TitlePackageType.NspBase,
+            TitlePackageType.NspDlc,
+            TitlePackageType.NspUpdate,
+            TitlePackageType.NszBase,
+            TitlePackageType.NszDlc,
+            TitlePackageType.NszUpdate,
+            TitlePackageType.XciBase,
+            TitlePackageType.XciDlc,
+            TitlePackageType.XciUpdate,
+            TitlePackageType.XczBase,
+            TitlePackageType.XczDlc,
+            TitlePackageType.XczUpdate
         };
 
         foreach (var textBoxType in textBoxTypes)
@@ -153,25 +154,25 @@ public partial class PackageRenamer
         }
     }
 
-    private async Task UpdateSampleBox(PackageTitleType type, string templateValue)
+    private async Task UpdateSampleBox(TitlePackageType type, string templateValue)
     {
         _sampleBefore = $"c:\\dump\\lucas-game.nsp";
-        _sampleAfter = await RenamerService.CalculateSampleFileName(templateValue, type, "inputFile.nsp", "basePath");
+        _sampleAfter = await RenamerService.CalculateSampleFileName(templateValue, type, "inputFile.nsp", RenameType.PackageType);
     }
 
     private async Task TemplateFragmentClick(TemplateField templateFieldType, MouseEventArgs args)
     {
-        if (_currentPackageTitle != PackageTitleType.None)
+        if (_currentTitlePackage != TitlePackageType.None)
         {
-            UpdateTemplateFieldRecord(templateFieldType, _currentPackageTitle);
-            await JsRuntime.InvokeVoidAsync("setFocus", _currentPackageTitle.ToString(), " {0}");
+            UpdateTemplateFieldRecord(templateFieldType, _currentTitlePackage);
+            await JsRuntime.InvokeVoidAsync("setFocus", _currentTitlePackage.ToString(), " {0}");
         }
     }
 
 
-    private void UpdateTemplateFieldRecord(TemplateField templateField, PackageTitleType type)
+    private void UpdateTemplateFieldRecord(TemplateField templateField, TitlePackageType type)
     {
-        var templateFieldInfo = _templateFields[_currentPackageTitle];
+        var templateFieldInfo = _templateFields[_currentTitlePackage];
         var templateFieldValue = _templateFieldMappings[templateField];
 
         templateFieldInfo.Value = templateFieldInfo.CursorPosition > 0
@@ -180,32 +181,32 @@ public partial class PackageRenamer
 
         templateFieldInfo.CursorPosition += templateFieldValue.Length;
 
-        Task.Run(() => UpdateSampleBox(_currentPackageTitle, templateFieldInfo.Value));
+        Task.Run(() => UpdateSampleBox(_currentTitlePackage, templateFieldInfo.Value));
     }
 
 
-    private async Task OnTemplateFieldClick(PackageTitleType type, MouseEventArgs args)
+    private async Task OnTemplateFieldClick(TitlePackageType type, MouseEventArgs args)
     {
         await TemplateTextboxUpdateNew(type);
-        await UpdateSampleBox(_currentPackageTitle, _templateFields[_currentPackageTitle].Value);
+        await UpdateSampleBox(_currentTitlePackage, _templateFields[_currentTitlePackage].Value);
     }
 
-    private async Task OnTemplateFieldInput(PackageTitleType type, string? value)
+    private async Task OnTemplateFieldInput(TitlePackageType type, string? value)
     {
         if (value is not null)
         {
             _templateFields[type].Value = value;
             await TemplateTextboxUpdateNew(type);
-            await UpdateSampleBox(_currentPackageTitle, value);
+            await UpdateSampleBox(_currentTitlePackage, value);
         }
     }
 
-    private async Task TemplateTextboxUpdateNew(PackageTitleType type)
+    private async Task TemplateTextboxUpdateNew(TitlePackageType type)
     {
-        _currentPackageTitle = type;
-        var labelParts = Regex.Split(_currentPackageTitle.ToString(), "(?<!^)(?=[A-Z])");
+        _currentTitlePackage = type;
+        var labelParts = Regex.Split(_currentTitlePackage.ToString(), "(?<!^)(?=[A-Z])");
         _sampleResultLabel = string.Join(" ", labelParts);
-        if (type == PackageTitleType.None)
+        if (type == TitlePackageType.None)
         {
             _sampleResultLabel = "Sample Result";
             _fragmentButtonDisabled = true;
@@ -259,18 +260,18 @@ public partial class PackageRenamer
             }
         }
 
-        _settings.NspBasePath = _templateFields[PackageTitleType.NspBase].Value;
-        _settings.NspDlcPath = _templateFields[PackageTitleType.NspDlc].Value;
-        _settings.NspUpdatePath = _templateFields[PackageTitleType.NspUpdate].Value;
-        _settings.NszBasePath = _templateFields[PackageTitleType.NszBase].Value;
-        _settings.NszDlcPath = _templateFields[PackageTitleType.NszDlc].Value;
-        _settings.NszUpdatePath = _templateFields[PackageTitleType.NszUpdate].Value;
-        _settings.XciBasePath = _templateFields[PackageTitleType.XciBase].Value;
-        _settings.XciDlcPath = _templateFields[PackageTitleType.XciDlc].Value;
-        _settings.XciUpdatePath = _templateFields[PackageTitleType.XciUpdate].Value;
-        _settings.XczBasePath = _templateFields[PackageTitleType.XczBase].Value;
-        _settings.XczDlcPath = _templateFields[PackageTitleType.XczDlc].Value;
-        _settings.XczUpdatePath = _templateFields[PackageTitleType.XczUpdate].Value;
+        _settings.NspBasePath = _templateFields[TitlePackageType.NspBase].Value;
+        _settings.NspDlcPath = _templateFields[TitlePackageType.NspDlc].Value;
+        _settings.NspUpdatePath = _templateFields[TitlePackageType.NspUpdate].Value;
+        _settings.NszBasePath = _templateFields[TitlePackageType.NszBase].Value;
+        _settings.NszDlcPath = _templateFields[TitlePackageType.NszDlc].Value;
+        _settings.NszUpdatePath = _templateFields[TitlePackageType.NszUpdate].Value;
+        _settings.XciBasePath = _templateFields[TitlePackageType.XciBase].Value;
+        _settings.XciDlcPath = _templateFields[TitlePackageType.XciDlc].Value;
+        _settings.XciUpdatePath = _templateFields[TitlePackageType.XciUpdate].Value;
+        _settings.XczBasePath = _templateFields[TitlePackageType.XczBase].Value;
+        _settings.XczDlcPath = _templateFields[TitlePackageType.XczDlc].Value;
+        _settings.XczUpdatePath = _templateFields[TitlePackageType.XczUpdate].Value;
 
         NotificationService.Notify(notificationMessage);
         return validationResult.IsValid;
@@ -287,7 +288,7 @@ public partial class PackageRenamer
         };
 
         if (templateField is TemplateField.Extension or TemplateField.AppName or TemplateField.PatchId
-            or TemplateField.PatchNum)
+            or TemplateField.PatchCount)
             options.Position = TooltipPosition.Left;
 
         var content = templateField switch
@@ -302,7 +303,7 @@ public partial class PackageRenamer
                 "The name the corresponding Application, useful in updates and dlc to see the Application they belong to",
             TemplateField.PatchId =>
                 "If content is an Application, this value is equal to the id of the corresponding Patch content, otherwise empty",
-            TemplateField.PatchNum =>
+            TemplateField.PatchCount =>
                 "If content is an Application, this value is equal to the number of patches available for the corresponding Application, otherwise empty",
             _ => string.Empty
         };
@@ -315,7 +316,7 @@ public partial class PackageRenamer
 
 public record TemplateFieldInfo
 {
-    public required PackageTitleType FieldType { get; init; }
+    public required TitlePackageType FieldType { get; init; }
     public int CursorPosition { get; set; }
     public required string Value { get; set; }
 }

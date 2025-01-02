@@ -33,11 +33,11 @@ public class SqlRenamerService(
         '™', '©', '®', '~', '#', '%', '&', ':'
     ];
     
-    private async Task<(string, bool, string)> TryBuildNewFileNameAsync(LibraryTitle fileInfo, string file)
+    private async Task<(string, bool, string)> TryBuildNewFileNameAsync(LibraryTitle fileInfo, string file, RenameType renameType)
     {
         try
         {
-            var newPath = await BuildNewFileNameAsync(fileInfo, file);
+            var newPath = await BuildNewFileNameAsync(fileInfo, file, renameType);
             return (newPath, false, string.Empty);
         }
         catch (Exception e)
@@ -88,7 +88,8 @@ public class SqlRenamerService(
         return invalidChars.Aggregate(input, (current, c) => current.Replace(c.ToString(), ""));
     }
     
-    private Task<string> TemplateReplaceAsync(string renameTemplate, LibraryTitle fileInfo)
+    private Task<string> TemplateReplaceAsync(
+        string renameTemplate, LibraryTitle fileInfo, RenameType renameType)
     {
         var newPath = renameTemplate;
         foreach (var (key, pattern) in RenamerTemplateFields.TemplateFieldMappings)
@@ -106,17 +107,19 @@ public class SqlRenamerService(
                 safeAppTitleName = RemoveIllegalCharacters(fileInfo.ApplicationTitleName);
             }
             
-            
             var replacement = key switch
             {
-                TemplateField.BasePath  => _packageRenamerSettings.OutputBasePath,
+                TemplateField.BasePath  => (renameType == RenameType.PackageType) ?  
+                    _packageRenamerSettings.OutputBasePath : _bundleRenamerSettings.OutputBasePath,
                 TemplateField.TitleName => safeTitleName,
                 TemplateField.TitleId   => fileInfo.TitleId,
                 TemplateField.Version   => fileInfo.TitleVersion.ToString(),
                 TemplateField.Extension => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName   => safeAppTitleName,
+                TemplateField.Region   => fileInfo.Region,
                 TemplateField.PatchId   => fileInfo.PatchTitleId,
-                TemplateField.PatchNum  => fileInfo.PatchNumber.ToString(),
+                TemplateField.PatchCount   => fileInfo.UpdatesCount.ToString(),
+                TemplateField.DlcCount   => fileInfo.DlcCount.ToString(),
                 _                       => string.Empty
             };
             
@@ -128,43 +131,40 @@ public class SqlRenamerService(
         }
         return Task.FromResult(newPath);
     }
+
+    private async Task<LibraryTitle?> GetAggregatedFileInfo(string fileLocation)
+    {
+        var fileInfo = await _fileInfoService.GetFileInfo(fileLocation, false);
+        var titledbTitle =
+                await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == fileInfo.TitleId);
+        if (titledbTitle is null) return fileInfo;
+
+        //prefer Name  from titledb instead of the file
+        fileInfo.TitleName = titledbTitle.TitleName;
+        fileInfo.UpdatesCount = titledbTitle.UpdatesCount;
+        fileInfo.DlcCount = titledbTitle.DlcCount;
+
+        if (titledbTitle.ContentType == TitleContentType.Base
+            || string.IsNullOrEmpty(titledbTitle.OtherApplicationId)) return fileInfo;
+
+        var parentTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == titledbTitle.OtherApplicationId);
+        fileInfo.ApplicationTitleName = parentTitle?.TitleName;
+        
+
+
+        return fileInfo;
+    }
    
     
-    public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(string inputPath, bool recursive = false)
+    public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(
+        string inputPath, RenameType renameType, bool recursive = false)
     {
         var files = await _fileInfoService.GetFileNames(inputPath, recursive);
         var fileList = new List<RenameTitle>();
         
-        // clean up this mess later
         foreach (var file in files)
         {
-            var fileInfo = await _fileInfoService.GetFileInfo(file, false);
-            
-            if (fileInfo?.Error == true)
-            {
-                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, fileInfo.Error, fileInfo.ErrorMessage));
-                continue;
-            }
-
-            if (fileInfo is not null && string.IsNullOrEmpty(fileInfo.TitleName))
-            {
-                var titledbTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == fileInfo.TitleId);
-                if (titledbTitle is not null)
-                {
-                    fileInfo.TitleName = titledbTitle.TitleName;
-                    if (fileInfo.ApplicationTitleId is not null && titledbTitle.ContentType != TitleContentType.Base)
-                    {
-                        var appTitledbTitle =
-                            await _titledbDbContext.Titles.FirstOrDefaultAsync(t =>
-                                t.ApplicationId == fileInfo.ApplicationTitleId);
-                        if (appTitledbTitle != null)
-                        {
-                            fileInfo.ApplicationTitleName = appTitledbTitle.TitleName;
-                        }
-                    }
-                }
-            }
-
+            var fileInfo = await GetAggregatedFileInfo(file);
             if (fileInfo is null)
             {
                 fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, true,
@@ -172,7 +172,13 @@ public class SqlRenamerService(
                 continue;
             }
             
-            var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file);
+            if (fileInfo?.Error == true)
+            {
+                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, fileInfo.Error, fileInfo.ErrorMessage));
+                continue;
+            }
+            
+            var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file, renameType);
             if (error)
             {
                 fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, error,
@@ -195,74 +201,108 @@ public class SqlRenamerService(
         return fileList;
     }
 
-    public async Task<string> BuildNewFileNameAsync(LibraryTitle fileInfo, string filePath)
+    private async Task<string> BuildNewFileNameAsync(
+        LibraryTitle fileInfo, 
+        string filePath, 
+        RenameType renameType)
     {
         fileInfo.FileName = filePath;
 
-        // No demo support for now
-        var renameTemplate = fileInfo.PackageType switch
+        switch (renameType)
         {
-            AccuratePackageType.NSP => fileInfo.Type switch
+            case RenameType.Bundle:
             {
-                TitleLibraryType.Base   => _packageRenamerSettings.NspBasePath,
-                TitleLibraryType.Update => _packageRenamerSettings.NspUpdatePath,
-                TitleLibraryType.DLC    => _packageRenamerSettings.NspDlcPath,
-                _                       => string.Empty
-            },
-            AccuratePackageType.NSZ => fileInfo.Type switch
+                var renameTemplate = fileInfo.Type switch
+                {
+                    TitleLibraryType.Base => _bundleRenamerSettings.BundleBase,
+                    TitleLibraryType.Update => _bundleRenamerSettings.BundleUpdate,
+                    TitleLibraryType.DLC => _bundleRenamerSettings.BundleDlc,
+                    _ => string.Empty
+                };
+                var prependBasePath = $"{{BasePath}}{renameTemplate}";
+                return await TemplateReplaceAsync(prependBasePath, fileInfo, renameType);
+            }
+            case RenameType.PackageType:
             {
-                TitleLibraryType.Base   => _packageRenamerSettings.NszBasePath,
-                TitleLibraryType.Update => _packageRenamerSettings.NszUpdatePath,
-                TitleLibraryType.DLC    => _packageRenamerSettings.NszDlcPath,
-                _                       => string.Empty
-            },
-            AccuratePackageType.XCI => fileInfo.Type switch
-            {
-                TitleLibraryType.Base   => _packageRenamerSettings.XciBasePath,
-                TitleLibraryType.Update => _packageRenamerSettings.XciUpdatePath,
-                TitleLibraryType.DLC    => _packageRenamerSettings.XciDlcPath,
-                _                       => string.Empty
-            },
-            AccuratePackageType.XCZ => fileInfo.Type switch
-            {
-                TitleLibraryType.Base   => _packageRenamerSettings.XczBasePath,
-                TitleLibraryType.Update => _packageRenamerSettings.XczUpdatePath,
-                TitleLibraryType.DLC    => _packageRenamerSettings.XczDlcPath,
-                _                       => string.Empty
-            },
-            _ => throw new Exception("Unknown package type")
-        };
-        
-        return await TemplateReplaceAsync(renameTemplate, fileInfo);
-
+                // No demo support for now
+                var renameTemplate = fileInfo.PackageType switch
+                {
+                    AccuratePackageType.NSP => fileInfo.Type switch
+                    {
+                        TitleLibraryType.Base   => _packageRenamerSettings.NspBasePath,
+                        TitleLibraryType.Update => _packageRenamerSettings.NspUpdatePath,
+                        TitleLibraryType.DLC    => _packageRenamerSettings.NspDlcPath,
+                        _                       => string.Empty
+                    },
+                    AccuratePackageType.NSZ => fileInfo.Type switch
+                    {
+                        TitleLibraryType.Base   => _packageRenamerSettings.NszBasePath,
+                        TitleLibraryType.Update => _packageRenamerSettings.NszUpdatePath,
+                        TitleLibraryType.DLC    => _packageRenamerSettings.NszDlcPath,
+                        _                       => string.Empty
+                    },
+                    AccuratePackageType.XCI => fileInfo.Type switch
+                    {
+                        TitleLibraryType.Base   => _packageRenamerSettings.XciBasePath,
+                        TitleLibraryType.Update => _packageRenamerSettings.XciUpdatePath,
+                        TitleLibraryType.DLC    => _packageRenamerSettings.XciDlcPath,
+                        _                       => string.Empty
+                    },
+                    AccuratePackageType.XCZ => fileInfo.Type switch
+                    {
+                        TitleLibraryType.Base   => _packageRenamerSettings.XczBasePath,
+                        TitleLibraryType.Update => _packageRenamerSettings.XczUpdatePath,
+                        TitleLibraryType.DLC    => _packageRenamerSettings.XczDlcPath,
+                        _                       => string.Empty
+                    },
+                    _ => throw new Exception("Unknown package type")
+                };
+                return await TemplateReplaceAsync(renameTemplate, fileInfo, renameType);
+            }
+            default:
+                return string.Empty;
+        }
     }
 
     public async Task<string> CalculateSampleFileName(string templateText, 
-        PackageTitleType packageType, string inputFile, string basePath)
+        TitlePackageType titlePackageType, string inputFile, RenameType renameType)
     {
-        var libraryType = packageType switch
-        {
-            PackageTitleType.NspBase   => TitleLibraryType.Base,
-            PackageTitleType.NspUpdate => TitleLibraryType.Update,
-            PackageTitleType.NspDlc    => TitleLibraryType.DLC,
-            PackageTitleType.BundleBase => TitleLibraryType.Base,
-            PackageTitleType.BundleUpdate => TitleLibraryType.Update,
-            PackageTitleType.BundleDlc    => TitleLibraryType.DLC,
-            _                          => TitleLibraryType.Unknown
-        };
-        
         var fileInfo = new LibraryTitle
         {
             PackageType = AccuratePackageType.NSP,
-            Type = libraryType,
             TitleName = "Some Title Name",
             TitleId = "0010000",
             FileName = inputFile,
             ApplicationTitleName = "Some App Name",
             PatchNumber = 1,
             PatchTitleId = "0000001",
+            Region = "US",
+            UpdatesCount = 5,
+            DlcCount = 3,
         };
-        return await TemplateReplaceAsync(templateText, fileInfo);
+        
+        if (renameType == RenameType.Bundle)
+        {
+            fileInfo.Type = titlePackageType switch
+            {
+                TitlePackageType.BundleBase   => TitleLibraryType.Base,
+                TitlePackageType.BundleUpdate => TitleLibraryType.Update,
+                TitlePackageType.BundleDlc    => TitleLibraryType.DLC,
+                _                             => TitleLibraryType.Unknown
+            }; 
+        }
+        else
+        {
+            fileInfo.Type = titlePackageType switch
+            {
+                TitlePackageType.NspBase   => TitleLibraryType.Base,
+                TitlePackageType.NspUpdate => TitleLibraryType.Update,
+                TitlePackageType.NspDlc    => TitleLibraryType.DLC,
+                _                          => TitleLibraryType.Unknown
+            };
+        }
+        
+        return await TemplateReplaceAsync(templateText, fileInfo, renameType);
     }
 
     public Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings)

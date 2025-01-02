@@ -9,7 +9,7 @@ public enum TemplateField
     Extension,
     AppName,
     PatchId,
-    PatchNum,
+    PatchCount,
     Region,
     Size,
     DlcCount

@@ -14,7 +14,9 @@ public class RenamerTemplateFields
         { TemplateField.Extension, "{Extension}" },
         { TemplateField.AppName, "{AppName}" },
         { TemplateField.PatchId, "{PatchId}" },
-        { TemplateField.PatchNum, "{PatchNum}" },
+        { TemplateField.PatchCount, "{PatchCount}" },
+        { TemplateField.DlcCount, "{DlcCount}" },
+        { TemplateField.Region, "{Region}" },
     };
     
     public static string GetTemplateField(TemplateField templateField)
