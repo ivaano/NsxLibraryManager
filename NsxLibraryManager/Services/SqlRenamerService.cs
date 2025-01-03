@@ -151,7 +151,8 @@ public class SqlRenamerService(
             
             if (!string.IsNullOrEmpty(fileInfo.TitleName))
             {
-                if (renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase)
+                if ((renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase) ||
+                    (renameType == RenameType.PackageType && _packageRenamerSettings.TitlesForceUppercase))
                 {
                     fileInfo.TitleName = CustomTitleCase(fileInfo.TitleName);
                 }
@@ -165,7 +166,8 @@ public class SqlRenamerService(
             
             if (!string.IsNullOrEmpty(fileInfo.ApplicationTitleName))
             {
-                if (renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase)
+                if ((renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase) ||
+                    (renameType == RenameType.PackageType && _packageRenamerSettings.TitlesForceUppercase))
                 {
                     fileInfo.ApplicationTitleName = CustomTitleCase(fileInfo.ApplicationTitleName);
                 }
@@ -419,7 +421,7 @@ public class SqlRenamerService(
                 if (file.DestinationFileName is not null)
                 {
                     File.Move(file.SourceFileName, file.DestinationFileName);
-                    renamedFiles.Add(file);
+                    renamedFiles.Add(file with { RenamedSuccessfully = true });
                 }
                 else
                 {

@@ -10,10 +10,12 @@
         <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
-                        IsLoading="@isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
+                        IsLoading="@_isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
             <HeaderTemplate>
-                <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
-                <RadzenButton Text="Rename Files" Click="@RenameFiles" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" Disabled="@_scanInputButtonDisabled" class=".rz-shadow-2"/>
+                <RadzenButton Text="Rename Files" Click="@RenameFiles" ButtonStyle="ButtonStyle.Danger" Disabled="@_renameButtonDisabled"  class=".rz-shadow-2"/>
+                <RadzenText TextStyle="TextStyle.Caption">Input Path: @_inputPathDisplay</RadzenText> |
+                <RadzenText TextStyle="TextStyle.Caption">Output Path: @_outputPathDisplay </RadzenText>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn TItem="RenameTitle" Property="SourceFileName" Title="Source File" Width="200px">
@@ -59,10 +61,29 @@
                             <div class="rz-message rz-messages-error ">@_validationErrors["InputPath"]</div>
                         </Helper>
                     </RadzenFormField>
-                    <div class="rz-text-align-right">
-                        <RadzenCheckBox Name="Recusive" @bind-Value="@_settings.Recursive"/>
-                        <RadzenLabel Text="Recursive Subdirectories" Component="Recusive" Style="margin-left: 8px; vertical-align: middle;"/>
-                    </div>
+                    <RadzenFormField Text="Unkown Placeholder" Variant="@Variant" Style="width: 100%; padding: 1px">
+                        <ChildContent>
+                            <RadzenTextBox @bind-Value="@_settings.UnknownPlaceholder" id="UnknownPlaceholder" Name="UnknownPlaceholder"
+                                           Style="font-family: monospace;"
+                            />
+                        </ChildContent>
+                        <Helper>
+                            <RadzenText TextStyle="TextStyle.Caption">This will be used to replace an empty TitleName or AppName when renaming files.</RadzenText>
+
+                        </Helper>
+                    </RadzenFormField>
+                    <RadzenRow class="rz-text-align-center">
+                        <RadzenColumn Size="6">
+                            <RadzenCheckBox Name="DeleteEmptyFolders"
+                                            @bind-Value="@_settings.DeleteEmptyFolders"
+                                            MouseEnter="@(args => ShowTooltip("Once the rename process finishes, all empty folders inside input path will be removed.", args) )"/>
+                            <RadzenLabel Text="Delete empty folders after rename" Component="DeleteEmptyFolders" Style="margin-left: 8px; vertical-align: middle;"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenCheckBox Name="Recusive" @bind-Value="@_settings.Recursive"/>
+                            <RadzenLabel Text="Recursive Subdirectories" Component="Recusive" Style="margin-left: 8px; vertical-align: middle;"/>
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RenamerFieldSet>
                 <RenamerFieldSet Text="Output">
                     <RadzenFormField Text="Base Path" Variant="@Variant" Style="width: 100%; padding: 1px">
@@ -76,6 +97,14 @@
                             <div class="rz-message rz-messages-error ">@_validationErrors["OutputBasePath"]</div>
                         </Helper>
                     </RadzenFormField>
+                    <div class="rz-text-align-right">
+                        <RadzenCheckBox Name="TitlesForceUppercase"
+                                        @bind-Value="@_settings.TitlesForceUppercase"
+                                        MouseEnter="@(args => ShowTooltip("Convert TitleName and AppName to Title Case when renaming.", args) )"/>
+                        <RadzenLabel Text="TitleName and AppName to TitleCase"
+                                     Component="TitlesForceUppercase"
+                                     Style="margin-left: 8px; vertical-align: middle;"/>
+                    </div>
                 </RenamerFieldSet>
                 <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
                     <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Success" Click="@ValidateConfiguration" class="rz-ripple">Validate Configuration</RadzenButton>

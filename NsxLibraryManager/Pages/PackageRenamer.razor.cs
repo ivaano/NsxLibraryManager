@@ -48,22 +48,26 @@ public partial class PackageRenamer
     private IEnumerable<RenameTitle> _renameTitles = default!;
     private RadzenDataGrid<RenameTitle> _renameGrid = default!;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    
-    private bool isLoading = false;
+    private bool _isLoading = false;
+    private bool _scanInputButtonDisabled = false;
+    private bool _renameButtonDisabled = true;
+    private string _inputPathDisplay = string.Empty;
+    private string _outputPathDisplay = string.Empty;
+    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         await ShowLoading();
         InitializeTemplateFields();
         await InitializeSettings();
-
         await SelectConfigurationTab();
     }
 
     private async Task ShowLoading()
     {
-        isLoading = true;
+        _isLoading = true;
         await Task.Yield();
-        isLoading = false;
+        _isLoading = false;
     }
     
     private Task SelectConfigurationTab()
@@ -73,19 +77,45 @@ public partial class PackageRenamer
         return Task.CompletedTask;
 
     }
+
+    private async Task ResetGrid()
+    {
+        _renameButtonDisabled = true;
+        _renameTitles = default!;
+        StateHasChanged(); 
+        await Task.Delay(1); 
+    }
     
     private async Task LoadFiles()
     {
-        isLoading = true;
-        _renameTitles = await RenamerService.GetFilesToRenameAsync(
-            _settings.InputPath, RenameType.PackageType, _settings.Recursive);
-        isLoading = false;
+        try
+        {
+            _isLoading = true;
+            _scanInputButtonDisabled = true;
+
+            await ResetGrid();
+            _renameTitles = await RenamerService.GetFilesToRenameAsync(
+                _settings.InputPath, RenameType.PackageType, _settings.Recursive);
+            if (_renameTitles.Any())
+            {
+                _renameButtonDisabled = false;
+            } 
+                
+        }
+        finally
+        {
+            _isLoading = false;
+            _scanInputButtonDisabled = false;
+            StateHasChanged();
+        }
     }
     
     private async Task RenameFiles()
     {
-        if (_renameTitles is null)
+        if (!_renameTitles.Any())
             return;
+        _renameButtonDisabled = true;
+        _scanInputButtonDisabled = true;
         var fileList = _renameTitles.ToList();
         var countFiles = fileList.Count(x => x.Error == false);
         
@@ -93,16 +123,43 @@ public partial class PackageRenamer
             $"This action will rename {countFiles} file(s), do you want to continue?", "Rename Files",
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
 
-        if (confirmationResult is true && fileList.Any())
+        if (confirmationResult is true && fileList.Count > 0)
         {
-            isLoading = true;
+            _isLoading = true;
+            await ResetGrid();
             _renameTitles = await RenamerService.RenameFilesAsync(fileList);
+            if (_settings.DeleteEmptyFolders)
+            {
+                var deleteFoldersResult = await RenamerService.DeleteEmptyFoldersAsync(_settings.InputPath);
+                if (!deleteFoldersResult)
+                {
+                    NotificationService.Notify(new NotificationMessage
+                    {
+                        Severity = NotificationSeverity.Error,
+                        Summary = "Some Folders Couldn't be Deleted",
+                        Duration = 4000
+                    });
+                }
+            }
+            
             var stats = _renameTitles.ToList();
             var errors = stats.Count(x => x.Error);
             var success = stats.Count(x => x.RenamedSuccessfully);
-            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Rename Process Finished!", Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 4000 });
+            
+            NotificationService.Notify(errors > 0
+                ? new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error, Summary = "Rename process finished with som errors!",
+                    Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 6000
+                }
+                : new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success, Summary = "Rename process finished with success!",
+                    Detail = $"{success} Files Renamed and {errors} error(s)", Duration = 4000
+                });            
             await _renameGrid.Reload();
-            isLoading = false;
+            _isLoading = false;
+            _scanInputButtonDisabled = false;
         }
 
     }
@@ -110,6 +167,8 @@ public partial class PackageRenamer
     private async Task InitializeSettings()
     {
         _settings = await SettingsService.GetPackageRenamerSettings();
+        _inputPathDisplay = _settings.InputPath;
+        _outputPathDisplay = _settings.OutputBasePath;
         _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
 
         _templateFields[TitlePackageType.NspBase].Value = _settings.NspBasePath;
@@ -224,7 +283,7 @@ public partial class PackageRenamer
         var isValid = await ValidateConfiguration();
         if (!isValid)
             return;
-        var savedSettings = await SettingsService.SavePackageRenamerSettings(_settings);
+        await SettingsService.SavePackageRenamerSettings(_settings);
         var notificationMessage = new NotificationMessage
         {
             Severity = NotificationSeverity.Success,
@@ -232,6 +291,7 @@ public partial class PackageRenamer
             Duration = 4000
         };
         NotificationService.Notify(notificationMessage);
+        await ResetGrid();
     }
 
     #region UI Helpers
@@ -277,6 +337,9 @@ public partial class PackageRenamer
         return validationResult.IsValid;
     }
 
+    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null) => 
+        TooltipService.Open(elementReference, message, options);
+    
     private void ShowTooltip(TemplateField templateField, ElementReference elementReference)
     {
         var options = new TooltipOptions()

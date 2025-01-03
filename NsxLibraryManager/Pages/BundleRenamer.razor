@@ -13,8 +13,8 @@
                     <HeaderTemplate>
                         <RadzenButton Text="Scan Input Folder" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" Disabled="@_scanInputButtonDisabled" class=".rz-shadow-2"/>
                         <RadzenButton Text="Rename Files" Click="@RenameFiles" ButtonStyle="ButtonStyle.Danger" Disabled="@_renameButtonDisabled" class=".rz-shadow-2"/>
-                        <RadzenText TextStyle="TextStyle.Caption">Input Path: @inputPathDisplay</RadzenText> |
-                        <RadzenText TextStyle="TextStyle.Caption">Output Path: @outputPathDisplay </RadzenText>
+                        <RadzenText TextStyle="TextStyle.Caption">Input Path: @_inputPathDisplay</RadzenText> |
+                        <RadzenText TextStyle="TextStyle.Caption">Output Path: @_outputPathDisplay </RadzenText>
                     </HeaderTemplate>
                     <Columns>
                         <RadzenDataGridColumn TItem="RenameTitle" Property="SourceFileName" Title="Source File" Width="200px">

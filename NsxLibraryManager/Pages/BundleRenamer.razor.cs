@@ -50,8 +50,8 @@ public partial class BundleRenamer : ComponentBase
     };
     private bool _scanInputButtonDisabled = false;
     private bool _renameButtonDisabled = true;
-    private string inputPathDisplay = string.Empty;
-    private string outputPathDisplay = string.Empty;
+    private string _inputPathDisplay = string.Empty;
+    private string _outputPathDisplay = string.Empty;
 
 
     
@@ -61,7 +61,6 @@ public partial class BundleRenamer : ComponentBase
         await ShowLoading();
         InitializeTemplateFields();
         await InitializeSettings();
-
         await SelectConfigurationTab();
     }
     
@@ -76,8 +75,8 @@ public partial class BundleRenamer : ComponentBase
     private async Task InitializeSettings()
     {
         _settings = await SettingsService.GetBundleRenamerSettings();
-        inputPathDisplay = _settings.InputPath;
-        outputPathDisplay = _settings.OutputBasePath;
+        _inputPathDisplay = _settings.InputPath;
+        _outputPathDisplay = _settings.OutputBasePath;
         _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
 
         _templateFields[TitlePackageType.BundleBase].Value = _settings.BundleBase;
@@ -111,14 +110,22 @@ public partial class BundleRenamer : ComponentBase
         }
     }
     
+    private async Task ResetGrid()
+    {
+        _renameButtonDisabled = true;
+        _renameTitles = default!;
+        StateHasChanged(); 
+        await Task.Delay(1); 
+    }
+    
     private async Task LoadFiles()
     {
         try
         {
-            _renameTitles = default!;
             isLoading = true;
-            StateHasChanged(); 
-            await Task.Delay(1); // Ensure UI updates before heavy operation
+            _scanInputButtonDisabled = true;
+
+            await ResetGrid();
             _renameTitles = await RenamerService.GetFilesToRenameAsync(
                 _settings.InputPath, RenameType.Bundle, _settings.Recursive);
             if (_renameTitles.Any())
@@ -130,6 +137,7 @@ public partial class BundleRenamer : ComponentBase
         finally
         {
             isLoading = false;
+            _scanInputButtonDisabled = false;
             StateHasChanged();
         }
     }
@@ -283,6 +291,7 @@ public partial class BundleRenamer : ComponentBase
             Duration = 4000
         };
         NotificationService.Notify(notificationMessage);
+        await ResetGrid();
     }
     
     private async Task RenameFiles()
@@ -301,9 +310,7 @@ public partial class BundleRenamer : ComponentBase
         if (confirmationResult is true && fileList.Count > 0)
         {
             isLoading = true;
-            _renameTitles = default!;
-            StateHasChanged(); 
-            await Task.Delay(1); 
+            await ResetGrid();
             _renameTitles = await RenamerService.RenameFilesAsync(fileList);
             if (_settings.DeleteEmptyFolders)
             {
@@ -318,7 +325,6 @@ public partial class BundleRenamer : ComponentBase
                     });
                 }
             }
-            
 
             var stats = _renameTitles.ToList();
             var errors = stats.Count(x => x.Error);
