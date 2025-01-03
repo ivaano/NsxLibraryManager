@@ -296,6 +296,39 @@ public partial class PackageRenamer
 
     #region UI Helpers
 
+    private async Task<bool> LoadDefaultTemplate()
+    {
+        var confirmationResult = await DialogService.Confirm(
+            $"This action will replace current template do you want to continue?", "Default Template",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (confirmationResult is not true) return true;
+        const string nspBaseTemplate = @"{BasePath}\NSP\Base\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string nspUpdateTemplate = @"{BasePath}\NSP\Updates\{AppName} [{TitleId}][v{Version}].{Extension}";
+        const string nspDlcTemplate = @"{BasePath}\NSP\DLC\{AppName} [{TitleName}][{TitleId}][v{Version}].{Extension}";
+        
+        const string xciBaseTemplate = @"{BasePath}\XCI\Base\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string xciUpdateTemplate = @"{BasePath}\XCI\Updates\{AppName} [{TitleId}][v{Version}].{Extension}";
+        const string xciDlcTemplate = @"{BasePath}\XCI\DLC\{AppName} [{TitleName}][{TitleId}][v{Version}].{Extension}";
+        
+        _templateFields[TitlePackageType.NspBase].Value = nspBaseTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.NspUpdate].Value = nspUpdateTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.NspDlc].Value = nspDlcTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.NszBase].Value = nspBaseTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        
+        _templateFields[TitlePackageType.NszUpdate].Value = nspUpdateTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.NszDlc].Value = nspDlcTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        
+        _templateFields[TitlePackageType.XciBase].Value = xciBaseTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.XciUpdate].Value = xciUpdateTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.XciDlc].Value = xciDlcTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());        
+        
+        _templateFields[TitlePackageType.XczBase].Value = xciBaseTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.XczUpdate].Value = xciUpdateTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.XczDlc].Value = xciDlcTemplate.Replace(@"\", Path.DirectorySeparatorChar.ToString());        
+        return true;
+    }
+    
     private async Task<bool> ValidateConfiguration()
     {
         Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);

@@ -246,6 +246,22 @@ public partial class BundleRenamer : ComponentBase
         }
     }
 
+    private async Task<bool> LoadDefaultTemplate()
+    {
+        var confirmationResult = await DialogService.Confirm(
+            $"This action will replace current template do you want to continue?", "Default Template",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (confirmationResult is not true) return true;
+        const string baseTemplate = "{TitleName}\\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string updateTemplate = "{AppName}\\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string dlcTemplate = "{AppName}\\DLC\\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        _templateFields[TitlePackageType.BundleBase].Value = baseTemplate.Replace("\\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.BundleUpdate].Value = updateTemplate.Replace("\\", Path.DirectorySeparatorChar.ToString());
+        _templateFields[TitlePackageType.BundleDlc].Value = dlcTemplate.Replace("\\", Path.DirectorySeparatorChar.ToString());
+        return true;
+    }
+
     private async Task<bool> ValidateConfiguration()
     {
         Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
@@ -283,7 +299,7 @@ public partial class BundleRenamer : ComponentBase
         var isValid = await ValidateConfiguration();
         if (!isValid)
             return;
-        var savedSettings = await SettingsService.SaveBundleRenamerSettings(_settings);
+        await SettingsService.SaveBundleRenamerSettings(_settings);
         var notificationMessage = new NotificationMessage
         {
             Severity = NotificationSeverity.Success,
