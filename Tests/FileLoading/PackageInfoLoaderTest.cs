@@ -19,18 +19,23 @@ public class PackageInfoLoaderTest
         var keySetProviderServiceLogger = Substitute.For<ILogger<IKeySetProviderService>>();
         var appSettings = new AppSettings
         {
-                TitleDatabase = "titledb",
-                LibraryPath = "library",
-                ProdKeys = string.Empty,
-                DownloadSettings = new DownloadSettings
+            TitleDatabase = "titledb",
+            LibraryPath = "library",
+            ProdKeys = string.Empty,
+            DownloadSettings = new DownloadSettings
+            {
+                TimeoutInSeconds = 0,
+                TitleDbPath = "/tmp",
+                RegionUrl = string.Empty,
+                CnmtsUrl = string.Empty,
+                VersionsUrl = string.Empty,
+                Regions = new List<string>
                 {
-                        TimeoutInSeconds = 0,
-                        TitleDbPath = "/tmp",
-                        RegionUrl = string.Empty,
-                        CnmtsUrl = string.Empty,
-                        VersionsUrl = string.Empty,
-                        Regions = new List<string>{"US"}
+                    "US"
                 }
+            },
+            TitledbDbConnection = "titledb.db",
+            NsxLibraryDbConnection = "nsxlibrary.db",
         };
         var options = Options.Create(appSettings);
         _packageTypeAnalyzer = new PackageTypeAnalyzer(packageTypelogger);

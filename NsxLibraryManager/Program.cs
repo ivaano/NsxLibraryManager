@@ -13,8 +13,10 @@ using NsxLibraryManager.Core.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Data;
+using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Utils;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -24,16 +26,42 @@ var configFile = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirec
 
 var configBuilder = new ConfigurationBuilder()
     .AddJsonFile(configFile, optional: true, reloadOnChange: false);
-var configurationRoot = configBuilder.Build();
+var initialConfig = configBuilder.Build();
 
-var validatorResult = ConfigValidator.ValidateRootConfig(configurationRoot);
+var validatorResult = ConfigValidator.ValidateRootConfig(initialConfig);
+
+if (validatorResult.defaultConfigCreated)
+{
+    initialConfig = configBuilder.Build();
+}
 
 var builder = WebApplication.CreateBuilder(args);
+//var builder = StartupConfiguration.ConfigureServices(args, configurationRoot);
+builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
+    options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value));
+
+var scopeFactory = builder.Services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>();
+builder.Configuration.AddLiveDatabase(scopeFactory);
+/*
+builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("NsxLibraryDBConnection"));
+    // options.EnableSensitiveDataLogging(true);
+});
+*/
+
 // configuration.
 builder.Services
     .AddOptions<AppSettings>()
-    .BindConfiguration(AppConstants.AppSettingsSectionName);
+    .Bind(builder.Configuration.GetSection(AppConstants.AppSettingsSectionName))
+    .Configure<IConfiguration>((settings, config) =>
+    {
+        config.GetSection(AppConstants.AppSettingsSectionName).Bind(settings);
+    });
 
+
+    //.BindConfiguration(AppConstants.AppSettingsSectionName);
+/*
 builder.Configuration
     .AddJsonFile(configFile,
         optional: true,
@@ -45,6 +73,7 @@ builder.Configuration.AddInMemoryCollection(
         { "IsConfigValid", validatorResult.valid.ToString() },
         { "IsDefaultConfigCreated", validatorResult.defaultConfigCreated.ToString()}
     });
+*/
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<TitledbDbContext>(options =>
@@ -52,11 +81,7 @@ builder.Services.AddDbContext<TitledbDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("TitledbDBConnection"));
     // options.EnableSensitiveDataLogging(true);
 });
-builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
-{
-    options.UseSqlite(builder.Configuration.GetConnectionString("NsxLibraryDBConnection"));
-    // options.EnableSensitiveDataLogging(true);
-});
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //nsx services

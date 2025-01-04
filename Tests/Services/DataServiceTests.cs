@@ -24,17 +24,22 @@ public class DataServiceTests : IClassFixture<DatabaseFixture>, IDisposable
         var titleDbLocation = fixture.DbPath;
         var appSettings = new AppSettings
         {
-                DownloadSettings = new DownloadSettings
+            DownloadSettings = new DownloadSettings
+            {
+                TimeoutInSeconds = 10,
+                TitleDbPath = "/tmp",
+                Regions = new[]
                 {
-                        TimeoutInSeconds = 10,
-                        TitleDbPath = "/tmp",
-                        Regions = new[] { "US" },
-                        RegionUrl = "https://raw.githubusercontent.com/blawar/titledb/master/{region}.en.json",
-                        CnmtsUrl = "https://raw.githubusercontent.com/blawar/titledb/master/cnmts.json",
-                        VersionsUrl = "https://raw.githubusercontent.com/blawar/titledb/master/versions.json",
+                    "US"
                 },
-                TitleDatabase = titleDbLocation,
-                LibraryPath = @"n:\roms\prueba",
+                RegionUrl = "https://raw.githubusercontent.com/blawar/titledb/master/{region}.en.json",
+                CnmtsUrl = "https://raw.githubusercontent.com/blawar/titledb/master/cnmts.json",
+                VersionsUrl = "https://raw.githubusercontent.com/blawar/titledb/master/versions.json",
+            },
+            TitleDatabase = titleDbLocation,
+            LibraryPath = @"n:\roms\prueba",
+            TitledbDbConnection = null,
+            NsxLibraryDbConnection = null,
         };
         var optionsConfiguration = Options.Create(appSettings);
         var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());

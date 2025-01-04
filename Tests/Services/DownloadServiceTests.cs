@@ -29,9 +29,11 @@ public class DownloadServiceTests
         };
         var appSettings = new AppSettings
         {
-                DownloadSettings = downloadSettings,
-                TitleDatabase = "titledb.db",
-                LibraryPath = "somepath",
+            DownloadSettings = downloadSettings,
+            TitleDatabase = "titledb.db",
+            LibraryPath = "somepath",
+            TitledbDbConnection = null,
+            NsxLibraryDbConnection = null,
         };
         var options = Options.Create(appSettings);
         

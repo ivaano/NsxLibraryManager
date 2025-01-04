@@ -10,5 +10,8 @@ public static class AppConstants
     public const string RenamerSettingsName = "RenamerSettings";
     public const string AppSettingsSectionName = "NsxLibraryManager";
     public const string ConfigFileName = "config.json";
-    public const string ConfigDirectory = "titledb";
+    public const string ConfigDirectory = "config";
+    public const string DataDirectory = "data";
+    public const string DefaultNsxLibraryDb = "nsxLibrary.db";
+    public const string DefaultTitleDbName = "titledb.db";
 }

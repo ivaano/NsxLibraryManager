@@ -69,9 +69,10 @@ public class ConfigValidator : AbstractValidator<AppSettings>
 
         RuleFor(x => x.DownloadSettings.VersionsUrl)
             .NotEmpty().WithMessage("Versions url cannot be empty.");
-
+/*
         RuleFor(x => x.DownloadSettings.Regions)
             .NotEmpty().WithMessage("Regions cannot be empty.");
+            */
     }
     
     public static (bool valid, bool defaultConfigCreated) ValidateRootConfig(IConfigurationRoot configurationRoot)
@@ -100,6 +101,10 @@ public class ConfigValidator : AbstractValidator<AppSettings>
 
         var appSettings = new AppSettings()
         {
+            TitledbDbConnection = $"Data Source={Path.Combine(AppContext.BaseDirectory, 
+                AppConstants.DataDirectory, AppConstants.DefaultTitleDbName)}",
+            NsxLibraryDbConnection = $"Data Source={Path.Combine(AppContext.BaseDirectory, 
+                AppConstants.DataDirectory, AppConstants.DefaultNsxLibraryDb)}",
             TitleDatabase = Path.Combine(AppContext.BaseDirectory, "NsxlibraryManager.db"),
             LibraryPath = Path.Combine(AppContext.BaseDirectory, "library"),
             DownloadSettings = new DownloadSettings()
@@ -123,6 +128,11 @@ public class ConfigValidator : AbstractValidator<AppSettings>
         if (!Directory.Exists(configFolder))
         {
             Directory.CreateDirectory(configFolder);
+        }
+        var dataFolder = Path.Combine(AppContext.BaseDirectory, AppConstants.DataDirectory);
+        if (!Directory.Exists(dataFolder))
+        {
+            Directory.CreateDirectory(dataFolder);
         }
 
         var appSettingsPath = Path.Combine(configFolder, AppConstants.ConfigFileName);

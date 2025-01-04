@@ -5,6 +5,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Extensions;
 using Radzen;
 
 namespace NsxLibraryManager.Pages;
@@ -73,7 +74,7 @@ public partial class Settings
     {
         var validateFields =await ValidateFields();
         if (!validateFields) return;
-        
+        /*
         var jsonWriteOptions = new JsonSerializerOptions
         {
             WriteIndented = true
@@ -88,9 +89,10 @@ public partial class Settings
         var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
         var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory, AppConstants.ConfigFileName);
         await File.WriteAllTextAsync(appSettingsPath, newJson);
-
+        */
         var configurationRoot = (IConfigurationRoot)Configuration;
-        configurationRoot.Reload();
+        configurationRoot.SetValue("NsxLibraryManager:DownloadSettings:TimeoutInSeconds", "300");
+        //configurationRoot.Reload();
         ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Configuration Saved!", Detail = "Settings have been saved to config.json.", Duration = 4000 });
     }
     
