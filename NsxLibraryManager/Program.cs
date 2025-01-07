@@ -39,7 +39,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // configuration.
 builder.Configuration.AddConfiguration(initialConfig);
-
 builder.Services
     .AddOptions<AppSettings>()
     .Bind(builder.Configuration.GetSection(AppConstants.AppSettingsSectionName))
@@ -47,22 +46,8 @@ builder.Services
     {
         config.GetSection(AppConstants.AppSettingsSectionName).Bind(settings);
     });
+await builder.TitleDbDownloader();
 
-
-    //.BindConfiguration(AppConstants.AppSettingsSectionName);
-/*
-builder.Configuration
-    .AddJsonFile(configFile,
-        optional: true,
-        reloadOnChange: true);
-
-builder.Configuration.AddInMemoryCollection(
-    new Dictionary<string, string?>
-    {
-        { "IsConfigValid", validatorResult.valid.ToString() },
-        { "IsDefaultConfigCreated", validatorResult.defaultConfigCreated.ToString()}
-    });
-*/
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<NsxLibraryDbContext>(options =>

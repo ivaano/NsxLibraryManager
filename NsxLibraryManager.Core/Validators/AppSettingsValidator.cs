@@ -11,10 +11,10 @@ public class AppSettingsValidator: AbstractValidator<AppSettings>
     
     public static (bool valid, bool defaultConfigCreated) ValidateRootConfig(IConfigurationRoot configurationRoot)
     {
-        if (File.Exists(configurationRoot["NsxLibraryManager:TitledbDbConnection"]))
+        if (File.Exists(configurationRoot[$"{AppConstants.AppSettingsSectionName}:{AppConstants.AppSettingsTitledbDbConnection}"]))
             return (true, false);
 
-        if (configurationRoot["NsxLibraryManager:TitledbDbConnection"] is null)
+        if (configurationRoot[$"{AppConstants.AppSettingsSectionName}:{AppConstants.AppSettingsTitledbDbConnection}"] is null)
         {
             CreateDefaultConfigFile(AppConstants.ConfigFileName); 
             return (true, true);
@@ -33,10 +33,13 @@ public class AppSettingsValidator: AbstractValidator<AppSettings>
         };
         jsonWriteOptions.Converters.Add(new JsonStringEnumConverter());
 
-        var appSettings = new AppSettings()
+        var appSettings = new AppSettings
         {
-            NsxLibraryDbConnection =$"Data Source={Path.Combine(AppContext.BaseDirectory, AppConstants.DataDirectory, AppConstants.DefaultNsxLibraryDb)}",
-            TitledbDbConnection =$"Data Source={Path.Combine(AppContext.BaseDirectory, AppConstants.DataDirectory, AppConstants.DefaultTitleDbName)}",
+            NsxLibraryDbConnection =
+                $"Data Source={Path.Combine(AppContext.BaseDirectory, AppConstants.DataDirectory, AppConstants.DefaultNsxLibraryDb)}",
+            TitledbDbConnection =
+                $"Data Source={Path.Combine(AppContext.BaseDirectory, AppConstants.DataDirectory, AppConstants.DefaultTitleDbName)}",
+            SqlTitleDbRepository = AppConstants.DefaultTitleRepository,
         };
         
         var sectionName = new Dictionary<string, AppSettings>
