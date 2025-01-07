@@ -25,10 +25,9 @@ public class FileInfoServiceTests
 
     public FileInfoServiceTests()
     {
-        var titleDbService = Substitute.For<ITitleDbService>();
         _packageInfoLoader = Substitute.For<IPackageInfoLoader>();
         ILogger<FileInfoService> logger = Substitute.For<ILogger<FileInfoService>>();
-        _fileInfoService = new FileInfoService(_packageInfoLoader, titleDbService, logger);
+        _fileInfoService = new FileInfoService(_packageInfoLoader, logger);
     }
 
     

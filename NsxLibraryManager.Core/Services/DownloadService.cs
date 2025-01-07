@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Exceptions;
@@ -7,48 +8,41 @@ using NsxLibraryManager.Core.Settings;
 
 namespace NsxLibraryManager.Core.Services;
 
-public sealed class DownloadService(
-    IOptions<AppSettings> appSettings,
+public sealed partial class DownloadService(
+    IOptions<UserSettings> options,
     IHttpClientFactory httpClientFactory,
     ILogger<DownloadService> logger)
     : IDownloadService
 {
-    private readonly DownloadSettings _downloadSettings = appSettings.Value.DownloadSettings;
 
-    public async Task<string> GetRegionFile(string region, CancellationToken cancellationToken = default)
-    {
-        if (_downloadSettings is { TitleDbPath: null })
-            throw new InvalidOperationException("TitleDbPath is needed in config");
-        var url = _downloadSettings.RegionUrl.Replace("{region}", region) ??
-                  throw new InvalidOperationException("DownloadRegionUrl is needed in config");
-        var destFilePath = Path.Combine(_downloadSettings.TitleDbPath, $"{region}.en.json");
-        logger.LogInformation($"Downloading region {region} from {url} to {destFilePath}");
-        await DownloadFileAsync(url, destFilePath, cancellationToken);
-        return destFilePath;
-    }
-
-    public async Task<string> GetCnmtsFile(CancellationToken cancellationToken = default)
-    {
-        if (_downloadSettings is { TitleDbPath: null })
-            throw new InvalidOperationException("TitleDbPath is needed in config");
-        var destFilePath = Path.Combine(_downloadSettings.TitleDbPath, $"cnmts.json");
-        await DownloadFileAsync(_downloadSettings.CnmtsUrl, destFilePath, cancellationToken);
-        return destFilePath;
-    }
-
-    public async Task<string> GetVersionsFile(CancellationToken cancellationToken = default)
-    {
-        if (_downloadSettings is { TitleDbPath: null })
-            throw new InvalidOperationException("TitleDbPath is needed in config");
-        var destFilePath = Path.Combine(_downloadSettings.TitleDbPath, $"versions.json");
-        await DownloadFileAsync(_downloadSettings.VersionsUrl, destFilePath, cancellationToken);
-        return destFilePath;
-    }
-
-    public async Task DownloadFileAsync(string url, string destFilePath, CancellationToken cancellationToken)
+    [GeneratedRegex(@"\t|\n|\r")]
+    private static partial Regex NoNewLines();
+    
+    public async Task<string> GetVersionsFile(string versionUrl, CancellationToken cancellationToken = default)
     {
         using var client = httpClientFactory.CreateClient();
-        client.Timeout = TimeSpan.FromSeconds(_downloadSettings.TimeoutInSeconds);
+        var response = await client.GetAsync(versionUrl, cancellationToken);
+        if (!response.IsSuccessStatusCode) return string.Empty;
+        
+        var version = NoNewLines().Replace(await response.Content.ReadAsStringAsync(cancellationToken), ""); 
+        return version;
+    }
+
+    public async Task<string> GetLatestTitleDb(DownloadSettings downloadSettings, CancellationToken cancellationToken)
+    {
+        if (downloadSettings is { TitleDbPath: null,  TitleDbUrl: null})
+            throw new InvalidOperationException("TitleDbPath and TitleDbUrl settings are not set.");
+        
+        var destFilePath = Path.Combine(downloadSettings.TitleDbPath, $"{AppConstants.DefaultTitleDbName}.gz");
+        await DownloadFileAsync(downloadSettings.TitleDbUrl, destFilePath, downloadSettings.TimeoutInSeconds, cancellationToken);
+        
+        return destFilePath;
+    }
+
+    public async Task DownloadFileAsync(string url, string destFilePath, int timeOut, CancellationToken cancellationToken)
+    {
+        using var client = httpClientFactory.CreateClient();
+        client.Timeout = TimeSpan.FromSeconds(timeOut);
         try
         {
             var response = await client.GetAsync(url, cancellationToken);
@@ -72,4 +66,6 @@ public sealed class DownloadService(
             logger.LogError(e, "Error saving file {DestFilePath} with message {EMessage}", destFilePath, e.Message);
         }
     }
+
+
 }

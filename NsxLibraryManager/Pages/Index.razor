@@ -2,24 +2,27 @@
 @using NsxLibraryManager.Core.Settings
 @using Microsoft.Extensions.Options
 @using FluentValidation
+@using NsxLibraryManager.Services
+@using NsxLibraryManager.Services.Interface
 <h3>Index</h3>
 
 @code {
-    [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
+    [Inject] private ISettingsService SettingsService { get; set; } = default!;
     [Inject] private NavigationManager NavigationManager { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
-    [Inject] private IValidator<AppSettings> ConfigValidator { get; set; } = default!;
+    [Inject] private IValidator<UserSettings> ConfigValidator { get; set; } = default!;
 
     
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        var appSettings = SettingsService.GetUserSettings();
         bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
         if (isDefaultConfigCreated)
         {
             NavigationManager.NavigateTo("/settings");
         }
-        var validationResult = await ConfigValidator.ValidateAsync(AppSettings.Value);
-        NavigationManager.NavigateTo(validationResult.IsValid ? "/dashboard" : "/settings");
+        var validationResult = await ConfigValidator.ValidateAsync(appSettings);
+        NavigationManager.NavigateTo(validationResult.IsValid ? "/sqllibrary" : "/settings");
     }
 }

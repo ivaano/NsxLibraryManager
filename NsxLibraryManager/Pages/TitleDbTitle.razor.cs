@@ -8,10 +8,12 @@ namespace NsxLibraryManager.Pages;
 
 public partial class TitleDbTitle
 {
+    /*
     [Inject] 
     protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
     [Inject]
     protected ITitleDbService TitleDbService { get; set; } = default!;
+    */
     [Parameter] 
     public string? TitleId { get; set; }
     public LibraryTitle? LibraryTitle { get; set; }
@@ -25,6 +27,7 @@ public partial class TitleDbTitle
 
     protected override async Task OnInitializedAsync()
     {
+        /*
         if (TitleId != null)
         {
             LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId);
@@ -39,5 +42,6 @@ public partial class TitleDbTitle
                 GameDlcs = await TitleDbService.GetTitleDlc(LibraryTitle.TitleId);
             }
         }
+        */
     }
 }

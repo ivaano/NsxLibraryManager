@@ -9,13 +9,13 @@ namespace NsxLibraryManager.Core.Services.KeysManagement;
 public class KeySetProviderService : IKeySetProviderService
 {
 
-    private readonly AppSettings _configuration;
+    private readonly UserSettings _configuration;
     private readonly object _lock = new();
     private readonly ILogger<IKeySetProviderService> _logger;
     private KeySet? _keySet;
 
 
-    public KeySetProviderService(IOptions<AppSettings> configuration, ILogger<IKeySetProviderService> logger)
+    public KeySetProviderService(IOptions<UserSettings> configuration, ILogger<IKeySetProviderService> logger)
     {
         _configuration = configuration.Value;
         _logger = logger;

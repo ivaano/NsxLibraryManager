@@ -17,7 +17,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
     private readonly NsxLibraryDbContext _nsxLibraryDbContext;
     private readonly TitledbDbContext _titledbDbContext;
     private readonly IFileInfoService _fileInfoService;
-    private readonly AppSettings _configuration;
+    private readonly UserSettings _configuration;
     private readonly ILogger<SqlTitleLibraryService> _logger;
 
     
@@ -25,13 +25,13 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         NsxLibraryDbContext nsxLibraryDbContext,
         TitledbDbContext titledbDbContext,
         IFileInfoService fileInfoService,
-        IOptionsMonitor<AppSettings> configuration,
+        ISettingsService settingsService,
         ILogger<SqlTitleLibraryService> logger)
     {
         _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
         _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
         _fileInfoService = fileInfoService;
-        _configuration = configuration.CurrentValue;
+        _configuration = settingsService.GetUserSettings();
         _logger = logger;
 
 

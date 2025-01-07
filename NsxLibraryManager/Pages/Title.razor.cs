@@ -8,10 +8,10 @@ namespace NsxLibraryManager.Pages;
 
 public partial class Title
 {
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
-    [Inject]
-    protected ITitleDbService TitleDbService { get; set; } = default!;
+    //[Inject]
+    //protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
+    //[Inject]
+    //protected ITitleDbService TitleDbService { get; set; } = default!;
     [Parameter]
     public string? TitleId { get; set; }
 
@@ -30,8 +30,9 @@ public partial class Title
     
     private async Task LoadTitle()
     {
+        /*
         if (TitleId is null) return;  
-        LibraryTitle = TitleLibraryService.GetTitle(TitleId);
+        //LibraryTitle = TitleLibraryService.GetTitle(TitleId);
         if (LibraryTitle is not null)
         {
             var sizeInBytes = LibraryTitle.Size ?? 0;
@@ -39,6 +40,7 @@ public partial class Title
             HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;
             var titlePatches = TitleDbService.GetVersions(LibraryTitle.TitleId);
             var titlePatchesList = new List<GameVersions>();
+            
             foreach (var patch in titlePatches)
             {
                 if (LibraryTitle.OwnedUpdates == null) continue;
@@ -79,6 +81,7 @@ public partial class Title
                     FileName = string.Empty
             };
         }
+        */
     }
 
 

@@ -14,7 +14,6 @@ namespace NsxLibraryManager.Core.Services;
 public class FileInfoService : IFileInfoService
 {
     private readonly IPackageInfoLoader _packageInfoLoader;
-    private readonly ITitleDbService _titleDbService;
     private readonly ILogger<FileInfoService> _logger;
     private IEnumerable<string> _directoryFiles = new List<string>();
     private const string NszExtension = ".nsz";
@@ -24,11 +23,9 @@ public class FileInfoService : IFileInfoService
     private const string TitleFilePattern = @"^(.*?)(?:\s*\[(DLC.*?)\])?\s*\[([0-9a-fA-F]+)\]\[v(\d+)\]";
     public FileInfoService(
             IPackageInfoLoader packageInfoLoader, 
-            ITitleDbService titleDbService,
             ILogger<FileInfoService> logger)
     {
         _packageInfoLoader = packageInfoLoader ?? throw new ArgumentNullException(nameof(packageInfoLoader));
-        _titleDbService = titleDbService ?? throw new ArgumentNullException(nameof(titleDbService));
         _logger = logger;
     }
 

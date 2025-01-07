@@ -16,7 +16,6 @@ using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
-using NsxLibraryManager.Utils;
 using Radzen;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -28,7 +27,7 @@ var configBuilder = new ConfigurationBuilder()
     .AddJsonFile(configFile, optional: true, reloadOnChange: false);
 var initialConfig = configBuilder.Build();
 
-var validatorResult = ConfigValidator.ValidateRootConfig(initialConfig);
+var validatorResult = AppSettingsValidator.ValidateRootConfig(initialConfig);
 
 if (validatorResult.defaultConfigCreated)
 {
@@ -36,21 +35,11 @@ if (validatorResult.defaultConfigCreated)
 }
 
 var builder = WebApplication.CreateBuilder(args);
-//var builder = StartupConfiguration.ConfigureServices(args, configurationRoot);
-builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
-    options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value));
 
-var scopeFactory = builder.Services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>();
-builder.Configuration.AddLiveDatabase(scopeFactory);
-/*
-builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
-{
-    options.UseSqlite(builder.Configuration.GetConnectionString("NsxLibraryDBConnection"));
-    // options.EnableSensitiveDataLogging(true);
-});
-*/
 
 // configuration.
+builder.Configuration.AddConfiguration(initialConfig);
+
 builder.Services
     .AddOptions<AppSettings>()
     .Bind(builder.Configuration.GetSection(AppConstants.AppSettingsSectionName))
@@ -76,31 +65,43 @@ builder.Configuration.AddInMemoryCollection(
 */
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
+builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
+    options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value));
+
+
+builder.Services.AddDbContext<TitledbDbContext>(options =>
+    options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:TitledbDBConnection").Value));
+//builder.Services.AddScoped<ITitledbDatabaseService, TitledbDatabaseService>();
+
+/*
 builder.Services.AddDbContext<TitledbDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("TitledbDBConnection"));
+    options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:TitledbDBConnection").Value);
     // options.EnableSensitiveDataLogging(true);
 });
+*/
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //nsx services
 if (validatorResult.valid)
 {
-    builder.Services.AddTransient<ITitleDbService, TitleDbService>();
-    builder.Services.AddSingleton<IDataService, DataService>();
+    builder.Services.AddScoped<ISettingsService, SettingsService>();
+    //builder.Services.AddTransient<ITitleDbService, TitleDbService>();
+    //builder.Services.AddSingleton<IDataService, DataService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
     builder.Services.AddTransient<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
     builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
     builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
-    builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
+    //builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddTransient<ISqlTitleLibraryService, SqlTitleLibraryService>();
-    builder.Services.AddTransient<ISettingsService, SettingsService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
+
+    builder.Services.AddScoped<ITitledbService, TitledbService>();
     builder.Services.AddScoped<ISqlRenamerService, SqlRenamerService>();
     builder.Services.AddScoped<IValidator<PackageRenamerSettings>, RenamerSettingsValidator>();    
     builder.Services.AddScoped<IValidator<BundleRenamerSettings>, BundleSettingsValidator>();    
-    builder.Services.AddScoped<IValidator<AppSettings>, ConfigValidator>();    
+    builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    
 }
 
 //radzen services
@@ -122,6 +123,9 @@ if (builder.Environment.IsEnvironment("DeveLinux"))
 
 var app = builder.Build();
 
+
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -141,6 +145,7 @@ app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+app.EnsureDatabaseMigrated<NsxLibraryDbContext>();
 
 app.Run();    
 

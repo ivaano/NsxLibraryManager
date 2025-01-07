@@ -7,7 +7,7 @@ namespace NsxLibraryManager.Data;
 
 public class NsxLibraryDbContext : DbContext
 {
-    private readonly AppSettings _configuration;
+    private readonly UserSettings _configuration;
     public DbSet<Title> Titles { get; set; }
     public DbSet<Category> Categories { get; set; }
     
@@ -18,10 +18,9 @@ public class NsxLibraryDbContext : DbContext
 
     public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
     public DbSet<Settings> Settings { get; set; }
-    public DbSet<Setting> Setting { get; set; }
 
 
-    public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<AppSettings> configuration) :
+    public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<UserSettings> configuration) :
         base(options)
     {
         _configuration = configuration.Value;

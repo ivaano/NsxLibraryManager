@@ -1,11 +1,9 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
-using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Services.Interface;
 using Radzen;
 
 namespace NsxLibraryManager.Pages;
@@ -13,15 +11,15 @@ namespace NsxLibraryManager.Pages;
 public partial class Settings
 {
     
-    [Inject] private IOptionsSnapshot<AppSettings> AppSettings { get; set; } = default!;
+    [Inject] private ISettingsService SettingsService { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
-    [Inject] private IValidator<AppSettings> ConfigValidator { get; set; } = default!;
+    [Inject] private IValidator<UserSettings> ConfigValidator { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
     private IEnumerable<string> _regionsValue = new string[] { "US" };
     private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" } };
-    private AppSettings _config = default!;
+    private UserSettings _config = default!;
     private bool _databaseFieldDisabled = true;
     private ValidationResult? _validationResult;
 
@@ -31,9 +29,9 @@ public partial class Settings
         { "ProdKeys", string.Empty},
         { "LibraryPath", string.Empty },
         { "DownloadSettings.TitleDbPath", string.Empty },
-        { "DownloadSettings.RegionUrl", string.Empty },
+        { "DownloadSettings.TitleDbUrl", string.Empty },
         { "DownloadSettings.CnmtsUrl", string.Empty },
-        { "DownloadSettings.VersionsUrl", string.Empty },
+        { "DownloadSettings.VersionUrl", string.Empty },
         { "DownloadSettings.TimeoutInSeconds", string.Empty },
         { "DownloadSettings.Regions", string.Empty }
     };
@@ -41,15 +39,15 @@ public partial class Settings
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        await LoadConfiguration();
+        LoadConfiguration();
         bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
         if (isDefaultConfigCreated)
         {
             _databaseFieldDisabled = false;
-            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths and restart the application.", Duration = 60000 });
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths for the application to work.", Duration = 60000 });
         }
 
-        await ValidateFields();
+        //await ValidateFields();
     }
 
     private async Task<bool> ValidateFields()
@@ -72,8 +70,10 @@ public partial class Settings
     
     private async Task SaveConfiguration()
     {
-        var validateFields =await ValidateFields();
+        var validateFields = await ValidateFields();
         if (!validateFields) return;
+        
+        SettingsService.SaveUserSettings(_config);
         /*
         var jsonWriteOptions = new JsonSerializerOptions
         {
@@ -90,16 +90,15 @@ public partial class Settings
         var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory, AppConstants.ConfigFileName);
         await File.WriteAllTextAsync(appSettingsPath, newJson);
         */
-        var configurationRoot = (IConfigurationRoot)Configuration;
-        configurationRoot.SetValue("NsxLibraryManager:DownloadSettings:TimeoutInSeconds", "300");
+        //var configurationRoot = (IConfigurationRoot)Configuration;
+        //configurationRoot.SetValue("NsxLibraryManager:DownloadSettings:TimeoutInSeconds", "300");
         //configurationRoot.Reload();
-        ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Configuration Saved!", Detail = "Settings have been saved to config.json.", Duration = 4000 });
+        ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Configuration Saved!", Detail = "Settings have been saved.", Duration = 4000 });
     }
     
-    private Task LoadConfiguration()
+    private void LoadConfiguration()
     {
-        _config = AppSettings.Value;
-        return Task.CompletedTask;
+        _config = SettingsService.GetUserSettings();
     }
 
     private Task ReloadApp()

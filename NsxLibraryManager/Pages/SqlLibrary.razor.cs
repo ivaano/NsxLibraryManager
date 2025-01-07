@@ -11,6 +11,7 @@ using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Models.DTO;
+using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 
@@ -21,8 +22,8 @@ public partial class SqlLibrary : IDisposable
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = default!;
     
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    [Inject] private ISettingsService SettingsService { get; set; } = default!;
+
     
     [Inject]
     protected NsxLibraryDbContext DbContext { get; set; } = default!;
@@ -82,7 +83,8 @@ public partial class SqlLibrary : IDisposable
     
     private async Task InitialLoad()
     {
-        _libraryPath = TitleLibraryService.GetLibraryPath();
+        var settings = SettingsService.GetUserSettings();
+        _libraryPath = settings.LibraryPath;
         _categories = DbContext.Categories.Select(s => s.Name);
         await CalculateCounts();
     }
@@ -242,12 +244,7 @@ public partial class SqlLibrary : IDisposable
                 { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<SqlReloadLibraryProgressDialog>(
                 "Reloading library...", paramsDialog, dialogOptions);
-            /*
-            await DialogService.OpenAsync<RefreshPatchesProgressDialog>(
-                "Processing Updates", paramsDialog, dialogOptions);
-            await DialogService.OpenAsync<RefreshDlcProgressDialog>(
-                "Processing Dlcs", paramsDialog, dialogOptions);
-                */
+
             await InitialLoad();
             switch (_selectedTabIndex)
             {

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Services.Interface;
@@ -8,32 +10,80 @@ namespace NsxLibraryManager.Services;
 
 public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext) : ISettingsService
 {
-    private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
+    private static readonly Dictionary<SettingsEnum, string> InMemoryData = new();
 
+    private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
+    private static readonly object Lock = new();
+    private Dictionary<SettingsEnum, string> _data = new();
+    
+    private void Load()
+    {
+        lock (Lock)
+        {
+            if (InMemoryData.Count == 0)
+            {
+                LoadFromDatabase();
+            }
+            _data = new Dictionary<SettingsEnum, string>(InMemoryData);
+        }
+    }
+    
+    private void LoadFromDatabase()
+    {
+        //var dbData = _nsxLibraryDbContext.Settings;
+        var dbData = _nsxLibraryDbContext.Settings.ToDictionary(s => s.Key, s => s.Value);
+        
+        InMemoryData.Clear();
+        foreach (var item in dbData)
+        {
+            InMemoryData[item.Key] = item.Value;
+        }
+        _data = new Dictionary<SettingsEnum, string>(InMemoryData);
+    }
+    
+    private void SetValue(SettingsEnum settingEnumType, string value)
+    {
+        lock (Lock)
+        {
+            var setting = _nsxLibraryDbContext.Settings.FirstOrDefault(s => s.Key == settingEnumType) 
+                          ?? new Settings
+            {
+                Key = settingEnumType,
+                Value = value
+            };
+            setting.Value = value;
+            
+            _nsxLibraryDbContext.Settings.Update(setting);
+            _nsxLibraryDbContext.SaveChanges();
+
+            InMemoryData[settingEnumType] = value;
+        }
+    }
+    
     private static T MapToSettings<T>(Settings settings) where T : new()
     {
         return System.Text.Json.JsonSerializer.Deserialize<T>(settings.Value) ?? new T();
     }
 
-    private async Task<T> GetSettings<T>(Core.Enums.Settings settingType) where T : new()
+    private async Task<T> GetSerializedSettings<T>(SettingsEnum settingEnumType) where T : new()
     {
         var settings = await _nsxLibraryDbContext.Settings
-            .FirstOrDefaultAsync(c => c.Setting == settingType);
+            .FirstOrDefaultAsync(c => c.Key == settingEnumType);
 
         return settings is not null ? MapToSettings<T>(settings) : new T();
     }
     
-    private async Task<T> SaveSettings<T>(T settings, Core.Enums.Settings settingType)
+    private async Task<T> SaveSerializedSettings<T>(T settings, SettingsEnum settingEnumType)
     {
         var serializedSettings = System.Text.Json.JsonSerializer.Serialize(settings);
         var existingSettings = await _nsxLibraryDbContext.Settings
-            .FirstOrDefaultAsync(c => c.Setting == settingType);
+            .FirstOrDefaultAsync(c => c.Key == settingEnumType);
 
         if (existingSettings is null)
         {
             _nsxLibraryDbContext.Settings.Add(new Settings
             {
-                Setting = settingType,
+                Key = settingEnumType,
                 Value = serializedSettings
             });
         }
@@ -47,15 +97,60 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext) : ISetting
     }
 
     public Task<BundleRenamerSettings> GetBundleRenamerSettings() =>
-        GetSettings<BundleRenamerSettings>(Core.Enums.Settings.RenameBundle);
+        GetSerializedSettings<BundleRenamerSettings>(SettingsEnum.RenameBundle);
 
     public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
-        GetSettings<PackageRenamerSettings>(Core.Enums.Settings.RenameType);
+        GetSerializedSettings<PackageRenamerSettings>(SettingsEnum.RenamePackageType);
     
     public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings settings) =>
-        SaveSettings(settings, Core.Enums.Settings.RenameBundle);
+        SaveSerializedSettings(settings, SettingsEnum.RenameBundle);
+
+    public string GetSettingByType(SettingsEnum settingEnumType)
+    {
+        Load();
+        return _data.TryGetValue(settingEnumType, out var value) ? value : string.Empty;
+    }
+
+    public bool SaveUserSettings(UserSettings userSettings)
+    {
+        var serializedSettings = JsonSerializer.Serialize(userSettings);
+        SetValue(SettingsEnum.UserSettings, serializedSettings);
+        return true;
+    }
+
+    public UserSettings GetUserSettings()
+    {
+        Load();
+        var tempUserSettings = new UserSettings
+        {
+            DownloadSettings = new DownloadSettings
+            {
+                TimeoutInSeconds = 60,
+                TitleDbPath = Path.Combine(AppContext.BaseDirectory, AppConstants.DataDirectory),
+                //RegionUrl = "to be removed",
+                //CnmtsUrl = "to be removed",
+                VersionUrl = AppConstants.DefaultTitleDbVersion,
+                TitleDbUrl = AppConstants.DefaultTitleDbUrl
+            },
+            TitleDatabase = "to be removed",
+            LibraryPath = "temp",
+            Recursive = true
+        };
+        _data.TryGetValue(SettingsEnum.UserSettings, out var serializedUserSettings);
+        if (serializedUserSettings is null) return tempUserSettings;
+        try
+        {
+            var userSettings = JsonSerializer.Deserialize<UserSettings>(serializedUserSettings);
+            return userSettings ?? tempUserSettings;
+        }
+        catch (JsonException ex)
+        {
+            return tempUserSettings;
+        }
+
+    }
 
     public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings settings) =>
-        SaveSettings(settings, Core.Enums.Settings.RenameType);
+        SaveSerializedSettings(settings, SettingsEnum.RenamePackageType);
 
 }

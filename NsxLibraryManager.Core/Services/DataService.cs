@@ -34,7 +34,7 @@ public class DataService : IDataService
     }
     public IMemoryCache MemoryCache { get; }
 
-    public DataService(IOptions<AppSettings> configuration, IMapper mapper, ILogger<DataService> logger, 
+    public DataService(IOptions<UserSettings> configuration, IMapper mapper, ILogger<DataService> logger, 
             IMemoryCache memoryCache)
     {
         _logger = logger;

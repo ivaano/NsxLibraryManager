@@ -8,8 +8,8 @@ public partial class ReloadLibraryProgressDialog : IDisposable
 {
     [Inject]
     protected DialogService DialogService { get; set; }
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    //[Inject]
+    //protected ITitleLibraryService TitleLibraryService { get; set; }
     [Inject]
     protected ILogger<ReloadLibraryProgressDialog> Logger { get; set; }
     public double ProgressCompleted { get; set; }
@@ -30,6 +30,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
         await InvokeAsync(
             async () =>
             {
+                /*
                 FilesEnumerable = await TitleLibraryService.GetFilesAsync();
                 var fileList = FilesEnumerable.ToList();
                 FileCount = fileList.Count;
@@ -43,7 +44,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
                     ProgressCompleted++;
                     StateHasChanged();                    
                 }
-
+*/
             });
         DialogService.Close();
     }

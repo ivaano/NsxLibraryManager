@@ -10,8 +10,8 @@ public partial class RefreshLibraryProgressDialog : IDisposable
 {
     [Inject]
     protected DialogService DialogService { get; set; }
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    //[Inject]
+    //protected ITitleLibraryService TitleLibraryService { get; set; }
     [Inject]
     protected ILogger<ReloadLibraryProgressDialog> Logger { get; set; }
     public double ProgressCompleted { get; set; }
@@ -32,6 +32,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
         await InvokeAsync(
             async () =>
             {
+                /*
                 var filesToProcess = await TitleLibraryService.GetDeltaFilesInLibraryAsync();
                 FileCount = filesToProcess.filesToAdd.Count() + filesToProcess.filesToAdd.Count() + filesToProcess.titlesToRemove.Count();
                 var addedTitles = new List<LibraryTitle>();
@@ -76,7 +77,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     //ProgressCompleted++;
                     StateHasChanged();                    
                 }
-
+*/
             });
         DialogService.Close();
     }

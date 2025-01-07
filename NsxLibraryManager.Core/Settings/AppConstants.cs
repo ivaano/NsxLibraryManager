@@ -14,4 +14,6 @@ public static class AppConstants
     public const string DataDirectory = "data";
     public const string DefaultNsxLibraryDb = "nsxLibrary.db";
     public const string DefaultTitleDbName = "titledb.db";
+    public const string DefaultTitleDbUrl = "https://github.com/hangover6674/sql-titledb/raw/refs/heads/main/titledb.db.gz";
+    public const string DefaultTitleDbVersion = "https://github.com/hangover6674/sql-titledb/raw/refs/heads/main/version";
 }

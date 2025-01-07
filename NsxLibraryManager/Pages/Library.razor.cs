@@ -19,8 +19,8 @@ public partial class Library : IDisposable
     [Inject]
     protected IDataService DataService { get; set; }
     
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    //[Inject]
+    //protected ITitleLibraryService TitleLibraryService { get; set; }
    
     [Inject]
     protected DialogService DialogService { get; set; }
@@ -105,7 +105,7 @@ public partial class Library : IDisposable
     {
         _isLoading = true;
         //_libraryTitles = await DataService.GetLibraryTitlesAsync();
-        _libraryPath = TitleLibraryService.GetLibraryPath();
+        //_libraryPath = TitleLibraryService.GetLibraryPath();
         CalculateCounts();
         UpdateLastUpdate();
         var titles = DataService.GetLibraryTitlesQueryableAsync();

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Data;
@@ -6,6 +7,7 @@ using Radzen;
 using Radzen.Blazor;
 using TitleModel = NsxLibraryManager.Models.Titledb.Title;
 using System.Linq.Dynamic.Core;
+using NsxLibraryManager.Pages.Components;
 
 namespace NsxLibraryManager.Pages;
 
@@ -32,6 +34,7 @@ public partial class SqlTitleDb : IDisposable
     private int _count = 0;
     private bool _isLoading;
     private string _lastUpdated = "never";
+    private string _dbVersion = string.Empty;
     
     
     protected override async Task OnInitializedAsync()
@@ -44,7 +47,12 @@ public partial class SqlTitleDb : IDisposable
     {
         _isLoading = true;
         await Task.Yield();
-
+        var dbHistory = DbContext.History.OrderByDescending(h => h.TimeStamp).FirstOrDefault();
+        if (dbHistory is not null)
+        {
+            _dbVersion = dbHistory.VersionNumber;
+            _lastUpdated = dbHistory.TimeStamp.ToString(CultureInfo.CurrentCulture);
+        }
         var query = DbContext.Titles.AsQueryable();
         
         if (!string.IsNullOrEmpty(args.Filter))
@@ -129,6 +137,8 @@ public partial class SqlTitleDb : IDisposable
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
         if (confirmationResult is true)
         {
+            await DialogService.OpenAsync<RefreshTitleDbProgressDialog>("Refreshing titledb...");
+
             DialogService.Close();
             await _grid.Reload();
             StateHasChanged();

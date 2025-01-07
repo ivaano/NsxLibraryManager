@@ -20,44 +20,23 @@ public class DownloadServiceTests
     {
         var downloadSettings = new DownloadSettings
         {
-                TimeoutInSeconds = 10,
-                TitleDbPath = "/tmp",
-                Regions = new[] { "US" },
-                RegionUrl = "https://raw.githubusercontent.com/blawar/titledb/master/{region}.en.json",
-                CnmtsUrl = "https://raw.githubusercontent.com/blawar/titledb/master/cnmts.json",
-                VersionsUrl = "https://raw.githubusercontent.com/blawar/titledb/master/versions.json",
+            TimeoutInSeconds = 10,
+            TitleDbPath = "/tmp",
+            TitleDbUrl = "changos",
+            VersionUrl = "version",
+
         };
-        var appSettings = new AppSettings
+        var appSettings = new UserSettings
         {
             DownloadSettings = downloadSettings,
             TitleDatabase = "titledb.db",
             LibraryPath = "somepath",
-            TitledbDbConnection = null,
-            NsxLibraryDbConnection = null,
         };
         var options = Options.Create(appSettings);
         
         _downloadService = new DownloadService(options, _httpClientFactory, _logger);
     }
-    
-    [Fact]
-    public async Task Should_Download_Region_File()
-    {
-        //Arrange
-        var testRegion = "US";
-        var messageHandler = new MockHttpMessageHandler("TEST VALUE", HttpStatusCode.OK);
-        var httpClient = new HttpClient(messageHandler);
-        _httpClientFactory.CreateClient().Returns(httpClient);
-        var cancellationToken = new CancellationToken();
-        
-        //Act
-        var destFilePath = await _downloadService.GetRegionFile(testRegion, cancellationToken);
-        
-        //Assert
-        Assert.Equal("TEST VALUE", File.ReadAllText(destFilePath));
- 
-    }
-
+   
 }
 
 public class MockHttpMessageHandler : HttpMessageHandler

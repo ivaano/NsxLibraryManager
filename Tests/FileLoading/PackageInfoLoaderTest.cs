@@ -17,7 +17,7 @@ public class PackageInfoLoaderTest
     {
         var packageTypelogger = Substitute.For<ILogger<IPackageTypeAnalyzer>>();
         var keySetProviderServiceLogger = Substitute.For<ILogger<IKeySetProviderService>>();
-        var appSettings = new AppSettings
+        var appSettings = new UserSettings
         {
             TitleDatabase = "titledb",
             LibraryPath = "library",
@@ -26,16 +26,9 @@ public class PackageInfoLoaderTest
             {
                 TimeoutInSeconds = 0,
                 TitleDbPath = "/tmp",
-                RegionUrl = string.Empty,
-                CnmtsUrl = string.Empty,
-                VersionsUrl = string.Empty,
-                Regions = new List<string>
-                {
-                    "US"
-                }
+                TitleDbUrl = "title",
+                VersionUrl = "version"
             },
-            TitledbDbConnection = "titledb.db",
-            NsxLibraryDbConnection = "nsxlibrary.db",
         };
         var options = Options.Create(appSettings);
         _packageTypeAnalyzer = new PackageTypeAnalyzer(packageTypelogger);

@@ -19,7 +19,7 @@
                         style="height: 90vh">
             <HeaderTemplate>
                 <RadzenButton Click="@(args => RefreshTitleDb())" Text="Update TitleDb" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/>
-                <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption">Db Version: @_dbVersion - Last updated @_lastUpdated</RadzenText>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ApplicationId)" Title="TitleId" Width="90px" />

@@ -10,7 +10,7 @@ namespace NsxLibraryManager.Data;
 
 public class TitledbDbContext : DbContext
 {
-    private readonly AppSettings _configuration;
+    //private readonly UserSettings _configuration;
     public DbSet<Title> Titles { get; set; }
     public DbSet<Screenshot> Screenshots { get; set; }
     public DbSet<Cnmt> Cnmts { get; set; }
@@ -24,11 +24,12 @@ public class TitledbDbContext : DbContext
 
     public DbSet<RatingContent> RatingContents { get; set; }
     public DbSet<TitleRatingContent> TitleRatingContents { get; set; }
-    
-    public TitledbDbContext(DbContextOptions<TitledbDbContext> options, IOptions<AppSettings> configuration) :
+    public DbSet<History> History { get; set; }
+
+    public TitledbDbContext(DbContextOptions<TitledbDbContext> options) :
         base(options)
     {
-        _configuration = configuration.Value;
+       
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -99,7 +100,7 @@ public class TitledbDbContext : DbContext
             .WithMany(e => e.Titles)
             .UsingEntity<TitleRatingContent>();
         
-
+/*
         var countryLanguagesJson = File.ReadAllText(Path.Join(_configuration.DownloadSettings.TitleDbPath, "languages.json"));
         var countryLanguages = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(countryLanguagesJson);
         if (countryLanguages is null) throw new InvalidOperationException("Unable to parse languages.json");
@@ -126,5 +127,6 @@ public class TitledbDbContext : DbContext
                 modelBuilder.Entity<RegionLanguage>().HasData(new RegionLanguage { RegionId = regionObject.Id, LanguageId = existingLangId });
             }
         }
+        */
     }
 }

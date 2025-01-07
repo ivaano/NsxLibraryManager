@@ -9,14 +9,14 @@ partial class RefreshDlcProgressDialog
 {
     [Inject]
     protected DialogService DialogService { get; set; } = default!;
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
+    //[Inject]
+    //protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await TitleLibraryService.ProcessAllTitlesDlc();
+            //await TitleLibraryService.ProcessAllTitlesDlc();
             DialogService.Close();
         }
         

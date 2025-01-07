@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NsxLibraryManager.Core.Enums;
 
 namespace NsxLibraryManager.Models.NsxLibrary;
 
@@ -10,7 +11,7 @@ public class Settings
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; init; }
     
-    public required Core.Enums.Settings Setting { get; init; }
+    public required SettingsEnum Key { get; init; }
     
     [Column(TypeName = "TEXT")]
     public required string Value { get; set; }
