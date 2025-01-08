@@ -7,7 +7,7 @@
 
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
 
-        <RadzenDataGrid @ref="_grid" @bind-Settings="@Settings" LoadSettings="@LoadSettings" IsLoading="@_isLoading"
+        <RadzenDataGrid @ref="_grid" @bind-Settings="@Settings" IsLoading="@_isLoading"
                         Data="@_titles" LoadData="@LoadData" Count="@_count" PageSize="@_pageSize" 
                         PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)"
                         @bind-Value=@_selectedTitles

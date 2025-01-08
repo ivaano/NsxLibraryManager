@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Core.Models.Stats;
-using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Data;
 
 namespace NsxLibraryManager.Pages;
 
 public partial class Dashboard
 {
     [Inject]
-    protected IDataService DataService { get; set; } = default!;
+    protected NsxLibraryDbContext DbContext { get; set; } = default!;
     
     private CategoryDataItem[] _categories = Array.Empty<CategoryDataItem>();
     private PublisherDataItem[] _publishers = Array.Empty<PublisherDataItem>();
@@ -23,6 +23,7 @@ public partial class Dashboard
 
     private Task LoadData()
     {
+        /*
         var stats = DataService.GetLibraryTitlesStats();
         _categories = stats.CategoriesGames.Select(x => new CategoryDataItem { Category = x.Key, Count = x.Value }).Take(10).ToArray();
         _publishers = stats.PublisherGames.Select(x => new PublisherDataItem() { Publisher = x.Key, Count = x.Value }).Take(10).ToArray();
@@ -32,7 +33,7 @@ public partial class Dashboard
         type = typeof(PackageDistribution);
         properties = type.GetProperties();
         _packageDistribution = (from property in properties let value = property.GetValue(stats.PackageDistribution) let count = (int)value! let name = property.Name select new PackageDistributionItem { Type = name, Count = count }).OrderByDescending(x => x.Count).ToArray();
-        
+        */
         return Task.CompletedTask;
     }
 }

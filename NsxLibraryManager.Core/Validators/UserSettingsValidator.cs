@@ -1,8 +1,4 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using FluentValidation;
-using LiteDB;
-using Microsoft.Extensions.Configuration;
 using NsxLibraryManager.Core.Settings;
 
 namespace NsxLibraryManager.Core.Validators;

@@ -1,12 +1,11 @@
 ﻿using System.Text.Json;
 using Microsoft.JSInterop;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Data;
 using Radzen;
 using Radzen.Blazor;
 using System.Linq.Dynamic.Core;
+using System.Text;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +32,7 @@ public partial class SqlLibrary : IDisposable
     
     private static readonly string SettingsParamaterName = "SqlLibraryGridSettings";
 
-    [CanBeNull] private DataGridSettings _settings;
+    private DataGridSettings _settings;
     private IEnumerable<GridTitle> _libraryTitles;
     private RadzenDataGrid<GridTitle> _grid;
 
@@ -77,7 +76,9 @@ public partial class SqlLibrary : IDisposable
         {
             await LoadStateAsync();
             await Task.Delay(1);
-            await _grid.Reload();
+            //await _grid.Reload();
+            StateHasChanged();    
+
         }
     }
     
@@ -128,7 +129,7 @@ public partial class SqlLibrary : IDisposable
         }
         await _grid.Reload();
     }
-
+    
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
@@ -211,15 +212,6 @@ public partial class SqlLibrary : IDisposable
         await Task.CompletedTask;
     }
     
-
-    
-    private void LoadSettings(DataGridLoadSettingsEventArgs args)
-    {
-        if (Settings != null)
-        {
-            args.Settings = Settings;
-        }
-    }
 
     private void TabOnChange(int index)
     {

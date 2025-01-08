@@ -80,8 +80,8 @@ public partial class SqlTitleDb : IDisposable
         if (firstRender)
         {
             await LoadStateAsync();
-            await Task.Delay(1);
-            await _grid.Reload();
+            //await Task.Delay(1);
+            //await _grid.Reload();
             StateHasChanged();    
         }
     }
