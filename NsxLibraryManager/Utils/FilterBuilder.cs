@@ -13,15 +13,7 @@ public static class FilterBuilder
     
     private static string HandleDateFilter(FilterDescriptor filter)
     {
-        if (filter.FilterValue is null)
-        {
-            return filter.FilterOperator switch
-            {
-                FilterOperator.IsNotNull => $"{filter.Property} != null",
-                _ => $"{filter.Property} == null"
-            };
-        }
-        var dateValue = DateTime.Parse(filter.FilterValue.ToString());
+        var dateValue = DateTime.Parse(filter.FilterValue.ToString() ?? $"{filter.Property} != null");
         return filter.FilterOperator switch
         {
             FilterOperator.LessThan => $"{filter.Property} < DateTime(\"{dateValue:yyyy-MM-dd}\")",
@@ -29,7 +21,20 @@ public static class FilterBuilder
             FilterOperator.GreaterThan => $"{filter.Property} > DateTime(\"{dateValue:yyyy-MM-dd}\")",
             FilterOperator.GreaterThanOrEquals => $"{filter.Property} >= DateTime(\"{dateValue:yyyy-MM-dd}\")",
             FilterOperator.Equals => $"{filter.Property} == DateTime(\"{dateValue:yyyy-MM-dd}\")",
+            FilterOperator.NotEquals => $"{filter.Property} != DateTime(\"{dateValue:yyyy-MM-dd}\")",
             _ => throw new NotSupportedException($"Operator {filter.FilterOperator} not supported for dates")
+        };
+    }
+    
+    private static string HandleNullFilter(FilterDescriptor filter)
+    {
+        return filter.FilterOperator switch
+        {
+            FilterOperator.Equals => $"{filter.Property} == null",
+            FilterOperator.IsNull => $"{filter.Property} == null",
+            FilterOperator.NotEquals => $"{filter.Property} != null",
+            FilterOperator.IsNotNull => $"{filter.Property} != null",
+            _ => throw new NotSupportedException($"Operator {filter.FilterOperator} not supported for null values")
         };
     }
     
@@ -38,9 +43,11 @@ public static class FilterBuilder
         var filterExpressions = (from filter in filters
             let value = filter.FilterValue?.ToString() ?? ""
             let property = filter.Property
-            select property is "ReleaseDate" or "ReleaseDateUtc"
-                ? HandleDateFilter(filter)
-                : filter.FilterOperator switch
+            select filter.FilterValue switch
+            {
+                null => HandleNullFilter(filter),
+                DateTime dateTime => HandleDateFilter(filter),
+                _ => filter.FilterOperator switch
                 {
                     FilterOperator.Equals => $"{property} == \"{value}\"",
                     FilterOperator.NotEquals => $"{property} != \"{value}\"",
@@ -53,7 +60,8 @@ public static class FilterBuilder
                     FilterOperator.LessThanOrEquals => $"{property} <= {value}",
                     FilterOperator.In => BuildInClause(property, value),
                     _ => $"{property}.Contains(\"{value}\")" // Default to Contains
-                }).ToList();
+                }
+            }).ToList();
 
         // Combine all expressions with AND operator
         return string.Join(" and ", filterExpressions);
