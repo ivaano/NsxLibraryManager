@@ -27,7 +27,6 @@ public static class DatabaseMigrationExtensions
             }
             else
             {
-                // If database exists, apply any pending migrations
                 if (context.Database.GetPendingMigrations().Any())
                 {
                     logger.LogInformation("Applying pending migrations...");
@@ -37,7 +36,7 @@ public static class DatabaseMigrationExtensions
             }
                 
             // Run optional seeder
-            if (seeder != null)
+            if (seeder is not null)
             {
                 seeder(context, services);
                 logger.LogInformation("Seeding completed.");

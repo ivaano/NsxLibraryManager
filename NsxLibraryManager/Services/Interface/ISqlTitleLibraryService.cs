@@ -13,4 +13,5 @@ public interface ISqlTitleLibraryService
 
     public Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType contentType);
 
+    public Task<Title?> GetTitleByApplicationId(string applicationId);
 }

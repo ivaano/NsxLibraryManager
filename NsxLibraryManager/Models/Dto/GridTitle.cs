@@ -1,7 +1,7 @@
 ﻿using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Models.NsxLibrary;
 
-namespace NsxLibraryManager.Models.DTO;
+namespace NsxLibraryManager.Models.Dto;
 
 public class GridTitle
 {
@@ -46,8 +46,6 @@ public class GridTitle
     public int? OwnedDlcs { get; set; }
     
     public int? Version { get; set; }
-    
-    
     
     public TitleContentType ContentType { get; set; }
 

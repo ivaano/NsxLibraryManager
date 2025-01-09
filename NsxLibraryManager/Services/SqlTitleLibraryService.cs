@@ -1,13 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.ObjectModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
+using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
+using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 
 namespace NsxLibraryManager.Services;
@@ -53,9 +57,11 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM sqlite_sequence WHERE name = 'ScreenShots'");
         */
         //await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM Titles");
-
+        await _nsxLibraryDbContext.Screenshots.ExecuteDeleteAsync();
+        await _nsxLibraryDbContext.Versions.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.Titles.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.TitleCategory.ExecuteDeleteAsync();
+
         
         //await _nsxLibraryDbContext.Database.ExecuteSqlRawAsync($"DELETE FROM sqlite_sequence WHERE name = 'Titles'");
         //await _nsxLibraryDbContext.Database.ExecuteSqlRawAsync($"VACUUM");
@@ -73,7 +79,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
 
     private async Task<Title> AddTitleCategories(Title nsxLibraryTitle,  Models.Titledb.Title titledbTitle)
     {
-        //var titleCategories = new List<TitleCategory>();
+        if (titledbTitle.Categories is null) return nsxLibraryTitle;
         foreach (var category in titledbTitle.Categories)
         {
             var libraryCategory = await _nsxLibraryDbContext.Categories
@@ -87,7 +93,6 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
                     Name = category.Name,
                 };
                 _nsxLibraryDbContext.Categories.Add(libraryCategory);
-                //await _nsxLibraryDbContext.SaveChangesAsync();
             }
             
             var titleCategory = new TitleCategory
@@ -97,9 +102,6 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             };
             
             _nsxLibraryDbContext.TitleCategory.Add(titleCategory);
-
-            //titleCategories.Add(libraryCategory);
-            //await _nsxLibraryDbContext.SaveChangesAsync();
         }
         
         return nsxLibraryTitle;
@@ -111,6 +113,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             .Titles
             .Include(c => c.Categories)
             .Include(s => s.Screenshots)
+            .Include(v => v.Versions)
             .FirstOrDefaultAsync(t => t.ApplicationId == libraryTitle.TitleId);
         
         var nsxLibraryTitle = new Title
@@ -162,8 +165,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             nsxLibraryTitle.ReleaseDate = libraryTitle.ReleaseDate;
             nsxLibraryTitle.Size = metaFromFileName.Size;
             nsxLibraryTitle.Version = (int?)libraryTitle.TitleVersion;
-
-            
+           
             /*            
             if (libraryTitle.Type == TitleLibraryType.Base)
             {
@@ -204,6 +206,33 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         nsxLibraryTitle.UpdatesCount = titledbTitle.UpdatesCount;
         nsxLibraryTitle.Version = (int?)libraryTitle.TitleVersion;
        
+        if (titledbTitle.Screenshots != null)
+        {
+            var screenshots = new Collection<Screenshot>();
+            foreach (var titleScreenshot in titledbTitle.Screenshots)
+            {
+                screenshots.Add(new Screenshot
+                {
+                    Url = titleScreenshot.Url,
+                });
+            }
+            nsxLibraryTitle.Screenshots = screenshots;
+        }
+
+        if (titledbTitle.Versions is not null && titledbTitle.Versions.Count > 0)
+        {
+            var versions = new Collection<Version>();
+            foreach (var version in titledbTitle.Versions)
+            {
+                versions.Add(new Version
+                {
+                    VersionNumber = version.VersionNumber,
+                    VersionDate = version.VersionDate,
+                });
+            }
+            nsxLibraryTitle.Versions = versions;
+        }
+        
         return nsxLibraryTitle; 
     }
 
@@ -234,6 +263,13 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         }
         await _nsxLibraryDbContext.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<Title?> GetTitleByApplicationId(string applicationId)
+    {
+        var title = await _nsxLibraryDbContext.Titles.Include(s => s.Screenshots).FirstOrDefaultAsync(t => t.ApplicationId == applicationId);
+        var caco = title.MapToLibraryTitleDto();  
+        return title;
     }
 
     public async Task<Title?> ProcessFileAsync(string file)

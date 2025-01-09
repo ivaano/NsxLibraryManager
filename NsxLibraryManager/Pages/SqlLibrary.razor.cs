@@ -9,7 +9,7 @@ using System.Text;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Models.DTO;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
@@ -253,7 +253,7 @@ public partial class SqlLibrary : IDisposable
         }
     }
     
-    public async Task OpenDetails(TitleModel title)
+    public async Task OpenDetails(GridTitle title)
     {
         await DialogService.OpenAsync<Title>($"{title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },

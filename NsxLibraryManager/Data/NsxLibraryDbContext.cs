@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Models.NsxLibrary;
+using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 namespace NsxLibraryManager.Data;
 
@@ -15,6 +16,7 @@ public class NsxLibraryDbContext : DbContext
     public DbSet<Language> Languages { get; set; }
     public DbSet<Region> Regions { get; set; }
     public DbSet<Screenshot> Screenshots { get; set; }
+    public DbSet<Version> Versions { get; set; }
 
     public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
     public DbSet<Settings> Settings { get; set; }

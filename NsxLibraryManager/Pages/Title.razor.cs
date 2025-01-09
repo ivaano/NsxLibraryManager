@@ -2,6 +2,8 @@
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Models.Dto;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Data;
+using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Pages;
@@ -12,6 +14,9 @@ public partial class Title
     //protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
     //[Inject]
     //protected ITitleDbService TitleDbService { get; set; } = default!;
+    [Inject]
+    protected ISqlTitleLibraryService SqlTitleLibraryService { get; set; }
+    
     [Parameter]
     public string? TitleId { get; set; }
 
@@ -30,8 +35,20 @@ public partial class Title
     
     private async Task LoadTitle()
     {
+        
+        if (TitleId is null) return;
+        var title = await SqlTitleLibraryService.GetTitleByApplicationId(TitleId);
+        if (title is null) return;
+        var sizeInBytes = title.Size ?? 0;
+        GameFileSize = sizeInBytes.ToHumanReadableBytes();
+        HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
+        LibraryTitle = new LibraryTitle
+        {
+            TitleId = title.ApplicationId,
+            TitleName = title.TitleName,
+            FileName = title.FileName,
+        };
         /*
-        if (TitleId is null) return;  
         //LibraryTitle = TitleLibraryService.GetTitle(TitleId);
         if (LibraryTitle is not null)
         {
@@ -40,7 +57,7 @@ public partial class Title
             HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;
             var titlePatches = TitleDbService.GetVersions(LibraryTitle.TitleId);
             var titlePatchesList = new List<GameVersions>();
-            
+
             foreach (var patch in titlePatches)
             {
                 if (LibraryTitle.OwnedUpdates == null) continue;
@@ -52,7 +69,7 @@ public partial class Title
                 titlePatchesList.Add(patch);
             }
             GameVersions = titlePatchesList;
-            
+
             var titleDlcs = await TitleDbService.GetTitleDlc(LibraryTitle.TitleId);
             var titleDlcList = new List<Dlc>();
             foreach (var dlc in titleDlcs)
@@ -71,7 +88,7 @@ public partial class Title
                 titleDlcList.Add(dlc);
             }
             GameDlcs = titleDlcList;
-        } 
+        }
         else
         {
             LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId) ?? new LibraryTitle

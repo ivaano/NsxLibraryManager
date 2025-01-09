@@ -1,5 +1,5 @@
 ﻿@page "/sqllibrary"
-@using NsxLibraryManager.Models.DTO
+@using NsxLibraryManager.Models.Dto
 @using NsxLibraryManager.Utils
 
 <PageTitle>Nsx Library Manager</PageTitle>
@@ -35,7 +35,7 @@
                         <RadzenDataGridColumn TItem="GridTitle" Property="OtherApplicationId" Title="Other Application Id" Width="150px" Visible="false"/>
                         <RadzenDataGridColumn TItem="GridTitle" Property="TitleName" SortOrder="SortOrder.Ascending" Title="Name" Width="300px">
                             <Template Context="libraryTitle">
-                                <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" />
+                                <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" @onclick="_ => OpenDetails(libraryTitle)"/>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="GridTitle" Property="Version" Title="Version" Visible="false">
