@@ -12,11 +12,13 @@ using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using NsxLibraryManager;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
+using NsxLibraryManager;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -66,8 +68,10 @@ builder.Services.AddDbContext<TitledbDbContext>(options =>
 });
 */
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+//builder.Services.AddRazorPages();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
 //nsx services
 if (validatorResult.valid)
 {
@@ -120,15 +124,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
-app.UseRouting();
+app.UseAntiforgery();
 
 app.MapControllers();
 
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.EnsureDatabaseMigrated<NsxLibraryDbContext>();
 

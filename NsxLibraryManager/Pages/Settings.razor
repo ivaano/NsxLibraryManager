@@ -150,6 +150,20 @@
         </RadzenColumn>
 
     </RadzenRow>
+    <RadzenRow>
+        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+            <RadzenCard Variant="Variant.Outlined">
+                <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
+                        <RadzenLabel Text="Change the current theme" />
+                        <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
+                        </RadzenDropDown>
+                    </RadzenStack>
+
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenStack>
+    </RadzenRow>
     <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">

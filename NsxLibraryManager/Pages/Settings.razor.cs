@@ -16,6 +16,8 @@ public partial class Settings
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private IValidator<UserSettings> ConfigValidator { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
+    
+    [Inject] private ThemeService ThemeService { get; set; } = default!;
 
     private IEnumerable<string> _regionsValue = new string[] { "US" };
     private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" } };
@@ -66,6 +68,11 @@ public partial class Settings
             }
         }
         return _validationResult.IsValid;
+    }
+    
+    private void ChangeTheme(string value)
+    {
+        ThemeService.SetTheme(value);
     }
     
     private async Task SaveConfiguration()
