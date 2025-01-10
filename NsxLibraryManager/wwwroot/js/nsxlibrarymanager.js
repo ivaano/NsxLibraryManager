@@ -7,3 +7,10 @@ function setFocus(field) {
     let input = document.getElementById(field);
     input.focus();
 }
+
+function scrollDialogToTop() {
+    const dialogContent = document.querySelector('.rz-dialog-content');
+    if (dialogContent) {
+        dialogContent.scrollTop = 0;
+    }
+}

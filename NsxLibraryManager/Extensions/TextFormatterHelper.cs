@@ -1,6 +1,7 @@
 ﻿using System.Text;
+using NsxLibraryManager.Models.Dto;
 
-namespace NsxLibraryManager.Utils;
+namespace NsxLibraryManager.Extensions;
 
 public static class TextFormatterHelper
 {
@@ -11,6 +12,27 @@ public static class TextFormatterHelper
         var exp = (int) (Math.Log(bytes) / Math.Log(unit));
         var pre = "KMGTPE"[exp - 1];
         return $"{bytes / Math.Pow(unit, exp):F2} {pre}B";
+    }
+    
+    public static string ToDateFormat(this DateTime dateTime)
+    {
+        return dateTime.ToString("MM/dd/yyyy");
+    }
+
+    public static string ListCategories(this IEnumerable<CategoryDto> categories)
+    {
+        if (categories is null || !categories.Any())
+        {
+            return string.Empty;
+        }
+        var sb = new StringBuilder();
+        foreach (var category in categories)
+        {
+            sb.Append(category.Name);
+            sb.Append(", ");
+        }
+        sb.Remove(sb.Length - 1, 1);
+        return sb.ToString();
     }
     
     public static string ListToString(this IEnumerable<string>? list)

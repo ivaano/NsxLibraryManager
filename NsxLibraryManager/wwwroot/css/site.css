@@ -67,3 +67,11 @@ a, .btn-link {
     content: "An error has occurred."
 }
 
+.dialog-top-scroll .rz-dialog-content {
+    scroll-behavior: auto;
+    overflow-y: auto;
+}
+
+.dialog-top-scroll .rz-dialog-content:not(:hover) {
+    scrollbar-width: thin;
+}

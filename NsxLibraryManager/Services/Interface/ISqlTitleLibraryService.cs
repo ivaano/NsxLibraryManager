@@ -1,4 +1,5 @@
 ﻿using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 
 namespace NsxLibraryManager.Services.Interface;
@@ -13,5 +14,7 @@ public interface ISqlTitleLibraryService
 
     public Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType contentType);
 
-    public Task<Title?> GetTitleByApplicationId(string applicationId);
+    public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
+    
+    public Task<IQueryable<DlcDto>> GetTitleDlcsAsync(string applicationId);
 }

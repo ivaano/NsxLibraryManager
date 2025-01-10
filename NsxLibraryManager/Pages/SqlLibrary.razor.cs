@@ -9,6 +9,7 @@ using System.Text;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Pages.Components;
 using Microsoft.EntityFrameworkCore;
+using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
@@ -21,9 +22,9 @@ public partial class SqlLibrary : IDisposable
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = default!;
     
-    [Inject] private ISettingsService SettingsService { get; set; } = default!;
+    [Inject] 
+    private ISettingsService SettingsService { get; set; } = default!;
 
-    
     [Inject]
     protected NsxLibraryDbContext DbContext { get; set; } = default!;
     
@@ -169,6 +170,8 @@ public partial class SqlLibrary : IDisposable
             UpdatesCount = t.UpdatesCount,
             Version = t.Version,
         });
+        
+        //var finalQuery = queryT.Select(t => t.MapToLibraryTitleDto());
         
         if (args.Filters.Any())
         {

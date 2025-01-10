@@ -9,6 +9,7 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
 using Version = NsxLibraryManager.Models.NsxLibrary.Version;
@@ -264,12 +265,47 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         await _nsxLibraryDbContext.SaveChangesAsync();
         return true;
     }
-
-    public async Task<Title?> GetTitleByApplicationId(string applicationId)
+    
+    public Task<IQueryable<DlcDto>> GetTitleDlcsAsync(string applicationId)
     {
-        var title = await _nsxLibraryDbContext.Titles.Include(s => s.Screenshots).FirstOrDefaultAsync(t => t.ApplicationId == applicationId);
-        var caco = title.MapToLibraryTitleDto();  
-        return title;
+        var query = _titledbDbContext.Titles.AsNoTracking()
+            .Where(t => t.OtherApplicationId == applicationId)
+            .Where(t => t.ContentType == TitleContentType.DLC)
+            .OrderByDescending(t => t.ReleaseDate)
+            .Select(t => new DlcDto
+            {
+                ApplicationId = t.ApplicationId,
+                OtherApplicationId = t.OtherApplicationId,
+                TitleName = t.TitleName,
+                Size = t.Size,
+                
+            }).AsQueryable();
+        return Task.FromResult(query);
+    }
+
+    public async Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId)
+    {
+       
+        var title = await _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Include(v => v.Versions)
+            .Include(c => c.Categories)
+            .Include(s => s.Screenshots)
+            .FirstOrDefaultAsync(t => t.ApplicationId == applicationId);
+
+        var relatedTitles = await _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.OtherApplicationId == applicationId)
+            .OrderByDescending(t => t.ReleaseDate)
+            .ToListAsync();
+        
+        var relatedTitlesTitleDb = await _titledbDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.OtherApplicationId == applicationId)
+            .OrderByDescending(t => t.ReleaseDate)
+            .ToListAsync();
+        
+        return title.MapToLibraryTitleDto(relatedTitles, relatedTitlesTitleDb);
     }
 
     public async Task<Title?> ProcessFileAsync(string file)
