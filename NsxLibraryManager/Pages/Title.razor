@@ -1,6 +1,5 @@
 ﻿@page "/Title/{titleId}"
 @using NsxLibraryManager.Extensions
-@using NsxLibraryManager.Models.Dto
 
 <PageTitle>Title</PageTitle>
 <RadzenRow>
@@ -271,8 +270,8 @@
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Updates">
-                <RadzenDataGrid style="height: 50vh" @ref="dlcGrid" IsLoading="@dlcIsLoading" Count="@dlcCount"
-                                Data="@dlcs" LoadData="@LoadDlcData" AllowSorting="true" AllowColumnResize="true"
+                <RadzenDataGrid style="height: 50vh" IsLoading="@updatesIsLoading" Count="@updatesCount"
+                                Data="@updates" LoadData="@LoadUpdateData" AllowSorting="true" AllowColumnResize="true"
                                 AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" PageSize="100"
                                 ShowPagingSummary="true">
                     <Columns>

@@ -31,13 +31,19 @@ public partial class Title
 
     private LibraryTitleDto? LibraryTitle { get; set; }
     private string HtmlDescription { get; set; } = string.Empty;
+    private BooleanProvider myBooleanProvider = new BooleanProvider();
 
     //dlc grid
     private RadzenDataGrid<DlcDto> dlcGrid;
     private bool dlcIsLoading;
     private int dlcCount;
     private IEnumerable<DlcDto> dlcs;
-    BooleanProvider myBooleanProvider = new BooleanProvider();
+    
+    //updates grid
+    private RadzenDataGrid<UpdateDto> updatesGrid;
+    private bool updatesIsLoading;
+    private int updatesCount;
+    private IEnumerable<UpdateDto> updates;
 
 
     private async Task LiveLoadDlcData(LoadDataArgs args)
@@ -103,6 +109,46 @@ public partial class Title
         dlcCount = query.Count();
         dlcs = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
         dlcIsLoading = false;
+    }
+
+    private async Task LoadUpdateData(LoadDataArgs args)
+    {
+        updatesIsLoading = true;
+        await Task.Yield();
+        if (LibraryTitle?.Updates is null) return;
+        var libraryApplicationIds = LibraryTitle?.OwnedUpdates?
+                                        .ToLookup(x => x.ApplicationId) ??
+                                    new List<UpdateDto>().ToLookup(p => p.ToString(), p => p);
+        
+        
+        var query = LibraryTitle.Updates.Select(t => new UpdateDto
+        {
+            ApplicationId = t.ApplicationId,
+            OtherApplicationId = t.OtherApplicationId,
+            TitleName = t.TitleName,
+            FileName = libraryApplicationIds.Contains(t.ApplicationId) ? 
+                libraryApplicationIds[t.ApplicationId].First().FileName : 
+                null,
+            Version = libraryApplicationIds.Contains(t.ApplicationId) ? 
+                libraryApplicationIds[t.ApplicationId].First().Version : 
+                null,
+            Size = t.Size,
+            Owned = libraryApplicationIds.Contains(t.ApplicationId)
+        }).AsQueryable();
+        
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+        
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        
+        updatesCount = query.Count();
+        updates = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        updatesIsLoading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -31,14 +31,14 @@ public static class TitleLibraryMappingExtensions
         
         var updates = new Collection<UpdateDto>(
             (otherTitles ?? Array.Empty<Title>())
-            .Where(x => x.ContentType == TitleContentType.DLC)
+            .Where(x => x.ContentType == TitleContentType.Update)
             .Select(u => new UpdateDto()
             {
                 ApplicationId = u.ApplicationId,
                 TitleName = u.TitleName,
                 FileName = u.FileName,
                 Version = u.Version,
-                Size = u.Size,
+                Size = u.Size.GetValueOrDefault(),
             }).ToList());
 
         var titleDbDlcs = new Collection<DlcDto>(
@@ -62,7 +62,7 @@ public static class TitleLibraryMappingExtensions
             {
                 ApplicationId = d.ApplicationId,
                 TitleName = d.TitleName,
-                Size = d.Size
+                Size = d.Size.GetValueOrDefault()
             }).ToList());
         
         return new LibraryTitleDto

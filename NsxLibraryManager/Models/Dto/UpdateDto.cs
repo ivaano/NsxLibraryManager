@@ -7,5 +7,6 @@ public class UpdateDto
     public string? TitleName { get; init; }
     public string? FileName { get; init; }
     public int? Version { get; init; }
-    public long? Size { get; init; }
+    public long Size { get; init; }
+    public bool Owned { get; init; }
 }
