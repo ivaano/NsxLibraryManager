@@ -8,10 +8,10 @@ public record DlcDto()
     public string? OtherApplicationId { get; init; }
     public string? TitleName { get; init; }
     public int? Version { get; init; }
-    public long? Size { get; init; }
+    public long Size { get; init; }
 
+    public bool Owned { get; set; }
 
     public string? FileName { get; init; }
     public Collection<ScreenshotDto>? Screenshots { get; init; }
-
 };

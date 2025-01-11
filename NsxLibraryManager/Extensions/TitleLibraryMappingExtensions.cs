@@ -22,7 +22,7 @@ public static class TitleLibraryMappingExtensions
                     TitleName = d.TitleName,
                     FileName = d.FileName,
                     Version = d.Version,
-                    Size = d.Size,
+                    Size = d.Size.GetValueOrDefault(),
                     Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
                     {
                         Url = x.Url
@@ -48,7 +48,7 @@ public static class TitleLibraryMappingExtensions
             {
                 ApplicationId = d.ApplicationId,
                 TitleName = d.TitleName,
-                Size = d.Size,
+                Size = d.Size.GetValueOrDefault(),
                 Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
                 {
                     Url = x.Url
@@ -105,5 +105,4 @@ public static class TitleLibraryMappingExtensions
             }).ToList()),
         };
     }
-    
 }

@@ -16,5 +16,5 @@ public interface ISqlTitleLibraryService
 
     public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
     
-    public Task<IQueryable<DlcDto>> GetTitleDlcsAsync(string applicationId);
+    public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId);
 }

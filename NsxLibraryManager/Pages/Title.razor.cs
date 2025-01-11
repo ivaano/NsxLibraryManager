@@ -8,6 +8,7 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
+using NsxLibraryManager.Providers;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 using Radzen;
@@ -36,14 +37,15 @@ public partial class Title
     private bool dlcIsLoading;
     private int dlcCount;
     private IEnumerable<DlcDto> dlcs;
+    BooleanProvider myBooleanProvider = new BooleanProvider();
 
 
-    private async Task LoadDlcData(LoadDataArgs args)
+    private async Task LiveLoadDlcData(LoadDataArgs args)
     {
         dlcIsLoading = true;
         await Task.Yield();
         if (TitleId is null) return;
-        var query = await SqlTitleLibraryService.GetTitleDlcsAsync(TitleId);
+        var query = await SqlTitleLibraryService.GetTitleDlcsAsQueryable(TitleId);
         
         if (!string.IsNullOrEmpty(args.Filter))
         {
@@ -63,6 +65,44 @@ public partial class Title
         dlcCount = query.Count();
         dlcIsLoading = false;
         //dlcs = await query.ToListAsync();
+    }
+
+    private async Task LoadDlcData(LoadDataArgs args)
+    {
+        dlcIsLoading = true;
+        await Task.Yield();
+        if (LibraryTitle?.Dlc is null) return;
+        var libraryApplicationIds = LibraryTitle?.OwnedDlcs?
+            .ToLookup(x => x.ApplicationId) ??
+                                    new List<DlcDto>().ToLookup(p => p.ToString(), p => p);
+        
+        var query = LibraryTitle.Dlc.Select(t => new DlcDto
+        {
+            ApplicationId = t.ApplicationId,
+            OtherApplicationId = t.OtherApplicationId,
+            TitleName = t.TitleName,
+            FileName = libraryApplicationIds.Contains(t.ApplicationId) ? 
+                libraryApplicationIds[t.ApplicationId].First().FileName : 
+                null,
+            Version = libraryApplicationIds.Contains(t.ApplicationId) ? 
+                libraryApplicationIds[t.ApplicationId].First().Version : 
+                null,
+            Size = t.Size,
+            Owned = libraryApplicationIds.Contains(t.ApplicationId)
+        }).AsQueryable();
+        
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+        
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        dlcCount = query.Count();
+        dlcs = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        dlcIsLoading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -88,67 +128,6 @@ public partial class Title
 
         if (title is null) return;
         LibraryTitle = title;
-        /*
-        var sizeInBytes = title.Size ?? 0;
-        GameFileSize = sizeInBytes.ToHumanReadableBytes();
-        HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
-        LibraryTitle = new LibraryTitle
-        {
-            TitleId = title.ApplicationId,
-            TitleName = title.TitleName,
-            FileName = title.FileName,
-        };
-        
-        //LibraryTitle = TitleLibraryService.GetTitle(TitleId);
-        if (LibraryTitle is not null)
-        {
-            var sizeInBytes = LibraryTitle.Size ?? 0;
-            GameFileSize = sizeInBytes.ToHumanReadableBytes();
-            HtmlDescription = new MarkupString(LibraryTitle.Description.Text2Html()).Value;
-            var titlePatches = TitleDbService.GetVersions(LibraryTitle.TitleId);
-            var titlePatchesList = new List<GameVersions>();
-
-            foreach (var patch in titlePatches)
-            {
-                if (LibraryTitle.OwnedUpdates == null) continue;
-                var query = from o in LibraryTitle.OwnedUpdates
-                        where o == patch.VersionShifted
-                        select o;
-                patch.Owned = query.Any();
-
-                titlePatchesList.Add(patch);
-            }
-            GameVersions = titlePatchesList;
-
-            var titleDlcs = await TitleDbService.GetTitleDlc(LibraryTitle.TitleId);
-            var titleDlcList = new List<Dlc>();
-            foreach (var dlc in titleDlcs)
-            {
-                if (LibraryTitle.OwnedDlcs == null)
-                {
-                    dlc.Owned = false;
-                    titleDlcList.Add(dlc);
-                    continue;
-                }
-                var query = from o in LibraryTitle.OwnedDlcs
-                        where o == dlc.TitleId
-                        select o;
-                dlc.Owned =  query.Any();
-
-                titleDlcList.Add(dlc);
-            }
-            GameDlcs = titleDlcList;
-        }
-        else
-        {
-            LibraryTitle = await TitleLibraryService.GetTitleFromTitleDb(TitleId) ?? new LibraryTitle
-            {
-                    TitleId = TitleId,
-                    Size = 0,
-                    FileName = string.Empty
-            };
-        }
-        */
     }
 
 

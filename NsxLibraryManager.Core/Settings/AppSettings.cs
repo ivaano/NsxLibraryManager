@@ -10,4 +10,6 @@ public class AppSettings
     public required string NsxLibraryDbConnection { get; set; } = string.Empty;
     [Required]
     public required string SqlTitleDbRepository { get; set; } = string.Empty;
+    
+    public bool DownloadTitleDbOnStartup { get; set; } = true;
 }

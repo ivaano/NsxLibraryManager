@@ -266,9 +266,15 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         return true;
     }
     
-    public Task<IQueryable<DlcDto>> GetTitleDlcsAsync(string applicationId)
+    public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId)
     {
-        var query = _titledbDbContext.Titles.AsNoTracking()
+        var libraryApplicationIds = _nsxLibraryDbContext.Titles.AsNoTracking()
+            .Where(t => t.OtherApplicationId == applicationId)
+            .Where(t => t.ContentType == TitleContentType.DLC)
+            .OrderByDescending(t => t.ReleaseDate)
+            .Select(t => t.ApplicationId).ToHashSet();
+        
+        var queryableDlcs = _titledbDbContext.Titles.AsNoTracking()
             .Where(t => t.OtherApplicationId == applicationId)
             .Where(t => t.ContentType == TitleContentType.DLC)
             .OrderByDescending(t => t.ReleaseDate)
@@ -277,10 +283,11 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
                 ApplicationId = t.ApplicationId,
                 OtherApplicationId = t.OtherApplicationId,
                 TitleName = t.TitleName,
-                Size = t.Size,
-                
+                Size = t.Size.GetValueOrDefault(),
+                Owned = libraryApplicationIds.Contains(t.ApplicationId)
             }).AsQueryable();
-        return Task.FromResult(query);
+        
+        return Task.FromResult(queryableDlcs);
     }
 
     public async Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId)

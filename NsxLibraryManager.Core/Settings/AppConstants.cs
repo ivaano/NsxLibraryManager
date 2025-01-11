@@ -11,6 +11,7 @@ public static class AppConstants
     public const string AppSettingsSectionName = "NsxLibraryManager";
     public const string AppSettingsTitledbDbConnection = "TitledbDbConnection";
     public const string AppSettingsSqlTitleDbRepository = "SqlTitleDbRepository";
+    public const string AppSettingsDownloadTitleDbOnStartup = "DownloadTitleDbOnStartup";
     public const string ConfigFileName = "config.json";
     public const string ConfigDirectory = "config";
     public const string DataDirectory = "data";

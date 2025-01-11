@@ -9,6 +9,12 @@ public static class StartupFileDownloader
 {
     public static async Task<WebApplicationBuilder> TitleDbDownloader(this WebApplicationBuilder builder)
     {
+        var downloadOnStartup = builder.Configuration.GetValue<bool>($"{AppConstants.AppSettingsSectionName}:{AppConstants.AppSettingsDownloadTitleDbOnStartup}");
+        if (!downloadOnStartup)
+        {
+            Console.WriteLine($"Not downloading latest version of SqlTitleDb on Startup");
+            return builder;
+        }        
         var repoUrl = builder.Configuration.GetValue<string>($"{AppConstants.AppSettingsSectionName}:{AppConstants.AppSettingsSqlTitleDbRepository}");
         if (repoUrl is null)
         {
