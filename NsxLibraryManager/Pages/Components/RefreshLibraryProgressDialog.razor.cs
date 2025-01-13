@@ -35,6 +35,12 @@ public partial class RefreshLibraryProgressDialog : IDisposable
             {
                
                 var filesToProcess = await TitleLibraryService.GetDeltaFilesInLibraryAsync();
+                foreach (var file in filesToProcess.FilesToAdd)
+                {
+                    var result = await TitleLibraryService.ProcessFileAsync(file);
+                    ProgressCompleted++;
+                    StateHasChanged();
+                }
                 //FileCount = filesToProcess.Count();
                 /*
                var addedTitles = new List<LibraryTitle>();

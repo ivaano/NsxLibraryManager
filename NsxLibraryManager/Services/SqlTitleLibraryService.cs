@@ -332,14 +332,16 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
                     .Subtract(libraryFiles[fileName].LastWriteTime ?? DateTime.MinValue)
                     .TotalSeconds) > 1)
             .ToList();
-        
-            
 
+
+        var toAdd = filesToAdd.ToList();
+        var toRemove = filesToRemove.ToList();
         return new FileDelta
         {
-            FilesToAdd = filesToAdd,
-            FilesToRemove = filesToRemove,
-            FilesToUpdate = filesToUpdate
+            FilesToAdd = toAdd,
+            FilesToRemove = toRemove,
+            FilesToUpdate = filesToUpdate,
+            TotalFiles = toAdd.Count + toRemove.Count + filesToUpdate.Count
         };
 
     }
