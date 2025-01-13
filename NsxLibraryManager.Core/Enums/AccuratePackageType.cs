@@ -5,5 +5,6 @@ public enum AccuratePackageType
     NSP,
     NSZ,
     XCI,
-    XCZ
+    XCZ,
+    Unknown
 }

@@ -107,7 +107,6 @@ public class SqlRenamerService(
             input,
             ordinalPattern,
             match => {
-                // Ensure ordinal suffix is lowercase
                 var number = Regex.Match(match.Value, @"\d+").Value;
                 var suffix = Regex.Match(match.Value, @"(st|nd|rd|th)").Value.ToLower();
                 specialTerms.Add(number + suffix);
@@ -206,35 +205,48 @@ public class SqlRenamerService(
 
     private async Task<LibraryTitle?> GetAggregatedFileInfo(string fileLocation)
     {
-        var fileInfo = await _fileInfoService.GetFileInfo(fileLocation, false);
-        var titledbTitle =
-                await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == fileInfo.TitleId);
-        if (titledbTitle is null)
+        try
         {
-            //try to find OtherApplicationName in titledb
-            if (fileInfo.Type is TitleLibraryType.Update or TitleLibraryType.DLC
-                && string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleName) && !string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleId))
+            var fileInfo = await _fileInfoService.GetFileInfo(fileLocation, false);
+            var titledbTitle =
+                await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == fileInfo.TitleId);
+            if (titledbTitle is null)
             {
-                var otherApplication = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.OtherApplicationId == fileInfo.ApplicationTitleId);
-                if (otherApplication is null) return fileInfo;
+                //try to find OtherApplicationName in titledb
+                if (fileInfo.Type is TitleLibraryType.Update or TitleLibraryType.DLC
+                    && string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleName) && !string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleId))
+                {
+                    var otherApplication = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.OtherApplicationId == fileInfo.ApplicationTitleId);
+                    if (otherApplication is null) return fileInfo;
             
-                fileInfo.ApplicationTitleName = otherApplication.TitleName;
+                    fileInfo.ApplicationTitleName = otherApplication.TitleName;
+                }
+                return fileInfo;
             }
+
+            //prefer Name  from titledb instead of the file
+            fileInfo.TitleName = titledbTitle.TitleName;
+            fileInfo.UpdatesCount = titledbTitle.UpdatesCount;
+            fileInfo.DlcCount = titledbTitle.DlcCount;
+
+            if (titledbTitle.ContentType == TitleContentType.Base
+                || string.IsNullOrEmpty(titledbTitle.OtherApplicationId)) return fileInfo;
+
+            var parentTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == titledbTitle.OtherApplicationId);
+            fileInfo.ApplicationTitleName = parentTitle?.TitleName;
+
             return fileInfo;
         }
-
-        //prefer Name  from titledb instead of the file
-        fileInfo.TitleName = titledbTitle.TitleName;
-        fileInfo.UpdatesCount = titledbTitle.UpdatesCount;
-        fileInfo.DlcCount = titledbTitle.DlcCount;
-
-        if (titledbTitle.ContentType == TitleContentType.Base
-            || string.IsNullOrEmpty(titledbTitle.OtherApplicationId)) return fileInfo;
-
-        var parentTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == titledbTitle.OtherApplicationId);
-        fileInfo.ApplicationTitleName = parentTitle?.TitleName;
-
-        return fileInfo;
+        catch (Exception e)
+        {
+            return new LibraryTitle
+            {
+                Error = true,
+                ErrorMessage = e.Message,
+                TitleId = string.Empty,
+                FileName = string.Empty,
+            };
+        }
     }
    
     
@@ -243,10 +255,12 @@ public class SqlRenamerService(
     {
         var files = await _fileInfoService.GetFileNames(inputPath, recursive);
         var fileList = new List<RenameTitle>();
-        
+        _logger.LogInformation("{} file candidate(s) found.", fileList.Count);
         foreach (var file in files)
         {
+            _logger.LogInformation("Analyzing {}", file);
             var fileInfo = await GetAggregatedFileInfo(file);
+
             if (fileInfo is null)
             {
                 fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, true,

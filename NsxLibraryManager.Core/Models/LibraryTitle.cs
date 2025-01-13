@@ -7,7 +7,7 @@ namespace NsxLibraryManager.Core.Models;
 public class LibraryTitle
 {
     public int Id { get; set; }
-    public required string TitleId { get; init; }
+    public required string TitleId { get; set; }
     public long Nsuid { get; set; }
     public int? NumberOfPlayers { get; set; }
     // Last Patch Version in TitleDb
@@ -21,9 +21,9 @@ public class LibraryTitle
     public int? PatchNumber { get; set; }
     public string? TitleName { get; set; }
     public string? Publisher { get; set; }
-    public uint TitleVersion { get; init; }
+    public uint TitleVersion { get; set; }
     public TitleLibraryType Type { get; set; }
-    public AccuratePackageType PackageType { get; init; }
+    public AccuratePackageType PackageType { get; set; }
     public required string FileName { get; set; }
     public string? BannerUrl { get; set; }
     public List<string>? Category { get; set; }

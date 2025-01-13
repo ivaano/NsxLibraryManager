@@ -1,4 +1,5 @@
 ﻿using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 
@@ -17,4 +18,6 @@ public interface ISqlTitleLibraryService
     public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
     
     public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId);
+    
+    public Task<FileDelta> GetDeltaFilesInLibraryAsync();
 }

@@ -20,20 +20,20 @@ namespace NsxLibraryManager.Pages;
 public partial class SqlLibrary : IDisposable
 {
     [Inject]
-    protected IJSRuntime JsRuntime { get; set; } = default!;
+    protected IJSRuntime JsRuntime { get; set; } = null!;
     
     [Inject] 
-    private ISettingsService SettingsService { get; set; } = default!;
+    private ISettingsService SettingsService { get; set; } = null!;
 
     [Inject]
-    protected NsxLibraryDbContext DbContext { get; set; } = default!;
+    protected NsxLibraryDbContext DbContext { get; set; } = null!;
     
     [Inject]
     protected DialogService DialogService { get; set; }
     
     private static readonly string SettingsParamaterName = "SqlLibraryGridSettings";
 
-    private DataGridSettings _settings;
+    private DataGridSettings _settings = default!;
     private IEnumerable<GridTitle> _libraryTitles;
     private RadzenDataGrid<GridTitle> _grid;
 
@@ -77,9 +77,7 @@ public partial class SqlLibrary : IDisposable
         {
             await LoadStateAsync();
             await Task.Delay(1);
-            //await _grid.Reload();
             StateHasChanged();    
-
         }
     }
     
@@ -223,6 +221,21 @@ public partial class SqlLibrary : IDisposable
 
     private async Task RefreshLibrary()
     {
+        var confirmationResult = await DialogService.Confirm(
+            "This refresh the library", "Refresh library?",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (confirmationResult is true)
+        {
+            DialogService.Close();
+            StateHasChanged();
+            var paramsDialog = new Dictionary<string, object>();
+            var dialogOptions = new DialogOptions()
+                { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
+            await DialogService.OpenAsync<RefreshLibraryProgressDialog>(
+                "Refreshing library...", paramsDialog, dialogOptions);
+
+            await InitialLoad();
+        }
     }
 
     private async Task ReloadLibrary()
@@ -255,8 +268,8 @@ public partial class SqlLibrary : IDisposable
             }
         }
     }
-    
-    public async Task OpenDetails(GridTitle title)
+
+    private async Task OpenDetails(GridTitle title)
     {
         await DialogService.OpenAsync<Title>($"{title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },

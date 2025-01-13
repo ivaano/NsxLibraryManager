@@ -9,6 +9,7 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
@@ -288,6 +289,59 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             }).AsQueryable();
         
         return Task.FromResult(queryableDlcs);
+    }
+
+    public async Task<FileDelta> GetDeltaFilesInLibraryAsync()
+    {
+       
+        var libraryFiles = await _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.FileName, x => x);
+        
+        var libDirFiles = await GetFilesAsync();
+        
+        var dirFiles = new Dictionary<string, LibraryTitle>();
+        foreach (var fileName in libDirFiles)
+        {
+            if (_fileInfoService.TryGetFileInfoFromFileName(fileName, out var fileInfo))
+            {
+                dirFiles.Add(fileName, fileInfo);    
+            }
+            /*
+            try
+            {
+                //var fileInfo = await _fileInfoService.GetFileInfoFromFileName(fileName);
+                _fileInfoService.TryGetFileInfoFromFileName(fileName, out var fileInfo);
+                dirFiles.Add(fileName, fileInfo);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+            */
+        }
+        
+        var filesToAdd = dirFiles.Keys.Except(libraryFiles.Keys);
+        var filesToRemove = libraryFiles.Keys.Except(dirFiles.Keys);
+        
+       
+        var filesToUpdate = libraryFiles.Keys
+            .Intersect(dirFiles.Keys)
+            .Where(fileName =>
+                Math.Abs((dirFiles[fileName].LastWriteTime ?? DateTime.MinValue)
+                    .Subtract(libraryFiles[fileName].LastWriteTime ?? DateTime.MinValue)
+                    .TotalSeconds) > 1)
+            .ToList();
+        
+            
+
+        return new FileDelta
+        {
+            FilesToAdd = filesToAdd,
+            FilesToRemove = filesToRemove,
+            FilesToUpdate = filesToUpdate
+        };
+
     }
 
     public async Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId)

@@ -238,8 +238,8 @@
     <RadzenTabs TabPosition="@TabPosition.Top" RenderMode="TabRenderMode.Client" >
         <Tabs>
             <RadzenTabsItem Text="DLC">
-                <RadzenDataGrid style="height: 50vh" @ref="dlcGrid" IsLoading="@dlcIsLoading" Count="@dlcCount"
-                                Data="@dlcs" LoadData="@LoadDlcData" AllowSorting="true" AllowColumnResize="true"
+                <RadzenDataGrid style="height: 50vh" @ref="_dlcGrid" IsLoading="@_dlcIsLoading" Count="@_dlcCount"
+                                Data="@_dlcs" LoadData="@LoadDlcData" AllowSorting="true" AllowColumnResize="true"
                                 AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" PageSize="100"
                                 ShowPagingSummary="true">
                     <Columns>
@@ -264,118 +264,38 @@
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" TextAlign="TextAlign.Center"/>
-                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center" SortOrder="SortOrder.Descending" FormatString="{0}" FormatProvider="@myBooleanProvider"/>
+                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center" SortOrder="SortOrder.Descending" FormatString="{0}" FormatProvider="@_myBooleanProvider"/>
 
                     </Columns>
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Updates">
-                <RadzenDataGrid style="height: 50vh" IsLoading="@updatesIsLoading" Count="@updatesCount"
-                                Data="@updates" LoadData="@LoadUpdateData" AllowSorting="true" AllowColumnResize="true"
+                <RadzenDataGrid style="height: 50vh" @ref="_updatesGrid" IsLoading="@_updatesIsLoading" Count="@_updatesCount"
+                                Data="@_updates" LoadData="@LoadUpdateData" AllowSorting="true" AllowColumnResize="true"
                                 AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" PageSize="100"
                                 ShowPagingSummary="true">
                     <Columns>
                         <RadzenDataGridColumn Property="ApplicationId" Filterable="true" Title="ID" Width="60px" TextAlign="TextAlign.Center" FilterMode="FilterMode.Advanced"/>
-                        <RadzenDataGridColumn Property="TitleName" Filterable="false" Title="Name" Width="120px" TextAlign="TextAlign.Left">
-                            <Template Context="dlc">
+                        <RadzenDataGridColumn Property="FileName" Filterable="false" Title="File Name" Width="120px" TextAlign="TextAlign.Left">
+                            <Template Context="updateDto">
                                 <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
-                                    @dlc.TitleName
+                                    @updateDto.FileName
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn Property="Size" Filterable="false" Title="Size" Width="30px" TextAlign="TextAlign.Center">
-                            <Template Context="dlc">
-                                @dlc.Size.ToHumanReadableBytes()
+                            <Template Context="updateDto">
+                                @updateDto.Size.ToHumanReadableBytes()
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" TextAlign="TextAlign.Center"/>
-                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center" SortOrder="SortOrder.Descending" FormatString="{0}" FormatProvider="@myBooleanProvider"/>
+                        <RadzenDataGridColumn Property="Date" Filterable="false" Title="Date" Width="30px" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" SortOrder="SortOrder.Descending" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="ShortVersion" Filterable="false" Title="Short Version" Width="30px" SortOrder="SortOrder.Descending" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center"  FormatString="{0}" FormatProvider="@_myBooleanProvider"/>
 
                     </Columns>
                 </RadzenDataGrid>
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
-    @*
-    <RadzenColumn Size="7">
-        <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 100%;">
-            <HeaderTemplate>
-                <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
-                    <RadzenIcon Icon="deployed_code" class="rz-mr-1"/><b>DLC</b>
-                </RadzenText>
-            </HeaderTemplate>
-            <ChildContent>
-                <RadzenDataGrid style="height: 50vh" @ref="dlcGrid" IsLoading="@dlcIsLoading" Count="@dlcCount"
-                                Data="@dlcs" LoadData="@LoadDlcData" AllowSorting="true" AllowColumnResize="true"
-                                AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" PageSize="100"
-                                ShowPagingSummary="true">
-                    <Columns>
-                        <RadzenDataGridColumn Property="ApplicationId" Filterable="true" Title="ID" Width="60px" TextAlign="TextAlign.Center" FilterMode="FilterMode.Advanced"/>
-                        <RadzenDataGridColumn Property="TitleName" Filterable="false" Title="Name" Width="120px" TextAlign="TextAlign.Left">
-                            <Template Context="dlc">
-                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
-                                    @dlc.TitleName
-                                </div>
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="Size" Filterable="false" Title="Size" Width="30px" TextAlign="TextAlign.Center">
-                            <Template Context="dlc">
-                                @dlc.Size.ToHumanReadableBytes()
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" TextAlign="TextAlign.Center"/>
-                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center" SortOrder="SortOrder.Descending" FormatString="{0}" FormatProvider="@myBooleanProvider"/>
-
-                    </Columns>
-                </RadzenDataGrid>
-            </ChildContent>
-        </RadzenPanel>
-
-    </RadzenColumn>
-    <RadzenColumn Size="5">
-        <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 100%;">
-            <HeaderTemplate>
-                <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
-                    <RadzenIcon Icon="update" class="rz-mr-1"/><b>Patches</b>
-                </RadzenText>
-            </HeaderTemplate>
-            <ChildContent>
-                <RadzenRow>
-                    <RadzenColumn Size="4">
-                        <RadzenText TextStyle="TextStyle.H6">Date</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="4">
-                        <RadzenText TextStyle="TextStyle.H6">TitleId</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="2" Style="text-align: center">
-                        <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="2" Style="text-align: center">
-                        <RadzenText TextStyle="TextStyle.H6">Status</RadzenText>
-                    </RadzenColumn>
-                </RadzenRow>
-                @foreach (var version in GameVersions.Reverse())
-                {
-                    <RadzenRow>
-                        <RadzenColumn Size="4">
-                            <RadzenLink Path="@($"/Title/{version.TitleId}")" Text="@version.Date"/>
-                        </RadzenColumn>
-                        <RadzenColumn Size="4">
-                            @version.TitleId.ToUpper()
-                        </RadzenColumn>
-                        <RadzenColumn Size="2" Style="text-align: center">@version.Version.VersionShifted()</RadzenColumn>
-                        @if (@version.Owned)
-                        {
-                            <RadzenColumn Size="2" class="rz-background-color-success-lighter" Style="text-align: center">Owned</RadzenColumn>
-                        }
-                        else
-                        {
-                            <RadzenColumn Size="2" Style="text-align: center">Missing</RadzenColumn>
-                        }
-                    </RadzenRow>
-                }
-            </ChildContent>
-        </RadzenPanel>
-    </RadzenColumn>
-    *@
 </RadzenRow>

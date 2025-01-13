@@ -21,6 +21,9 @@ public class FileInfoService : IFileInfoService
     private const string XciExtension = ".xci";
     private const string XczExtension = ".xcz";
     private const string TitleFilePattern = @"^(.*?)(?:\s*\[(DLC.*?)\])?\s*\[([0-9a-fA-F]+)\]\[v(\d+)\]";
+    const string TitleIdPattern = @"\[([0-9A-F]{16})\]";
+    const string TitleNamePattern = @"^(.*?)(?:\s*\[)";
+
     public FileInfoService(
             IPackageInfoLoader packageInfoLoader, 
             ILogger<FileInfoService> logger)
@@ -73,7 +76,82 @@ public class FileInfoService : IFileInfoService
         }
         return fileList;
     }
+    public bool TryGetFileInfoFromFileName(string fileName, out LibraryTitle libraryTitle)
+    {
+        var fileNameNoExt = Path.GetFileNameWithoutExtension(fileName); 
+        var extension = Path.GetExtension(fileName); 
+        var dlcName = string.Empty;
+        libraryTitle = new LibraryTitle
+        {
+            TitleId = string.Empty,
+            FileName = string.Empty,
+        };
 
+        var match = Regex.Match(fileNameNoExt, TitleFilePattern);
+        if (match.Success)
+        {
+            libraryTitle.TitleName = match.Groups[1].Value.Trim();
+            dlcName = match.Groups[2].Value.Trim();
+            libraryTitle.TitleId = match.Groups[3].Value;
+            _ = int.TryParse(match.Groups[4].Value, out var versionNumber) ? versionNumber : 0;
+            libraryTitle.TitleVersion = (uint)versionNumber;
+            if (string.IsNullOrEmpty(dlcName) && versionNumber == 0)
+            {
+                libraryTitle.Type = TitleLibraryType.Base;
+            } 
+            
+            if (string.IsNullOrEmpty(dlcName) && versionNumber > 0)
+            {
+                libraryTitle.Type = TitleLibraryType.Update;
+            }
+            
+            if (!string.IsNullOrEmpty(dlcName))
+            {
+                if (dlcName.StartsWith("DLC", StringComparison.OrdinalIgnoreCase))
+                {
+                    dlcName = dlcName[3..].Trim(); 
+                }
+                libraryTitle.Type = TitleLibraryType.DLC;
+                libraryTitle.TitleName = $"{libraryTitle.TitleName} - {dlcName}"; 
+            }
+        }
+        
+        if (string.IsNullOrEmpty(libraryTitle.TitleId))
+        {
+            //Try matching only title id [xxxx]
+            var matchId = Regex.Match(fileNameNoExt, TitleIdPattern);
+            if (matchId.Success)
+            {
+                libraryTitle.TitleId = matchId.Groups[1].Value.Trim();
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        var packageType = extension switch
+        {
+            _ when extension.Equals(NszExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.NSZ,
+            _ when extension.Equals(NspExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.NSP,
+            _ when extension.Equals(XciExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.XCI,
+            _ when extension.Equals(XczExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.XCZ,
+            _ => AccuratePackageType.Unknown
+        };
+        
+        if (packageType == AccuratePackageType.Unknown)
+        {
+            return false;
+        }
+        libraryTitle.PackageType = packageType;
+        libraryTitle.Size = new FileInfo(fileName).Length;
+        libraryTitle.FileName = Path.GetFullPath(fileName);
+        libraryTitle.LastWriteTime = File.GetLastWriteTime(fileName);
+        
+        return true;            
+    }
+    
+    
     public async Task<LibraryTitle> GetFileInfoFromFileName(string fileName)
     {
         
@@ -81,16 +159,33 @@ public class FileInfoService : IFileInfoService
 
         var fileNameNoExt = Path.GetFileNameWithoutExtension(fileName); 
         var directory = Path.GetDirectoryName(fileName); 
-        string extension = Path.GetExtension(fileName); 
-        
+        var extension = Path.GetExtension(fileName); 
+        var name = string.Empty;
+        var dlcName = string.Empty;
+        var id = string.Empty;
+        var version = string.Empty;        
         var match = Regex.Match(fileNameNoExt, TitleFilePattern);
 
-        if (!match.Success) throw new InvalidPathException(fileName);
+        if (match.Success)
+        {
+            name = match.Groups[1].Value.Trim();
+            dlcName = match.Groups[2].Value.Trim();
+            id = match.Groups[3].Value;
+            version = match.Groups[4].Value;
+        }
         
-        var name = match.Groups[1].Value.Trim();
-        var dlcName = match.Groups[2].Value.Trim();
-        var id = match.Groups[3].Value;
-        var version = match.Groups[4].Value;
+        if (string.IsNullOrEmpty(id))
+        {
+            var matchId = Regex.Match(fileNameNoExt, TitleIdPattern);
+            if (matchId.Success)
+            {
+                id = matchId.Groups[1].Value.Trim();
+            }
+            else
+            {
+                
+            }
+        }
         var packageType = extension switch
         {
             _ when extension.Equals(NszExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.NSZ,
@@ -101,10 +196,7 @@ public class FileInfoService : IFileInfoService
         };
         _ = int.TryParse(version, out var versionNumber) ? versionNumber : 0;
 
-        if (string.IsNullOrEmpty(id))
-        {
-            throw new InvalidPathException(fileName);
-        }
+
             
         var title = new LibraryTitle
         {
@@ -140,7 +232,9 @@ public class FileInfoService : IFileInfoService
         return title;
     }
 
-    
+
+
+
     public IEnumerable<string> GetDirectoryFiles(string filePath)
     {
         var files = Directory.GetFiles(filePath);

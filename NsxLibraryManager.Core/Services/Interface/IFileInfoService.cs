@@ -14,6 +14,7 @@ public interface IFileInfoService
     Task<LibraryTitle> GetFileInfo(string filePath, bool detailed);
     
     Task<LibraryTitle> GetFileInfoFromFileName(string filePath);
+    bool TryGetFileInfoFromFileName(string filePath, out LibraryTitle libraryTitle);
 
     Task<long?> GetFileSize(string filePath);
     Task<string?> GetFileIcon(string filePath);
