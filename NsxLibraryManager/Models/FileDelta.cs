@@ -1,10 +1,12 @@
-﻿namespace NsxLibraryManager.Models;
+﻿using NsxLibraryManager.Core.Models;
+
+namespace NsxLibraryManager.Models;
 
 public class FileDelta
 {
-    public required IEnumerable<string> FilesToAdd { get; init; }
-    public required IEnumerable<string> FilesToRemove { get; init; }
-    public required IEnumerable<string> FilesToUpdate { get; init; }
+    public required IEnumerable<LibraryTitle> FilesToAdd { get; init; }
+    public required IEnumerable<LibraryTitle> FilesToRemove { get; init; }
+    public required IEnumerable<LibraryTitle> FilesToUpdate { get; init; }
     
     public int TotalFiles { get; init; }
 

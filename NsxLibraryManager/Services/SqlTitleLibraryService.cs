@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
@@ -323,6 +324,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         
         var filesToAdd = dirFiles.Keys.Except(libraryFiles.Keys);
         var filesToRemove = libraryFiles.Keys.Except(dirFiles.Keys);
+
         
        
         var filesToUpdate = libraryFiles.Keys
@@ -334,13 +336,18 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             .ToList();
 
 
-        var toAdd = filesToAdd.ToList();
-        var toRemove = filesToRemove.ToList();
+        var toAdd = filesToAdd.Select(key => dirFiles[key]).ToList();
+        var toRemove = filesToRemove.Select(x => new LibraryTitle
+        {
+            TitleId = libraryFiles[x].ApplicationId,
+            FileName = libraryFiles[x].FileName
+        }).ToList();
+        var toUpdate = filesToUpdate.Select(key => dirFiles[key]).ToList();
         return new FileDelta
         {
             FilesToAdd = toAdd,
             FilesToRemove = toRemove,
-            FilesToUpdate = filesToUpdate,
+            FilesToUpdate = toUpdate,
             TotalFiles = toAdd.Count + toRemove.Count + filesToUpdate.Count
         };
 
@@ -369,6 +376,63 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             .ToListAsync();
         
         return title.MapToLibraryTitleDto(relatedTitles, relatedTitlesTitleDb);
+    }
+
+    public async Task<bool> RemoveLibraryTitleAsync(LibraryTitle title)
+    {
+        _logger.LogDebug("Removing file: {filename} from library", title.FileName);
+        var libraryTitle = _nsxLibraryDbContext.Titles.FirstOrDefault(x => x.ApplicationId == title.TitleId && x.FileName == title.FileName);
+        
+        if (libraryTitle is not null)
+        {
+            var updateCounts = new Dictionary<string, int>();
+            var dlcCounts = new Dictionary<string, int>();
+
+            if (libraryTitle is { ContentType: TitleContentType.Update, OtherApplicationId: not null })
+            {
+                var updateCount =
+                    _nsxLibraryDbContext.Titles.FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                if (updateCount is not null) updateCount.OwnedUpdates -= 1;
+            }
+            
+            if (libraryTitle is { ContentType: TitleContentType.DLC, OtherApplicationId: not null })
+            {
+                var dlcCount =
+                    _nsxLibraryDbContext.Titles.FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                if (dlcCount is not null) dlcCount.OwnedDlcs -= 1;
+                
+            }
+
+            try
+            {
+                var titleScreenshots = _nsxLibraryDbContext.Screenshots.Where(t => t.Title == libraryTitle);
+                _nsxLibraryDbContext.Screenshots.RemoveRange(titleScreenshots);                
+                _nsxLibraryDbContext.Titles.Remove(libraryTitle);
+                await _nsxLibraryDbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing file: {filename} from library", title.FileName);
+            }
+
+        }
+
+        return true;
+    }
+    
+    public async Task<bool> UpdateLibraryTitleAsync(LibraryTitle title)
+    {
+        _logger.LogDebug("Updating file: {filename} from library", title.FileName);
+        var libraryTitle = _nsxLibraryDbContext.Titles.FirstOrDefault(x => x.ApplicationId == title.TitleId && x.FileName == title.FileName);
+        
+        if (libraryTitle is not null)
+        {
+            _nsxLibraryDbContext.Titles.Remove(libraryTitle);
+            await _nsxLibraryDbContext.SaveChangesAsync();
+            var addAgain = await ProcessFileAsync(libraryTitle.FileName);
+        }
+
+        return true;
     }
 
     public async Task<Title?> ProcessFileAsync(string file)
