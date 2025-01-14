@@ -12,6 +12,7 @@ public interface ISqlTitleLibraryService
     public Task<IEnumerable<string>> GetFilesAsync();
     
     public Task<Title?> ProcessFileAsync(string file);
+    public Task<bool> AddLibraryTitleAsync(LibraryTitle title);
     public Task<bool> UpdateLibraryTitleAsync(LibraryTitle title);
     public Task<bool> RemoveLibraryTitleAsync(LibraryTitle title);
 

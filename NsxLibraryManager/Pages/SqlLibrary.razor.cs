@@ -235,6 +235,7 @@ public partial class SqlLibrary : IDisposable
                 "Refreshing library...", paramsDialog, dialogOptions);
 
             await InitialLoad();
+            await _grid.Reload();
         }
     }
 
