@@ -23,6 +23,8 @@ public sealed class Title : BaseTitle
     public ICollection<Version>? Versions { get; set; }
     public ICollection<Category>? Categories { get; set; }
     public ICollection<TitleCategory> TitleCategories { get; set; }
-
     public ICollection<Language> Languages { get; set; } = [];
+    
+    public ICollection<RatingsContent> RatingsContents { get; set; }  = [];
+
 }

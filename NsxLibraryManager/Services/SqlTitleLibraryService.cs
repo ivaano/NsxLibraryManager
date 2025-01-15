@@ -67,7 +67,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
     
     private async Task<Title> AddTitleCategories(Title nsxLibraryTitle, Models.Titledb.Title titledbTitle)
     {
-        if (titledbTitle.Categories is null) return nsxLibraryTitle;
+        if (titledbTitle.Categories is null || titledbTitle.Categories.Count == 0) return nsxLibraryTitle;
         foreach (var category in titledbTitle.Categories)
         {
             var libraryCategory = await _nsxLibraryDbContext.Categories
@@ -96,12 +96,38 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
     }
     
     
+    private async Task AddRatingContent(Title nsxLibraryTitle, Models.Titledb.Title titledbTitle)
+    {
+        if (titledbTitle.RatingContents is null || titledbTitle.RatingContents.Count == 0 || titledbTitle.ContentType != TitleContentType.Base ) return;
+        var libraryRatings = _nsxLibraryDbContext.RatingsContent.ToDictionary(x => x.Name, x => x);
+            
+        foreach (var rating in titledbTitle.RatingContents)
+        {
+            if (libraryRatings.TryGetValue(rating.Name, out var libraryRatingContent))
+            {
+                nsxLibraryTitle.RatingsContents.Add(libraryRatingContent);
+            }
+            else
+            {
+                var newlibraryRatingContent = new RatingsContent
+                {
+                    Name = rating.Name
+                };
+                nsxLibraryTitle.RatingsContents.Add(newlibraryRatingContent);
+            }
+        }
+
+        await Task.FromResult(nsxLibraryTitle);
+    }
+
+    
     public async Task<bool> DropLibrary()
     {
         await _nsxLibraryDbContext.Screenshots.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.Versions.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.Titles.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.TitleCategory.ExecuteDeleteAsync();
+        await _nsxLibraryDbContext.RatingsContent.ExecuteDeleteAsync();
         return true;
     }
 
@@ -119,6 +145,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         var titledbTitle = await _titledbDbContext
             .Titles
             .Include(t => t.Languages)
+            .Include(r => r.RatingContents)
             .Include(c => c.Categories)
             .Include(s => s.Screenshots)
             .Include(v => v.Versions)
@@ -186,6 +213,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
 
         await AddTitleLanguages(nsxLibraryTitle, titledbTitle);
         await AddTitleCategories(nsxLibraryTitle, titledbTitle);
+        await AddRatingContent(nsxLibraryTitle, titledbTitle);
 
 
 
@@ -473,18 +501,9 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             }
 
             var title = await AggregateLibraryTitle(libraryTitle);
-            if (title is not null)
-            {
-                _nsxLibraryDbContext.Add(title);
-            }
-
+            if (title is null) return title;
+            _nsxLibraryDbContext.Add(title);
             await _nsxLibraryDbContext.SaveChangesAsync();
-            /*
-            var titledbTitle = await _titleDbService.GetTitle(libraryTitle.TitleId);
-            var titleDbCnmt = _titleDbService.GetTitleCnmts(libraryTitle.TitleId);
-            libraryTitle = await AggregateLibraryTitle(libraryTitle, titledbTitle, titleDbCnmt);
-            await _dataService.AddLibraryTitleAsync(libraryTitle);
-            */
             return title;
         }
         catch (Exception e)

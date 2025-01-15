@@ -9,16 +9,15 @@ namespace NsxLibraryManager.Data;
 public class NsxLibraryDbContext : DbContext
 {
     private readonly UserSettings _configuration;
-    public DbSet<Title> Titles { get; set; }
     public DbSet<Category> Categories { get; set; }
-    
-    public DbSet<TitleCategory> TitleCategory { get; set; }
-    public DbSet<Language> Languages { get; set; }
-    public DbSet<Screenshot> Screenshots { get; set; }
-    public DbSet<Version> Versions { get; set; }
-
     public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
+    public DbSet<Language> Languages { get; set; }
+    public DbSet<RatingsContent> RatingsContent { get; set; }
+    public DbSet<Screenshot> Screenshots { get; set; }
     public DbSet<Settings> Settings { get; set; }
+    public DbSet<Title> Titles { get; set; }
+    public DbSet<TitleCategory> TitleCategory { get; set; }
+    public DbSet<Version> Versions { get; set; }
 
 
     public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<UserSettings> configuration) :
@@ -26,7 +25,7 @@ public class NsxLibraryDbContext : DbContext
     {
         _configuration = configuration.Value;
     }
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -41,8 +40,8 @@ public class NsxLibraryDbContext : DbContext
             .HasMany(e => e.Languages)
             .WithOne(e => e.Category)
             .HasForeignKey(e => e.CategoryId);
-        
-        
+
+
         modelBuilder.Entity<Title>()
             .HasMany(e => e.Categories)
             .WithMany(e => e.Titles)
@@ -56,6 +55,5 @@ public class NsxLibraryDbContext : DbContext
                     .WithMany(t => t.TitleCategories)
                     .HasForeignKey(tc => tc.TitleId)
             );
-        
     }
 }

@@ -11,7 +11,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
     [Inject]
     protected ISqlTitleLibraryService TitleLibraryService { get; set; }
     [Inject]
-    protected ILogger<ReloadLibraryProgressDialog> Logger { get; set; }
+    protected ILogger<RefreshLibraryProgressDialog> Logger { get; set; }
     public double ProgressCompleted { get; set; }
     public int FileCount { get; set; }
 

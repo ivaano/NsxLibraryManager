@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Models.Dto;
 
 namespace NsxLibraryManager.Extensions;
@@ -34,6 +35,38 @@ public static class TextFormatterHelper
         sb.Remove(sb.Length - 1, 1);
         return sb.ToString();
     }
+    
+    public static string AgeRating(this int? rating, AgeRatingAgency agency) =>
+        agency switch
+        {
+            AgeRatingAgency.Esrb => rating switch
+            {
+                < 10 => "Everyone",
+                >= 10 and < 13 => "Everyone 10+",
+                >= 13 and < 17 => "Teen",
+                >= 17 => "Mature",
+                _ => string.Empty
+            },
+            AgeRatingAgency.Pegi => rating switch
+            {
+                < 3 => "PEGI 3",
+                >= 3 and < 7 => "PEGI 7",
+                >= 7 and < 12 => "PEGI 12",
+                >= 12 and < 16 => "PEGI 16",
+                >= 16 => "PEGI 18",
+                _ => string.Empty
+            },
+            AgeRatingAgency.Iarc => rating switch
+            {
+                < 3 => "3+",
+                >= 3 and < 7 => "7+",
+                >= 7 and < 12 => "12+",
+                >= 12 and < 16 => "16+",
+                >= 16 => "18+",
+                _ => string.Empty
+            },
+            _ => "Unknown Agency"
+        };
     
     public static string ListToString(this IEnumerable<string>? list)
     {

@@ -1,8 +1,10 @@
 ﻿using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Models.Dto;
+using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Providers;
@@ -20,6 +22,9 @@ public partial class Title
     [Inject] 
     private IJSRuntime JsRuntime { get; set; } = null!;
     
+    [Inject]
+    private ISettingsService SettingsService { get; set; } = null!;
+    
     [Parameter]
     public string? TitleId { get; set; }
 
@@ -29,6 +34,7 @@ public partial class Title
     private LibraryTitleDto? LibraryTitleDto { get; set; }
     private string HtmlDescription { get; set; } = string.Empty;
     private readonly BooleanProvider _myBooleanProvider = new();
+    private AgeRatingAgency AgeRatingAgency { get; set; }
 
     //dlc grid
     private RadzenDataGrid<DlcDto> _dlcGrid;
@@ -150,9 +156,8 @@ public partial class Title
         if (TitleId is null) return;
         var title = await SqlTitleLibraryService.GetTitleByApplicationId(TitleId);
         HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
-
-        if (title is null) return;
         LibraryTitleDto = title;
+        AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;
     }
 
 

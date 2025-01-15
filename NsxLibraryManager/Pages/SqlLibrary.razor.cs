@@ -251,7 +251,7 @@ public partial class SqlLibrary : IDisposable
             var paramsDialog = new Dictionary<string, object>();
             var dialogOptions = new DialogOptions()
                 { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
-            await DialogService.OpenAsync<SqlReloadLibraryProgressDialog>(
+            await DialogService.OpenAsync<ReloadLibraryProgressDialog>(
                 "Reloading library...", paramsDialog, dialogOptions);
 
             await InitialLoad();

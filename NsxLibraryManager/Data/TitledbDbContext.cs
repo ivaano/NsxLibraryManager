@@ -100,33 +100,5 @@ public class TitledbDbContext : DbContext
             .WithMany(e => e.Titles)
             .UsingEntity<TitleRatingContent>();
         
-/*
-        var countryLanguagesJson = File.ReadAllText(Path.Join(_configuration.DownloadSettings.TitleDbPath, "languages.json"));
-        var countryLanguages = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(countryLanguagesJson);
-        if (countryLanguages is null) throw new InvalidOperationException("Unable to parse languages.json");
-        
-        var regionId = 0;
-        var langId = 0;
-        var uniqueLanguages = new Dictionary<string, int>();
-        foreach (var region in countryLanguages.Keys)
-        {
-            regionId++;
-            var regionObject = new Region {Id = regionId, Name = region };
-            modelBuilder.Entity<Region>().HasData(regionObject);
-            
-            var languages = countryLanguages[region];
-            foreach (var language in languages)
-            {
-                if (!uniqueLanguages.TryGetValue(language, out var existingLangId))
-                {
-                    langId++;
-                    uniqueLanguages.Add(language, langId);
-                    modelBuilder.Entity<Language>().HasData(new Language { Id = langId, LanguageCode = language });
-                    existingLangId = langId;
-                }
-                modelBuilder.Entity<RegionLanguage>().HasData(new RegionLanguage { RegionId = regionObject.Id, LanguageId = existingLangId });
-            }
-        }
-        */
     }
 }

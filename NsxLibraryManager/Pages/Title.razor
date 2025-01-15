@@ -1,6 +1,7 @@
 ﻿@page "/Title/{titleId}"
 @using NsxLibraryManager.Extensions
 
+
 <PageTitle>Title</PageTitle>
 <RadzenRow>
     <RadzenColumn Size="12" SizeMD="6">
@@ -84,7 +85,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="pending" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Rating.AgeRating(AgeRatingAgency))" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
