@@ -14,7 +14,6 @@ public class NsxLibraryDbContext : DbContext
     
     public DbSet<TitleCategory> TitleCategory { get; set; }
     public DbSet<Language> Languages { get; set; }
-    public DbSet<Region> Regions { get; set; }
     public DbSet<Screenshot> Screenshots { get; set; }
     public DbSet<Version> Versions { get; set; }
 
@@ -43,10 +42,6 @@ public class NsxLibraryDbContext : DbContext
             .WithOne(e => e.Category)
             .HasForeignKey(e => e.CategoryId);
         
-        modelBuilder.Entity<Region>()
-            .HasMany(e => e.Languages)
-            .WithMany(e => e.Regions)
-            .UsingEntity<RegionLanguage>();
         
         modelBuilder.Entity<Title>()
             .HasMany(e => e.Categories)
