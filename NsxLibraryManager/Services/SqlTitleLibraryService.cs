@@ -42,43 +42,29 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
         _logger = logger;
     }
 
-    public async Task<bool> DropLibrary()
+    private static Task<Title> AddTitleLanguages(Title nsxLibraryTitle, Models.Titledb.Title titledbTitle)
     {
-        /*
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM TitleRegion");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM TitleCategory");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM TitleLanguages");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM TitleRatingContents");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM Cnmts");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM Editions");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM Versions");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM ScreenShots");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM sqlite_sequence WHERE name = 'Cnmts'");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM sqlite_sequence WHERE name = 'Edition'");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM sqlite_sequence WHERE name = 'Versions'");
-        await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM sqlite_sequence WHERE name = 'ScreenShots'");
-        */
-        //await _nsxLibraryDbContext.Database.ExecuteSqlAsync($"DELETE FROM Titles");
-        await _nsxLibraryDbContext.Screenshots.ExecuteDeleteAsync();
-        await _nsxLibraryDbContext.Versions.ExecuteDeleteAsync();
-        await _nsxLibraryDbContext.Titles.ExecuteDeleteAsync();
-        await _nsxLibraryDbContext.TitleCategory.ExecuteDeleteAsync();
-
-
-        //await _nsxLibraryDbContext.Database.ExecuteSqlRawAsync($"DELETE FROM sqlite_sequence WHERE name = 'Titles'");
-        //await _nsxLibraryDbContext.Database.ExecuteSqlRawAsync($"VACUUM");
-        //await Task.Delay(1);
-        //return _nsxLibraryDbContext.Database.EnsureDeleted();
-        return true;
+        if (titledbTitle.Languages is not { Count: > 0 }) return Task.FromResult(nsxLibraryTitle);
+        var libraryLanguages = nsxLibraryTitle.Languages.ToDictionary(x => x.LanguageCode, x => x);
+            
+        foreach (var language in titledbTitle.Languages)
+        {
+            if (libraryLanguages.TryGetValue(language.LanguageCode, out var libraryLanguage))
+            {
+                nsxLibraryTitle.Languages.Add(libraryLanguage);
+            }
+            else
+            {
+                var newLibraryLanguage = new Language
+                {
+                    LanguageCode = language.LanguageCode
+                };
+                nsxLibraryTitle.Languages.Add(newLibraryLanguage);
+            }
+        }
+        return Task.FromResult(nsxLibraryTitle);
     }
-
-    public async Task<IEnumerable<string>> GetFilesAsync()
-    {
-        var files = await _fileInfoService.GetFileNames(_configuration.LibraryPath,
-            _configuration.Recursive);
-        return files;
-    }
-
+    
     private async Task<Title> AddTitleCategories(Title nsxLibraryTitle, Models.Titledb.Title titledbTitle)
     {
         if (titledbTitle.Categories is null) return nsxLibraryTitle;
@@ -108,11 +94,31 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
 
         return nsxLibraryTitle;
     }
+    
+    
+    public async Task<bool> DropLibrary()
+    {
+        await _nsxLibraryDbContext.Screenshots.ExecuteDeleteAsync();
+        await _nsxLibraryDbContext.Versions.ExecuteDeleteAsync();
+        await _nsxLibraryDbContext.Titles.ExecuteDeleteAsync();
+        await _nsxLibraryDbContext.TitleCategory.ExecuteDeleteAsync();
+        return true;
+    }
+
+    public async Task<IEnumerable<string>> GetFilesAsync()
+    {
+        var files = await _fileInfoService.GetFileNames(_configuration.LibraryPath,
+            _configuration.Recursive);
+        return files;
+    }
+
+
 
     private async Task<Title?> AggregateLibraryTitle(LibraryTitle libraryTitle)
     {
         var titledbTitle = await _titledbDbContext
             .Titles
+            .Include(t => t.Languages)
             .Include(c => c.Categories)
             .Include(s => s.Screenshots)
             .Include(v => v.Versions)
@@ -178,10 +184,10 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
             return nsxLibraryTitle;
         }
 
-        if (titledbTitle.Categories is not null)
-        {
-            await AddTitleCategories(nsxLibraryTitle, titledbTitle);
-        }
+        await AddTitleLanguages(nsxLibraryTitle, titledbTitle);
+        await AddTitleCategories(nsxLibraryTitle, titledbTitle);
+
+
 
         nsxLibraryTitle.BannerUrl = titledbTitle.BannerUrl;
         nsxLibraryTitle.ContentType = titledbTitle.ContentType;
@@ -240,6 +246,8 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
 
         return nsxLibraryTitle;
     }
+
+
 
     public async Task<bool> SaveDatabaseChangesAsync()
     {
@@ -345,6 +353,7 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
     {
         var title = await _nsxLibraryDbContext.Titles
             .AsNoTracking()
+            .Include(l => l.Languages)
             .Include(v => v.Versions)
             .Include(c => c.Categories)
             .Include(s => s.Screenshots)

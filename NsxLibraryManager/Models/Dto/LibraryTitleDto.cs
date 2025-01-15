@@ -17,6 +17,7 @@ public record LibraryTitleDto
     public IEnumerable<CategoryDto>? Categories { get; init; }
     public Collection<ScreenshotDto>? Screenshots { get; init; }
     public Collection<VersionDto>? Versions { get; init; }
+    public IEnumerable<LanguageDto>? Languages { get; init; }
 
     public AccuratePackageType PackageType { get; init; }
     public bool IsDemo { get; init; }

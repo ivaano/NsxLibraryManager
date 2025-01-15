@@ -26,7 +26,7 @@ public partial class Title
     private IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
     private IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
 
-    private LibraryTitleDto? LibraryTitle { get; set; }
+    private LibraryTitleDto? LibraryTitleDto { get; set; }
     private string HtmlDescription { get; set; } = string.Empty;
     private readonly BooleanProvider _myBooleanProvider = new();
 
@@ -47,12 +47,12 @@ public partial class Title
     {
         _dlcIsLoading = true;
         await Task.Yield();
-        if (LibraryTitle?.Dlc is null) return;
-        var libraryApplicationIds = LibraryTitle?.OwnedDlcs?
+        if (LibraryTitleDto?.Dlc is null) return;
+        var libraryApplicationIds = LibraryTitleDto?.OwnedDlcs?
             .ToLookup(x => x.ApplicationId) ??
                                     new List<DlcDto>().ToLookup(p => p.ToString(), p => p);
         
-        var query = LibraryTitle?.Dlc.Select(t => new DlcDto
+        var query = LibraryTitleDto?.Dlc.Select(t => new DlcDto
         {
             ApplicationId = t.ApplicationId,
             OtherApplicationId = t.OtherApplicationId,
@@ -85,12 +85,12 @@ public partial class Title
     {
         _updatesIsLoading = true;
         await Task.Yield();
-        if (LibraryTitle?.Updates is null) return;
-        var libraryApplicationIds = LibraryTitle?.OwnedUpdates?
+        if (LibraryTitleDto?.Updates is null) return;
+        var libraryApplicationIds = LibraryTitleDto?.OwnedUpdates?
                                         .ToLookup(x => x.Version) ??
                                     new List<UpdateDto>().ToLookup(p => p.Version, p => p);
         
-        var update = LibraryTitle?.Updates.FirstOrDefault();
+        var update = LibraryTitleDto?.Updates.FirstOrDefault();
         if (update is null)
         {
             _updatesCount = 0;
@@ -98,7 +98,7 @@ public partial class Title
             return;
         }
         
-        var query = LibraryTitle?.Versions?.Select(v => new UpdateDto
+        var query = LibraryTitleDto?.Versions?.Select(v => new UpdateDto
         {
             ApplicationId = update.ApplicationId,
             OtherApplicationId = update.OtherApplicationId,
@@ -152,7 +152,7 @@ public partial class Title
         HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
 
         if (title is null) return;
-        LibraryTitle = title;
+        LibraryTitleDto = title;
     }
 
 

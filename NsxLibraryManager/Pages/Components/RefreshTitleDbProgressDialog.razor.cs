@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Core.Services.Interface;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
@@ -59,9 +58,6 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
                         var compressedFilePath = await DownloadService.GetLatestTitleDb(settings.DownloadSettings, cancellationToken);
                         await TitledbService.ReplaceDatabase(compressedFilePath, cancellationToken);
                     }
-
-                    
-                    //await TitleDbService.ImportVersionsAsync();
                 });
         DialogService.Close();
     }

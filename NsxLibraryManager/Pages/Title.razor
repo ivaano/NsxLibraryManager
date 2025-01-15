@@ -4,12 +4,12 @@
 <PageTitle>Title</PageTitle>
 <RadzenRow>
     <RadzenColumn Size="12" SizeMD="6">
-        <RadzenImage Path="@(LibraryTitle?.BannerUrl.NullImageToEmpty())" Style="width: 100%; border-radius: 20px;"></RadzenImage>
+        <RadzenImage Path="@(LibraryTitleDto?.BannerUrl.NullImageToEmpty())" Style="width: 100%; border-radius: 20px;"></RadzenImage>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenRow Style="padding-bottom: 5px" Gap="3px">
             <RadzenColumn>
-                <RadzenText Text="@(LibraryTitle?.TitleName.NullStringToEmpty())" TextStyle="TextStyle.H4"/>
+                <RadzenText Text="@(LibraryTitleDto?.TitleName.NullStringToEmpty())" TextStyle="TextStyle.H4"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -24,7 +24,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.ReleaseDate)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.ReleaseDate)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px;">
@@ -39,7 +39,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -54,7 +54,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Categories.ListCategories())" TextStyle="TextStyle.Body1"/>
+                <RadzenText Text="@(LibraryTitleDto?.Categories.ListCategories())" TextStyle="TextStyle.Body1"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -69,7 +69,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Publisher.NullStringToEmpty())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Publisher.NullStringToEmpty())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -99,7 +99,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Size.ToHumanReadableBytes())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Size.ToHumanReadableBytes())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -114,7 +114,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="pending" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Languages.Select(x => x.LanguageCode).ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -134,7 +134,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.ApplicationId)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.ApplicationId)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -149,11 +149,11 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.ContentType.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.ContentType.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>        
         <RadzenRow Style="padding-bottom: 5px">
-            @if (LibraryTitle?.FileName != "")
+            @if (LibraryTitleDto?.FileName != "")
             {
                 <RadzenColumn Style="display: inline-flex; align-items: center;">
                     <span class="rz-pr-2">
@@ -166,7 +166,7 @@
                     </RadzenText>
                 </RadzenColumn>
                 <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                    <RadzenText Text="@(LibraryTitle?.FileName)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                    <RadzenText Text="@(LibraryTitleDto?.FileName)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
                 </RadzenColumn>
             }
 
@@ -175,7 +175,7 @@
 </RadzenRow>
 <RadzenRow Style="padding-top: 10px">
     <RadzenColumn Size="7">
-        <RadzenText Text="@(LibraryTitle?.Intro)" TextStyle="TextStyle.H6"/>
+        <RadzenText Text="@(LibraryTitleDto?.Intro)" TextStyle="TextStyle.H6"/>
         <p class="rz-text-body1">
             @((MarkupString)HtmlDescription)
         </p>
@@ -184,12 +184,12 @@
 
         <div id="screenshotsCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
-                @if (LibraryTitle?.Screenshots != null)
+                @if (LibraryTitleDto?.Screenshots != null)
                 {
                     var imageCount = 0;
-                    foreach (var image in LibraryTitle.Screenshots)
+                    foreach (var image in LibraryTitleDto.Screenshots)
                     {
-                        if (image.Url == LibraryTitle.Screenshots.FirstOrDefault()?.Url)
+                        if (image.Url == LibraryTitleDto.Screenshots.FirstOrDefault()?.Url)
                         {
                             <button type="button" data-bs-target="#screenshotsCarousel" data-bs-slide-to="@imageCount" class="active" aria-current="true" aria-label="Slide 1"></button>
                         }
@@ -203,11 +203,11 @@
             </div>
 
             <div class="carousel-inner">
-                @if (LibraryTitle?.Screenshots != null)
+                @if (LibraryTitleDto?.Screenshots != null)
                 {
-                    foreach (var image in LibraryTitle.Screenshots)
+                    foreach (var image in LibraryTitleDto.Screenshots)
                     {
-                        if (image.Url == LibraryTitle.Screenshots.FirstOrDefault()?.Url)
+                        if (image.Url == LibraryTitleDto.Screenshots.FirstOrDefault()?.Url)
                         {
                             <div class="carousel-item active">
                                 <img src="@image.Url" class="d-block w-100" alt="@image.Url">

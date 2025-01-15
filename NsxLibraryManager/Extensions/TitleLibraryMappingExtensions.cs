@@ -103,6 +103,10 @@ public static class TitleLibraryMappingExtensions
             {
                 Name = x.Name,
             }).ToList()),
+            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+            {
+               LanguageCode = x.LanguageCode,
+            }).ToList()),            
         };
     }
 }
