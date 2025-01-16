@@ -10,7 +10,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
     [Inject]
     protected DialogService DialogService { get; set; }
     [Inject]
-    protected ISqlTitleLibraryService TitleLibraryService { get; set; }
+    protected ITitleLibraryService TitleLibraryService { get; set; }
 
     private double ProgressCompleted { get; set; }
     private int FileCount { get; set; }

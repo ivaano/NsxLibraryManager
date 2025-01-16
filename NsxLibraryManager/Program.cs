@@ -19,6 +19,7 @@ using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
 using NsxLibraryManager;
+using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -83,11 +84,11 @@ if (validatorResult.valid)
     builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
     builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
     builder.Services.AddTransient<IStatsService, StatsService>();
-    builder.Services.AddTransient<ISqlTitleLibraryService, SqlTitleLibraryService>();
+    builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
 
     builder.Services.AddScoped<ITitledbService, TitledbService>();
-    builder.Services.AddScoped<ISqlRenamerService, SqlRenamerService>();
+    builder.Services.AddScoped<IRenamerService, RenamerService>();
     builder.Services.AddScoped<IValidator<PackageRenamerSettings>, RenamerSettingsValidator>();    
     builder.Services.AddScoped<IValidator<BundleRenamerSettings>, BundleSettingsValidator>();    
     builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    

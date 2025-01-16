@@ -11,24 +11,22 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Services.Interface;
+using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 namespace NsxLibraryManager.Services;
 
-public class SqlRenamerService(
+public class RenamerService(
     TitledbDbContext titledbDbContext, 
     IValidator<PackageRenamerSettings> validator,
     IValidator<BundleRenamerSettings> validatorBundle,
     IFileInfoService fileInfoService,
-    ILogger<SqlRenamerService> logger)
-    : ISqlRenamerService
+    ILogger<RenamerService> logger)
+    : IRenamerService
 {
     private readonly TitledbDbContext _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
-    private readonly IValidator<PackageRenamerSettings> _validator = validator;
-    private readonly IValidator<BundleRenamerSettings> _validatorBundle = validatorBundle;
-    private readonly IFileInfoService _fileInfoService = fileInfoService;
     private PackageRenamerSettings _packageRenamerSettings = null!;
     private BundleRenamerSettings _bundleRenamerSettings = null!;
-    private readonly ILogger<SqlRenamerService> _logger = logger;
+
     private static char[] GetInvalidAdditionalChars() =>
     [
         '™', '©', '®', '~', '#', '%', '&', ':',
@@ -50,7 +48,7 @@ public class SqlRenamerService(
         }
         catch (Exception e)
         {
-            _logger.LogError("Error building new file name for {file} - {message}", file, e.Message);
+            logger.LogError("Error building new file name for {file} - {message}", file, e.Message);
             return (string.Empty, true, e.Message);
         }
     }
@@ -59,19 +57,19 @@ public class SqlRenamerService(
     {
         if (string.IsNullOrEmpty(newPath))
         {
-            _logger.LogError("Error building new file name for {file} - {message}", file, "New path is empty");
+            logger.LogError("Error building new file name for {file} - {message}", file, "New path is empty");
             return Task.FromResult((string.Empty, true, "New path is empty"));
         }
 
         if (file == newPath)
         {
-            _logger.LogError("Error building new file name for {file} - {message}", file, "New path is the same as the old path");
+            logger.LogError("Error building new file name for {file} - {message}", file, "New path is the same as the old path");
             return Task.FromResult((string.Empty, true, "New path is the same as the old path"));
         }
 
         if (File.Exists(newPath))
         {
-            _logger.LogError("Error building new file name for {file} - {message}", file, "File already exists");
+            logger.LogError("Error building new file name for {file} - {message}", file, "File already exists");
             return Task.FromResult((newPath, true, "File already exists"));
         }
 
@@ -207,7 +205,7 @@ public class SqlRenamerService(
     {
         try
         {
-            var fileInfo = await _fileInfoService.GetFileInfo(fileLocation, false);
+            var fileInfo = await fileInfoService.GetFileInfo(fileLocation, false);
             var titledbTitle =
                 await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == fileInfo.TitleId);
             if (titledbTitle is null)
@@ -253,12 +251,12 @@ public class SqlRenamerService(
     public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
     {
-        var files = await _fileInfoService.GetFileNames(inputPath, recursive);
+        var files = await fileInfoService.GetFileNames(inputPath, recursive);
         var fileList = new List<RenameTitle>();
-        _logger.LogInformation("{} file candidate(s) found.", fileList.Count);
+        logger.LogInformation("{} file candidate(s) found.", fileList.Count);
         foreach (var file in files)
         {
-            _logger.LogInformation("Analyzing {}", file);
+            logger.LogInformation("Analyzing {}", file);
             var fileInfo = await GetAggregatedFileInfo(file);
 
             if (fileInfo is null)
@@ -445,7 +443,7 @@ public class SqlRenamerService(
             }
             catch (Exception e)
             {
-                _logger.LogError("Error renaming file {file} - {message}", file.SourceFileName, e.Message);
+                logger.LogError("Error renaming file {file} - {message}", file.SourceFileName, e.Message);
                 renamedFiles.Add(file with
                 {
                     RenamedSuccessfully = false,
@@ -464,7 +462,7 @@ public class SqlRenamerService(
         var result = true;
         foreach (var directoryName in inputDirectories)
         {
-            var isEmpty = await _fileInfoService.IsDirectoryEmpty(directoryName);
+            var isEmpty = await fileInfoService.IsDirectoryEmpty(directoryName);
 
             if (!isEmpty) continue;
             try
@@ -481,13 +479,13 @@ public class SqlRenamerService(
 
     public async Task<ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)
     {
-        var validationResult = await _validator.ValidateAsync(settings);
+        var validationResult = await validator.ValidateAsync(settings);
         return validationResult;
     }
     
     public async Task<ValidationResult> ValidateRenamerSettingsAsync(BundleRenamerSettings settings)
     {
-        var validationResult = await _validatorBundle.ValidateAsync(settings);
+        var validationResult = await validatorBundle.ValidateAsync(settings);
         return validationResult;
     }
 }

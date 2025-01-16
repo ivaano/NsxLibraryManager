@@ -17,7 +17,7 @@ namespace NsxLibraryManager.Pages;
 public partial class Title
 {
     [Inject]
-    protected ISqlTitleLibraryService SqlTitleLibraryService { get; set; } = default!;
+    protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
     
     [Inject] 
     private IJSRuntime JsRuntime { get; set; } = null!;
@@ -154,7 +154,7 @@ public partial class Title
     {
         
         if (TitleId is null) return;
-        var title = await SqlTitleLibraryService.GetTitleByApplicationId(TitleId);
+        var title = await TitleLibraryService.GetTitleByApplicationId(TitleId);
         HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
         LibraryTitleDto = title;
         AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;

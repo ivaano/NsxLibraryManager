@@ -17,7 +17,7 @@ using TitleModel = NsxLibraryManager.Models.NsxLibrary.Title;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class SqlLibrary : IDisposable
+public partial class Library : IDisposable
 {
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = null!;

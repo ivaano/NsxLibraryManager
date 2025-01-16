@@ -9,6 +9,49 @@ namespace NsxLibraryManager.Extensions;
 
 public static class TitleLibraryMappingExtensions
 {
+    public static LibraryTitleDto MapToSimpleLibraryTitleDto(this Title title)
+    {
+        return new LibraryTitleDto
+        {
+            NsuId = title.NsuId,
+            ApplicationId = title.ApplicationId,
+            OtherApplicationId = title.OtherApplicationId,
+            TitleName = title.TitleName,
+            FileName = title.FileName,
+            Version = title.Version,
+            BannerUrl = title.BannerUrl,
+            Description = title.Description,
+            ContentType = title.ContentType,
+            PackageType = title.PackageType,
+            Size = (title.Size is not null) ? (long)title.Size : 0,
+            Rating = title.Rating,
+            Region = title.Region,
+            NumberOfPlayers = title.NumberOfPlayers,
+            Publisher = title.Publisher,
+            ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            Versions = new Collection<VersionDto>(
+                title.Versions
+                    .Select(x => new VersionDto()
+                    {
+                        VersionNumber = x.VersionNumber,
+                        VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
+                        ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
+                    }).ToList()),
+            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+            {
+                Url = x.Url
+            }).ToList()),
+            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
+            {
+                Name = x.Name,
+            }).ToList()),
+            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+            {
+                LanguageCode = x.LanguageCode,
+            }).ToList()),            
+        };
+    }
+    
     public static LibraryTitleDto MapToLibraryTitleDto(this Title title, 
         IEnumerable<Title>? otherTitles = null, 
         IEnumerable<Models.Titledb.Title>? otherTitlesTitleDb = null)

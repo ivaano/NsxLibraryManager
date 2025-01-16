@@ -3,10 +3,11 @@ using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
+using Radzen;
 
 namespace NsxLibraryManager.Services.Interface;
 
-public interface ISqlTitleLibraryService
+public interface ITitleLibraryService
 {
     public Task<bool> DropLibrary();
     public Task<IEnumerable<string>> GetFilesAsync();
@@ -20,6 +21,7 @@ public interface ISqlTitleLibraryService
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();
 
     public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
+    public Task<IEnumerable<LibraryTitleDto>> GetTitlesAsQueryable(LoadDataArgs args);
 
     public Task<bool> SaveDatabaseChangesAsync();
 

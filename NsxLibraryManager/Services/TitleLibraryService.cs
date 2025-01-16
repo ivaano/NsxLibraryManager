@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
@@ -11,26 +12,27 @@ using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
+using Radzen;
 using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 
 namespace NsxLibraryManager.Services;
 
-public class SqlTitleLibraryService : ISqlTitleLibraryService
+public class TitleLibraryService : ITitleLibraryService
 {
     private readonly NsxLibraryDbContext _nsxLibraryDbContext;
     private readonly TitledbDbContext _titledbDbContext;
     private readonly IFileInfoService _fileInfoService;
     private readonly UserSettings _configuration;
-    private readonly ILogger<SqlTitleLibraryService> _logger;
+    private readonly ILogger<TitleLibraryService> _logger;
 
 
-    public SqlTitleLibraryService(
+    public TitleLibraryService(
         NsxLibraryDbContext nsxLibraryDbContext,
         TitledbDbContext titledbDbContext,
         IFileInfoService fileInfoService,
         ISettingsService settingsService,
-        ILogger<SqlTitleLibraryService> logger)
+        ILogger<TitleLibraryService> logger)
     {
         _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
         _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
@@ -273,6 +275,33 @@ public class SqlTitleLibraryService : ISqlTitleLibraryService
     }
 
 
+    public async Task<IEnumerable<LibraryTitleDto>> GetTitlesAsQueryable(LoadDataArgs args)
+    {
+        var query = _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.ContentType == TitleContentType.Base)
+            .Include(x => x.Categories)
+            .Include(x => x.Versions)
+            .Include(x => x.Screenshots)
+            .Include(x => x.Languages).AsQueryable();
+        
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        
+        var finalQuery = query.Select(t => t.MapToSimpleLibraryTitleDto());
+
+        return finalQuery
+            .Skip(args.Skip.Value)
+            .Take(args.Top.Value)
+            .ToList();
+    }
 
     public async Task<bool> SaveDatabaseChangesAsync()
     {

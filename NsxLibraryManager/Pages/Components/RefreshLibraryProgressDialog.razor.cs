@@ -9,7 +9,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
     [Inject]
     protected DialogService DialogService { get; set; }
     [Inject]
-    protected ISqlTitleLibraryService TitleLibraryService { get; set; }
+    protected ITitleLibraryService TitleLibraryService { get; set; }
     [Inject]
     protected ILogger<RefreshLibraryProgressDialog> Logger { get; set; }
     public double ProgressCompleted { get; set; }

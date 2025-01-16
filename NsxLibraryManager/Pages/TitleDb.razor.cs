@@ -11,7 +11,7 @@ using NsxLibraryManager.Pages.Components;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class SqlTitleDb : IDisposable
+public partial class TitleDb : IDisposable
 {
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = default!;

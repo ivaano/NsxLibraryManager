@@ -4,7 +4,7 @@ using NsxLibraryManager.Core.Settings;
 
 namespace NsxLibraryManager.Services.Interface;
 
-public interface ISqlRenamerService
+public interface IRenamerService
 {
     Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(string filePath, RenameType renameType, bool recursive = false);
     Task<string> CalculateSampleFileName(string templateText, TitlePackageType type, string inputFile, RenameType renameType);
