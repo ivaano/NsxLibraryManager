@@ -1,8 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Extensions;

@@ -82,7 +82,7 @@ if (validatorResult.valid)
     builder.Services.AddTransient<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
     builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
     builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
-    //builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddTransient<IStatsService, StatsService>();
     builder.Services.AddTransient<ISqlTitleLibraryService, SqlTitleLibraryService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
 
