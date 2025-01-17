@@ -76,8 +76,8 @@ public partial class Title
     
     private string GetTruncatedText()
     {
-        const int maxLength = 500;
-        return HtmlDescription.Length > maxLength ? HtmlDescription.Substring(0, maxLength) + "..." : HtmlDescription;
+        const int maxLength = 900;
+        return HtmlDescription.Length > maxLength ? string.Concat(HtmlDescription.AsSpan(0, maxLength), "...") : HtmlDescription;
     }
 
     private void ToggleText()
