@@ -36,6 +36,13 @@ public partial class Title
     private double interval = 4000;
     private bool started = true;
     private int selectedIndex;
+    
+    //readmore/less
+    private bool IsExpanded { get; set; } = false;
+    private string MaxHeight => IsExpanded ? "none" : "300px";
+    private ElementReference textRef;
+
+    private string TextToDisplay => IsExpanded ? HtmlDescription : GetTruncatedText();
     private void Toggle()
     {
         if (started)
@@ -66,6 +73,17 @@ public partial class Title
     private int _updatesCount;
     private IEnumerable<UpdateDto> _updates;
 
+    
+    private string GetTruncatedText()
+    {
+        const int maxLength = 500;
+        return HtmlDescription.Length > maxLength ? HtmlDescription.Substring(0, maxLength) + "..." : HtmlDescription;
+    }
+
+    private void ToggleText()
+    {
+        IsExpanded = !IsExpanded;
+    }
 
     private async Task LoadDlcData(LoadDataArgs args)
     {

@@ -75,3 +75,15 @@ a, .btn-link {
 .dialog-top-scroll .rz-dialog-content:not(:hover) {
     scrollbar-width: thin;
 }
+
+.text-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.text-content {
+    transition: max-height 0.3s ease-in-out;
+    white-space: pre-wrap;
+    overflow: hidden;
+}
+

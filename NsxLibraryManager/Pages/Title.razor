@@ -174,17 +174,22 @@
         </RadzenRow>
     </RadzenColumn>
 </RadzenRow>
-<RadzenRow Style="padding-top: 10px">
-    <RadzenColumn Size="7">
+<RadzenRow Style="padding-top: 10px; padding-bottom: 3px">
+    <RadzenColumn Size="5">
         <RadzenText Text="@(LibraryTitleDto?.Intro)" TextStyle="TextStyle.H6"/>
-        <p class="rz-text-body1">
-            @((MarkupString)HtmlDescription)
-        </p>
+        
+        <div class="text-container">
+            <p @ref="textRef" class="text-content" style="max-height: @MaxHeight;" @onclick="ToggleText">
+                @((MarkupString)TextToDisplay)
+            </p>
+            <RadzenButton Click=@(args => ToggleText()) Icon=@(IsExpanded ? "remove" : "add") Text=@(IsExpanded ? "Read Less" : "Read More") ButtonStyle="ButtonStyle.Primary" Variant="Variant.Text"/>
+
+        </div>
     </RadzenColumn>
-    <RadzenColumn>
+    <RadzenColumn Size="7">
 
         <RadzenCarousel @ref="_carousel" @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval"
-                        PagerOverlay="true" ButtonShade="Shade.Default" Style="height: 366px; max-width: 650px;" class="rz-mx-auto">
+                        PagerOverlay="true" ButtonShade="Shade.Default" Style="height: 366px;" class="rz-mx-auto">
             <Items>
                 @if (LibraryTitleDto?.Screenshots is not null)
                 {

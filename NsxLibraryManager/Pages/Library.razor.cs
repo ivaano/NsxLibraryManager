@@ -274,7 +274,7 @@ public partial class Library : IDisposable
     {
         await DialogService.OpenAsync<Title>($"{title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },
-            new DialogOptions() { Width = "80%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
+            new DialogOptions() { Width = "90%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
     }
 
     public void Dispose()
