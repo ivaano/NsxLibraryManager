@@ -1,9 +1,16 @@
 ﻿@page "/gameList"
+@using NsxLibraryManager.Core.Enums
+@using NsxLibraryManager.Extensions
 @using NsxLibraryManager.Models.Dto
 
+<RadzenCard>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
+    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
 
-<RadzenDataList IsLoading="@IsLoading" LoadData="@LoadData"
-                Data="@_games" TItem="LibraryTitleDto" AllowPaging="false" Style="padding: 0">
+</RadzenCard>
+
+<RadzenDataList IsLoading="@IsLoading" 
+                Data="@_games" TItem="LibraryTitleDto" AllowPaging="true" Style="padding: 0">
     <Template Context="game">
         <RadzenCard Style="width: 100%; padding: 10px">
             <RadzenRow Gap="0.5rem">
@@ -23,7 +30,8 @@
                     <RadzenRow>
                         <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
                             <RadzenText Text="Title Id" Style="font-weight: bold"/>
-                            <RadzenText Text="@(game.ApplicationId)"/>
+                            <RadzenLink Path="@($"/Title/{game.ApplicationId}")" Text="@(game.ApplicationId)" />
+
                         </RadzenColumn>
                         <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
                             <RadzenText Text="Publisher" Style="font-weight: bold"/>
@@ -45,7 +53,7 @@
                             <RadzenText Text="Category" Style="font-weight: bold"/>
                             @if (game.Categories != null)
                             {
-                                <RadzenText Text="@((string.Join(", ", game.Categories)))"/>
+                                <RadzenText Text="@(game.Categories.ListCategories())"/>
                             }
                         </RadzenColumn>
                         <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
@@ -56,55 +64,41 @@
                     <RadzenRow>
                         <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
                             <RadzenText Text="Rating content" Style="font-weight: bold"/>
-                            @if (game.Rating != null)
+                            @if (game.Rating is not null)
                             {
-                                <RadzenText Text="@game.Rating.ToString()"/>
+                                <RadzenText Text="@game.RatingsContent.ListRatingsContent()"/>
                             }
 
                         </RadzenColumn>
                         <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
-                            <RadzenText Text="Age (rating)" Style="font-weight: bold"/>
-                            <RadzenText Text="@game.Rating.ToString()"/>
+                            <RadzenText Text="@($"{AgeRatingAgency} rating")" Style="font-weight: bold"/>
+                            <RadzenText Text="@game.Rating.AgeRating(AgeRatingAgency)"/>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow>
+                        <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
+                            <RadzenText Text="DLC" Style="font-weight: bold"/>
+                            <RadzenText Text="@($"Owned: {game.OwnedDlcCount} - Available: {game.DlcCount}")" Style="font-weight: bold"/>
+                        </RadzenColumn>
+                        <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
+                            <RadzenText Text="Latest Update" Style="font-weight: bold"/>
+                            <RadzenText Text="@game.LatestVersion.ToString()"/>
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow>
                         <RadzenColumn>
                             <RadzenText Text="File" Style="font-weight: bold"/>
                             <RadzenText Text="@game.FileName"/>
-                        </RadzenColumn>
-                    </RadzenRow>
-                    <RadzenRow>
-                        <RadzenColumn >
-                            <RadzenButton ButtonStyle="ButtonStyle.Light" Click="(e => ShowDlcInfoToggle(game.ApplicationId))">DLC info</RadzenButton>
+                            <RadzenText TextStyle="TextStyle.Caption">Size: @game.Size.ToHumanReadableBytes()</RadzenText>
                         </RadzenColumn>
                     </RadzenRow>
                 </RadzenColumn>
             </RadzenRow>
-            
-            <RadzenRow Gap="0.3rem" Visible="@ShowDlcInfo" UniqueId="@game.ApplicationId">
-                <RadzenColumn >
-                    <RadzenText>Available DLC</RadzenText>
-                    @if (game.DlcCount != null)
-                    {
-                        game.DlcCount.ToString();
-                    }
-                </RadzenColumn>
-                <RadzenColumn >
-                    <RadzenText>Owned DLC</RadzenText>
-                    @if (game.OwnedDlcs != null)
-                    {
-                        @(string.Join(", ", game.OwnedDlcs))
-                    }
-                </RadzenColumn>
-            </RadzenRow >
-            <RadzenRow Gap="0.3rem" Visible="false">
-                Patch INfo
-            </RadzenRow>
-
         </RadzenCard>
 
     </Template>
 </RadzenDataList>
-<RadzenPager ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
+<RadzenPager @ref="@pager" Density="@Density.Compact" ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
              HorizontalAlign="HorizontalAlign.Right" Count="_count"
              PageSize="@_pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>
+             

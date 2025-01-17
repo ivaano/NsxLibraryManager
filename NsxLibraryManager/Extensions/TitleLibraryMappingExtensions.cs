@@ -9,7 +9,7 @@ namespace NsxLibraryManager.Extensions;
 
 public static class TitleLibraryMappingExtensions
 {
-    public static LibraryTitleDto MapToSimpleLibraryTitleDto(this Title title)
+    public static LibraryTitleDto MapLibraryTitleDtoNoDlcOrUpdates(this Title title)
     {
         return new LibraryTitleDto
         {
@@ -19,15 +19,19 @@ public static class TitleLibraryMappingExtensions
             TitleName = title.TitleName,
             FileName = title.FileName,
             Version = title.Version,
+            IconUrl = title.IconUrl,
             BannerUrl = title.BannerUrl,
             Description = title.Description,
             ContentType = title.ContentType,
             PackageType = title.PackageType,
-            Size = (title.Size is not null) ? (long)title.Size : 0,
+            Size = title.Size ?? 0,
             Rating = title.Rating,
             Region = title.Region,
             NumberOfPlayers = title.NumberOfPlayers,
             Publisher = title.Publisher,
+            LatestVersion = title.LatestVersion,
+            DlcCount = title.DlcCount,
+            OwnedDlcCount = title.OwnedDlcs ?? 0, 
             ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
             Versions = new Collection<VersionDto>(
                 title.Versions
@@ -40,6 +44,10 @@ public static class TitleLibraryMappingExtensions
             Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
             {
                 Url = x.Url
+            }).ToList()),
+            RatingsContent = new List<RatingContentDto>((title.RatingsContents ?? null).Select(x => new RatingContentDto()
+            {
+                Name = x.Name,
             }).ToList()),
             Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
             {

@@ -21,7 +21,8 @@ public interface ITitleLibraryService
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();
 
     public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
-    public Task<IEnumerable<LibraryTitleDto>> GetTitlesAsQueryable(LoadDataArgs args);
+    public int GetBaseTitlesCount();
+    public Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args);
 
     public Task<bool> SaveDatabaseChangesAsync();
 

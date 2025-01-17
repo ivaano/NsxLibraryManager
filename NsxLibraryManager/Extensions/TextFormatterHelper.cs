@@ -32,7 +32,23 @@ public static class TextFormatterHelper
             sb.Append(category.Name);
             sb.Append(", ");
         }
-        sb.Remove(sb.Length - 1, 1);
+        sb.Remove(sb.Length - 2, 2);
+        return sb.ToString();
+    }
+    
+    public static string ListRatingsContent(this IEnumerable<RatingContentDto>? ratingsContent)
+    {
+        if (ratingsContent is null || !ratingsContent.Any())
+        {
+            return string.Empty;
+        }
+        var sb = new StringBuilder();
+        foreach (var rating in ratingsContent)
+        {
+            sb.Append(rating.Name);
+            sb.Append(", ");
+        }
+        sb.Remove(sb.Length - 2, 2);
         return sb.ToString();
     }
     

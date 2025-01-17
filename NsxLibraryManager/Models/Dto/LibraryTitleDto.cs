@@ -15,6 +15,7 @@ public record LibraryTitleDto
     public Collection<DlcDto>? OwnedDlcs { get; init; }
     public Collection<UpdateDto>? OwnedUpdates { get; init; }
     public IEnumerable<CategoryDto>? Categories { get; init; }
+    public IEnumerable<RatingContentDto>? RatingsContent { get; init; }
     public Collection<ScreenshotDto>? Screenshots { get; init; }
     public Collection<VersionDto>? Versions { get; init; }
     public IEnumerable<LanguageDto>? Languages { get; init; }
@@ -24,6 +25,7 @@ public record LibraryTitleDto
     public DateTime? LastWriteTime { get; init; }
     public required string ReleaseDate { get; init; }
     public int? DlcCount { get; init; }
+    public int? OwnedDlcCount { get; init; }
     public int? LatestVersion { get; init; }
     public int? Version { get; init; }
     public int? NumberOfPlayers { get; init; }

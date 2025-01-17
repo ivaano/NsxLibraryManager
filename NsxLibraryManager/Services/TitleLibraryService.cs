@@ -12,6 +12,7 @@ using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Utils;
 using Radzen;
 using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
@@ -275,11 +276,19 @@ public class TitleLibraryService : ITitleLibraryService
     }
 
 
-    public async Task<IEnumerable<LibraryTitleDto>> GetTitlesAsQueryable(LoadDataArgs args)
+    public int GetBaseTitlesCount()
+    {
+        return _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Count(t => t.ContentType == TitleContentType.Base);
+    }
+
+    public async Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args)
     {
         var query = _nsxLibraryDbContext.Titles
             .AsNoTracking()
             .Where(t => t.ContentType == TitleContentType.Base)
+            .Include(x => x.RatingsContents)
             .Include(x => x.Categories)
             .Include(x => x.Versions)
             .Include(x => x.Screenshots)
@@ -290,17 +299,29 @@ public class TitleLibraryService : ITitleLibraryService
             query = query.Where(args.Filter);
         }
 
+        if (args.Filters is not null)
+        {
+            if (args.Filters.Any())
+            {
+                query = query.Where(FilterBuilder.BuildFilterString(args.Filters));
+            }
+        }
+
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
             query = query.OrderBy(args.OrderBy);
         }
         
-        var finalQuery = query.Select(t => t.MapToSimpleLibraryTitleDto());
-
-        return finalQuery
-            .Skip(args.Skip.Value)
-            .Take(args.Top.Value)
-            .ToList();
+        var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
+        
+        return new GetBaseTitlesResultDto
+        {
+            Count = await finalQuery.CountAsync(),
+            Titles = finalQuery
+                .Skip(args.Skip.Value)
+                .Take(args.Top.Value)
+                .ToList()
+        };
     }
 
     public async Task<bool> SaveDatabaseChangesAsync()
