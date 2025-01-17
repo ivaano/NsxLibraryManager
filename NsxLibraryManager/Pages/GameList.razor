@@ -1,18 +1,16 @@
 ﻿@page "/gameList"
-@using NsxLibraryManager.Core.Enums
 @using NsxLibraryManager.Extensions
 @using NsxLibraryManager.Models.Dto
 
 <RadzenCard>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
     <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
-
 </RadzenCard>
 
 <RadzenDataList IsLoading="@IsLoading" 
-                Data="@_games" TItem="LibraryTitleDto" AllowPaging="true" Style="padding: 0">
+                Data="@_games" TItem="LibraryTitleDto" AllowPaging="true">
     <Template Context="game">
-        <RadzenCard Style="width: 100%; padding: 10px">
+        <RadzenCard Style="width: 100%; padding: 5px">
             <RadzenRow Gap="0.5rem">
                 <RadzenColumn Size="2">
                     <RadzenImage Path="@(game.IconUrl)" Style="width: 100%; height: auto"></RadzenImage>

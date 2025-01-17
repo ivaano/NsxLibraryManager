@@ -30,7 +30,25 @@ public partial class Title
 
     private IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
     private IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
+    //carousel
+    private RadzenCarousel _carousel = default!;
+    private bool auto = true;
+    private double interval = 4000;
+    private bool started = true;
+    private int selectedIndex;
+    private void Toggle()
+    {
+        if (started)
+        {
+            _carousel.Stop();
+        }
+        else
+        {
+            _carousel.Start();
+        }
 
+        started = !started;
+    }
     private LibraryTitleDto? LibraryTitleDto { get; set; }
     private string HtmlDescription { get; set; } = string.Empty;
     private readonly BooleanProvider _myBooleanProvider = new();

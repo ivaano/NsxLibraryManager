@@ -18,7 +18,7 @@ public partial class GameList
     public bool ShowDlcInfo { get; set; } = false;
 
     private readonly string _pagingSummaryFormat = "Displaying page {0} of {1} (total {2} games)";
-    private readonly int _pageSize = 10;
+    private readonly int _pageSize = 5;
     private int _count;
     public bool IsLoading;
     private IEnumerable<LibraryTitleDto> _games = default!;
