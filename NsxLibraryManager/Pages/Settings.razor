@@ -1,5 +1,4 @@
 ﻿@page "/settings"
-@using Microsoft.Extensions.Configuration.UserSecrets
 
 <PageTitle>Settings</PageTitle>
 <RadzenRow>
@@ -22,22 +21,11 @@
             <RadzenStack>
                 <RadzenFormField Text="Database Path">
                     <ChildContent>
-                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="TitleDatabase"/>
+                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.LibraryDatabase" Name="LibraryDatabase"/>
                     </ChildContent>
                     <Helper>
-                        @if (@_validationErrors["TitleDatabase"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["TitleDatabase"]</div>    
-                        }
                         <div class="rz-text-caption">
-                            @if (_databaseFieldDisabled)
-                            {
                                 <text>Can't change database while app is running, change it in config.json and restart the app.</text>
-                            }
-                            else
-                            {
-                                <text>* required</text>
-                            }
                         </div>                        
                     </Helper>
                 </RadzenFormField>
@@ -87,7 +75,7 @@
     </RadzenRow>
 </RadzenFieldset>
 
-<RadzenFieldset Text="Download Settings" Style="background-color: #38474e">
+<RadzenFieldset Text="Download Settings" >
     <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
@@ -111,7 +99,7 @@
             <RadzenStack>
                 <RadzenFormField Text="TitleDb Version">
                     <ChildContent>
-                        <RadzenNumeric @bind-Value="@_config.DownloadSettings.VersionUrl"></RadzenNumeric>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionUrl"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
                         @if (@_validationErrors["DownloadSettings.VersionUrl"] != string.Empty)
@@ -131,7 +119,7 @@
             <RadzenStack>
                 <RadzenFormField Text="Title Db Path">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbPath" Disabled="true"></RadzenTextBox>
+                        <RadzenTextBox @bind-Value="@_config.TitleDatabase" Disabled="true"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
                         @if (@_validationErrors["DownloadSettings.TitleDbPath"] != string.Empty)

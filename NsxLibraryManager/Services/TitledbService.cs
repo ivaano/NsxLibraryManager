@@ -2,6 +2,7 @@
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
+using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services.Interface;
 
 namespace NsxLibraryManager.Services;
@@ -41,16 +42,10 @@ public class TitledbService : ITitledbService
     {
         try
         {
-            var databasePath = _configuration.GetSection("NsxLibraryManager:TitledbDBConnection").Value;   //configuration.GetSection("NsxLibraryManager:TitledbDBConnection").Value;
+            var databasePath = _configuration.GetSection("NsxLibraryManager:TitledbDBConnection").Value.CleanDatabasePath();
 
-            if (databasePath is not null)
+            if (!string.IsNullOrEmpty(databasePath))
             {
-                const string removeString = "Data Source=";
-
-                var index = databasePath.IndexOf(removeString, StringComparison.OrdinalIgnoreCase);
-                databasePath = (index < 0)
-                    ? databasePath
-                    : databasePath.Remove(index, removeString.Length);
                 
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {

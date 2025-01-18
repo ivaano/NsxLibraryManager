@@ -7,7 +7,7 @@ public static class DatabaseMigrationExtensions
 {
     public static IApplicationBuilder EnsureDatabaseMigrated<TContext>(
         this IApplicationBuilder app,
-        Action<TContext, IServiceProvider> seeder = null) 
+        Action<TContext, IServiceProvider>? seeder = null) 
         where TContext : DbContext
     {
         using var scope = app.ApplicationServices.CreateScope();

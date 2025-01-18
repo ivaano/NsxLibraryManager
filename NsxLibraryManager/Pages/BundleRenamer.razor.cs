@@ -142,7 +142,7 @@ public partial class BundleRenamer : ComponentBase
         }
     }
     
-    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null) => 
+    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null!) => 
         TooltipService.Open(elementReference, message, options);
     
     private void ShowTooltip(TemplateField templateField, ElementReference elementReference)

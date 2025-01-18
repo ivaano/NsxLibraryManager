@@ -18,7 +18,6 @@ using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
-using NsxLibraryManager;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 Console.OutputEncoding = Encoding.UTF8;
