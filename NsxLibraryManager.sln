@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Utils", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{25CADB3E-5069-4226-9773-A3E34DAA7F7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Contracts", "Common.Contracts\Common.Contracts.csproj", "{14C24CC3-66C0-4174-B399-03B0D8CED2F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Services", "Common.Services\Common.Services.csproj", "{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,5 +37,13 @@ Global
 		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
