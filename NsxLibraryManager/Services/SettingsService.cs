@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Common.Contracts;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Settings;
@@ -9,7 +10,7 @@ using Settings = NsxLibraryManager.Models.NsxLibrary.Settings;
 
 namespace NsxLibraryManager.Services;
 
-public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext, IConfiguration configuration) : ISettingsService
+public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext, IConfiguration configuration) : ISettingsService, ISettingsIvan
 {
     private static readonly Dictionary<SettingsEnum, string> InMemoryData = new();
 
@@ -63,7 +64,7 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext, IConfigura
     
     private static T MapToSettings<T>(Settings settings) where T : new()
     {
-        return System.Text.Json.JsonSerializer.Deserialize<T>(settings.Value) ?? new T();
+        return JsonSerializer.Deserialize<T>(settings.Value) ?? new T();
     }
 
     private async Task<T> GetSerializedSettings<T>(SettingsEnum settingEnumType) where T : new()
@@ -76,7 +77,7 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext, IConfigura
     
     private async Task<T> SaveSerializedSettings<T>(T settings, SettingsEnum settingEnumType)
     {
-        var serializedSettings = System.Text.Json.JsonSerializer.Serialize(settings);
+        var serializedSettings = JsonSerializer.Serialize(settings);
         var existingSettings = await _nsxLibraryDbContext.Settings
             .FirstOrDefaultAsync(c => c.Key == settingEnumType);
 
@@ -99,18 +100,15 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext, IConfigura
 
     public Task<BundleRenamerSettings> GetBundleRenamerSettings() =>
         GetSerializedSettings<BundleRenamerSettings>(SettingsEnum.RenameBundle);
-
-    public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
-        GetSerializedSettings<PackageRenamerSettings>(SettingsEnum.RenamePackageType);
     
     public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings settings) =>
         SaveSerializedSettings(settings, SettingsEnum.RenameBundle);
-
-    public string GetSettingByType(SettingsEnum settingEnumType)
-    {
-        Load();
-        return _data.TryGetValue(settingEnumType, out var value) ? value : string.Empty;
-    }
+    
+    public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
+        GetSerializedSettings<PackageRenamerSettings>(SettingsEnum.RenamePackageType);
+    
+    public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings settings) =>
+        SaveSerializedSettings(settings, SettingsEnum.RenamePackageType);
 
     public bool SaveUserSettings(UserSettings userSettings)
     {
@@ -157,7 +155,15 @@ public class SettingsService(NsxLibraryDbContext nsxLibraryDbContext, IConfigura
 
     }
 
-    public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings settings) =>
-        SaveSerializedSettings(settings, SettingsEnum.RenamePackageType);
+    public string GetSettingByType(SettingsEnum settingEnumType)
+    {
+        Load();
+        return _data.TryGetValue(settingEnumType, out var value) ? value : string.Empty;
+    }
 
+    public UserSettingValue GetSettingAsync(string key)
+    {
+        var userSettings = GetUserSettings();
+        return new UserSettingValue("Prodkeys", userSettings.ProdKeys);  
+    }
 }

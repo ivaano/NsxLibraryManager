@@ -22,6 +22,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NsxLibraryManager.Utils\NsxLibraryManager.Utils.csproj" />
+        <ProjectReference Include="..\Common.Contracts\Common.Contracts.csproj" />
+        <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
     </ItemGroup>
+
     
 </Project>

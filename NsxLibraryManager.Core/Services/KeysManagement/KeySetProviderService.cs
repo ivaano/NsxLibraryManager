@@ -1,4 +1,5 @@
-﻿using LibHac.Common.Keys;
+﻿using Common.Contracts;
+using LibHac.Common.Keys;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
@@ -13,12 +14,13 @@ public class KeySetProviderService : IKeySetProviderService
     private readonly object _lock = new();
     private readonly ILogger<IKeySetProviderService> _logger;
     private KeySet? _keySet;
+    private readonly ISettingsIvan _settingsMediator;
 
-
-    public KeySetProviderService(IOptions<UserSettings> configuration, ILogger<IKeySetProviderService> logger)
+    public KeySetProviderService(IOptions<UserSettings> configuration, ILogger<IKeySetProviderService> logger, ISettingsIvan settingsIvan)
     {
         _configuration = configuration.Value;
         _logger = logger;
+        _settingsMediator = settingsIvan;
 
         AppDirProdKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, IKeySetProviderService.DefaultProdKeysFileName);
         AppDirTitleKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, IKeySetProviderService.DefaultTitleKeysFileName);
@@ -114,7 +116,7 @@ public class KeySetProviderService : IKeySetProviderService
 
     private string? FindKeysFile(string? keysFilePathRawFromSettings, string keysFileName)
     {
-
+        var configFromIvanSettings = _settingsMediator.GetSettingAsync("Prodkeys");
         // 1. Check from settings (if defined)
         if (!string.IsNullOrWhiteSpace(keysFilePathRawFromSettings))
         {

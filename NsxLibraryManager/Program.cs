@@ -1,4 +1,5 @@
 using System.Text;
+using Common.Contracts;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 using NsxLibraryManager.Core.FileLoading;
@@ -76,6 +77,8 @@ builder.Services.AddRazorComponents()
 if (validatorResult.valid)
 {
     builder.Services.AddScoped<ISettingsService, SettingsService>();
+    builder.Services.AddScoped<ISettingsIvan, SettingsService>();
+    
     //builder.Services.AddTransient<ITitleDbService, TitleDbService>();
     //builder.Services.AddSingleton<IDataService, DataService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
