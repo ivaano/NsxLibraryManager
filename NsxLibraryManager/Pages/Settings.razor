@@ -25,32 +25,50 @@
                     </ChildContent>
                     <Helper>
                         <div class="rz-text-caption">
-                                <text>Can't change database while app is running, change it in config.json and restart the app.</text>
+                            <text>Can't change database while app is running, change it in config.json and restart the app.</text>
                         </div>                        
                     </Helper>
                 </RadzenFormField>
-                <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
-                    <ChildContent>
-                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["ProdKeys"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["TitleDatabase"]</div>    
-                        }
-                        <div class="rz-text-caption">  
-                            @if (_databaseFieldDisabled)
-                            {
-                                <text>Can't change prod keys file while app is running, change it in config.json and restart the app.</text>
-                            }
-                            else
-                            {
-                                <text>Location to prod.keys file, if no location is given the app will look in</text>
-                                @NsxLibraryManager.Utils.PathHelper.HomeUserDir
-                                <text>folder.</text>
-                            }                            
-                        </div>
-                    </Helper>
+                <RadzenFormField Text="Keys">
+                    <RadzenRow Gap="2rem" RowGap="2rem" class="rz-m-0 rz-m-md-12">
+                        <RadzenColumn Size="6">
+                            <RadzenStack>
+                                <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
+                                    </ChildContent>
+                                </RadzenFormField>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenFormField AllowFloatingLabel="false" Text="Title Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleKeys" Name="TitleKeys"/>
+                                    </ChildContent>
+                                </RadzenFormField>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenFormField AllowFloatingLabel="false" Text="Console Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ConsoleKeys" Name="ConsoleKeys"/>
+                                    </ChildContent>
+                                </RadzenFormField>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Caption">Missing keys will be derived from existing keys if possible, 
+                                    keys are necessary to read the nsp packages, if no keys are provided we will try to load them from the path @homeDirKeysFilePath
+                                    if we dont find a keys there thw system will rely on the file name to get the title info from titledb, but any operation that needs to identify a title
+                                    will be severily limited. Most of the time prod.keys is enough to get the package info.</RadzenText>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenCard Variant="Variant.Outlined">
+                                <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose keyfiles" 
+                                              Auto="true" Multiple="true" Url="api/upload/keys" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select file" } })"
+                                              Progress=@(args => OnUploadProgress(args, "Drag and drop files to upload")) Complete="@OnUploadComplete" Error="@OnUploadError" Style="width: 100%"/>
+                                <RadzenButton  Text="Remove Current Keys" Click=@(args => ClearKeys()) class="rz-mt-4"/>
+                            </RadzenCard>
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RadzenFormField>
                 <RadzenFormField Text="Library Path">
                     <ChildContent>
@@ -89,7 +107,7 @@
                             <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TitleDbUrl"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Url of the SQL-TitleDb.
+                            Where to get the SQL-TitleDb.
                         </div>                        
                     </Helper>
                 </RadzenFormField>
@@ -140,23 +158,45 @@
     </RadzenRow>
     <RadzenRow>
         <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+
+        </RadzenStack>
+    </RadzenRow>
+</RadzenFieldset>
+<RadzenFieldset Text="Misc">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="6">
             <RadzenCard Variant="Variant.Outlined">
                 <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
                     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
-                        <RadzenLabel Text="Change the current theme" />
+                        <RadzenLabel Text="UI Theme" />
                         <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
                         </RadzenDropDown>
                     </RadzenStack>
-
                 </RadzenStack>
             </RadzenCard>
-        </RadzenStack>
-    </RadzenRow>
-    <RadzenRow Gap="1.2rem">
-        <RadzenColumn Size="12" SizeSM="12">
-            <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
-                <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
-            </RadzenRow>
+        </RadzenColumn>
+        <RadzenColumn Size="6">
         </RadzenColumn>
     </RadzenRow>
 </RadzenFieldset>
+<RadzenRow Gap="1.2rem">
+    <RadzenColumn Size="12" SizeSM="12">
+        <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
+            <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+        </RadzenRow>
+    </RadzenColumn>
+</RadzenRow>
+<style>
+    #ddUpload {
+        left: 0;
+        --rz-upload-button-bar-background-color: transparent;
+        --rz-upload-button-bar-padding: 0;
+    }
+
+    #ddUpload .rz-fileupload-buttonbar .rz-fileupload-choose {
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        padding: 50px 0;
+    }
+</style>

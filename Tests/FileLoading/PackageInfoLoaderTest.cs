@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Common.Contracts;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NsxLibraryManager.Core.FileLoading;
@@ -17,6 +18,7 @@ public class PackageInfoLoaderTest
     {
         var packageTypelogger = Substitute.For<ILogger<IPackageTypeAnalyzer>>();
         var keySetProviderServiceLogger = Substitute.For<ILogger<IKeySetProviderService>>();
+        var settingsMediator = Substitute.For<ISettingsMediator>();
         var appSettings = new UserSettings
         {
             TitleDatabase = "titledb",
@@ -32,7 +34,7 @@ public class PackageInfoLoaderTest
         };
         var options = Options.Create(appSettings);
         _packageTypeAnalyzer = new PackageTypeAnalyzer(packageTypelogger);
-        _keySetProviderService = new KeySetProviderService(options, keySetProviderServiceLogger);
+        _keySetProviderService = new KeySetProviderService(options, keySetProviderServiceLogger, settingsMediator);
     }
 
     [Fact]

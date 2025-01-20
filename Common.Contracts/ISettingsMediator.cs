@@ -1,8 +1,8 @@
 ﻿namespace Common.Contracts;
 
-public interface ISettingsIvan
+public interface ISettingsMediator
 {
-        UserSettingValue GetSettingAsync(string key);
+        UserSettingValue GetUserSetting(string key);
 }
 
 public record UserSettingValue(string Key, string Value);

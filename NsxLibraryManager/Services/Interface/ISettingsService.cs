@@ -15,4 +15,8 @@ public interface ISettingsService
     public UserSettings GetUserSettings();
     
     public bool SaveUserSettings(UserSettings userSettings);
+    
+    public string GetConfigFolder();
+
+    public bool RemoveCurrentKeys();
 }

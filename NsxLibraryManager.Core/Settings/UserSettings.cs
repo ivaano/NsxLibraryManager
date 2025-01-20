@@ -11,6 +11,9 @@ public class UserSettings
     public string LibraryPath { get; set; } = string.Empty;
     public bool Recursive { get; set; } = true;
     public string ProdKeys { get; set; } = string.Empty;
+    public string TitleKeys { get; set; } = string.Empty;
+    public string ConsoleKeys { get; set; } = string.Empty;
+    public string UiTheme { get; set; } = string.Empty;
 
     public AgeRatingAgency AgeRatingAgency { get; set; } = AgeRatingAgency.Esrb;
 

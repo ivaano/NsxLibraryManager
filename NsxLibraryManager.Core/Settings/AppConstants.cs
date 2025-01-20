@@ -2,12 +2,6 @@ namespace NsxLibraryManager.Core.Settings;
 
 public static class AppConstants
 {
-    //public const string LibraryCollectionName = "Library";
-    //public const string CnmtsCollectionName = "PackagedContentMeta";
-   //public const string VersionsCollectionName = "Versions";
-    //public const string GameCollectionName = "Games";
-    //public const string SettingsCollectionName = "Settings";
-    //public const string RenamerSettingsName = "RenamerSettings";
     public const string AppSettingsSectionName = "NsxLibraryManager";
     public const string AppSettingsTitledbDbConnection = "TitledbDbConnection";
     public const string AppSettingsSqlTitleDbRepository = "SqlTitleDbRepository";
@@ -22,5 +16,6 @@ public static class AppConstants
     public const string DefaultTitleDbVersion = "https://github.com/hangover6674/sql-titledb/raw/refs/heads/main/version";
     public const string TitleDbVersionFile = "version";
     public const string TitleDbFile = "titledb.db.gz";
+    public const string ThemeCookie = "NsxLibraryManagerTheme";
      
 }
