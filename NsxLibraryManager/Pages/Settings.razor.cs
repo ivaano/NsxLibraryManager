@@ -1,10 +1,14 @@
-﻿using FluentValidation;
+﻿using System.Text.Json;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
+using Radzen.Blazor;
+using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Pages;
 
@@ -14,17 +18,19 @@ public partial class Settings
     [Inject] private ISettingsService SettingsService { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
-    [Inject] private IValidator<UserSettings> ConfigValidator { get; set; } = default!;
+    [Inject] private IValidator<UserSettings> UserSettingsValidator { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
     
     [Inject] private ThemeService ThemeService { get; set; } = default!;
 
-    private IEnumerable<string> _regionsValue = new string[] { "US" };
-    private IEnumerable<Region> _regions = new List<Region>() { new() { Name = "US" } };
+
     private UserSettings _config = default!;
     private bool _databaseFieldDisabled = true;
     private ValidationResult? _validationResult;
-
+    private RadzenUpload uploadDD;
+    private string homeDirKeysFilePath;
+    private string theme = string.Empty;
+    
     private readonly Dictionary<string, string> _validationErrors = new()
     {
         { "TitleDatabase", string.Empty },
@@ -42,11 +48,17 @@ public partial class Settings
     {
         await base.OnInitializedAsync();
         LoadConfiguration();
-        bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out var isDefaultConfigCreated);
-        if (isDefaultConfigCreated)
+        var configExists = bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out _);
+        if (configExists)
         {
             _databaseFieldDisabled = false;
-            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Default configuration created", Detail = "A default config.json file has been created, setup the correct paths for the application to work.", Duration = 60000 });
+            ShowNotification(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Default configuration created", 
+                Detail = "A default config.json file has been created, set the correct paths for the application to work.", 
+                Duration = 60000
+            });
         }
 
         //await ValidateFields();
@@ -55,7 +67,7 @@ public partial class Settings
     private async Task<bool> ValidateFields()
     {
         Array.ForEach(_validationErrors.Keys.ToArray(), key => _validationErrors[key] = string.Empty);
-        _validationResult = await ConfigValidator.ValidateAsync(_config);
+        _validationResult = await UserSettingsValidator.ValidateAsync(_config);
         if (!_validationResult.IsValid)
         {
             foreach (var failure in _validationResult.Errors)
@@ -73,6 +85,7 @@ public partial class Settings
     private void ChangeTheme(string value)
     {
         ThemeService.SetTheme(value);
+        _config.UiTheme = value;
     }
     
     private async Task SaveConfiguration()
@@ -81,33 +94,123 @@ public partial class Settings
         if (!validateFields) return;
         
         SettingsService.SaveUserSettings(_config);
-        /*
-        var jsonWriteOptions = new JsonSerializerOptions
+        ShowNotification(new NotificationMessage
         {
-            WriteIndented = true
-        };
-        jsonWriteOptions.Converters.Add(new JsonStringEnumConverter());
-
-        var sectionName = new Dictionary<string, AppSettings>
-        {
-            { AppConstants.AppSettingsSectionName, _config }
-        };
-
-        var newJson = JsonSerializer.Serialize(sectionName, jsonWriteOptions);
-        var appSettingsPath = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory, AppConstants.ConfigFileName);
-        await File.WriteAllTextAsync(appSettingsPath, newJson);
-        */
-        //var configurationRoot = (IConfigurationRoot)Configuration;
-        //configurationRoot.SetValue("NsxLibraryManager:DownloadSettings:TimeoutInSeconds", "300");
-        //configurationRoot.Reload();
-        ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Configuration Saved!", Detail = "Settings have been saved.", Duration = 4000 });
+            Severity = NotificationSeverity.Success, 
+            Summary = "Configuration Saved!", 
+            Detail = "Settings have been saved.", 
+            Duration = 4000
+        });
     }
     
     private void LoadConfiguration()
     {
         _config = SettingsService.GetUserSettings();
+        var homeUserFolder = PathHelper.HomeUserDir;
+        if (homeUserFolder is not null)
+        {
+            homeDirKeysFilePath = Path.Combine(homeUserFolder, ".switch").ToFullPath();
+        }
     }
 
+    private void OnUploadProgress(UploadProgressArgs args, string name)
+    {
+
+        if (args.Progress == 100)
+        {
+            foreach (var file in args.Files)
+            {
+                var log = $"Uploaded: {file.Name} / {file.Size} bytes";
+            }
+        }
+    }
+
+    private void OnUploadComplete(UploadCompleteEventArgs args)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        try
+        {
+            var uploadedFiles = args.JsonResponse.Deserialize<List<FileUploadResponse>>(options);
+            if (uploadedFiles is null) return;
+            foreach (var file in uploadedFiles)
+            {
+                ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = file.FileName,
+                    Detail = file.Message,
+                    Duration = 3000,
+                    CloseOnClick = true
+                });
+            }
+            StateHasChanged();
+        }
+        catch (JsonException ex)
+        {
+            ShowNotification(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error, 
+                Summary = "Upload Error", 
+                Detail = ex.Message, 
+                Duration = 20000,
+                CloseOnClick = true 
+            });
+        }
+        LoadConfiguration();
+
+    }
+
+    private void OnUploadError(UploadErrorEventArgs args)
+    {
+        var errorDetail = string.Empty;
+        var summary = string.Empty;
+        try
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var response = JsonSerializer.Deserialize<ErrorResponse>(args.Message, options);
+            if (response is not null)
+            {
+                errorDetail = response.Errors.ListToString();
+                summary = response.ErrorMessage;
+            }
+        }
+        catch (JsonException e)
+        {
+            errorDetail = e.Message;
+        }
+        
+        ShowNotification(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Error, 
+            Summary = summary, 
+            Detail = errorDetail, 
+            Duration = 20000,
+            CloseOnClick = true 
+        });
+    }
+
+    private void ClearKeys()
+    {
+        if (SettingsService.RemoveCurrentKeys())
+        {
+            ShowNotification(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Success",
+                Detail = "Keys have been removed.",
+                Duration = 3000,
+                CloseOnClick = true
+            });
+            LoadConfiguration();
+        }
+    }
+    
     private Task ReloadApp()
     {
         ApplicationLifetime.StopApplication();

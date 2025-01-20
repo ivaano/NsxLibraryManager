@@ -14,16 +14,16 @@ public class KeySetProviderService : IKeySetProviderService
     private readonly object _lock = new();
     private readonly ILogger<IKeySetProviderService> _logger;
     private KeySet? _keySet;
-    private readonly ISettingsIvan _settingsMediator;
+    private readonly ISettingsMediator _settingsMediator;
 
-    public KeySetProviderService(IOptions<UserSettings> configuration, ILogger<IKeySetProviderService> logger, ISettingsIvan settingsIvan)
+    public KeySetProviderService(IOptions<UserSettings> configuration, ILogger<IKeySetProviderService> logger, ISettingsMediator settingsMediator)
     {
         _configuration = configuration.Value;
         _logger = logger;
-        _settingsMediator = settingsIvan;
+        _settingsMediator = settingsMediator;
 
-        AppDirProdKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, IKeySetProviderService.DefaultProdKeysFileName);
-        AppDirTitleKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, IKeySetProviderService.DefaultTitleKeysFileName);
+        AppDirProdKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, AppConstants.ConfigDirectory, IKeySetProviderService.DefaultProdKeysFileName);
+        AppDirTitleKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, AppConstants.ConfigDirectory, IKeySetProviderService.DefaultTitleKeysFileName);
 
         Reset();
     }
@@ -116,7 +116,6 @@ public class KeySetProviderService : IKeySetProviderService
 
     private string? FindKeysFile(string? keysFilePathRawFromSettings, string keysFileName)
     {
-        var configFromIvanSettings = _settingsMediator.GetSettingAsync("Prodkeys");
         // 1. Check from settings (if defined)
         if (!string.IsNullOrWhiteSpace(keysFilePathRawFromSettings))
         {
@@ -125,8 +124,8 @@ public class KeySetProviderService : IKeySetProviderService
                 return keysFilePathTemp;
         }
 
-        // 2. Try to load from the current app dir
-        var appDirKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, keysFileName);
+        // 2. Try to load from config app dir
+        var appDirKeysFilePath = Path.Combine(PathHelper.CurrentAppDir, AppConstants.ConfigDirectory, keysFileName);
         if (File.Exists(appDirKeysFilePath))
             return appDirKeysFilePath;
 

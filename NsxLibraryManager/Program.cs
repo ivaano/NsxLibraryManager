@@ -1,11 +1,8 @@
 using System.Text;
 using Common.Contracts;
-using Microsoft.AspNetCore.OData;
-using Microsoft.OData.ModelBuilder;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Mapping;
-using NsxLibraryManager.Core.Models.Dto;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
@@ -53,34 +50,21 @@ await builder.TitleDbDownloader();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
+
 builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
     options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value));
-
-
 builder.Services.AddDbContext<TitledbDbContext>(options =>
     options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:TitledbDBConnection").Value));
-//builder.Services.AddScoped<ITitledbDatabaseService, TitledbDatabaseService>();
 
-/*
-builder.Services.AddDbContext<TitledbDbContext>(options =>
-{
-    options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:TitledbDBConnection").Value);
-    // options.EnableSensitiveDataLogging(true);
-});
-*/
-
-//builder.Services.AddRazorPages();
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 //nsx services
 if (validatorResult.valid)
 {
     builder.Services.AddScoped<ISettingsService, SettingsService>();
-    builder.Services.AddScoped<ISettingsIvan, SettingsService>();
-    
-    //builder.Services.AddTransient<ITitleDbService, TitleDbService>();
-    //builder.Services.AddSingleton<IDataService, DataService>();
+    builder.Services.AddScoped<ISettingsMediator, SettingsService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
     builder.Services.AddTransient<IPackageTypeAnalyzer, PackageTypeAnalyzer>();
     builder.Services.AddTransient<IPackageInfoLoader, PackageInfoLoader>();
@@ -88,24 +72,23 @@ if (validatorResult.valid)
     builder.Services.AddTransient<IStatsService, StatsService>();
     builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
-
     builder.Services.AddScoped<ITitledbService, TitledbService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();
+    builder.Services.AddScoped<IFileUploadService, FileUploadService>();
     builder.Services.AddScoped<IValidator<PackageRenamerSettings>, RenamerSettingsValidator>();    
     builder.Services.AddScoped<IValidator<BundleRenamerSettings>, BundleSettingsValidator>();    
     builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    
 }
+builder.Services.AddControllersWithViews();
 
 //radzen services
 builder.Services.AddRadzenComponents();
+builder.Services.AddRadzenCookieThemeService(options =>
+{
+    options.Name = AppConstants.ThemeCookie; 
+    options.Duration = TimeSpan.FromDays(365);
+});
 
-var modelBuilder = new ODataConventionModelBuilder();
-modelBuilder.EntitySet<Game>("Games");
-
-builder.Services.AddControllers().AddOData(
-        options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
-                "odata",
-                modelBuilder.GetEdmModel()));
 
 //Static web assets for linux development https://learn.microsoft.com/en-us/aspnet/core/razor-pages/ui-class?view=aspnetcore-7.0&tabs=visual-studio#consume-content-from-a-referenced-rcl
 if (builder.Environment.IsEnvironment("DeveLinux"))
@@ -114,8 +97,6 @@ if (builder.Environment.IsEnvironment("DeveLinux"))
 }
 
 var app = builder.Build();
-
-
 
 
 // Configure the HTTP request pipeline.
@@ -128,12 +109,11 @@ if (!app.Environment.IsDevelopment())
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseRouting();
 app.UseAntiforgery();
-
+app.MapRazorPages();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapControllers();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
 
 app.EnsureDatabaseMigrated<NsxLibraryDbContext>();
 
