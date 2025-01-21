@@ -53,7 +53,8 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     ProgressCompleted++;
                     StateHasChanged();
                 }
-                
+                await TitleLibraryService.SaveLibraryReloadDate(refresh: true);
+
 
             });
         DialogService.Close();

@@ -18,6 +18,7 @@ public class NsxLibraryDbContext : DbContext
     public DbSet<Title> Titles { get; set; }
     public DbSet<TitleCategory> TitleCategory { get; set; }
     public DbSet<Version> Versions { get; set; }
+    public DbSet<LibraryUpdate> LibraryUpdates { get; set; }
 
 
     public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<UserSettings> configuration) :

@@ -24,7 +24,7 @@ public class TitleLibraryService : ITitleLibraryService
     private readonly NsxLibraryDbContext _nsxLibraryDbContext;
     private readonly TitledbDbContext _titledbDbContext;
     private readonly IFileInfoService _fileInfoService;
-    private readonly UserSettings _configuration;
+    private readonly UserSettings _settings;
     private readonly ILogger<TitleLibraryService> _logger;
 
 
@@ -38,7 +38,7 @@ public class TitleLibraryService : ITitleLibraryService
         _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
         _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
         _fileInfoService = fileInfoService;
-        _configuration = settingsService.GetUserSettings();
+        _settings = settingsService.GetUserSettings();
         _logger = logger;
     }
 
@@ -133,8 +133,8 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task<IEnumerable<string>> GetFilesAsync()
     {
-        var files = await _fileInfoService.GetFileNames(_configuration.LibraryPath,
-            _configuration.Recursive);
+        var files = await _fileInfoService.GetFileNames(_settings.LibraryPath,
+            _settings.Recursive);
         return files;
     }
 
@@ -276,11 +276,11 @@ public class TitleLibraryService : ITitleLibraryService
     }
 
 
-    public int GetBaseTitlesCount()
+    public int GetTitlesCountByContentType(TitleContentType titleContentType)
     {
         return _nsxLibraryDbContext.Titles
             .AsNoTracking()
-            .Count(t => t.ContentType == TitleContentType.Base);
+            .Count(t => t.ContentType == titleContentType);
     }
 
     public async Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args)
@@ -376,6 +376,36 @@ public class TitleLibraryService : ITitleLibraryService
             }).AsQueryable();
 
         return Task.FromResult(queryableDlcs);
+    }
+
+    public Task<LibraryUpdate?> GetLastLibraryUpdateAsync()
+    {
+        return Task.FromResult(_nsxLibraryDbContext.LibraryUpdates
+            .AsNoTracking()
+            .OrderBy(t => t.DateUpdated)
+            .LastOrDefault());
+    }
+
+    public async Task SaveLibraryReloadDate(bool refresh = false)
+    {
+        var dateCreated = DateTime.Now;
+        if (refresh)
+        {
+            var previousDate = await GetLastLibraryUpdateAsync();
+            dateCreated = previousDate?.DateCreated ?? DateTime.Now;
+        }
+        
+        var reloadRecord = new LibraryUpdate
+        {
+            DateCreated = dateCreated,
+            DateUpdated = DateTime.Now,
+            BaseTitleCount = GetTitlesCountByContentType(TitleContentType.Base),
+            UpdateTitleCount = GetTitlesCountByContentType(TitleContentType.Update),
+            DlcTitleCount = GetTitlesCountByContentType(TitleContentType.DLC),
+            LibraryPath = _settings.LibraryPath
+        };
+        _nsxLibraryDbContext.LibraryUpdates.Add(reloadRecord);
+        await _nsxLibraryDbContext.SaveChangesAsync();
     }
 
     public async Task<FileDelta> GetDeltaFilesInLibraryAsync()

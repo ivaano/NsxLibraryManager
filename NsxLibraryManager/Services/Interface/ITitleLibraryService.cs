@@ -21,11 +21,16 @@ public interface ITitleLibraryService
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();
 
     public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
-    public int GetBaseTitlesCount();
+    public int GetTitlesCountByContentType(TitleContentType contentType);
+    
     public Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args);
 
     public Task<bool> SaveDatabaseChangesAsync();
 
     public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId);
+
+    public Task SaveLibraryReloadDate(bool refresh = false);
     
+    public Task<LibraryUpdate?> GetLastLibraryUpdateAsync();
+
 }

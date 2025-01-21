@@ -22,11 +22,13 @@ public partial class Library : IDisposable
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = null!;
     
-    [Inject] 
-    private ISettingsService SettingsService { get; set; } = null!;
+  //  [Inject] private ISettingsService SettingsService { get; set; } = null!;
 
     [Inject]
     protected NsxLibraryDbContext DbContext { get; set; } = null!;
+    
+    [Inject]
+    protected ITitleLibraryService TitleLibraryService { get; set; } = null!;
     
     [Inject]
     protected DialogService DialogService { get; set; }
@@ -83,10 +85,17 @@ public partial class Library : IDisposable
     
     private async Task InitialLoad()
     {
-        var settings = SettingsService.GetUserSettings();
-        _libraryPath = settings.LibraryPath;
+        //var settings = SettingsService.GetUserSettings();
+        //_libraryPath = settings.LibraryPath;
+        var lastUpdated = await TitleLibraryService.GetLastLibraryUpdateAsync();
+        _libraryPath = lastUpdated?.LibraryPath ?? string.Empty;
+        _baseCount = lastUpdated?.BaseTitleCount ?? 0;
+        _patchCount = lastUpdated?.UpdateTitleCount ?? 0;
+        _dlcCount = lastUpdated?.DlcTitleCount ?? 0;
+        _lastUpdated = lastUpdated?.DateUpdated.ToString("MM/dd/yyyy h:mm tt") ?? "Never";
+        
         _categories = DbContext.Categories.Select(s => s.Name);
-        await CalculateCounts();
+        //await CalculateCounts();
     }
 
     private Task CalculateCounts()

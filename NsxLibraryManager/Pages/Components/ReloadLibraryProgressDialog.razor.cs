@@ -59,7 +59,8 @@ public partial class ReloadLibraryProgressDialog : IDisposable
       
                 await TitleLibraryService.SaveContentCounts(updateCounts, TitleContentType.Update);
                 await TitleLibraryService.SaveContentCounts(dlcCounts, TitleContentType.DLC);
-
+                
+                await TitleLibraryService.SaveLibraryReloadDate();
             });
         DialogService.Close();
     }

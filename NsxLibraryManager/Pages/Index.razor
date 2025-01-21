@@ -23,6 +23,6 @@
             NavigationManager.NavigateTo("/settings");
         }
         var validationResult = await ConfigValidator.ValidateAsync(appSettings);
-        NavigationManager.NavigateTo(validationResult.IsValid ? "/sqllibrary" : "/settings");
+        NavigationManager.NavigateTo(validationResult.IsValid ? "/dashboard" : "/settings");
     }
 }
