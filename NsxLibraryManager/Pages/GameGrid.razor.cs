@@ -18,7 +18,7 @@ public partial class GameGrid
     public bool ShowDlcInfo { get; set; } = false;
 
     private readonly string _pagingSummaryFormat = "Displaying page {0} of {1} (total {2} games)";
-    private readonly int _pageSize = 5;
+    private readonly int _pageSize = 15;
     private int _count;
     public bool IsLoading;
     private IEnumerable<LibraryTitleDto> _games = default!;
@@ -95,6 +95,11 @@ public partial class GameGrid
         };
 
         await LoadData(loadDataArgs);
+    }
+
+    private string GetTitleUrl(string titleId)
+    {
+        return "/title/" + titleId;
     }
 
 
