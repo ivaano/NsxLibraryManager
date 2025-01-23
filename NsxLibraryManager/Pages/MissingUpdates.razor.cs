@@ -14,14 +14,13 @@ public partial class MissingUpdates : ComponentBase
     [Inject]
     protected DialogService DialogService { get; set; } = null!;
     
-    
     private IEnumerable<LibraryTitleDto> _libraryTitles = default!;
-    private string _libraryPath = string.Empty;
+    
     //grid
     private RadzenDataGrid<LibraryTitleDto> _grid = null!;
     private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30, 50, 100];
     private int _pageSize = 100;
-    private int _count = 0;
+    private int _count;
     private bool _isLoading = true;
     
     private string _lastUpdated = string.Empty;
@@ -35,7 +34,6 @@ public partial class MissingUpdates : ComponentBase
     private async Task InitialLoad()
     {
         var lastUpdated = await TitleLibraryService.GetLastLibraryUpdateAsync();
-        _libraryPath = lastUpdated?.LibraryPath ?? string.Empty;
         _lastUpdated = lastUpdated?.DateUpdated.ToString("MM/dd/yyyy h:mm tt") ?? "Never";
     }
     

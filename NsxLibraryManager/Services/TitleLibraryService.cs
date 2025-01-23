@@ -192,18 +192,21 @@ public class TitleLibraryService : ITitleLibraryService
             nsxLibraryTitle.BannerUrl = libraryTitle.BannerUrl;
             nsxLibraryTitle.Description = libraryTitle.Description;
             nsxLibraryTitle.Developer = libraryTitle.Developer;
+            nsxLibraryTitle.DlcCount = libraryTitle.DlcCount ?? 0;
             nsxLibraryTitle.IconUrl = libraryTitle.IconUrl;
             nsxLibraryTitle.Intro = libraryTitle.Intro;
             nsxLibraryTitle.LastWriteTime = libraryTitle.LastWriteTime;
             nsxLibraryTitle.NsuId = libraryTitle.Nsuid;
             nsxLibraryTitle.NumberOfPlayers = libraryTitle.NumberOfPlayers;
+            nsxLibraryTitle.OwnedDlcs = 0;
+            nsxLibraryTitle.OwnedUpdates = 0;
             nsxLibraryTitle.PackageType = metaFromFileName.PackageType;
             nsxLibraryTitle.Publisher = libraryTitle.Publisher;
             nsxLibraryTitle.Rating = libraryTitle.Rating;
             nsxLibraryTitle.ReleaseDate = libraryTitle.ReleaseDate;
             nsxLibraryTitle.Size = metaFromFileName.Size;
             nsxLibraryTitle.Version = (int?)libraryTitle.TitleVersion;
-
+    
             /*
             if (libraryTitle.Type == TitleLibraryType.Base)
             {
@@ -217,14 +220,11 @@ public class TitleLibraryService : ITitleLibraryService
         await AddTitleCategories(nsxLibraryTitle, titledbTitle);
         await AddRatingContent(nsxLibraryTitle, titledbTitle);
 
-
-
         nsxLibraryTitle.BannerUrl = titledbTitle.BannerUrl;
         nsxLibraryTitle.ContentType = titledbTitle.ContentType;
         nsxLibraryTitle.Description = titledbTitle.Description;
         nsxLibraryTitle.Developer = titledbTitle.Developer;
-        nsxLibraryTitle.DlcCount = titledbTitle.DlcCount;
-        nsxLibraryTitle.DlcCount = titledbTitle.DlcCount;
+        nsxLibraryTitle.DlcCount = titledbTitle.DlcCount ?? 0;
         nsxLibraryTitle.IconUrl = titledbTitle.IconUrl;
         nsxLibraryTitle.Intro = titledbTitle.Intro;
         nsxLibraryTitle.LastWriteTime = libraryTitle.LastWriteTime;
@@ -232,6 +232,8 @@ public class TitleLibraryService : ITitleLibraryService
         nsxLibraryTitle.NsuId = titledbTitle.NsuId;
         nsxLibraryTitle.NumberOfPlayers = titledbTitle.NumberOfPlayers;
         nsxLibraryTitle.OtherApplicationId = titledbTitle.OtherApplicationId;
+        nsxLibraryTitle.OwnedDlcs = 0;
+        nsxLibraryTitle.OwnedUpdates = 0;
         nsxLibraryTitle.PackageType = libraryTitle.PackageType;
         // prefer the publisher from the file
         nsxLibraryTitle.Publisher = titledbTitle.Publisher.ConvertNullOrEmptyTo(libraryTitle.Publisher);
@@ -285,6 +287,38 @@ public class TitleLibraryService : ITitleLibraryService
             .Count(t => t.ContentType == titleContentType);
     }
 
+    private async Task<GetBaseTitlesResultDto> ApplyAdditionalFilters(IQueryable<Title> query, LoadDataArgs args)
+    {
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (args.Filters is not null)
+        {
+            if (args.Filters.Any())
+            {
+                query = query.Where(FilterBuilder.BuildFilterString(args.Filters));
+            }
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        
+        var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
+        
+        return new GetBaseTitlesResultDto
+        {
+            Count = await finalQuery.CountAsync(),
+            Titles = finalQuery
+                .Skip(args.Skip.Value)
+                .Take(args.Top.Value)
+                .ToList()
+        };
+    }
+
     public async Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args)
     {
         var query = _nsxLibraryDbContext.Titles
@@ -296,34 +330,7 @@ public class TitleLibraryService : ITitleLibraryService
             .Include(x => x.Screenshots)
             .Include(x => x.Languages).AsQueryable();
         
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(args.Filter);
-        }
-
-        if (args.Filters is not null)
-        {
-            if (args.Filters.Any())
-            {
-                query = query.Where(FilterBuilder.BuildFilterString(args.Filters));
-            }
-        }
-
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
-        }
-        
-        var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
-        
-        return new GetBaseTitlesResultDto
-        {
-            Count = await finalQuery.CountAsync(),
-            Titles = finalQuery
-                .Skip(args.Skip.Value)
-                .Take(args.Top.Value)
-                .ToList()
-        };
+        return await ApplyAdditionalFilters(query, args);
     }
 
     public async Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args)
@@ -332,42 +339,31 @@ public class TitleLibraryService : ITitleLibraryService
             .AsNoTracking()
             .Where(t => t.ContentType == TitleContentType.Base)
             .Where(t => t.Versions != null && t.Versions.Count > 0 && t.LatestOwnedUpdateVersion < t.LatestVersion)
+            //.Include(x => x.RatingsContents)
+            //.Include(x => x.Categories)
+            .Include(x => x.Versions!.OrderByDescending(v => v.VersionNumber).Take(1))
+            .AsQueryable();
+            //.Include(x => x.Screenshots)
+            //.Include(x => x.Languages).AsQueryable();
+
+        return await ApplyAdditionalFilters(query, args);
+    }
+
+    public async Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingDlc(LoadDataArgs args)
+    {
+        var query = _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.ContentType == TitleContentType.Base)
+            .Where(t => t.OwnedDlcs < t.DlcCount)
             .Include(x => x.RatingsContents)
             .Include(x => x.Categories)
             .Include(x => x.Versions!.OrderByDescending(v => v.VersionNumber).Take(1))
             .Include(x => x.Screenshots)
             .Include(x => x.Languages).AsQueryable();
         
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(args.Filter);
-        }
-
-        if (args.Filters is not null)
-        {
-            if (args.Filters.Any())
-            {
-                query = query.Where(FilterBuilder.BuildFilterString(args.Filters));
-            }
-        }
-
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
-        }
-        
-        var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
-        
-        return new GetBaseTitlesResultDto
-        {
-            Count = await finalQuery.CountAsync(),
-            Titles = finalQuery
-                .Skip(args.Skip.Value)
-                .Take(args.Top.Value)
-                .ToList()
-        };
+        return await ApplyAdditionalFilters(query, args);
     }
-
+    
     public async Task<bool> SaveDatabaseChangesAsync()
     {
         await _nsxLibraryDbContext.SaveChangesAsync();

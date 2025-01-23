@@ -25,6 +25,7 @@ public interface ITitleLibraryService
     
     public Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args);
+    public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingDlc(LoadDataArgs args);
 
     public Task<bool> SaveDatabaseChangesAsync();
 

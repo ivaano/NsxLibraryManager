@@ -109,6 +109,7 @@ public partial class Title
             Owned = libraryApplicationIds.Contains(t.ApplicationId)
         }).AsQueryable();
         
+        
         if (!string.IsNullOrEmpty(args.Filter))
         {
             query = query.Where(args.Filter);
@@ -118,8 +119,11 @@ public partial class Title
         {
             query = query.OrderBy(args.OrderBy);
         }
+
         _dlcCount = query.Count();
+        //_dlcs = query;
         _dlcs = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
         _dlcIsLoading = false;
     }
 

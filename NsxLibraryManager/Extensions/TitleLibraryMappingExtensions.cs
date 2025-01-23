@@ -36,30 +36,30 @@ public static class TitleLibraryMappingExtensions
             TitleName = title.TitleName,
             UpdatesCount = title.UpdatesCount ?? 0,
             Version = title.Version,
-            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
-            {
-                Name = x.Name,
-            }).ToList()),
-            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
-            {
-                LanguageCode = x.LanguageCode,
-            }).ToList()),
-            RatingsContent = new List<RatingContentDto>((title.RatingsContents ?? null).Select(x => new RatingContentDto()
-            {
-                Name = x.Name,
-            }).ToList()),            
-            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
-            {
-                Url = x.Url
-            }).ToList()),
-            Versions = new Collection<VersionDto>(
+            Categories = (title.Categories is not null) ? new List<CategoryDto>((title.Categories).Select(x => new CategoryDto
+                    {
+                        Name = x.Name,
+                    }).ToList()) : null,
+            Languages = new List<LanguageDto>((title.Languages).Select(x => new LanguageDto
+                    {
+                        LanguageCode = x.LanguageCode,
+                    }).ToList()),
+            RatingsContent = new List<RatingContentDto>((title.RatingsContents).Select(x => new RatingContentDto()
+                    {
+                        Name = x.Name,
+                    }).ToList()),            
+            Screenshots = (title.Screenshots is not null) ? new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+                    {
+                        Url = x.Url
+                    }).ToList()) : null,
+            Versions = (title.Versions is not null) ? new Collection<VersionDto>(
                 title.Versions
                     .Select(x => new VersionDto()
                     {
                         VersionNumber = x.VersionNumber,
                         VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
                         ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
-                    }).ToList()),
+                    }).ToList()) : null,
         };
     }
     
