@@ -7,7 +7,7 @@
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
     <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
 </RadzenCard>
-
+<RadzenStack>
 @{
     var groupSize = 5; 
     var gameList = _games.ToList(); 
@@ -44,7 +44,7 @@
             }
         </RadzenCardGroup>
 }
-    
+</RadzenStack>
 <RadzenPager @ref="@pager" Density="@Density.Compact" ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
              HorizontalAlign="HorizontalAlign.Right" Count="_count"
              PageSize="@_pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>

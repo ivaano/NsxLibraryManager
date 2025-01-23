@@ -13,26 +13,45 @@ public static class TitleLibraryMappingExtensions
     {
         return new LibraryTitleDto
         {
-            NsuId = title.NsuId,
             ApplicationId = title.ApplicationId,
-            OtherApplicationId = title.OtherApplicationId,
-            TitleName = title.TitleName,
-            FileName = title.FileName,
-            Version = title.Version,
-            IconUrl = title.IconUrl,
             BannerUrl = title.BannerUrl,
-            Description = title.Description,
             ContentType = title.ContentType,
+            Description = title.Description,
+            DlcCount = title.DlcCount,
+            FileName = title.FileName,
+            IconUrl = title.IconUrl,
+            LatestOwnedUpdateVersion = title.LatestOwnedUpdateVersion,
+            LatestVersion = title.LatestVersion,
+            NsuId = title.NsuId,
+            NumberOfPlayers = title.NumberOfPlayers,
+            OtherApplicationId = title.OtherApplicationId,
+            OwnedDlcCount = title.OwnedDlcs ?? 0, 
+            OwnedUpdatesCount = title.OwnedUpdates ?? 0,
             PackageType = title.PackageType,
-            Size = title.Size ?? 0,
+            Publisher = title.Publisher,
             Rating = title.Rating,
             Region = title.Region,
-            NumberOfPlayers = title.NumberOfPlayers,
-            Publisher = title.Publisher,
-            LatestVersion = title.LatestVersion,
-            DlcCount = title.DlcCount,
-            OwnedDlcCount = title.OwnedDlcs ?? 0, 
             ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            Size = title.Size ?? 0,
+            TitleName = title.TitleName,
+            UpdatesCount = title.UpdatesCount ?? 0,
+            Version = title.Version,
+            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
+            {
+                Name = x.Name,
+            }).ToList()),
+            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+            {
+                LanguageCode = x.LanguageCode,
+            }).ToList()),
+            RatingsContent = new List<RatingContentDto>((title.RatingsContents ?? null).Select(x => new RatingContentDto()
+            {
+                Name = x.Name,
+            }).ToList()),            
+            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+            {
+                Url = x.Url
+            }).ToList()),
             Versions = new Collection<VersionDto>(
                 title.Versions
                     .Select(x => new VersionDto()
@@ -41,22 +60,6 @@ public static class TitleLibraryMappingExtensions
                         VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
                         ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
                     }).ToList()),
-            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
-            {
-                Url = x.Url
-            }).ToList()),
-            RatingsContent = new List<RatingContentDto>((title.RatingsContents ?? null).Select(x => new RatingContentDto()
-            {
-                Name = x.Name,
-            }).ToList()),
-            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
-            {
-                Name = x.Name,
-            }).ToList()),
-            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
-            {
-                LanguageCode = x.LanguageCode,
-            }).ToList()),            
         };
     }
     

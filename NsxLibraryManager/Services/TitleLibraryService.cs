@@ -8,12 +8,14 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Migrations;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 using Radzen;
+using RatingsContent = NsxLibraryManager.Models.NsxLibrary.RatingsContent;
 using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 
@@ -324,6 +326,48 @@ public class TitleLibraryService : ITitleLibraryService
         };
     }
 
+    public async Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args)
+    {
+        var query = _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.ContentType == TitleContentType.Base)
+            .Where(t => t.Versions != null && t.Versions.Count > 0 && t.LatestOwnedUpdateVersion < t.LatestVersion)
+            .Include(x => x.RatingsContents)
+            .Include(x => x.Categories)
+            .Include(x => x.Versions!.OrderByDescending(v => v.VersionNumber).Take(1))
+            .Include(x => x.Screenshots)
+            .Include(x => x.Languages).AsQueryable();
+        
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (args.Filters is not null)
+        {
+            if (args.Filters.Any())
+            {
+                query = query.Where(FilterBuilder.BuildFilterString(args.Filters));
+            }
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        
+        var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
+        
+        return new GetBaseTitlesResultDto
+        {
+            Count = await finalQuery.CountAsync(),
+            Titles = finalQuery
+                .Skip(args.Skip.Value)
+                .Take(args.Top.Value)
+                .ToList()
+        };
+    }
+
     public async Task<bool> SaveDatabaseChangesAsync()
     {
         await _nsxLibraryDbContext.SaveChangesAsync();
@@ -342,6 +386,10 @@ public class TitleLibraryService : ITitleLibraryService
                 {
                     case TitleContentType.Update:
                         title.OwnedUpdates = count.Value;
+                        title.LatestOwnedUpdateVersion = _nsxLibraryDbContext.Titles
+                            .AsNoTracking()
+                            .Where(t => t.OtherApplicationId == title.ApplicationId && t.ContentType == TitleContentType.Update)
+                            .Max(t => t.Version);
                         break;
                     case TitleContentType.DLC:
                         title.OwnedDlcs = count.Value;

@@ -36,7 +36,7 @@ public partial class Library : IDisposable
     private static readonly string SettingsParamaterName = "SqlLibraryGridSettings";
 
     private DataGridSettings _settings = default!;
-    private IEnumerable<GridTitle> _libraryTitles;
+    private IEnumerable<GridTitle> _libraryTitles = [];
     private RadzenDataGrid<GridTitle> _grid;
 
     private IEnumerable<string> _selectedCategories;
