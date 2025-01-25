@@ -8,7 +8,6 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
-using NsxLibraryManager.Migrations;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;

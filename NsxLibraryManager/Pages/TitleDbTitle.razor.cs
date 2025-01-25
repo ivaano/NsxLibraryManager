@@ -2,6 +2,9 @@
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Models.Dto;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models.Dto;
+using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Pages;
@@ -14,10 +17,14 @@ public partial class TitleDbTitle
     [Inject]
     protected ITitleDbService TitleDbService { get; set; } = default!;
     */
+    [Inject]
+    protected ITitledbService TitledbService { get; set; } = default!;
+    
     [Parameter] 
     public string? TitleId { get; set; }
     public LibraryTitle? LibraryTitle { get; set; }
-    
+    private LibraryTitleDto? LibraryTitleDto { get; set; }
+
     public IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
     public IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
     
@@ -27,6 +34,10 @@ public partial class TitleDbTitle
 
     protected override async Task OnInitializedAsync()
     {
+        if (TitleId is null) return;
+        var title =  await TitledbService.GetTitleByApplicationId(TitleId);
+        HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
+        LibraryTitleDto = title;
         /*
         if (TitleId != null)
         {

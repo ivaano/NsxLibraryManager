@@ -7,6 +7,7 @@ using Radzen;
 using Radzen.Blazor;
 using TitleModel = NsxLibraryManager.Models.Titledb.Title;
 using System.Linq.Dynamic.Core;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Pages.Components;
 
 namespace NsxLibraryManager.Pages;
@@ -86,6 +87,13 @@ public partial class TitleDb : IDisposable
         }
     }
 
+    private async Task OpenDetails(TitleModel title)
+    {
+        await DialogService.OpenAsync<Title>($"{title.TitleName}",
+            new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },
+            new DialogOptions() { Width = "90%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
+    }
+    
     private DataGridSettings? Settings 
     { 
         get => _settings;
