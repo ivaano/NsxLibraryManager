@@ -9,7 +9,7 @@ public record LibraryTitleDto
     public string? OtherApplicationId { get; init; }
     public string? TitleName { get; init; }
     public long? NsuId { get; init; }
-    public required string FileName { get; init; }
+    public string? FileName { get; init; }
     public Collection<DlcDto>? Dlc { get; init; }
     public Collection<UpdateDto>? Updates { get; init; }
     public Collection<DlcDto>? OwnedDlcs { get; init; }
@@ -32,8 +32,8 @@ public record LibraryTitleDto
     public int? Rating { get; init; }
     public int? UpdatesCount { get; init; }
     public int? Version { get; init; }
-    public required long Size { get; init; }
-    public required string ReleaseDate { get; init; }
+    public long Size { get; init; }
+    public string? ReleaseDate { get; init; }
     public string? BannerUrl { get; init; }
     public string? Description { get; init; }
     public string? Developer { get; init; }

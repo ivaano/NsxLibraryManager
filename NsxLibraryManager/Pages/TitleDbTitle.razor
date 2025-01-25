@@ -5,12 +5,12 @@
 <PageTitle>Title From DbTitle</PageTitle>
 <RadzenRow>
     <RadzenColumn Size="12" SizeMD="6">
-        <RadzenImage Path="@(LibraryTitle?.BannerUrl.NullImageToEmpty())" Style="width: 100%; border-radius: 20px;"></RadzenImage>
+        <RadzenImage Path="@(LibraryTitleDto?.BannerUrl.NullImageToEmpty())" Style="width: 100%; border-radius: 20px;"></RadzenImage>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenRow Style="padding-bottom: 5px" Gap="3px">
             <RadzenColumn>
-                <RadzenText Text="@(LibraryTitle?.TitleName.NullStringToEmpty())" TextStyle="TextStyle.H4"/>
+                <RadzenText Text="@(LibraryTitleDto?.TitleName.NullStringToEmpty())" TextStyle="TextStyle.H4"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -25,8 +25,8 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.ReleaseDate.ToString("MMM dd, yyyy"))" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
-            </RadzenColumn>
+                <RadzenText Text="@(LibraryTitleDto?.ReleaseDate)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+</RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px;">
             <RadzenColumn Style="display: inline-flex; align-items: center;">
@@ -40,7 +40,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">

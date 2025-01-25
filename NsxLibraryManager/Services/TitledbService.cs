@@ -1,28 +1,32 @@
 ﻿using System.IO.Compression;
+using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
 
 namespace NsxLibraryManager.Services;
 
 public class TitledbService : ITitledbService
 {
-    //private readonly SettingsService _settingsService;
-    //private readonly string _databasePath;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ILogger<TitledbService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly TitledbDbContext _titledbDbContext;
 
 
     public TitledbService(
         ILogger<TitledbService> logger,
-        IConfiguration configuration, IServiceScopeFactory serviceScopeFactory)
+        IConfiguration configuration,
+        TitledbDbContext titledbDbContext,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
         _configuration = configuration;
         _serviceScopeFactory = serviceScopeFactory;
+        _titledbDbContext = titledbDbContext;
     }
 
     private void DecompressFile(string compressedFilePath, string decompressedFilePath)
@@ -31,6 +35,26 @@ public class TitledbService : ITitledbService
         using var decompressedFileStream = new FileStream(decompressedFilePath, FileMode.Create, FileAccess.Write);
         using var gzipStream = new GZipStream(compressedFileStream, CompressionMode.Decompress);
         gzipStream.CopyTo(decompressedFileStream);
+    }
+
+    public async Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId)
+    {
+        var title = await _titledbDbContext.Titles
+            .AsNoTracking()
+            .Include(l => l.Languages)
+            .Include(v => v.Versions)
+            .Include(c => c.Categories)
+            .Include(s => s.Screenshots)
+            .FirstOrDefaultAsync(t => t.ApplicationId == applicationId);
+
+        var relatedTitles = await _titledbDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.OtherApplicationId == applicationId)
+            .OrderByDescending(t => t.ReleaseDate)
+            .ToListAsync();
+        
+
+        return title.MapToTitleDto(relatedTitles);
     }
 
     public Task<string?> GetLatestTitledbVersionAsync()
