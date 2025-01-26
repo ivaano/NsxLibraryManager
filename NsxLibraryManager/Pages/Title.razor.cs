@@ -121,11 +121,11 @@ public partial class Title
         }
 
         _dlcCount = query.Count();
-        //_dlcs = query;
         _dlcs = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
 
         _dlcIsLoading = false;
     }
+    
 
     private async Task LoadUpdateData(LoadDataArgs args)
     {
