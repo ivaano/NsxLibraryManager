@@ -89,7 +89,7 @@ public partial class TitleDb : IDisposable
 
     private async Task OpenDetails(TitleModel title)
     {
-        await DialogService.OpenAsync<Title>($"{title.TitleName}",
+        await DialogService.OpenAsync<TitleDbTitle>($"{title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },
             new DialogOptions() { Width = "90%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
     }
