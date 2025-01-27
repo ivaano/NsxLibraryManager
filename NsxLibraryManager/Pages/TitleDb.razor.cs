@@ -9,6 +9,7 @@ using TitleModel = NsxLibraryManager.Models.Titledb.Title;
 using System.Linq.Dynamic.Core;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Pages.Components;
+using NsxLibraryManager.Services.Interface;
 
 namespace NsxLibraryManager.Pages;
 
@@ -16,6 +17,9 @@ public partial class TitleDb : IDisposable
 {
     [Inject]
     protected IJSRuntime JsRuntime { get; set; } = default!;
+    
+    [Inject]
+    protected ITitledbService TitledbService { get; set; } = default!;
     
     [Inject]
     protected TitledbDbContext DbContext { get; set; } = default!;
@@ -48,12 +52,13 @@ public partial class TitleDb : IDisposable
     {
         _isLoading = true;
         await Task.Yield();
-        var dbHistory = DbContext.History.OrderByDescending(h => h.TimeStamp).FirstOrDefault();
-        if (dbHistory is not null)
+        var dbVersion = TitledbService.GetLatestTitledbVersionAsync();
+        if (dbVersion is { IsSuccess: true, Value: var dbHistoryDto })
         {
-            _dbVersion = dbHistory.VersionNumber;
-            _lastUpdated = dbHistory.TimeStamp.ToString(CultureInfo.CurrentCulture);
+            _dbVersion = dbHistoryDto.Version;
+            _lastUpdated = dbHistoryDto.Date;
         }
+
         var query = DbContext.Titles.AsQueryable();
         
         if (!string.IsNullOrEmpty(args.Filter))

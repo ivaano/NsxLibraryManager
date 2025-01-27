@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Globalization;
+using System.IO.Compression;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Settings;
@@ -6,6 +7,7 @@ using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Services;
 
@@ -57,9 +59,17 @@ public class TitledbService : ITitledbService
         return title.MapToTitleDto(relatedTitles);
     }
 
-    public Task<string?> GetLatestTitledbVersionAsync()
+    public Result<DbHistoryDto> GetLatestTitledbVersionAsync()
     {
-        throw new NotImplementedException();
+        var dbHistory = _titledbDbContext.History.OrderByDescending(h => h.TimeStamp).FirstOrDefault();
+        if (dbHistory is null) return Result.Failure<DbHistoryDto>("No History");
+        
+        var result = new DbHistoryDto
+        {
+            Version = dbHistory.VersionNumber,
+            Date = dbHistory.TimeStamp.ToString(CultureInfo.CurrentCulture)
+        };
+        return Result.Success(result);
     }
 
     public Task ReplaceDatabase(string compressedFilePath, CancellationToken cancellationToken = default)

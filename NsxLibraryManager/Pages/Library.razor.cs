@@ -85,8 +85,6 @@ public partial class Library : IDisposable
     
     private async Task InitialLoad()
     {
-        //var settings = SettingsService.GetUserSettings();
-        //_libraryPath = settings.LibraryPath;
         var lastUpdated = await TitleLibraryService.GetLastLibraryUpdateAsync();
         _libraryPath = lastUpdated?.LibraryPath ?? string.Empty;
         _baseCount = lastUpdated?.BaseTitleCount ?? 0;
@@ -95,28 +93,6 @@ public partial class Library : IDisposable
         _lastUpdated = lastUpdated?.DateUpdated.ToString("MM/dd/yyyy h:mm tt") ?? "Never";
         
         _categories = DbContext.Categories.Select(s => s.Name);
-        //await CalculateCounts();
-    }
-
-    private Task CalculateCounts()
-    {
-        try
-        {
-            _baseCount = DbContext.Titles
-                .Count(x => x.ContentType == TitleContentType.Base);
-            _patchCount = DbContext.Titles
-                .Count(x => x.ContentType == TitleContentType.Update);
-            _dlcCount = DbContext.Titles
-                .Count(x => x.ContentType == TitleContentType.DLC);  
-        }
-        catch (Exception)
-        {
-            _baseCount = 0;
-            _patchCount = 0;
-            _dlcCount = 0;
-        }
-
-        return Task.CompletedTask;
     }
     
     private async Task OnSelectedCategoriesChange(object value)
