@@ -11,6 +11,6 @@ public interface ITitledbService
     public Result<DbHistoryDto> GetLatestTitledbVersionAsync();
 
     public Task<Result<IEnumerable<string>>> GetCategoriesAsync();
-    public Task<Result<GridPageViewModel>> GetTitles(LoadDataArgs args, IEnumerable<string> categories);
+    public Task<Result<GridPageViewModel>> GetTitles(LoadDataArgs args, IEnumerable<string>? categories);
     Task ReplaceDatabase(string compressedFilePath, CancellationToken cancellationToken);
 }
