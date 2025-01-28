@@ -27,9 +27,8 @@ public partial class TitleDbService : ComponentBase
     private string _lastUpdated = "never";
     private string _dbVersion = string.Empty;
     
-    private IEnumerable<string> _selectedCategories;
-    private IEnumerable<string> _categories;
-    private List<FilterDescriptor> categoryFilters = [];
+    private IEnumerable<string>? _selectedCategories;
+    private IEnumerable<string>? _categories;
     
     protected override async Task OnInitializedAsync()
     {
@@ -45,6 +44,7 @@ public partial class TitleDbService : ComponentBase
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
+        await Task.Yield();
         var dbVersion = TitledbService.GetLatestTitledbVersionAsync();
         if (dbVersion is { IsSuccess: true, Value: var dbHistoryDto })
         {
