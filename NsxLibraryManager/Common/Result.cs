@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace NsxLibraryManager.Utils;
+namespace NsxLibraryManager.Common;
 
 public class Result<T>
 {

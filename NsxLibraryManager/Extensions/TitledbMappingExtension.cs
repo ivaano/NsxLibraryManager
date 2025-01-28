@@ -7,7 +7,73 @@ namespace NsxLibraryManager.Extensions;
 
 public static class TitledbMappingExtension
 {
-    public static LibraryTitleDto MapToTitleDto(this Title title, IEnumerable<Title>? otherTitles = null)
+    
+    public static GridTitle MapToGridTitleDto(this Title title)
+    {
+        return new GridTitle
+        {
+            ApplicationId = title.ApplicationId,
+            BannerUrl = title.BannerUrl,
+            ContentType = title.ContentType,
+            Description = title.Description,
+            DlcCount = title.DlcCount,
+            Size = title.Size ?? 0,
+            Intro = title.Intro,
+            IconUrl = title.IconUrl,
+            LatestVersion = title.LatestVersion,
+            NsuId = title.NsuId,
+            NumberOfPlayers = title.NumberOfPlayers,
+            OtherApplicationId = title.OtherApplicationId,
+            Publisher = title.Publisher,
+            Rating = title.Rating,
+            FileName = string.Empty
+        };
+    }
+    
+    public static LibraryTitleDto MapToTitleDto(this Title title)
+    {
+        return new LibraryTitleDto
+        {
+            ApplicationId = title.ApplicationId,
+            TitleName = title.TitleName,
+            BannerUrl = title.BannerUrl,
+            ContentType = title.ContentType,
+            Description = title.Description,
+            DlcCount = title.DlcCount,
+            Size = title.Size ?? 0,
+            Intro = title.Intro,
+            IconUrl = title.IconUrl,
+            LatestVersion = title.LatestVersion,
+            NsuId = title.NsuId,
+            NumberOfPlayers = title.NumberOfPlayers,
+            OtherApplicationId = title.OtherApplicationId,
+            Publisher = title.Publisher,
+            Rating = title.Rating,
+            ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
+            {
+                Name = x.Name,
+            }).ToList()),
+            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+            {
+                LanguageCode = x.LanguageCode,
+            }).ToList()),
+            Versions = new Collection<VersionDto>(
+                title.Versions
+                    .Select(x => new VersionDto()
+                    {
+                        VersionNumber = x.VersionNumber,
+                        VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
+                        ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
+                    }).ToList()),
+            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+            {
+                Url = x.Url
+            }).ToList()),
+        };
+    }
+    
+    public static LibraryTitleDto MapToTitleDtoWithOtherTitles(this Title title, IEnumerable<Title>? otherTitles = null)
     {
         var dlcs = new Collection<DlcDto>(
             (otherTitles ?? Array.Empty<Title>())

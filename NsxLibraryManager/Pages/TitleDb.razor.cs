@@ -58,7 +58,16 @@ public partial class TitleDb : IDisposable
             _dbVersion = dbHistoryDto.Version;
             _lastUpdated = dbHistoryDto.Date;
         }
+/*
+        var gridData = await TitledbService.GetTitles(args);
 
+        if (gridData.TryGetValue(out var titles))
+        {
+
+            _lastUpdated = titles;
+        }
+        */
+        
         var query = DbContext.Titles.AsQueryable();
         
         if (!string.IsNullOrEmpty(args.Filter))

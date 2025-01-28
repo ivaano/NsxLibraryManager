@@ -1,4 +1,4 @@
-﻿@page "/titledb"
+﻿@page "/titledb2"
 @using NsxLibraryManager.Extensions
 @using NsxLibraryManager.Utils
 @using TitleModel = NsxLibraryManager.Models.Titledb.Title;
@@ -26,8 +26,8 @@
                 <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ApplicationId)" Title="TitleId" Width="90px" />
                 <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.ContentType)" Title="Type" Width="80px"/>
                 <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.TitleName)" Title="Name" Width="300px" >
-                    <Template Context="title">
-                        <RadzenLink href="javascript:void(0)" Text="@title.TitleName" @onclick="_ => OpenDetails(title)"/>
+                    <Template Context="libraryTitle">
+                        <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" @onclick="_ => OpenDetails(libraryTitle)"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="TitleModel" Property="@nameof(TitleModel.Region)" Title="Region" Width="50px" />

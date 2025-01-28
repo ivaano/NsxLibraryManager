@@ -1,13 +1,16 @@
 ﻿using System.Globalization;
 using System.IO.Compression;
+using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Services;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Common;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Utils;
+using NsxLibraryManager.ViewModels.TitleDb;
+using Radzen;
+using FileInfo = System.IO.FileInfo;
 
 namespace NsxLibraryManager.Services;
 
@@ -56,7 +59,7 @@ public class TitledbService : ITitledbService
             .ToListAsync();
         
 
-        return title.MapToTitleDto(relatedTitles);
+        return title.MapToTitleDtoWithOtherTitles(relatedTitles);
     }
 
     public Result<DbHistoryDto> GetLatestTitledbVersionAsync()
@@ -70,6 +73,70 @@ public class TitledbService : ITitledbService
             Date = dbHistory.TimeStamp.ToString(CultureInfo.CurrentCulture)
         };
         return Result.Success(result);
+    }
+
+    public async Task<Result<IEnumerable<string>>> GetCategoriesAsync()
+    {
+        var categories = await _titledbDbContext.Categories
+            .OrderBy(c => c.Name)
+            .Select(c =>  c.Name )
+            .AsNoTracking()
+            .ToListAsync();
+        
+        return categories.Count > 0 
+            ? Result.Success<IEnumerable<string>>(categories) 
+            : Result.Failure<IEnumerable<string>>("No Categories");
+    }
+
+    public async Task<Result<GridPageViewModel>> GetTitles(LoadDataArgs args, IEnumerable<string>? categories)
+    {
+        var query = _titledbDbContext.Titles
+            .AsNoTracking()
+            .Include(x => x.RatingContents)
+            .Include(x => x.Categories)
+            .Include(x => x.Versions)
+            .Include(x => x.Screenshots)
+            .Include(x => x.Languages)
+            .AsQueryable();
+
+        if (categories is not null)
+        {
+            var enumerable = categories as string[] ?? categories.ToArray();
+            if (enumerable.Length != 0)
+            {
+                query = query
+                    .Where(c => c.Categories.Any(c => enumerable.Contains(c.Name)));
+            }
+        }
+
+        
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+        
+        var count = await query.CountAsync();
+        
+        var titles = await query
+            .Select(t => t.MapToTitleDto())
+            .Skip(args.Skip.Value)
+            .Take(args.Top.Value)
+            .ToListAsync();
+
+        if (count > 0)
+        {
+            return Result.Success(new GridPageViewModel
+            {
+                TotalRecords = count,
+                Titles = titles
+            });            
+        }
+        return Result.Failure<GridPageViewModel>("No Titles");
     }
 
     public Task ReplaceDatabase(string compressedFilePath, CancellationToken cancellationToken = default)
