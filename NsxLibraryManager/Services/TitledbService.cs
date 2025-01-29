@@ -7,7 +7,6 @@ using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
-using NsxLibraryManager.Utils;
 using NsxLibraryManager.ViewModels.TitleDb;
 using Radzen;
 using FileInfo = System.IO.FileInfo;
@@ -57,9 +56,9 @@ public class TitledbService : ITitledbService
             .Where(t => t.OtherApplicationId == applicationId)
             .OrderByDescending(t => t.ReleaseDate)
             .ToListAsync();
-        
 
-        return title.MapToTitleDtoWithOtherTitles(relatedTitles);
+
+        return title?.MapToTitleDtoWithOtherTitles(relatedTitles);
     }
 
     public Result<DbHistoryDto> GetLatestTitledbVersionAsync()
@@ -88,7 +87,7 @@ public class TitledbService : ITitledbService
             : Result.Failure<IEnumerable<string>>("No Categories");
     }
 
-    public async Task<Result<GridPageViewModel>> GetTitles(LoadDataArgs args, IEnumerable<string>? categories)
+    public async Task<Result<GridPageViewModel>> GetTitles(LoadDataArgs args, IEnumerable<string>? selecteCategories)
     {
         var query = _titledbDbContext.Titles
             .AsNoTracking()
@@ -99,13 +98,13 @@ public class TitledbService : ITitledbService
             .Include(x => x.Languages)
             .AsQueryable();
 
-        if (categories is not null)
+        if (selecteCategories is not null)
         {
-            var enumerable = categories as string[] ?? categories.ToArray();
-            if (enumerable.Length != 0)
+            var categories = selecteCategories as string[] ?? selecteCategories.ToArray();
+            if (categories.Length != 0)
             {
                 query = query
-                    .Where(c => c.Categories.Any(c => enumerable.Contains(c.Name)));
+                    .Where(c => c.Categories!.Any(x => categories.Contains(x.Name)));
             }
         }
 
@@ -115,17 +114,16 @@ public class TitledbService : ITitledbService
             query = query.Where(args.Filter);
         }
 
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
-        }
+        query = !string.IsNullOrEmpty(args.OrderBy) ? 
+            query.OrderBy(args.OrderBy) : 
+            query.OrderBy(x => x.TitleName);
         
         var count = await query.CountAsync();
         
         var titles = await query
             .Select(t => t.MapToTitleDto())
-            .Skip(args.Skip.Value)
-            .Take(args.Top.Value)
+            .Skip(args.Skip!.Value)
+            .Take(args.Top!.Value)
             .ToListAsync();
 
         if (count > 0)

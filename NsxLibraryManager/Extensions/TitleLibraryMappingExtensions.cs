@@ -31,7 +31,7 @@ public static class TitleLibraryMappingExtensions
             Publisher = title.Publisher,
             Rating = title.Rating,
             Region = title.Region,
-            ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            ReleaseDate = title.ReleaseDate,
             Size = title.Size ?? 0,
             TitleName = title.TitleName,
             UpdatesCount = title.UpdatesCount ?? 0,
@@ -140,7 +140,7 @@ public static class TitleLibraryMappingExtensions
             Updates = titleDbUpdates,
             OwnedDlcs = dlcs,
             OwnedUpdates = updates,
-            ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            ReleaseDate = title.ReleaseDate,
             Versions = new Collection<VersionDto>(
                 title.Versions
                     .Select(x => new VersionDto()
