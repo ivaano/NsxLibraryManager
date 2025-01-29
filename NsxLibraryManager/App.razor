@@ -42,20 +42,20 @@
 </html>
 @code {
     [CascadingParameter]
-    private HttpContext HttpContext { get; set; }
+    private HttpContext? HttpContext { get; set; }
 
     [Inject]
-    private ThemeService ThemeService { get; set; }
+    private ThemeService? ThemeService { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        var theme = HttpContext.Request.Cookies[AppConstants.ThemeCookie];
+        var theme = HttpContext?.Request.Cookies[AppConstants.ThemeCookie];
 
         if (!string.IsNullOrEmpty(theme))
         {
-            ThemeService.SetTheme(theme, false);
+            ThemeService?.SetTheme(theme, false);
         }
         
     }

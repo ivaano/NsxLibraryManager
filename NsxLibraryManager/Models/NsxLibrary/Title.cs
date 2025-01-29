@@ -22,11 +22,11 @@ public sealed class Title : BaseTitle
     [StringLength(200)]
     public required string FileName { get; set; }
     public DateTime? LastWriteTime { get; set; }
-   
-    public ICollection<Screenshot>? Screenshots { get; set; }
-    public ICollection<Version>? Versions { get; set; }
-    public ICollection<Category>? Categories { get; set; }
-    public ICollection<TitleCategory> TitleCategories { get; set; }
+
+    public ICollection<Screenshot> Screenshots { get; set; } = [];
+    public ICollection<Version> Versions { get; set; } = [];
+    public ICollection<Category> Categories { get; set; } = [];
+    public ICollection<TitleCategory> TitleCategories { get; set; } = [];
     public ICollection<Language> Languages { get; set; } = [];
     
     public ICollection<RatingsContent> RatingsContents { get; set; }  = [];

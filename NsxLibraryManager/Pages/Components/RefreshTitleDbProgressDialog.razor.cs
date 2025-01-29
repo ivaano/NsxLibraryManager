@@ -9,7 +9,7 @@ namespace NsxLibraryManager.Pages.Components;
 
 public partial class RefreshTitleDbProgressDialog : IDisposable
 {
-    public string DownloadingInfo { get; set; }
+    private string DownloadingInfo { get; set; }
 
     [Inject] protected DialogService DialogService { get; set; }
     [Inject] protected ISettingsService SettingsService { get; set; }

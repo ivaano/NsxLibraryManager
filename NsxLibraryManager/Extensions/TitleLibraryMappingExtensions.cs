@@ -1,9 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.Globalization;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
-using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Extensions;
 
@@ -36,10 +34,10 @@ public static class TitleLibraryMappingExtensions
             TitleName = title.TitleName,
             UpdatesCount = title.UpdatesCount ?? 0,
             Version = title.Version,
-            Categories = (title.Categories is not null) ? new List<CategoryDto>((title.Categories).Select(x => new CategoryDto
+            Categories = new List<CategoryDto>((title.Categories).Select(x => new CategoryDto
                     {
                         Name = x.Name,
-                    }).ToList()) : null,
+                    }).ToList()),
             Languages = new List<LanguageDto>((title.Languages).Select(x => new LanguageDto
                     {
                         LanguageCode = x.LanguageCode,
@@ -48,18 +46,18 @@ public static class TitleLibraryMappingExtensions
                     {
                         Name = x.Name,
                     }).ToList()),            
-            Screenshots = (title.Screenshots is not null) ? new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
                     {
                         Url = x.Url
-                    }).ToList()) : null,
-            Versions = (title.Versions is not null) ? new Collection<VersionDto>(
+                    }).ToList()),
+            Versions = new Collection<VersionDto>(
                 title.Versions
                     .Select(x => new VersionDto()
                     {
                         VersionNumber = x.VersionNumber,
                         VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
                         ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
-                    }).ToList()) : null,
+                    }).ToList()),
         };
     }
     
@@ -153,11 +151,11 @@ public static class TitleLibraryMappingExtensions
             {
                 Url = x.Url
             }).ToList()),
-            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
+            Categories = new List<CategoryDto>((title.Categories).Select(x => new CategoryDto
             {
                 Name = x.Name,
             }).ToList()),
-            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+            Languages = new List<LanguageDto>((title.Languages).Select(x => new LanguageDto
             {
                LanguageCode = x.LanguageCode,
             }).ToList()),            

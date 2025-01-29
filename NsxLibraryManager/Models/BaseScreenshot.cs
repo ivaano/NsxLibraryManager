@@ -13,7 +13,7 @@ public class BaseScreenshot
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(200)]
-    public string? Url { get; init; }
+    public required string Url { get; init; }
     public int? TitleId { get; init; }
     public int? EditionId { get; init; }
 
