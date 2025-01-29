@@ -33,7 +33,7 @@ public record LibraryTitleDto
     public int? UpdatesCount { get; init; }
     public int? Version { get; init; }
     public long Size { get; init; }
-    public string? ReleaseDate { get; init; }
+    public DateTime? ReleaseDate { get; init; }
     public string? BannerUrl { get; init; }
     public string? Description { get; init; }
     public string? Developer { get; init; }

@@ -49,7 +49,8 @@ public static class TitledbMappingExtension
             OtherApplicationId = title.OtherApplicationId,
             Publisher = title.Publisher,
             Rating = title.Rating,
-            ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            Region = title.Region,
+            ReleaseDate = title.ReleaseDate,
             Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
             {
                 Name = x.Name,
@@ -117,7 +118,7 @@ public static class TitledbMappingExtension
             OtherApplicationId = title.OtherApplicationId,
             Publisher = title.Publisher,
             Rating = title.Rating,
-            ReleaseDate = (title.ReleaseDate is not null && title.ReleaseDate != DateTime.MinValue) ? title.ReleaseDate.Value.ToString("MM/dd/yyyy") : string.Empty,
+            ReleaseDate = title.ReleaseDate,
             Updates = updates,
             Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
             {
