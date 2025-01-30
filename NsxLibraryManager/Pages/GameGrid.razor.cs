@@ -59,9 +59,16 @@ public partial class GameGrid
     private async Task LoadData(LoadDataArgs args)
     {
         IsLoading = true;
-        var loadData = await TitleLibraryService.GetBaseTitles(args);
-        _games = loadData.Titles;
-        _count = loadData.Count;
+        const string baseFilter = "ContentType = 128";
+        args.Filter = string.IsNullOrEmpty(args.Filter) ? 
+            baseFilter : $"({baseFilter}) and ({args.Filter})";
+        var loadData = await TitleLibraryService.GetTitles(args);
+        if (loadData.IsSuccess)
+        {
+            _games = loadData.Value.Titles;
+            _count = loadData.Value.Count;            
+        }
+
         IsLoading = false;
     }
 

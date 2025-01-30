@@ -30,6 +30,7 @@ public static class TitleLibraryMappingExtensions
             Rating = title.Rating,
             Region = title.Region,
             ReleaseDate = title.ReleaseDate,
+            LastWriteTime = title.LastWriteTime,
             Size = title.Size ?? 0,
             TitleName = title.TitleName,
             UpdatesCount = title.UpdatesCount ?? 0,

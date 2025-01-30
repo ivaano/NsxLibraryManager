@@ -8,6 +8,7 @@ using NsxLibraryManager.Core.Settings;
 namespace NsxLibraryManager.Core.Services;
 
 public sealed partial class DownloadService(
+    IOptions<UserSettings> options,
     IHttpClientFactory httpClientFactory,
     ILogger<DownloadService> logger)
     : IDownloadService

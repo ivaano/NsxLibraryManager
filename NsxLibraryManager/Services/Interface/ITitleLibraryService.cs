@@ -1,4 +1,5 @@
-﻿using NsxLibraryManager.Core.Enums;
+﻿using NsxLibraryManager.Common;
+using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.Dto;
@@ -23,7 +24,7 @@ public interface ITitleLibraryService
     public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
     public int GetTitlesCountByContentType(TitleContentType contentType);
     
-    public Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args);
+    public Task<Result<GetBaseTitlesResultDto>> GetTitles(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingDlc(LoadDataArgs args);
 
@@ -34,5 +35,7 @@ public interface ITitleLibraryService
     public Task SaveLibraryReloadDate(bool refresh = false);
     
     public Task<LibraryUpdate?> GetLastLibraryUpdateAsync();
+    
+    public Task<Result<IEnumerable<string>>> GetCategoriesAsync();
 
 }

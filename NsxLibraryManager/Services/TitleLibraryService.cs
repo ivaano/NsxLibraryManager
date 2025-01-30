@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq.Dynamic.Core;
 using Microsoft.EntityFrameworkCore;
+using NsxLibraryManager.Common;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Extensions;
@@ -286,7 +287,7 @@ public class TitleLibraryService : ITitleLibraryService
             .Count(t => t.ContentType == titleContentType);
     }
 
-    private async Task<GetBaseTitlesResultDto> ApplyAdditionalFilters(IQueryable<Title> query, LoadDataArgs args)
+    private static async Task<GetBaseTitlesResultDto> ApplyAdditionalFilters(IQueryable<Title> query, LoadDataArgs args)
     {
         if (!string.IsNullOrEmpty(args.Filter))
         {
@@ -297,7 +298,23 @@ public class TitleLibraryService : ITitleLibraryService
         {
             if (args.Filters.Any())
             {
-                query = query.Where(FilterBuilder.BuildFilterString(args.Filters));
+                var categories = args.Filters
+                    .Where(fd => fd.Property == "Category")
+                    .Select(x => (string)x.FilterValue)
+                    .ToList();
+                var otherFilters = args.Filters
+                    .Where(fd => fd.Property != "Category")
+                    .ToList();
+
+                if (categories.Count != 0)
+                {
+                    query = query.Where(c => c.Categories.Any(x => categories.Contains(x.Name)));
+                }
+
+                if (otherFilters.Count != 0)
+                {
+                    query = query.Where(FilterBuilder.BuildFilterString(otherFilters));
+                }
             }
         }
 
@@ -307,29 +324,32 @@ public class TitleLibraryService : ITitleLibraryService
         }
         
         var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
+
+        var count = await finalQuery.CountAsync();
+        var titles = await finalQuery
+            .Skip(args.Skip.Value)
+            .Take(args.Top.Value)
+            .ToListAsync();
         
         return new GetBaseTitlesResultDto
         {
-            Count = await finalQuery.CountAsync(),
-            Titles = finalQuery
-                .Skip(args.Skip.Value)
-                .Take(args.Top.Value)
-                .ToList()
+            Count = count,
+            Titles = titles
         };
     }
 
-    public async Task<GetBaseTitlesResultDto> GetBaseTitles(LoadDataArgs args)
+    public async Task<Result<GetBaseTitlesResultDto>> GetTitles(LoadDataArgs args)
     {
         var query = _nsxLibraryDbContext.Titles
             .AsNoTracking()
-            .Where(t => t.ContentType == TitleContentType.Base)
             .Include(x => x.RatingsContents)
             .Include(x => x.Categories)
-            .Include(x => x.Versions)
-            .Include(x => x.Screenshots)
-            .Include(x => x.Languages).AsQueryable();
+            .AsQueryable();
+        var titles = await ApplyAdditionalFilters(query, args);
         
-        return await ApplyAdditionalFilters(query, args);
+        return titles.Count > 0
+            ? Result.Success(titles)
+            : Result.Failure<GetBaseTitlesResultDto>("No Titles");
     }
 
     public async Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args)
@@ -340,7 +360,7 @@ public class TitleLibraryService : ITitleLibraryService
             .Where(t => t.Versions != null && t.Versions.Count > 0 && t.LatestOwnedUpdateVersion < t.LatestVersion)
             //.Include(x => x.RatingsContents)
             //.Include(x => x.Categories)
-            .Include(x => x.Versions!.OrderByDescending(v => v.VersionNumber).Take(1))
+            .Include(x => x.Versions.OrderByDescending(v => v.VersionNumber).Take(1))
             .AsQueryable();
             //.Include(x => x.Screenshots)
             //.Include(x => x.Languages).AsQueryable();
@@ -427,6 +447,19 @@ public class TitleLibraryService : ITitleLibraryService
             .AsNoTracking()
             .OrderBy(t => t.DateUpdated)
             .LastOrDefault());
+    }
+
+    public async Task<Result<IEnumerable<string>>>GetCategoriesAsync()
+    {
+        var categories = await _nsxLibraryDbContext.Categories
+            .OrderBy(c => c.Name)
+            .Select(c =>  c.Name )
+            .AsNoTracking()
+            .ToListAsync();
+        
+        return categories.Count > 0 
+            ? Result.Success<IEnumerable<string>>(categories) 
+            : Result.Failure<IEnumerable<string>>("No Categories");
     }
 
     public async Task SaveLibraryReloadDate(bool refresh = false)
