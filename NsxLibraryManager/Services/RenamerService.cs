@@ -251,7 +251,8 @@ public class RenamerService(
     public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
     {
-        var files = await fileInfoService.GetFileNames(inputPath, recursive);
+        var filesResult = await fileInfoService.GetFileNames(inputPath, recursive);
+        filesResult.TryGetValue(out var files);
         var fileList = new List<RenameTitle>();
         logger.LogInformation("{} file candidate(s) found.", fileList.Count);
         foreach (var file in files)

@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Common.Services;
 using LibHac.Ncm;
 using Microsoft.Extensions.Logging;
 using NsxLibraryManager.Core.Enums;
@@ -50,7 +51,7 @@ public class FileInfoService : IFileInfoService
     }
     
    
-    public  async Task<IEnumerable<string>> GetFileNames(
+    public  async Task<Result<IEnumerable<string>>> GetFileNames(
             string filePath, 
             bool recursive = false)
     {
@@ -72,9 +73,9 @@ public class FileInfoService : IFileInfoService
         }
         else
         {
-            throw new InvalidPathException(filePath);
+            return Result.Failure<IEnumerable<string>>($"Invalid file path {filePath}");
         }
-        return fileList;
+        return Result.Success<IEnumerable<string>>(fileList);
     }
     public bool TryGetFileInfoFromFileName(string fileName, out LibraryTitle libraryTitle)
     {

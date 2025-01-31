@@ -1,10 +1,11 @@
-﻿using NsxLibraryManager.Core.Models;
+﻿using Common.Services;
+using NsxLibraryManager.Core.Models;
 
 namespace NsxLibraryManager.Core.Services.Interface;
 
 public interface IFileInfoService
 {
-    Task<IEnumerable<string>> GetFileNames(string filePath, bool recursive = false);
+    Task<Result<IEnumerable<string>>> GetFileNames(string filePath, bool recursive = false);
 
     Task<bool> IsDirectoryEmpty(string? directoryPath);
     IEnumerable<string> GetDirectoryFiles(string filePath);

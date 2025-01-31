@@ -116,7 +116,7 @@ public class FileInfoServiceTests
 
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(Path.GetFullPath(filePath), result.First());
+        Assert.Equal(Path.GetFullPath(filePath), result.Value.First());
     }
     
     [Fact]
@@ -130,7 +130,7 @@ public class FileInfoServiceTests
         
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(3, result.Count());
+        Assert.Equal(3, result.Value.Count());
     }
     
     [Fact]
@@ -145,7 +145,7 @@ public class FileInfoServiceTests
 
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(4, result.Count());
+        Assert.Equal(4, result.Value.Count());
     }
     
     private static IPackageInfo GetBasePackageInfo(PackageType packageType = PackageType.NSP, 

@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq.Dynamic.Core;
+using Common.Services;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Common;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Extensions;
@@ -135,9 +135,10 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task<IEnumerable<string>> GetFilesAsync()
     {
-        var files = await _fileInfoService.GetFileNames(_settings.LibraryPath,
-            _settings.Recursive);
-        return files;
+        var filesResult = await _fileInfoService.GetFileNames(_settings.LibraryPath, _settings.Recursive);
+        if (filesResult.IsSuccess) return filesResult.Value;
+        _logger.LogError("Error getting files from library: {error}", filesResult.Error);
+        return Array.Empty<string>();
     }
 
 
