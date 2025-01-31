@@ -20,6 +20,7 @@
             TItem="LibraryTitleDto"
             Data="@_libraryTitles"
             LoadData="@LoadData"
+            AllowColumnReorder="true"
             PageSize="@_pageSize" 
             PageSizeOptions="@_pageSizeOptions" 
             PageSizeChanged="@(args => _pageSize = args)"
@@ -34,7 +35,7 @@
             PagerHorizontalAlign="HorizontalAlign.Center" 
             ColumnWidth="200px" AllowColumnPicking="true"
             ShowPagingSummary="true" 
-            style="height: 95vh">
+            style="height: 89vh">
             <HeaderTemplate>
                 <RadzenButton Click="@(_ => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
                 <RadzenButton Click="@(_ => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
