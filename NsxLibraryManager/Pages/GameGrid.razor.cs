@@ -8,7 +8,7 @@ using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class GameGrid
+public partial class GameGrid : IDisposable
 {
     [Inject] 
     protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
@@ -113,5 +113,11 @@ public partial class GameGrid
     public void ShowDlcInfoToggle(string titleId)
     {
         ShowDlcInfo = !ShowDlcInfo;
+    }
+
+    public void Dispose()
+    {
+        pager.Dispose();
+        _games = null!;
     }
 }
