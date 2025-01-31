@@ -35,10 +35,11 @@
             ColumnWidth="200px" AllowColumnPicking="true"
             ShowPagingSummary="true" 
             style="height: 95vh">
-        <HeaderTemplate>
-            <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
-
-        </HeaderTemplate>
+            <HeaderTemplate>
+                <RadzenButton Click="@(_ => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                <RadzenButton Click="@(_ => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
+            </HeaderTemplate>
         <Columns>
             <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="150px"/>
             <RadzenDataGridColumn Property="OtherApplicationId" Title="Other Application Id" Width="150px" Visible="false"/>

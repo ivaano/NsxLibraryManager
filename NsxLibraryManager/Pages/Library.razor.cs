@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Models.Dto;
+using NsxLibraryManager.Pages.Components;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
 using Radzen.Blazor;
@@ -144,6 +145,44 @@ public partial class Library : IDisposable
         await DialogService.OpenAsync<Title>($"{title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },
             new DialogOptions() { Width = "90%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
+    }
+    
+    private async Task RefreshLibrary()
+    {
+        var confirmationResult = await DialogService.Confirm(
+            "This action will add or remove titles that are not on the library.", "Refresh library?",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (confirmationResult is true)
+        {
+            DialogService.Close();
+            StateHasChanged();
+            var paramsDialog = new Dictionary<string, object>();
+            var dialogOptions = new DialogOptions()
+                { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
+            await DialogService.OpenAsync<RefreshLibraryProgressDialog>(
+                "Refreshing library...", paramsDialog, dialogOptions);
+            await InitialLoad();
+            await _grid.Reload();
+        }
+    }
+    
+    private async Task ReloadLibrary()
+    {
+        var confirmationResult = await DialogService.Confirm(
+            "This action will clear the db and reload all your nsp/nsz files in your library path, Are you sure?", "Reload Library",
+            new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (confirmationResult is true)
+        {
+            DialogService.Close();
+            StateHasChanged();
+            var paramsDialog = new Dictionary<string, object>();
+            var dialogOptions = new DialogOptions()
+                { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
+            await DialogService.OpenAsync<ReloadLibraryProgressDialog>(
+                "Reloading library...", paramsDialog, dialogOptions);
+            await InitialLoad();
+            await _grid.Reload();
+        }
     }
 
     public void Dispose()
