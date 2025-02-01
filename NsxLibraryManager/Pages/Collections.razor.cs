@@ -11,6 +11,10 @@ public partial class Collections : ComponentBase
     
     [Inject]
     protected ITitleLibraryService TitleLibraryService { get; set; } = null!;
+    
+    [Inject]
+    protected NotificationService NotificationService { get; set; } = null!;
+    
     private RadzenDataGrid<CollectionDto> _grid = null!;
     private IEnumerable<CollectionDto> _collections = null!;
     private bool _isLoading;
@@ -18,9 +22,19 @@ public partial class Collections : ComponentBase
     private int _pageSize = 5;
     private int _count;
 
-    List<CollectionDto> collectionsToInsert = [];
-    List<CollectionDto> collectionsUpdate = [];
+
     private bool newRecordInsertDisabled = false;
+
+    private void ShowNotification(NotificationSeverity severity, string summary, string detail, int duration = 4000)
+    {
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = severity, 
+            Summary = summary, 
+            Detail = detail, 
+            Duration = duration
+        });
+    }
     
     private async Task LoadData()
     {
@@ -46,18 +60,6 @@ public partial class Collections : ComponentBase
         await LoadData();
     }
     
-    
-    private void Reset()
-    {
-        collectionsToInsert.Clear();
-        collectionsUpdate.Clear();
-    }
-
-    private void Reset(CollectionDto collectionDto)
-    {
-        collectionsToInsert.Remove(collectionDto);
-        collectionsUpdate.Remove(collectionDto);
-    }
 
     private async void OnCreateRow(CollectionDto collectionDto)
     {
@@ -69,15 +71,27 @@ public partial class Collections : ComponentBase
             {
                 collectionDto.Id = result.Value.Id;
                 await LoadData();
+                ShowNotification(
+                    NotificationSeverity.Success, 
+                    "Success Adding Collection", 
+                    $"{result.Value.Name} Collection Added");
             }
             else
             {
-                //notify error
+                CancelEdit(collectionDto);
+                ShowNotification(
+                    NotificationSeverity.Error, 
+                    "Error Adding Collection", 
+                    result.Error ?? "Unknown Error");
             }
         }
         catch (Exception e)
         {
-            //notify error
+            CancelEdit(collectionDto);
+            ShowNotification(
+                NotificationSeverity.Error, 
+                "Error Adding Collection", 
+                e.Message);
         }
     }
 
@@ -86,7 +100,6 @@ public partial class Collections : ComponentBase
         try
         {
             newRecordInsertDisabled = false;
-            Reset(collectionDto);
             var result = await TitleLibraryService.UpdateCollection(collectionDto);
             if (result.IsSuccess)
             {
@@ -94,24 +107,28 @@ public partial class Collections : ComponentBase
             }
             else
             {
-                //notify error
+                CancelEdit(collectionDto);
+                ShowNotification(
+                    NotificationSeverity.Error, 
+                    "Error Adding Collection", 
+                    result.Error ?? "Unknown Error");
             }
         }
         catch (Exception e)
         {
-            throw; //notify error
+            CancelEdit(collectionDto);
+            ShowNotification(
+                NotificationSeverity.Error, 
+                "Error Adding Collection", 
+                e.Message);
         }
     }
-    
-    
     
     private async Task InsertRow()
     {
         if (!_grid.IsValid) return;
-        Reset();
         var collection = new CollectionDto();
         newRecordInsertDisabled = true;
-        collectionsToInsert.Add(collection);
         await _grid.InsertRow(collection);
     }
 
@@ -120,26 +137,19 @@ public partial class Collections : ComponentBase
         if (!_grid.IsValid) return;
         newRecordInsertDisabled = true;
         var collection = new CollectionDto();
-        collectionsToInsert.Add(collection);
         await _grid.InsertAfterRow(collection, row);
     }
 
     private async Task EditRow(CollectionDto collectionDto)
     {
         if (!_grid.IsValid) return;
-        Reset();
-
-        collectionsUpdate.Add(collectionDto);
         await _grid.EditRow(collectionDto);
     }
 
     private async Task DeleteRow(CollectionDto collectionDto)
     {
-        Reset(collectionDto);
-
         if (_collections.Contains(collectionDto))
         {
-
             var result = await TitleLibraryService.RemoveCollection(collectionDto);
             if (result.IsSuccess)
             {
@@ -147,7 +157,11 @@ public partial class Collections : ComponentBase
             }
             else
             {
-                //notify error
+                CancelEdit(collectionDto);
+                ShowNotification(
+                    NotificationSeverity.Error, 
+                    "Error Adding Collection", 
+                    result.Error ?? "Unknown Error");
             }
         }
         else
@@ -162,18 +176,10 @@ public partial class Collections : ComponentBase
     {
         await _grid.UpdateRow(collectionDto);
     }
-    
-    void CancelEdit(CollectionDto collectionDto)
+
+    private void CancelEdit(CollectionDto collectionDto)
     {
         newRecordInsertDisabled = false;
         _grid.CancelEditRow(collectionDto);
-/*
-        var orderEntry = dbContext.Entry(order);
-        if (orderEntry.State == EntityState.Modified)
-        {
-            orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
-            orderEntry.State = EntityState.Unchanged;
-        }
-        */
     }
 }

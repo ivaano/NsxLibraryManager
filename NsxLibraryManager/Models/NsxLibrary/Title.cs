@@ -19,7 +19,7 @@ public sealed class Title : BaseTitle
     public AccuratePackageType PackageType { get; set; }
     
     [Column(TypeName = "VARCHAR")]
-    [StringLength(200)]
+    
     public required string FileName { get; set; }
     public DateTime? LastWriteTime { get; set; }
     
