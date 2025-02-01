@@ -37,5 +37,9 @@ public interface ITitleLibraryService
     public Task<LibraryUpdate?> GetLastLibraryUpdateAsync();
     
     public Task<Result<IEnumerable<string>>> GetCategoriesAsync();
+    public Task<Result<IEnumerable<CollectionDto>>> GetCollections();
+    public Task<Result<CollectionDto>> AddCollection(CollectionDto collectionDto);
+    public Task<Result<CollectionDto>> RemoveCollection(CollectionDto collectionDto);
+    public Task<Result<CollectionDto>> UpdateCollection(CollectionDto collectionDto);
 
 }

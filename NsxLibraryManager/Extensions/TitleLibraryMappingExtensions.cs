@@ -7,6 +7,16 @@ namespace NsxLibraryManager.Extensions;
 
 public static class TitleLibraryMappingExtensions
 {
+    
+    public static CollectionDto MapToCollectionDto(this Collection collection)
+    {
+        return new CollectionDto
+        {
+            Id = collection.Id,
+            Name = collection.Name,
+        };
+    }
+    
     public static LibraryTitleDto MapLibraryTitleDtoNoDlcOrUpdates(this Title title)
     {
         return new LibraryTitleDto
