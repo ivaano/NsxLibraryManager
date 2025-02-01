@@ -10,6 +10,7 @@ public class NsxLibraryDbContext : DbContext
 {
     private readonly UserSettings _configuration;
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Collection> Collections { get; set; }
     public DbSet<CategoryLanguage> CategoryLanguages { get; set; }
     public DbSet<Language> Languages { get; set; }
     public DbSet<RatingsContent> RatingsContent { get; set; }

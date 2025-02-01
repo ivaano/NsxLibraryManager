@@ -11,7 +11,8 @@ public class Collection
     public int Id { get; init; }
     
     [Column(TypeName = "VARCHAR")]
-    public required string Name { get; init; }
+    [StringLength(100)]
+    public required string Name { get; set; }
     
     public virtual ICollection<Title> Titles { get; set; } = [];
 }

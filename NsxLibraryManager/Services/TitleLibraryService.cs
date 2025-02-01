@@ -463,6 +463,58 @@ public class TitleLibraryService : ITitleLibraryService
             : Result.Failure<IEnumerable<string>>("No Categories");
     }
 
+    #region Collections
+    public async Task<Result<IEnumerable<CollectionDto>>> GetCollections()
+    {
+        var collections = await _nsxLibraryDbContext.Collections
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .Select(x => x.MapToCollectionDto())
+            .ToListAsync();
+        
+        return collections.Count > 0 
+            ? Result.Success<IEnumerable<CollectionDto>>(collections) 
+            : Result.Failure<IEnumerable<CollectionDto>>("No Collections");
+    }
+
+    public async Task<Result<CollectionDto>> AddCollection(CollectionDto collectionDto)
+    {
+        var exists = _nsxLibraryDbContext.Collections
+            .AsNoTracking()
+            .Any(c => c.Name == collectionDto.Name);
+        if (exists) return Result.Failure<CollectionDto>("Collection already exists");
+        if (collectionDto.Name is null) return Result.Failure<CollectionDto>("Collection name is required");
+        
+        var collection = new Collection
+        {
+            Name = collectionDto.Name,
+        };
+        _nsxLibraryDbContext.Collections.Add(collection);
+        await _nsxLibraryDbContext.SaveChangesAsync();
+        return Result.Success(collection.MapToCollectionDto());
+
+    }
+    
+    public async Task<Result<CollectionDto>> RemoveCollection(CollectionDto collectionDto)
+    {
+        var collection = await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(c => c.Id == collectionDto.Id);
+        if (collection is null) return Result.Failure<CollectionDto>("Collection already exists");
+        var deleteResult = _nsxLibraryDbContext.Collections.Remove(collection);
+        await _nsxLibraryDbContext.SaveChangesAsync();
+        return Result.Success(deleteResult.Entity.MapToCollectionDto());
+    }
+
+    public async Task<Result<CollectionDto>> UpdateCollection(CollectionDto collectionDto)
+    {
+        var collection = await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(c => c.Id == collectionDto.Id);
+        if (collection is null) return Result.Failure<CollectionDto>("Collection already exists");
+        if (collectionDto.Name is null) return Result.Failure<CollectionDto>("Collection name is required"); 
+        collection.Name = collectionDto.Name;
+        await _nsxLibraryDbContext.SaveChangesAsync();
+        return Result.Success(collection.MapToCollectionDto());
+    }
+
+    #endregion
     public async Task SaveLibraryReloadDate(bool refresh = false)
     {
         var dateCreated = DateTime.Now;
