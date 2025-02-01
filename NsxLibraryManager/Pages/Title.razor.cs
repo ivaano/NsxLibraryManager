@@ -4,7 +4,6 @@ using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Models.Dto;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Providers;
