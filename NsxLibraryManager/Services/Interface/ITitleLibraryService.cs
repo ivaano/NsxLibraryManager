@@ -16,12 +16,14 @@ public interface ITitleLibraryService
     public Task<Title?> ProcessFileAsync(string file);
     public Task<bool> AddLibraryTitleAsync(LibraryTitle title);
     public Task<bool> UpdateLibraryTitleAsync(LibraryTitle title);
+    public Task<int> UpdateLibraryTitleAsync(LibraryTitleDto titleDto);
+
     public Task<bool> RemoveLibraryTitleAsync(LibraryTitle title);
 
     public Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType contentType);
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();
 
-    public Task<LibraryTitleDto?> GetTitleByApplicationId(string applicationId);
+    public Task<Result<LibraryTitleDto>> GetTitleByApplicationId(string applicationId);
     public int GetTitlesCountByContentType(TitleContentType contentType);
     
     public Task<Result<GetBaseTitlesResultDto>> GetTitles(LoadDataArgs args);
@@ -38,8 +40,9 @@ public interface ITitleLibraryService
     
     public Task<Result<IEnumerable<string>>> GetCategoriesAsync();
     public Task<Result<IEnumerable<CollectionDto>>> GetCollections();
-    public Task<Result<CollectionDto>> AddCollection(CollectionDto collectionDto);
-    public Task<Result<CollectionDto>> RemoveCollection(CollectionDto collectionDto);
-    public Task<Result<CollectionDto>> UpdateCollection(CollectionDto collectionDto);
+    public Task<Result<CollectionDto?>> AddCollection(CollectionDto collectionDto);
+    public Task<Result<CollectionDto?>> RemoveCollection(CollectionDto collectionDto);
+    public Task<Result<CollectionDto?>> UpdateCollection(CollectionDto collectionDto);
 
+    
 }

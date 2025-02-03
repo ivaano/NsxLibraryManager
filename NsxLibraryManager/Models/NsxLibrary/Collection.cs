@@ -15,4 +15,7 @@ public class Collection
     public required string Name { get; set; }
     
     public virtual ICollection<Title> Titles { get; set; } = [];
+    
+    [NotMapped]
+    public int TitlesCount => Titles.Count;
 }

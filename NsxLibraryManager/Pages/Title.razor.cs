@@ -193,11 +193,13 @@ public partial class Title
     {
         
         if (TitleId is null) return;
-        var title = await TitleLibraryService.GetTitleByApplicationId(TitleId);
-        HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
-        LibraryTitleDto = title;
-        AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;
+        var titleResult = await TitleLibraryService.GetTitleByApplicationId(TitleId);
+        if (titleResult.IsSuccess)
+        {
+            var title = titleResult.Value;
+            HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
+            LibraryTitleDto = title;
+            AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;
+        }
     }
-
-
 }

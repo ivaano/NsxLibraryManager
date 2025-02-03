@@ -187,7 +187,7 @@ public partial class Library : IDisposable
 
     private async Task EditRow(LibraryTitleDto title)
     {
-        await DialogService.OpenAsync<Title>($"{title.TitleName}",
+        await DialogService.OpenAsync<TitleEditDialog>($"Edit - {title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },
             new DialogOptions() { Width = "90%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
     }
