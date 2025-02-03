@@ -34,6 +34,7 @@ public static class TitledbMappingExtension
     {
         return new LibraryTitleDto
         {
+            Id = title.Id,
             ApplicationId = title.ApplicationId,
             TitleName = title.TitleName,
             BannerUrl = title.BannerUrl,
@@ -103,6 +104,7 @@ public static class TitledbMappingExtension
         
         return new LibraryTitleDto
         {
+            Id = title.Id,
             ApplicationId = title.ApplicationId,
             BannerUrl = title.BannerUrl,
             ContentType = title.ContentType,

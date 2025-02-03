@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Common.Services;
+using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
 using Radzen;
@@ -23,7 +24,7 @@ public partial class Collections : ComponentBase
     private int _count;
 
 
-    private bool newRecordInsertDisabled = false;
+    private bool _newRecordInsertDisabled;
 
     private void ShowNotification(NotificationSeverity severity, string summary, string detail, int duration = 4000)
     {
@@ -65,7 +66,7 @@ public partial class Collections : ComponentBase
     {
         try
         {
-            newRecordInsertDisabled = false;
+            _newRecordInsertDisabled = false;
             var result = await TitleLibraryService.AddCollection(collectionDto);
             if (result.IsSuccess)
             {
@@ -99,7 +100,7 @@ public partial class Collections : ComponentBase
     {
         try
         {
-            newRecordInsertDisabled = false;
+            _newRecordInsertDisabled = false;
             var result = await TitleLibraryService.UpdateCollection(collectionDto);
             if (result.IsSuccess)
             {
@@ -128,14 +129,14 @@ public partial class Collections : ComponentBase
     {
         if (!_grid.IsValid) return;
         var collection = new CollectionDto();
-        newRecordInsertDisabled = true;
+        _newRecordInsertDisabled = true;
         await _grid.InsertRow(collection);
     }
 
     private async Task InsertAfterRow(CollectionDto row)
     {
         if (!_grid.IsValid) return;
-        newRecordInsertDisabled = true;
+        _newRecordInsertDisabled = true;
         var collection = new CollectionDto();
         await _grid.InsertAfterRow(collection, row);
     }
@@ -179,7 +180,7 @@ public partial class Collections : ComponentBase
 
     private void CancelEdit(CollectionDto collectionDto)
     {
-        newRecordInsertDisabled = false;
+        _newRecordInsertDisabled = false;
         _grid.CancelEditRow(collectionDto);
     }
 }

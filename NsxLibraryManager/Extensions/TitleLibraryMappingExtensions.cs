@@ -8,21 +8,35 @@ namespace NsxLibraryManager.Extensions;
 public static class TitleLibraryMappingExtensions
 {
     
-    public static CollectionDto MapToCollectionDto(this Collection collection)
+    public static CollectionDto MapToCollectionDto(this Collection collection, int titlesCount)
     {
         return new CollectionDto
         {
             Id = collection.Id,
             Name = collection.Name,
+            TitlesCount = titlesCount
         };
+    }
+    
+    public static CollectionDto? MapToCollectionDto(this Collection? collection)
+    {
+        if (collection is not null)
+            return new CollectionDto
+            {
+                Id = collection.Id,
+                Name = collection.Name,
+            };
+        return null;
     }
     
     public static LibraryTitleDto MapLibraryTitleDtoNoDlcOrUpdates(this Title title)
     {
         return new LibraryTitleDto
         {
+            Id = title.Id,
             ApplicationId = title.ApplicationId,
             BannerUrl = title.BannerUrl,
+            Collection = title.Collection.MapToCollectionDto(),
             ContentType = title.ContentType,
             Description = title.Description,
             DlcCount = title.DlcCount,
@@ -130,6 +144,7 @@ public static class TitleLibraryMappingExtensions
         
         return new LibraryTitleDto
         {
+            Id = title.Id,
             NsuId = title.NsuId,
             ApplicationId = title.ApplicationId,
             OtherApplicationId = title.OtherApplicationId,
@@ -137,10 +152,11 @@ public static class TitleLibraryMappingExtensions
             FileName = title.FileName,
             Version = title.Version,
             BannerUrl = title.BannerUrl,
+            Collection = title.Collection.MapToCollectionDto(),
             Description = title.Description,
             ContentType = title.ContentType,
             PackageType = title.PackageType,
-            Size = (title.Size is not null) ? (long)title.Size : 0,
+            Size = title.Size ?? 0,
             Rating = title.Rating,
             Region = title.Region,
             NumberOfPlayers = title.NumberOfPlayers,
@@ -149,6 +165,8 @@ public static class TitleLibraryMappingExtensions
             Updates = titleDbUpdates,
             OwnedDlcs = dlcs,
             OwnedUpdates = updates,
+            OwnedDlcCount = title.OwnedDlcs ?? 0,
+            OwnedUpdatesCount = title.OwnedUpdates ?? 0,
             ReleaseDate = title.ReleaseDate,
             Versions = new Collection<VersionDto>(
                 title.Versions

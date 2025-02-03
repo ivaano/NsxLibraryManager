@@ -5,11 +5,13 @@ namespace NsxLibraryManager.Models.Dto;
 
 public record LibraryTitleDto
 {
+    public int Id { get; init; }
     public required string ApplicationId { get; init; }
     public string? OtherApplicationId { get; init; }
     public string? TitleName { get; init; }
     public long? NsuId { get; init; }
     public string? FileName { get; init; }
+    public CollectionDto? Collection { get; set; }
     public Collection<DlcDto>? Dlc { get; init; }
     public Collection<UpdateDto>? Updates { get; init; }
     public Collection<DlcDto>? OwnedDlcs { get; init; }
