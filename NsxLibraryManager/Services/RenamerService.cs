@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
+using Common.Services;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
@@ -341,7 +343,7 @@ public class RenamerService(
                 TemplateField.Version   => fileInfo.TitleVersion.ToString(),
                 TemplateField.Extension => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName   => safeAppTitleName,
-                TemplateField.Region   =>  fileInfo.Region,
+                TemplateField.Region    =>  fileInfo.Region,
                 TemplateField.PatchId   => fileInfo.PatchTitleId,
                 TemplateField.Size      => fileInfo.Size.HasValue ? fileInfo.Size.Value.ToHumanReadableBytes() : string.Empty,
                 TemplateField.PatchCount   => fileInfo.UpdatesCount.ToString(),
@@ -403,24 +405,39 @@ public class RenamerService(
             };
         }
     }
-
-    public async Task<IEnumerable<RenameTitle>> GetLibraryFilesToRenameAsync(
-        RenameType renameType, bool recursive = false)
+/*    
+    private async Task<Result<bool>> BuildNewFileName(LibraryTitleDto libraryTitleDto, RenameType renameType)
     {
-        var fileList = new List<RenameTitle>();
-        var filesResult = await _nsxLibraryDbContext.Collections
-            .AsNoTracking()
-            .Include(c => c.Titles)
-            .Where(c => c.Titles.Count != 0)
-            .ToListAsync();
-        
-        var testa = await _nsxLibraryDbContext.Titles
-            .AsNoTracking()
-            .Include(t => t.Collection)
-            .Where(t => t.Collection != null)
-            .ToListAsync();
-        return fileList;
+        var libraryTitle = new LibraryTitle
+        {
+            PackageType = libraryTitleDto.PackageType,
+            TitleName = libraryTitleDto.TitleName,
+            TitleId = libraryTitleDto.ApplicationId,
+            FileName = libraryTitleDto.FileName ?? string.Empty,
+            ApplicationTitleName = string.Empty,
+            PatchNumber = 0,
+            PatchTitleId = "0000001",
+            Region = libraryTitleDto.Region,
+            UpdatesCount = libraryTitleDto.UpdatesCount,
+            Collection = libraryTitleDto.Collection.Name,
+            DlcCount = libraryTitleDto.DlcCount,
+            Size = libraryTitleDto.Size,
+            Type = libraryTitleDto.ContentType switch
+            {
+                TitleContentType.Base => TitleLibraryType.Base,
+                TitleContentType.Update => TitleLibraryType.Update,
+                TitleContentType.DLC => TitleLibraryType.DLC,
+                _ => TitleLibraryType.Unknown
+            },
+
+        };
+        var prependBasePath = $"{{BasePath}}";
+        var algo = await TemplateReplaceAsync(prependBasePath, libraryTitle, renameType);
+
+        return false;
     }
+*/
+
     
     public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
@@ -434,7 +451,6 @@ public class RenamerService(
         var files = filesResult.Value;
         
         var fileList = new List<RenameTitle>();
-        logger.LogInformation("{} file candidate(s) found.", fileList.Count);
         foreach (var file in files)
         {
             logger.LogInformation("Analyzing {}", file);

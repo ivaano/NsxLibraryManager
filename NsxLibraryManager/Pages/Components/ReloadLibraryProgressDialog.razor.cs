@@ -30,7 +30,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
         await InvokeAsync(
             async () =>
             {
-                FilesEnumerable = await TitleLibraryService.GetFilesAsync();
+                FilesEnumerable = await TitleLibraryService.GetLibraryFilesAsync();
                 var fileList = FilesEnumerable.ToList();
                 FileCount = fileList.Count;
                 if (FileCount > 0)

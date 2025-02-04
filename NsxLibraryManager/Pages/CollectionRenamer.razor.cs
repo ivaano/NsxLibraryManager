@@ -21,6 +21,8 @@ public partial class CollectionRenamer : ComponentBase
     [Inject] private TooltipService TooltipService { get; set; } = default!;
 
     [Inject] private IRenamerService RenamerService { get; set; } = default!;
+    
+    [Inject] private ITitleLibraryService TitleLibraryService { get; set; } = default!; 
 
     [Inject] private NotificationService NotificationService { get; set; } = default!;
 
@@ -141,12 +143,12 @@ public partial class CollectionRenamer : ComponentBase
             _scanInputButtonDisabled = true;
 
             await ResetGrid();
-            _renameTitles = await RenamerService.GetLibraryFilesToRenameAsync(
-               RenameType.Collection, _settings.Recursive);
-            if (_renameTitles.Any())
+            var renameFilesResult = await TitleLibraryService.GetLibraryFilesToRenameAsync(RenameType.Collection);
+            if (renameFilesResult.IsSuccess)
             {
+                _renameTitles = renameFilesResult.Value;
                 _renameButtonDisabled = false;
-            } 
+            }
                 
         }
         finally
