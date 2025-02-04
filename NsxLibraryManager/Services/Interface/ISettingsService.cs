@@ -6,9 +6,11 @@ namespace NsxLibraryManager.Services.Interface;
 public interface ISettingsService
 {
     public Task<BundleRenamerSettings> GetBundleRenamerSettings();
+    public Task<CollectionRenamerSettings> GetCollectionRenamerSettings();
     public Task<PackageRenamerSettings> GetPackageRenamerSettings();
     public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings packageRenamerSettings);
     public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings bundleRenamerSettings);
+    public Task<CollectionRenamerSettings> SaveCollectionRenamerSettings(CollectionRenamerSettings collectionRenamerSettings);
     
     public string GetSettingByType(SettingsEnum key);
     

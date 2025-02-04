@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -10,22 +11,28 @@ using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
+using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services.Interface;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 namespace NsxLibraryManager.Services;
 
 public class RenamerService(
-    TitledbDbContext titledbDbContext, 
-    IValidator<PackageRenamerSettings> validator,
+    TitledbDbContext titledbDbContext,
+    NsxLibraryDbContext nsxLibraryDbContext,
+    IValidator<PackageRenamerSettings> validatorPackage,
     IValidator<BundleRenamerSettings> validatorBundle,
+    IValidator<CollectionRenamerSettings> validatorCollection,
     IFileInfoService fileInfoService,
     ILogger<RenamerService> logger)
     : IRenamerService
 {
     private readonly TitledbDbContext _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
+    private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
     private PackageRenamerSettings _packageRenamerSettings = null!;
     private BundleRenamerSettings _bundleRenamerSettings = null!;
+    private CollectionRenamerSettings _collectionRenamerSettings = null!;
+    
 
     private static char[] GetInvalidAdditionalChars() =>
     [
@@ -37,7 +44,25 @@ public class RenamerService(
         '¡', '¿', 
         '\u200B', '\u200C', '\u200D', '\uFEFF' 
     ];
-    
+
+    #region RenamerSettings
+    public Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings)
+    {
+        _packageRenamerSettings = settings;
+        return Task.FromResult(_packageRenamerSettings);
+    }
+
+    public Task<BundleRenamerSettings> LoadRenamerSettingsAsync(BundleRenamerSettings settings)
+    {
+        _bundleRenamerSettings = settings;
+        return Task.FromResult(_bundleRenamerSettings);
+    }
+
+    public Task<CollectionRenamerSettings> LoadRenamerSettingsAsync(CollectionRenamerSettings settings)
+    {
+        _collectionRenamerSettings = settings;
+        return Task.FromResult(_collectionRenamerSettings);
+    }
     
     private async Task<(string, bool, string)> TryBuildNewFileNameAsync(LibraryTitle fileInfo, string file, RenameType renameType)
     {
@@ -53,6 +78,129 @@ public class RenamerService(
         }
     }
 
+    public async Task<ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)
+    {
+        var validationResult = await validatorPackage.ValidateAsync(settings);
+        return validationResult;
+    }
+    
+    public async Task<ValidationResult> ValidateRenamerSettingsAsync(BundleRenamerSettings settings)
+    {
+        var validationResult = await validatorBundle.ValidateAsync(settings);
+        return validationResult;
+    }
+    
+    public async Task<ValidationResult> ValidateRenamerSettingsAsync(CollectionRenamerSettings settings)
+    {
+        var validationResult = await validatorCollection.ValidateAsync(settings);
+        return validationResult;
+    }
+    #endregion
+    
+    public Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename)
+    {
+        var renamedFiles = new List<RenameTitle>();
+        foreach (var file in filesToRename)
+        {
+            if (file.Error || file.RenamedSuccessfully)
+            {
+                renamedFiles.Add(file);
+                continue;
+            }
+            
+            try
+            {
+                var newDirName = Path.GetDirectoryName(file.DestinationFileName);
+                if (!Path.Exists(newDirName) && newDirName is not null)
+                { 
+                    Directory.CreateDirectory(newDirName);
+                }
+                
+                if (file.DestinationFileName is not null)
+                {
+                    File.Move(file.SourceFileName, file.DestinationFileName);
+                    renamedFiles.Add(file with { RenamedSuccessfully = true });
+                }
+                else
+                {
+                    var renameTitle = file with { Error = true, ErrorMessage = "Empty destination file name" };
+                    renamedFiles.Add(renameTitle);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error renaming file {file} - {message}", file.SourceFileName, e.Message);
+                renamedFiles.Add(file with
+                {
+                    RenamedSuccessfully = false,
+                    Error = true,
+                    ErrorMessage = e.Message
+                });
+            }
+        }
+
+        return Task.FromResult(renamedFiles.AsEnumerable());
+    }
+    
+    public async Task<string> CalculateSampleFileName(string templateText, 
+    TitlePackageType titlePackageType, string inputFile, RenameType renameType)
+    {
+        var fileInfo = new LibraryTitle
+        {
+            PackageType = AccuratePackageType.NSP,
+            TitleName = "Title Name",
+            TitleId = "0010000",
+            FileName = inputFile,
+            ApplicationTitleName = "BaseApp Name",
+            PatchNumber = 1,
+            PatchTitleId = "0000001",
+            Region = "US",
+            UpdatesCount = 5,
+            Collection = "Collection",
+            DlcCount = 3,
+            Size = 1000000000,
+            Type = (renameType, titlePackageType) switch
+            {
+                (RenameType.Collection, TitlePackageType.BundleBase)   => TitleLibraryType.Base,
+                (RenameType.Collection, TitlePackageType.BundleUpdate) => TitleLibraryType.Update,
+                (RenameType.Collection, TitlePackageType.BundleDlc)    => TitleLibraryType.DLC,
+            
+                (RenameType.Bundle, TitlePackageType.BundleBase)   => TitleLibraryType.Base,
+                (RenameType.Bundle, TitlePackageType.BundleUpdate) => TitleLibraryType.Update,
+                (RenameType.Bundle, TitlePackageType.BundleDlc)    => TitleLibraryType.DLC,
+        
+                (RenameType.PackageType, TitlePackageType.NspBase)   => TitleLibraryType.Base,
+                (RenameType.PackageType, TitlePackageType.NspUpdate) => TitleLibraryType.Update,
+                (RenameType.PackageType, TitlePackageType.NspDlc)    => TitleLibraryType.DLC,
+                _ => TitleLibraryType.Unknown
+            }
+        };
+        
+        return await TemplateReplaceAsync(templateText, fileInfo, renameType);
+    }
+
+    public async Task<bool> DeleteEmptyFoldersAsync(string sourceFolder)
+    {
+        var inputDirectories = Directory.EnumerateDirectories(sourceFolder, "*", SearchOption.AllDirectories);
+        var result = true;
+        foreach (var directoryName in inputDirectories)
+        {
+            var isEmpty = await fileInfoService.IsDirectoryEmpty(directoryName);
+
+            if (!isEmpty) continue;
+            try
+            {
+                Directory.Delete(directoryName, true);
+            }
+            catch (Exception)
+            {
+                result = false;
+            }
+        }
+        return result;
+    }
+    
+    
     private Task<(string, bool, string)> ValidateDestinationFileAsync(string file, string newPath)
     {
         if (string.IsNullOrEmpty(newPath))
@@ -149,6 +297,7 @@ public class RenamerService(
             if (!string.IsNullOrEmpty(fileInfo.TitleName))
             {
                 if ((renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase) ||
+                    (renameType == RenameType.Collection && _collectionRenamerSettings.TitlesForceUppercase) ||
                     (renameType == RenameType.PackageType && _packageRenamerSettings.TitlesForceUppercase))
                 {
                     fileInfo.TitleName = CustomTitleCase(fileInfo.TitleName);
@@ -164,6 +313,7 @@ public class RenamerService(
             if (!string.IsNullOrEmpty(fileInfo.ApplicationTitleName))
             {
                 if ((renameType == RenameType.Bundle && _bundleRenamerSettings.TitlesForceUppercase) ||
+                    (renameType == RenameType.Collection && _collectionRenamerSettings.TitlesForceUppercase) ||
                     (renameType == RenameType.PackageType && _packageRenamerSettings.TitlesForceUppercase))
                 {
                     fileInfo.ApplicationTitleName = CustomTitleCase(fileInfo.ApplicationTitleName);
@@ -178,8 +328,14 @@ public class RenamerService(
             
             var replacement = key switch
             {
-                TemplateField.BasePath  => (renameType == RenameType.PackageType) ?  
-                    _packageRenamerSettings.OutputBasePath : _bundleRenamerSettings.OutputBasePath,
+                TemplateField.BasePath => renameType switch
+                {
+                    RenameType.PackageType => _packageRenamerSettings.OutputBasePath,
+                    RenameType.Bundle      => _bundleRenamerSettings.OutputBasePath,
+                    RenameType.Collection  => _collectionRenamerSettings.OutputBasePath,
+                    _                      => string.Empty
+                },
+                TemplateField.CollectionName => fileInfo.Collection,
                 TemplateField.TitleName => safeTitleName,
                 TemplateField.TitleId   => fileInfo.TitleId,
                 TemplateField.Version   => fileInfo.TitleVersion.ToString(),
@@ -187,6 +343,7 @@ public class RenamerService(
                 TemplateField.AppName   => safeAppTitleName,
                 TemplateField.Region   =>  fileInfo.Region,
                 TemplateField.PatchId   => fileInfo.PatchTitleId,
+                TemplateField.Size      => fileInfo.Size.HasValue ? fileInfo.Size.Value.ToHumanReadableBytes() : string.Empty,
                 TemplateField.PatchCount   => fileInfo.UpdatesCount.ToString(),
                 TemplateField.DlcCount   => fileInfo.DlcCount.ToString(),
                 _                       => string.Empty
@@ -246,13 +403,36 @@ public class RenamerService(
             };
         }
     }
-   
+
+    public async Task<IEnumerable<RenameTitle>> GetLibraryFilesToRenameAsync(
+        RenameType renameType, bool recursive = false)
+    {
+        var fileList = new List<RenameTitle>();
+        var filesResult = await _nsxLibraryDbContext.Collections
+            .AsNoTracking()
+            .Include(c => c.Titles)
+            .Where(c => c.Titles.Count != 0)
+            .ToListAsync();
+        
+        var testa = await _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Include(t => t.Collection)
+            .Where(t => t.Collection != null)
+            .ToListAsync();
+        return fileList;
+    }
     
     public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
     {
         var filesResult = await fileInfoService.GetFileNames(inputPath, recursive);
-        filesResult.TryGetValue(out var files);
+        if (filesResult.IsFailure)
+        {
+            throw new InvalidPathException(filesResult.Error ?? inputPath);
+        }
+
+        var files = filesResult.Value;
+        
         var fileList = new List<RenameTitle>();
         logger.LogInformation("{} file candidate(s) found.", fileList.Count);
         foreach (var file in files)
@@ -354,139 +534,9 @@ public class RenamerService(
                 };
                 return await TemplateReplaceAsync(renameTemplate, fileInfo, renameType);
             }
+            case RenameType.Collection:
             default:
                 return string.Empty;
         }
-    }
-
-    public async Task<string> CalculateSampleFileName(string templateText, 
-        TitlePackageType titlePackageType, string inputFile, RenameType renameType)
-    {
-        var fileInfo = new LibraryTitle
-        {
-            PackageType = AccuratePackageType.NSP,
-            TitleName = "Some Title Name",
-            TitleId = "0010000",
-            FileName = inputFile,
-            ApplicationTitleName = "Some App Name",
-            PatchNumber = 1,
-            PatchTitleId = "0000001",
-            Region = "US",
-            UpdatesCount = 5,
-            DlcCount = 3,
-        };
-        
-        if (renameType == RenameType.Bundle)
-        {
-            fileInfo.Type = titlePackageType switch
-            {
-                TitlePackageType.BundleBase   => TitleLibraryType.Base,
-                TitlePackageType.BundleUpdate => TitleLibraryType.Update,
-                TitlePackageType.BundleDlc    => TitleLibraryType.DLC,
-                _                             => TitleLibraryType.Unknown
-            }; 
-        }
-        else
-        {
-            fileInfo.Type = titlePackageType switch
-            {
-                TitlePackageType.NspBase   => TitleLibraryType.Base,
-                TitlePackageType.NspUpdate => TitleLibraryType.Update,
-                TitlePackageType.NspDlc    => TitleLibraryType.DLC,
-                _                          => TitleLibraryType.Unknown
-            };
-        }
-        
-        return await TemplateReplaceAsync(templateText, fileInfo, renameType);
-    }
-
-    public Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings)
-    {
-        _packageRenamerSettings = settings;
-        return Task.FromResult(_packageRenamerSettings);
-    }
-
-    public Task<BundleRenamerSettings> LoadRenamerSettingsAsync(BundleRenamerSettings settings)
-    {
-        _bundleRenamerSettings = settings;
-        return Task.FromResult(_bundleRenamerSettings);
-    }
-
-    public Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename)
-    {
-        var renamedFiles = new List<RenameTitle>();
-        foreach (var file in filesToRename)
-        {
-            if (file.Error || file.RenamedSuccessfully)
-            {
-                renamedFiles.Add(file);
-                continue;
-            }
-            
-            try
-            {
-                var newDirName = Path.GetDirectoryName(file.DestinationFileName);
-                if (!Path.Exists(newDirName) && newDirName is not null)
-                { 
-                    Directory.CreateDirectory(newDirName);
-                }
-                
-                if (file.DestinationFileName is not null)
-                {
-                    File.Move(file.SourceFileName, file.DestinationFileName);
-                    renamedFiles.Add(file with { RenamedSuccessfully = true });
-                }
-                else
-                {
-                    var renameTitle = file with { Error = true, ErrorMessage = "Empty destination file name" };
-                    renamedFiles.Add(renameTitle);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.LogError("Error renaming file {file} - {message}", file.SourceFileName, e.Message);
-                renamedFiles.Add(file with
-                {
-                    RenamedSuccessfully = false,
-                    Error = true,
-                    ErrorMessage = e.Message
-                });
-            }
-        }
-
-        return Task.FromResult(renamedFiles.AsEnumerable());
-    }
-
-    public async Task<bool> DeleteEmptyFoldersAsync(string sourceFolder)
-    {
-        var inputDirectories = Directory.EnumerateDirectories(sourceFolder, "*", SearchOption.AllDirectories);
-        var result = true;
-        foreach (var directoryName in inputDirectories)
-        {
-            var isEmpty = await fileInfoService.IsDirectoryEmpty(directoryName);
-
-            if (!isEmpty) continue;
-            try
-            {
-                Directory.Delete(directoryName, true);
-            }
-            catch (Exception)
-            {
-                result = false;
-            }
-        }
-        return result;
-    }
-
-    public async Task<ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings)
-    {
-        var validationResult = await validator.ValidateAsync(settings);
-        return validationResult;
-    }
-    
-    public async Task<ValidationResult> ValidateRenamerSettingsAsync(BundleRenamerSettings settings)
-    {
-        var validationResult = await validatorBundle.ValidateAsync(settings);
-        return validationResult;
     }
 }

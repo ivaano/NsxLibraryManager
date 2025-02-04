@@ -71,12 +71,18 @@ public partial class PackageRenamer
         _isLoading = false;
     }
     
-    private Task SelectConfigurationTab()
+    private async Task SelectConfigurationTab()
     {
-        if (_settings.InputPath != string.Empty) return Task.CompletedTask;
+        if (_settings.InputPath != string.Empty) return;
         selectedTabIndex = 1;
-        return Task.CompletedTask;
-
+        
+        await DialogService.Alert(
+            $"The Package Renamer lets you rename files using a template \n" +
+            $"with placeholders that are replaced by file metadata or titledb data if available.\n" +
+            $"The organization type for this renamer is based on the package type (NSP, NSZ, XCI, XCZ)\n" +
+            $"Files do not need to be in your library, you can select any folder as input and output.\n" +
+            $"Renamed files will not be added to your library.",
+            "Welcome to Package Renamer", new AlertOptions { OkButtonText = "Got it" });
     }
 
     private async Task ResetGrid()

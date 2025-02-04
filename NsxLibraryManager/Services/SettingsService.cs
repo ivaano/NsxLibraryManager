@@ -128,12 +128,18 @@ public class SettingsService(
 
     public Task<BundleRenamerSettings> GetBundleRenamerSettings() =>
         GetSerializedSettings<BundleRenamerSettings>(SettingsEnum.RenameBundle);
+
+    public Task<CollectionRenamerSettings> GetCollectionRenamerSettings() =>
+        GetSerializedSettings<CollectionRenamerSettings>(SettingsEnum.RenameCollection);
+
+    public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
+        GetSerializedSettings<PackageRenamerSettings>(SettingsEnum.RenamePackageType);
     
     public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings settings) =>
         SaveSerializedSettings(settings, SettingsEnum.RenameBundle);
-    
-    public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
-        GetSerializedSettings<PackageRenamerSettings>(SettingsEnum.RenamePackageType);
+
+    public Task<CollectionRenamerSettings> SaveCollectionRenamerSettings(CollectionRenamerSettings settings)=>
+        SaveSerializedSettings(settings, SettingsEnum.RenameCollection);
     
     public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings settings) =>
         SaveSerializedSettings(settings, SettingsEnum.RenamePackageType);

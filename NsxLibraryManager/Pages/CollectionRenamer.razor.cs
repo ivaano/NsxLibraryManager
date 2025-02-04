@@ -12,7 +12,7 @@ using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class BundleRenamer : ComponentBase
+public partial class CollectionRenamer : ComponentBase
 {
     private const Variant Variant = Radzen.Variant.Outlined;
 
@@ -33,7 +33,7 @@ public partial class BundleRenamer : ComponentBase
     private RadzenDataGrid<RenameTitle> _renameGrid = default!;
     private IEnumerable<RenameTitle> _renameTitles = default!;
     private bool isLoading = false;
-    private BundleRenamerSettings _settings = default!;
+    private CollectionRenamerSettings _settings = default!;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    
     private readonly Dictionary<TemplateField, string> _templateFieldMappings =
         RenamerTemplateFields.TemplateFieldMappings;
@@ -66,11 +66,11 @@ public partial class BundleRenamer : ComponentBase
     
     private async Task SelectConfigurationTab()
     {
-        if (_settings.InputPath != string.Empty) return;
+        if (!string.IsNullOrEmpty(_settings.BundleBase)) return;
         selectedTabIndex = 1;
         
         await DialogService.Alert(
-            $"The Bundle Renamer lets you rename files using a template \n" +
+            $"The Collection Renamer lets you rename files using a template \n" +
             $"with placeholders that are replaced by file metadata or titledb data if available.\n" +
             $"The organization type for this renamer is based bundles, or titles related between them using ApplicationId and OtherApplicationId fields.\n" +
             $"Files do not need to be in your library, you can select any folder as input and output.\n" +
@@ -80,7 +80,16 @@ public partial class BundleRenamer : ComponentBase
     
     private async Task InitializeSettings()
     {
-        _settings = await SettingsService.GetBundleRenamerSettings();
+        _settings = await SettingsService.GetCollectionRenamerSettings();
+        if (string.IsNullOrEmpty(_settings.InputPath))
+        {
+            var userSettings = SettingsService.GetUserSettings();
+           
+            _settings.InputPath = userSettings.LibraryPath.EndsWith(Path.DirectorySeparatorChar) 
+                ? userSettings.LibraryPath 
+                : userSettings.LibraryPath + Path.DirectorySeparatorChar;
+            _settings.OutputBasePath = _settings.InputPath;
+        }
         _inputPathDisplay = _settings.InputPath;
         _outputPathDisplay = _settings.OutputBasePath;
         _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
@@ -132,8 +141,8 @@ public partial class BundleRenamer : ComponentBase
             _scanInputButtonDisabled = true;
 
             await ResetGrid();
-            _renameTitles = await RenamerService.GetFilesToRenameAsync(
-                _settings.InputPath, RenameType.Bundle, _settings.Recursive);
+            _renameTitles = await RenamerService.GetLibraryFilesToRenameAsync(
+               RenameType.Collection, _settings.Recursive);
             if (_renameTitles.Any())
             {
                 _renameButtonDisabled = false;
@@ -183,6 +192,10 @@ public partial class BundleRenamer : ComponentBase
                 "Number of DLC for this title on TitleDb, otherwise empty",
             TemplateField.Region =>
                 "Title Region from Titledb eg [US]",
+            TemplateField.Size =>
+                "Size of the file in human readable format eg [1.2GB]",
+            TemplateField.CollectionName =>
+                "Collection name from the library, all related titles will be renamed based on this collection",
             _ => string.Empty
         };
 
@@ -221,9 +234,9 @@ public partial class BundleRenamer : ComponentBase
     
     private async Task UpdateSampleBox(TitlePackageType type, string templateValue)
     {
-        _sampleBefore = $"{_settings.InputPath}{Path.DirectorySeparatorChar}lucas-game.nsp";
+        _sampleBefore = $"{_settings.InputPath}lucas-game.nsp";
         var basePathIncluded = $"{{BasePath}}{templateValue}";
-        _sampleAfter = await RenamerService.CalculateSampleFileName(basePathIncluded, type, "inputFile.nsp", RenameType.Bundle);
+        _sampleAfter = await RenamerService.CalculateSampleFileName(basePathIncluded, type, "inputFile.nsp", RenameType.Collection);
     }
     
     private async Task TemplateTextboxUpdateNew(TitlePackageType type)
@@ -259,9 +272,9 @@ public partial class BundleRenamer : ComponentBase
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
 
         if (confirmationResult is not true) return true;
-        const string baseTemplate = "{TitleName}\\{TitleName} [{TitleId}][v{Version}].{Extension}";
-        const string updateTemplate = "{AppName}\\{TitleName} [{TitleId}][v{Version}].{Extension}";
-        const string dlcTemplate = "{AppName}\\DLC\\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string baseTemplate = "{Collection}\\{TitleName}\\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string updateTemplate = "{Collection}\\{AppName}\\{TitleName} [{TitleId}][v{Version}].{Extension}";
+        const string dlcTemplate = "{Collection}\\{AppName}\\DLC\\{TitleName} [{TitleId}][v{Version}].{Extension}";
         _templateFields[TitlePackageType.BundleBase].Value = baseTemplate.Replace("\\", Path.DirectorySeparatorChar.ToString());
         _templateFields[TitlePackageType.BundleUpdate].Value = updateTemplate.Replace("\\", Path.DirectorySeparatorChar.ToString());
         _templateFields[TitlePackageType.BundleDlc].Value = dlcTemplate.Replace("\\", Path.DirectorySeparatorChar.ToString());
@@ -305,7 +318,7 @@ public partial class BundleRenamer : ComponentBase
         var isValid = await ValidateConfiguration();
         if (!isValid)
             return;
-        await SettingsService.SaveBundleRenamerSettings(_settings);
+        await SettingsService.SaveCollectionRenamerSettings(_settings);
         var notificationMessage = new NotificationMessage
         {
             Severity = NotificationSeverity.Success,
@@ -369,5 +382,4 @@ public partial class BundleRenamer : ComponentBase
         }
 
     }
-    
 }

@@ -3,5 +3,6 @@
 public enum RenameType
 {
     Bundle,
+    Collection,
     PackageType
 }
