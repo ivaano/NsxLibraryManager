@@ -6,8 +6,6 @@ namespace NsxLibraryManager.Services.Interface;
 
 public interface IRenamerService
 {
-    Task<IEnumerable<RenameTitle>> GetLibraryFilesToRenameAsync(RenameType renameType, bool recursive = false);
-
     Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(string filePath, RenameType renameType, bool recursive = false);
     Task<string> CalculateSampleFileName(string templateText, TitlePackageType type, string inputFile, RenameType renameType);
     Task<PackageRenamerSettings> LoadRenamerSettingsAsync(PackageRenamerSettings settings);

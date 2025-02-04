@@ -133,11 +133,11 @@ public class TitleLibraryService : ITitleLibraryService
         return true;
     }
 
-    public async Task<IEnumerable<string>> GetFilesAsync()
+    public async Task<IEnumerable<string>> GetLibraryFilesAsync()
     {
         var filesResult = await _fileInfoService.GetFileNames(_settings.LibraryPath, _settings.Recursive);
         if (filesResult.IsSuccess) return filesResult.Value;
-        _logger.LogError("Error getting files from library: {error}", filesResult.Error);
+        _logger.LogError("Error getting files from library: {Error}", filesResult.Error);
         return Array.Empty<string>();
     }
 
@@ -385,11 +385,6 @@ public class TitleLibraryService : ITitleLibraryService
         return await ApplyAdditionalFilters(query, args);
     }
     
-    public async Task<bool> SaveDatabaseChangesAsync()
-    {
-        await _nsxLibraryDbContext.SaveChangesAsync();
-        return true;
-    }
 
     public async Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType titleContentType)
     {
@@ -550,7 +545,7 @@ public class TitleLibraryService : ITitleLibraryService
             .AsNoTracking()
             .ToDictionaryAsync(x => x.FileName, x => x);
 
-        var libDirFiles = await GetFilesAsync();
+        var libDirFiles = await GetLibraryFilesAsync();
 
         var dirFiles = new Dictionary<string, LibraryTitle>();
         foreach (var fileName in libDirFiles)
@@ -810,8 +805,6 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
         return Result.Success(true);
     }
 
-
-
     public async Task<Title?> ProcessFileAsync(string file)
     {
         try
@@ -835,5 +828,28 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
             _logger.LogError(e, "Error processing file: {file}", file);
             return null;
         }
+    }
+    
+    public async Task<Result<IEnumerable<RenameTitle>>> GetLibraryFilesToRenameAsync(
+        RenameType renameType)
+    {
+        var fileList = new List<RenameTitle>();
+        if (renameType == RenameType.Collection)
+        {
+            var collectionFiles = await _nsxLibraryDbContext.Titles
+                .AsNoTracking()
+                .Include(t => t.Collection)
+                .Where(t => t.Collection != null)
+                .Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates())
+                .ToListAsync();
+
+            foreach (var file in collectionFiles)
+            {
+
+            }
+        }
+        
+        
+        return Result.Failure<IEnumerable<RenameTitle>>("No Files");
     }
 }
