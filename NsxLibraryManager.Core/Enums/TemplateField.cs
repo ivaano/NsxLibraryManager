@@ -3,6 +3,7 @@
 public enum TemplateField
 {
     BasePath,
+    CollectionName,
     TitleName,
     TitleId,
     Version,

@@ -77,6 +77,7 @@ if (validatorResult.valid)
     builder.Services.AddScoped<IFileUploadService, FileUploadService>();
     builder.Services.AddScoped<IValidator<PackageRenamerSettings>, RenamerSettingsValidator>();    
     builder.Services.AddScoped<IValidator<BundleRenamerSettings>, BundleSettingsValidator>();    
+    builder.Services.AddScoped<IValidator<CollectionRenamerSettings>, CollectionSettingsValidator>();    
     builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    
 }
 builder.Services.AddControllersWithViews();

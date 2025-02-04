@@ -14,11 +14,11 @@ public interface ITitleLibraryService
     public Task<IEnumerable<string>> GetFilesAsync();
     
     public Task<Title?> ProcessFileAsync(string file);
-    public Task<bool> AddLibraryTitleAsync(LibraryTitle title);
-    public Task<bool> UpdateLibraryTitleAsync(LibraryTitle title);
+    public Task<Result<bool>> AddLibraryTitleAsync(LibraryTitle title);
+    public Task<Result<bool>> UpdateLibraryTitleAsync(LibraryTitle title);
     public Task<int> UpdateLibraryTitleAsync(LibraryTitleDto titleDto);
 
-    public Task<bool> RemoveLibraryTitleAsync(LibraryTitle title);
+    public Task<Result<bool>> RemoveLibraryTitleAsync(LibraryTitle title);
 
     public Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType contentType);
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();

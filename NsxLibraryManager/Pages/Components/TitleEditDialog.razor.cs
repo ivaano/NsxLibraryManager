@@ -26,7 +26,8 @@ public partial class TitleEditDialog : ComponentBase
     private int _dropdownValue;
     private string _relatedPatchTitle = string.Empty;
     private string _relatedDlcTitle = string.Empty;      
-    private bool disableCollectionDropdown = false;
+    private bool _disableCollectionDropdown;
+    private string _disableCollectionDropdownMessage = string.Empty;
     
     protected override async Task OnParametersSetAsync()
     {
@@ -63,11 +64,8 @@ public partial class TitleEditDialog : ComponentBase
                 }
                 else
                 {
-                    disableCollectionDropdown = true;
-                    ShowNotification(
-                        NotificationSeverity.Warning, 
-                        "Base Title Not Found", 
-                        $"Base Title with Application Id {_libraryTitleDto.OtherApplicationId} not found, collection for this title will not be updated.");
+                    _disableCollectionDropdown = true;
+                    _disableCollectionDropdownMessage = $"Base Title with Application Id {_libraryTitleDto.OtherApplicationId} not found, collection for this title can't be updated.";
                 }
             }
             else
@@ -110,6 +108,6 @@ public partial class TitleEditDialog : ComponentBase
     
     private void Cancel()
     {
-        DialogService.Close(true);
+        DialogService.Close(false);
     }
 }

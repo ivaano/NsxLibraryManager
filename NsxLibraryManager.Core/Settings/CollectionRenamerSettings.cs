@@ -1,6 +1,6 @@
 ﻿namespace NsxLibraryManager.Core.Settings;
 
-public class BundleRenamerSettings : RenamerSettings
+public class CollectionRenamerSettings: RenamerSettings
 {
 
     public string BundleBase { get; set; } = string.Empty;

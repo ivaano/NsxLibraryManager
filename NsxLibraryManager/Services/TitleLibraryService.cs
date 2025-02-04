@@ -345,6 +345,7 @@ public class TitleLibraryService : ITitleLibraryService
             .AsNoTracking()
             .Include(x => x.RatingsContents)
             .Include(x => x.Categories)
+            .Include(x => x.Collection)
             .AsQueryable();
         var titles = await ApplyAdditionalFilters(query, args);
         
@@ -617,7 +618,7 @@ public class TitleLibraryService : ITitleLibraryService
             : Result.Failure<LibraryTitleDto>("Title not found");
     }
 
-    public async Task<bool> AddLibraryTitleAsync(LibraryTitle title)
+    public async Task<Result<bool>> AddLibraryTitleAsync(LibraryTitle title)
     {
         _logger.LogDebug("Adding file: {filename} from library", title.FileName);
         var libraryTitle = await ProcessFileAsync(title.FileName);
@@ -625,10 +626,17 @@ public class TitleLibraryService : ITitleLibraryService
         switch (libraryTitle)
         {
             case null:
-                return false;
+                return Result.Failure<bool>($"Error processing file {title.FileName}");
             case { ContentType: TitleContentType.Update, OtherApplicationId: not null }:
             {
-                var parentTitle = _nsxLibraryDbContext.Titles.FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                var parentTitle = _nsxLibraryDbContext.Titles
+                    .Include(x => x.Collection)
+                    .FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                
+                if (parentTitle?.Collection is not null)
+                {
+                    libraryTitle.Collection = parentTitle.Collection;
+                }
                 var updateCount = _nsxLibraryDbContext.Titles
                     .Count(x => x.ContentType == TitleContentType.Update && x.OtherApplicationId == libraryTitle.OtherApplicationId);
                 if (parentTitle is not null) parentTitle.OwnedUpdates = updateCount;
@@ -637,7 +645,15 @@ public class TitleLibraryService : ITitleLibraryService
 
             case { ContentType: TitleContentType.DLC, OtherApplicationId: not null }:
             {
-                var parentTitle = _nsxLibraryDbContext.Titles.FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                var parentTitle = _nsxLibraryDbContext.Titles
+                    .Include(x => x.Collection)
+                    .FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                
+                if (parentTitle?.Collection is not null)
+                {
+                    libraryTitle.Collection = parentTitle.Collection;
+                }
+                
                 var dlcCount = _nsxLibraryDbContext.Titles
                     .Count(x => x.ContentType == TitleContentType.DLC && x.OtherApplicationId == libraryTitle.OtherApplicationId);
                 if (parentTitle is not null) parentTitle.OwnedDlcs = dlcCount;
@@ -646,15 +662,25 @@ public class TitleLibraryService : ITitleLibraryService
             }
         }
         await _nsxLibraryDbContext.SaveChangesAsync();
-        return true;
+        return Result.Success(true);
     }
 
-    public async Task<bool> UpdateLibraryTitleAsync(LibraryTitle title)
+    public async Task<Result<bool>> UpdateLibraryTitleAsync(LibraryTitle title)
     {
         _logger.LogDebug("Updating file: {filename} from library", title.FileName);
-        await RemoveLibraryTitleAsync(title);
-        await AddLibraryTitleAsync(title);
-        return true;
+        var removeResult = await RemoveLibraryTitleAsync(title);
+        if (removeResult.IsFailure)
+        {
+            _logger.LogError(removeResult.Error);
+            return removeResult;
+        }
+
+        var addTitleResult = await AddLibraryTitleAsync(title);
+        if (addTitleResult.IsSuccess) return addTitleResult;
+        
+        _logger.LogError(addTitleResult.Error);
+        return addTitleResult;
+
     }
 
 public async Task<int> UpdateLibraryTitleAsync(LibraryTitleDto title)
@@ -740,7 +766,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
     return titles;
 }
 
-    public async Task<bool> RemoveLibraryTitleAsync(LibraryTitle title)
+    public async Task<Result<bool>> RemoveLibraryTitleAsync(LibraryTitle title)
     {
         _logger.LogDebug("Removing file: {filename} from library", title.FileName);
         var libraryTitle =
@@ -750,7 +776,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
         switch (libraryTitle)
         {
             case null:
-                return false;
+                return Result.Failure<bool>($"Title {title.TitleId} with filename {title.FileName} not found");
             case { ContentType: TitleContentType.Update, OtherApplicationId: not null }:
             {
                 var updateCount =
@@ -781,7 +807,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
         }
 
 
-        return true;
+        return Result.Success(true);
     }
 
 
@@ -794,7 +820,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
             var libraryTitle = await _fileInfoService.GetFileInfo(file, detailed: false);
             if (libraryTitle is null)
             {
-                _logger.LogDebug("Unable to get File Information from file : {file}", file);
+                _logger.LogError("Unable to get File Information from file : {file}", file);
                 return null;
             }
 

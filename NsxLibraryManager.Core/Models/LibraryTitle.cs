@@ -20,6 +20,7 @@ public class LibraryTitle
     public DateTime ReleaseDate { get; set; }
     public int? PatchNumber { get; set; }
     public string? TitleName { get; set; }
+    public string? Collection { get; set; }
     public string? Publisher { get; set; }
     public uint TitleVersion { get; set; }
     public TitleLibraryType Type { get; set; }
