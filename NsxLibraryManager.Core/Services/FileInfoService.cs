@@ -2,10 +2,12 @@
 using Common.Services;
 using LibHac.Ncm;
 using Microsoft.Extensions.Logging;
+using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.Services;
@@ -277,47 +279,22 @@ public class FileInfoService : IFileInfoService
         return iconUri;
     }
     
-    public Task<LibraryTitle> GetFileInfo(string filePath, bool detailed)
+    public Task<Result<LibraryTitleDto>> GetFileInfo(string filePath, bool detailed)
     {
         PackageInfo packageInfo;
         try
         {
             packageInfo = _packageInfoLoader.GetPackageInfo(filePath, detailed);
+            if (packageInfo.Contents is null)
+                return Task.FromResult(Result.Failure<LibraryTitleDto>($"No contents found in the package of file {filePath}"));
         } 
         catch (Exception)
         {
             _logger.LogError("Error getting package info from file {filePath}", filePath);
-            throw new Exception($"Error getting package info from file {filePath}");
+            return Task.FromResult(Result.Failure<LibraryTitleDto>($"Error getting package info from file {filePath}"));
         }
 
-        if (packageInfo.Contents is null)
-            throw new Exception($"No contents found in the package of file {filePath}");
-        
-        var title = new LibraryTitle
-        {
-            ApplicationTitleId = packageInfo.Contents.ApplicationTitleId,
-            PatchTitleId = packageInfo.Contents.PatchTitleId,
-            PatchNumber = packageInfo.Contents.PatchNumber,
-            TitleId = packageInfo.Contents.TitleId,
-            TitleName = packageInfo.Contents.Name,
-            Publisher = packageInfo.Contents.Publisher,
-            TitleVersion = packageInfo.Contents.Version.Version,
-            PackageType = packageInfo.AccuratePackageType,
-            FileName = Path.GetFullPath(filePath),
-            LastWriteTime = File.GetLastWriteTime(filePath)
-        };
-
-        //var availableVersion = await _titleDbService.GetAvailableVersion(title.TitleId);
-        //title.AvailableVersion = availableVersion >> 16;
-        title.Type = packageInfo.Contents.Type switch
-        {
-                ContentMetaType.Application => TitleContentType.Base,
-                ContentMetaType.Patch => TitleContentType.Update,
-                ContentMetaType.AddOnContent => TitleContentType.DLC,
-                _ => title.Type
-        };
-
-        return Task.FromResult(title);
+        return Task.FromResult(Result.Success(packageInfo.ToLibraryTitleDto(filePath)));
     }
 
 }

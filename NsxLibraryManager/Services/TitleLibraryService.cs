@@ -135,7 +135,7 @@ public class TitleLibraryService(
 
 
 
-    private async Task<Title?> AggregateLibraryTitle(LibraryTitle libraryTitle)
+    private async Task<Title?> AggregateLibraryTitle(LibraryTitleDto libraryTitle)
     {
         var titledbTitle = await _titledbDbContext
             .Titles
@@ -144,12 +144,12 @@ public class TitleLibraryService(
             .Include(c => c.Categories)
             .Include(s => s.Screenshots)
             .Include(v => v.Versions)
-            .FirstOrDefaultAsync(t => t.ApplicationId == libraryTitle.TitleId);
+            .FirstOrDefaultAsync(t => t.ApplicationId == libraryTitle.ApplicationId);
 
         var nsxLibraryTitle = new Title
         {
-            FileName = libraryTitle.FileName,
-            ApplicationId = libraryTitle.TitleId,
+            FileName = libraryTitle.FileName!,
+            ApplicationId = libraryTitle.ApplicationId,
         };
 
         if (titledbTitle is null)
@@ -161,7 +161,7 @@ public class TitleLibraryService(
                 : libraryTitle.TitleName;
 
             //If no Type try use the filename
-            if (libraryTitle.Type == TitleContentType.Unknown)
+            if (libraryTitle.ContentType == TitleContentType.Unknown)
             {
                 nsxLibraryTitle.ContentType = metaFromFileName.Type switch
                 {
@@ -173,7 +173,7 @@ public class TitleLibraryService(
             }
             else
             {
-                nsxLibraryTitle.ContentType = libraryTitle.Type switch
+                nsxLibraryTitle.ContentType = libraryTitle.ContentType switch
                 {
                     TitleContentType.Base => TitleContentType.Base,
                     TitleContentType.Update => TitleContentType.Update,
@@ -189,7 +189,7 @@ public class TitleLibraryService(
             nsxLibraryTitle.IconUrl = libraryTitle.IconUrl;
             nsxLibraryTitle.Intro = libraryTitle.Intro;
             nsxLibraryTitle.LastWriteTime = libraryTitle.LastWriteTime;
-            nsxLibraryTitle.NsuId = libraryTitle.Nsuid;
+            nsxLibraryTitle.NsuId = libraryTitle.NsuId;
             nsxLibraryTitle.NumberOfPlayers = libraryTitle.NumberOfPlayers;
             nsxLibraryTitle.OwnedDlcs = 0;
             nsxLibraryTitle.OwnedUpdates = 0;
@@ -802,14 +802,14 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
         try
         {
             logger.LogDebug("Processing file: {file}", file);
-            var libraryTitle = await fileInfoService.GetFileInfo(file, detailed: false);
-            if (libraryTitle is null)
+            var libraryTitleResult = await fileInfoService.GetFileInfo(file, detailed: false);
+            if (libraryTitleResult.IsFailure)
             {
                 logger.LogError("Unable to get File Information from file : {file}", file);
                 return null;
             }
 
-            var title = await AggregateLibraryTitle(libraryTitle);
+            var title = await AggregateLibraryTitle(libraryTitleResult.Value);
             if (title is null) return title;
             _nsxLibraryDbContext.Add(title);
             await _nsxLibraryDbContext.SaveChangesAsync();
