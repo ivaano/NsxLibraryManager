@@ -1,5 +1,6 @@
 ﻿using Common.Services;
 using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Shared.Dto;
 
 namespace NsxLibraryManager.Core.Services.Interface;
 
@@ -12,7 +13,7 @@ public interface IFileInfoService
 
     Task<IEnumerable<string>> GetRecursiveFiles(string filePath);
 
-    Task<LibraryTitle> GetFileInfo(string filePath, bool detailed);
+    Task<Result<LibraryTitleDto>> GetFileInfo(string filePath, bool detailed);
     
     Task<LibraryTitle> GetFileInfoFromFileName(string filePath);
     bool TryGetFileInfoFromFileName(string filePath, out LibraryTitle libraryTitle);
