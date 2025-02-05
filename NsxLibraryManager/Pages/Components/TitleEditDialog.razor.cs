@@ -99,10 +99,14 @@ public partial class TitleEditDialog : ComponentBase
         
 
         var updatedTitles = await TitleLibraryService.UpdateLibraryTitleAsync(_libraryTitleDto);
-        ShowNotification(
-            NotificationSeverity.Success, 
-            "Success Updating Title", 
-            $"{updatedTitles} Title(s) Updated");
+        if (updatedTitles.IsSuccess)
+        {
+            ShowNotification(
+                NotificationSeverity.Success, 
+                "Success Updating Title", 
+                $"{updatedTitles.Value} Title(s) Updated");
+        }
+
         DialogService.Close(true);
     }
     
