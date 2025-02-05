@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 using NsxLibraryManager.Shared.Mapping;
 using NsxLibraryManager.Shared.Settings;
@@ -46,8 +47,8 @@ public partial class PackageRenamer
 
     private bool _fragmentButtonDisabled = true;
     private PackageRenamerSettings _settings = default!;
-    private IEnumerable<RenameTitle> _renameTitles = default!;
-    private RadzenDataGrid<RenameTitle> _renameGrid = default!;
+    private IEnumerable<RenameTitleDto> _renameTitles = default!;
+    private RadzenDataGrid<RenameTitleDto> _renameGrid = default!;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    
     private bool _isLoading = false;
     private bool _scanInputButtonDisabled = false;

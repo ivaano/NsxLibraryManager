@@ -95,9 +95,9 @@ public class RenamerService(
     }
     #endregion
     
-    public Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename)
+    public Task<IEnumerable<RenameTitleDto>> RenameFilesAsync(IEnumerable<RenameTitleDto> filesToRename)
     {
-        var renamedFiles = new List<RenameTitle>();
+        var renamedFiles = new List<RenameTitleDto>();
         foreach (var file in filesToRename)
         {
             if (file.Error || file.RenamedSuccessfully)
@@ -474,7 +474,7 @@ public class RenamerService(
         }
     }
     
-    public async Task<IEnumerable<RenameTitle>> GetFilesToRenameAsync(
+    public async Task<IEnumerable<RenameTitleDto>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
     {
         var filesResult = await fileInfoService.GetFileNames(inputPath, recursive);
@@ -485,14 +485,14 @@ public class RenamerService(
 
         var files = filesResult.Value;
         
-        var fileList = new List<RenameTitle>();
+        var fileList = new List<RenameTitleDto>();
         foreach (var file in files)
         {
             logger.LogInformation("Analyzing {}", file);
             var fileInfoResult = await GetAggregatedFileInfo(file);
             if (fileInfoResult.IsFailure)
             {
-                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, true,
+                fileList.Add(new RenameTitleDto(file, string.Empty, string.Empty, string.Empty, false, true,
                     fileInfoResult.Error));
                 continue;
             }
@@ -501,7 +501,7 @@ public class RenamerService(
             var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file, renameType);
             if (error)
             {
-                fileList.Add(new RenameTitle(file, string.Empty, string.Empty, string.Empty, false, error,
+                fileList.Add(new RenameTitleDto(file, string.Empty, string.Empty, string.Empty, false, error,
                     errorMessage));
                 continue;
             }
@@ -509,12 +509,12 @@ public class RenamerService(
             (newPath, error, errorMessage) = await ValidateDestinationFileAsync(file, newPath);
             if (error)
             {
-                fileList.Add(new RenameTitle(file, newPath, fileInfo.ApplicationId, fileInfo.TitleName, false, error,
+                fileList.Add(new RenameTitleDto(file, newPath, fileInfo.ApplicationId, fileInfo.TitleName, false, error,
                     errorMessage));
                 continue;
             }
 
-            fileList.Add(new RenameTitle(file, newPath, fileInfo.ApplicationId, fileInfo.TitleName, false, error,
+            fileList.Add(new RenameTitleDto(file, newPath, fileInfo.ApplicationId, fileInfo.TitleName, false, error,
                 errorMessage));
         }
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 using NsxLibraryManager.Shared.Mapping;
 using NsxLibraryManager.Shared.Settings;
@@ -30,8 +31,8 @@ public partial class BundleRenamer : ComponentBase
     
     private int selectedTabIndex = 0;
     
-    private RadzenDataGrid<RenameTitle> _renameGrid = default!;
-    private IEnumerable<RenameTitle> _renameTitles = default!;
+    private RadzenDataGrid<RenameTitleDto> _renameGrid = default!;
+    private IEnumerable<RenameTitleDto> _renameTitles = default!;
     private bool isLoading = false;
     private BundleRenamerSettings _settings = default!;
     private readonly IEnumerable<int> _pageSizeOptions = new[] { 25, 50, 100 };    

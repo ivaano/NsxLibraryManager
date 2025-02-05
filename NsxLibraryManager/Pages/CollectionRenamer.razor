@@ -1,12 +1,13 @@
 ﻿@page "/CollectionRenamer"
 @using NsxLibraryManager.Core.Models
+@using NsxLibraryManager.Shared.Dto
 @using NsxLibraryManager.Shared.Enums
 
 <RadzenTabs @bind-SelectedIndex="@selectedTabIndex">
     <Tabs>
         <RadzenTabsItem Text="Renamer">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-                <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+                <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitleDto" AllowSorting="true" AllowPaging="true" PageSize="100"
                                 AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                                 IsLoading="@isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">

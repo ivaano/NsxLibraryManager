@@ -3,23 +3,23 @@ using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Shared.Dto;
 
-public record LibraryTitleDto
+public class LibraryTitleDto
 {
-    public required string ApplicationId { get; init; }
+    public required string ApplicationId { get; set; }
     public string? BannerUrl { get; init; }
     public IEnumerable<CategoryDto>? Categories { get; init; }
     public CollectionDto? Collection { get; set; }
-    public TitleContentType ContentType { get; init; }
+    public TitleContentType ContentType { get; set; }
     public string? Description { get; init; }
     public string? Developer { get; init; }
     public Collection<DlcDto>? Dlc { get; init; }
     public int? DlcCount { get; set; }
     public string? FileName { get; set; }
-    public int Id { get; init; }
+    public int? Id { get; init; }
     public string? IconUrl { get; init; }
     public bool IsDemo { get; init; }
     public string? Intro { get; init; }
-    public DateTime? LastWriteTime { get; init; }
+    public DateTime? LastWriteTime { get; set; }
     public IEnumerable<LanguageDto>? Languages { get; init; }
     public int? LatestOwnedUpdateVersion { get; init; }
     public int? LatestVersion { get; init; }
@@ -32,7 +32,7 @@ public record LibraryTitleDto
     public int? OwnedDlcCount { get; init; }
     public Collection<UpdateDto>? OwnedUpdates { get; init; }
     public int? OwnedUpdatesCount { get; init; }
-    public AccuratePackageType PackageType { get; init; }
+    public AccuratePackageType PackageType { get; set; }
     public int? PatchNumber { get; set; }
     public string? PatchTitleId { get; set; }
     public string? Publisher { get; init; }
@@ -41,7 +41,7 @@ public record LibraryTitleDto
     public DateTime? ReleaseDate { get; init; }
     public string? Region { get; init; }
     public Collection<ScreenshotDto>? Screenshots { get; init; }
-    public long Size { get; init; }
+    public long Size { get; set; }
     public string? TitleName { get; set; }
     public uint TitleVersion { get; set; }
     public Collection<UpdateDto>? Updates { get; init; }

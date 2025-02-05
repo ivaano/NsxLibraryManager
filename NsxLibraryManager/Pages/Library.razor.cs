@@ -91,8 +91,6 @@ public partial class Library : IDisposable
         await Task.CompletedTask;
     }
     
-
-    
     private async Task InitialLoad()
     {
         var lastUpdated = await TitleLibraryService.GetLastLibraryUpdateAsync();
@@ -132,6 +130,11 @@ public partial class Library : IDisposable
         {
             _libraryTitles = titles.Value.Titles;
             _count = titles.Value.Count;
+        }
+        else
+        {
+            _libraryTitles = Array.Empty<LibraryTitleDto>();    
+            _count = 0;
         }
         _isLoading = false;
     }

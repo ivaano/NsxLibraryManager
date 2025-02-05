@@ -14,10 +14,10 @@ public interface ITitleLibraryService
     public Task<IEnumerable<string>> GetLibraryFilesAsync();
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();
     public Task<Title?> ProcessFileAsync(string file);
-    public Task<Result<bool>> AddLibraryTitleAsync(LibraryTitle title);
-    public Task<Result<bool>> UpdateLibraryTitleAsync(LibraryTitle title);
-    public Task<int> UpdateLibraryTitleAsync(LibraryTitleDto titleDto);
-    public Task<Result<bool>> RemoveLibraryTitleAsync(LibraryTitle title);
+    public Task<Result<bool>> AddLibraryTitleAsync(LibraryTitleDto title);
+    //public Task<Result<bool>> UpdateLibraryTitleAsync(LibraryTitle title);
+    public Task<Result<int>> UpdateLibraryTitleAsync(LibraryTitleDto titleDto);
+    public Task<Result<bool>> RemoveLibraryTitleAsync(LibraryTitleDto title);
     public Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType contentType);
     public Task<Result<LibraryTitleDto>> GetTitleByApplicationId(string applicationId);
     public int GetTitlesCountByContentType(TitleContentType contentType);
@@ -34,6 +34,6 @@ public interface ITitleLibraryService
     public Task<Result<CollectionDto?>> RemoveCollection(CollectionDto collectionDto);
     public Task<Result<CollectionDto?>> UpdateCollection(CollectionDto collectionDto);
 
-    public Task<Result<IEnumerable<RenameTitle>>> GetLibraryFilesToRenameAsync(RenameType renameType);
+    public Task<Result<IEnumerable<RenameTitleDto>>> GetLibraryFilesToRenameAsync(RenameType renameType);
 
 }
