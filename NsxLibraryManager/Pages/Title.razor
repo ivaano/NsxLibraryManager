@@ -188,7 +188,7 @@
     </RadzenColumn>
     <RadzenColumn Size="7">
 
-        <RadzenCarousel @ref="_carousel" @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval"
+        <RadzenCarousel @ref="_carousel" @bind-SelectedIndex="@_selectedIndex" Auto="@_auto" Interval="@_interval"
                         PagerOverlay="true" ButtonShade="Shade.Default" Style="height: 366px;" class="rz-mx-auto">
             <Items>
                 @if (LibraryTitleDto?.Screenshots is not null)

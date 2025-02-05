@@ -1,35 +1,13 @@
 using System.Collections.ObjectModel;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.Titledb;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Extensions;
 
 public static class TitledbMappingExtension
 {
-    
-    public static GridTitle MapToGridTitleDto(this Title title)
-    {
-        return new GridTitle
-        {
-            ApplicationId = title.ApplicationId,
-            BannerUrl = title.BannerUrl,
-            ContentType = title.ContentType,
-            Description = title.Description,
-            DlcCount = title.DlcCount,
-            Size = title.Size ?? 0,
-            Intro = title.Intro,
-            IconUrl = title.IconUrl,
-            LatestVersion = title.LatestVersion,
-            NsuId = title.NsuId,
-            NumberOfPlayers = title.NumberOfPlayers,
-            OtherApplicationId = title.OtherApplicationId,
-            Publisher = title.Publisher,
-            Rating = title.Rating,
-            FileName = string.Empty
-        };
-    }
-    
+  
     public static LibraryTitleDto MapToTitleDto(this Title title)
     {
         return new LibraryTitleDto

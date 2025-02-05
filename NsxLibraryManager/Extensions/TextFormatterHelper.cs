@@ -1,6 +1,6 @@
 ﻿using System.Text;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Models.Dto;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Extensions;
 

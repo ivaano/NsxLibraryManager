@@ -15,19 +15,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="13.0.1"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
-        <PackageReference Include="Radzen.Blazor" Version="5.9.6" />
+        <PackageReference Include="Radzen.Blazor" Version="5.9.7" />
         <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\NsxLibraryManager.Core\NsxLibraryManager.Core.csproj" />
         <ProjectReference Include="..\NsxLibraryManager.Utils\NsxLibraryManager.Utils.csproj" />
+        <ProjectReference Include="..\NsxLibraryManager.Shared\NsxLibraryManager.Shared.csproj" />
         <ProjectReference Include="..\Common.Contracts\Common.Contracts.csproj" />
         <ProjectReference Include="..\Common.Services\Common.Services.csproj" />
     </ItemGroup>

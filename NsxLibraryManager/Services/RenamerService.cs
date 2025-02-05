@@ -1,27 +1,23 @@
 ﻿using System.Globalization;
-using System.Linq.Dynamic.Core;
 using System.Text.RegularExpressions;
 using Common.Services;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
-using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
-using NsxLibraryManager.Models.Dto;
-using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Mapping;
+using NsxLibraryManager.Shared.Settings;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 namespace NsxLibraryManager.Services;
 
 public class RenamerService(
     TitledbDbContext titledbDbContext,
-    NsxLibraryDbContext nsxLibraryDbContext,
     IValidator<PackageRenamerSettings> validatorPackage,
     IValidator<BundleRenamerSettings> validatorBundle,
     IValidator<CollectionRenamerSettings> validatorCollection,
@@ -30,7 +26,6 @@ public class RenamerService(
     : IRenamerService
 {
     private readonly TitledbDbContext _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
-    private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
     private PackageRenamerSettings _packageRenamerSettings = null!;
     private BundleRenamerSettings _bundleRenamerSettings = null!;
     private CollectionRenamerSettings _collectionRenamerSettings = null!;
@@ -143,7 +138,78 @@ public class RenamerService(
 
         return Task.FromResult(renamedFiles.AsEnumerable());
     }
-    
+
+    public Result<string> GetRenameTemplate(RenameType renameType, TitleContentType contentType, AccuratePackageType accuratePackageType)
+    {
+        string templateText;
+        switch (renameType)
+        {
+            case RenameType.Bundle:
+            {
+                var renameTemplate = contentType switch
+                {
+                    TitleContentType.Base => _bundleRenamerSettings.BundleBase,
+                    TitleContentType.Update => _bundleRenamerSettings.BundleUpdate,
+                    TitleContentType.DLC => _bundleRenamerSettings.BundleDlc,
+                    _ => string.Empty
+                };
+                templateText = $"{{BasePath}}{renameTemplate}";
+                break;
+            }
+            case RenameType.Collection:
+                var collectionRenameTemplate = contentType switch
+                {
+                    TitleContentType.Base => _collectionRenamerSettings.BundleBase,
+                    TitleContentType.Update => _collectionRenamerSettings.BundleUpdate,
+                    TitleContentType.DLC => _collectionRenamerSettings.BundleDlc,
+                    _ => string.Empty
+                };
+                templateText = $"{{BasePath}}{collectionRenameTemplate}";
+                break;
+            case RenameType.PackageType:
+            {
+                templateText = accuratePackageType switch
+                {
+                    AccuratePackageType.NSP => contentType switch
+                    {
+                        TitleContentType.Base   => _packageRenamerSettings.NspBasePath,
+                        TitleContentType.Update => _packageRenamerSettings.NspUpdatePath,
+                        TitleContentType.DLC    => _packageRenamerSettings.NspDlcPath,
+                        _                       => string.Empty
+                    },
+                    AccuratePackageType.NSZ => contentType switch
+                    {
+                        TitleContentType.Base   => _packageRenamerSettings.NszBasePath,
+                        TitleContentType.Update => _packageRenamerSettings.NszUpdatePath,
+                        TitleContentType.DLC    => _packageRenamerSettings.NszDlcPath,
+                        _                       => string.Empty
+                    },
+                    AccuratePackageType.XCI => contentType switch
+                    {
+                        TitleContentType.Base   => _packageRenamerSettings.XciBasePath,
+                        TitleContentType.Update => _packageRenamerSettings.XciUpdatePath,
+                        TitleContentType.DLC    => _packageRenamerSettings.XciDlcPath,
+                        _                       => string.Empty
+                    },
+                    AccuratePackageType.XCZ => contentType switch
+                    {
+                        TitleContentType.Base   => _packageRenamerSettings.XczBasePath,
+                        TitleContentType.Update => _packageRenamerSettings.XczUpdatePath,
+                        TitleContentType.DLC    => _packageRenamerSettings.XczDlcPath,
+                        _                       => string.Empty
+                    },
+                    _ => throw new Exception("Unknown package type")
+                };
+                break;
+            }
+            default:
+                return Result.Failure<string>("Unknown rename type");
+        }
+        
+        return Result.Success(templateText);
+    }
+
+
     public async Task<string> CalculateSampleFileName(string templateText, 
     TitlePackageType titlePackageType, string inputFile, RenameType renameType)
     {
@@ -163,18 +229,18 @@ public class RenamerService(
             Size = 1000000000,
             Type = (renameType, titlePackageType) switch
             {
-                (RenameType.Collection, TitlePackageType.BundleBase)   => TitleLibraryType.Base,
-                (RenameType.Collection, TitlePackageType.BundleUpdate) => TitleLibraryType.Update,
-                (RenameType.Collection, TitlePackageType.BundleDlc)    => TitleLibraryType.DLC,
+                (RenameType.Collection, TitlePackageType.BundleBase)   => TitleContentType.Base,
+                (RenameType.Collection, TitlePackageType.BundleUpdate) => TitleContentType.Update,
+                (RenameType.Collection, TitlePackageType.BundleDlc)    => TitleContentType.DLC,
             
-                (RenameType.Bundle, TitlePackageType.BundleBase)   => TitleLibraryType.Base,
-                (RenameType.Bundle, TitlePackageType.BundleUpdate) => TitleLibraryType.Update,
-                (RenameType.Bundle, TitlePackageType.BundleDlc)    => TitleLibraryType.DLC,
+                (RenameType.Bundle, TitlePackageType.BundleBase)   => TitleContentType.Base,
+                (RenameType.Bundle, TitlePackageType.BundleUpdate) => TitleContentType.Update,
+                (RenameType.Bundle, TitlePackageType.BundleDlc)    => TitleContentType.DLC,
         
-                (RenameType.PackageType, TitlePackageType.NspBase)   => TitleLibraryType.Base,
-                (RenameType.PackageType, TitlePackageType.NspUpdate) => TitleLibraryType.Update,
-                (RenameType.PackageType, TitlePackageType.NspDlc)    => TitleLibraryType.DLC,
-                _ => TitleLibraryType.Unknown
+                (RenameType.PackageType, TitlePackageType.NspBase)   => TitleContentType.Base,
+                (RenameType.PackageType, TitlePackageType.NspUpdate) => TitleContentType.Update,
+                (RenameType.PackageType, TitlePackageType.NspDlc)    => TitleContentType.DLC,
+                _ => TitleContentType.Unknown
             }
         };
         
@@ -323,7 +389,7 @@ public class RenamerService(
                 safeAppTitleName = RemoveIllegalCharacters(fileInfo.ApplicationTitleName);
             }
 
-            if (fileInfo is { Type: TitleLibraryType.Update, ApplicationTitleName: null })
+            if (fileInfo is { Type: TitleContentType.Update, ApplicationTitleName: null })
             {
                 safeAppTitleName = safeTitleName;
             }
@@ -370,7 +436,7 @@ public class RenamerService(
             if (titledbTitle is null)
             {
                 //try to find OtherApplicationName in titledb
-                if (fileInfo.Type is TitleLibraryType.Update or TitleLibraryType.DLC
+                if (fileInfo.Type is TitleContentType.Update or TitleContentType.DLC
                     && string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleName) && !string.IsNullOrWhiteSpace(fileInfo.ApplicationTitleId))
                 {
                     var otherApplication = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.OtherApplicationId == fileInfo.ApplicationTitleId);
@@ -498,61 +564,14 @@ public class RenamerService(
         RenameType renameType)
     {
         fileInfo.FileName = filePath;
-
-        switch (renameType)
+        
+        var templateResult = GetRenameTemplate(renameType, fileInfo.Type, fileInfo.PackageType);
+        if (templateResult.IsFailure)
         {
-            case RenameType.Bundle:
-            {
-                var renameTemplate = fileInfo.Type switch
-                {
-                    TitleLibraryType.Base => _bundleRenamerSettings.BundleBase,
-                    TitleLibraryType.Update => _bundleRenamerSettings.BundleUpdate,
-                    TitleLibraryType.DLC => _bundleRenamerSettings.BundleDlc,
-                    _ => string.Empty
-                };
-                var prependBasePath = $"{{BasePath}}{renameTemplate}";
-                return await TemplateReplaceAsync(prependBasePath, fileInfo, renameType);
-            }
-            case RenameType.PackageType:
-            {
-                // No demo support for now
-                var renameTemplate = fileInfo.PackageType switch
-                {
-                    AccuratePackageType.NSP => fileInfo.Type switch
-                    {
-                        TitleLibraryType.Base   => _packageRenamerSettings.NspBasePath,
-                        TitleLibraryType.Update => _packageRenamerSettings.NspUpdatePath,
-                        TitleLibraryType.DLC    => _packageRenamerSettings.NspDlcPath,
-                        _                       => string.Empty
-                    },
-                    AccuratePackageType.NSZ => fileInfo.Type switch
-                    {
-                        TitleLibraryType.Base   => _packageRenamerSettings.NszBasePath,
-                        TitleLibraryType.Update => _packageRenamerSettings.NszUpdatePath,
-                        TitleLibraryType.DLC    => _packageRenamerSettings.NszDlcPath,
-                        _                       => string.Empty
-                    },
-                    AccuratePackageType.XCI => fileInfo.Type switch
-                    {
-                        TitleLibraryType.Base   => _packageRenamerSettings.XciBasePath,
-                        TitleLibraryType.Update => _packageRenamerSettings.XciUpdatePath,
-                        TitleLibraryType.DLC    => _packageRenamerSettings.XciDlcPath,
-                        _                       => string.Empty
-                    },
-                    AccuratePackageType.XCZ => fileInfo.Type switch
-                    {
-                        TitleLibraryType.Base   => _packageRenamerSettings.XczBasePath,
-                        TitleLibraryType.Update => _packageRenamerSettings.XczUpdatePath,
-                        TitleLibraryType.DLC    => _packageRenamerSettings.XczDlcPath,
-                        _                       => string.Empty
-                    },
-                    _ => throw new Exception("Unknown package type")
-                };
-                return await TemplateReplaceAsync(renameTemplate, fileInfo, renameType);
-            }
-            case RenameType.Collection:
-            default:
-                return string.Empty;
+            logger.LogError(templateResult.Error);
         }
+        
+        return await TemplateReplaceAsync(templateResult.Value, fileInfo, renameType);
+        
     }
 }

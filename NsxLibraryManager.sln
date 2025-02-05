@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Contracts", "Common.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Services", "Common.Services\Common.Services.csproj", "{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Shared", "NsxLibraryManager.Shared\NsxLibraryManager.Shared.csproj", "{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,5 +47,9 @@ Global
 		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

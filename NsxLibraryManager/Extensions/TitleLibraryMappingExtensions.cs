@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Extensions;
 

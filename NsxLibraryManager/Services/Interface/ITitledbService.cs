@@ -1,5 +1,5 @@
 ﻿using Common.Services;
-using NsxLibraryManager.Models.Dto;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.ViewModels.TitleDb;
 using Radzen;
 

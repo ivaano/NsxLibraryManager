@@ -1,4 +1,4 @@
-﻿using NsxLibraryManager.Models.Dto;
+﻿using NsxLibraryManager.Shared.Dto;
 
 namespace NsxLibraryManager.Services.Interface;
 

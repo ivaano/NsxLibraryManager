@@ -2,17 +2,17 @@
 using System.Linq.Dynamic.Core;
 using Common.Services;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.Services.Interface;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Settings;
 using NsxLibraryManager.Utils;
 using Radzen;
 using RatingsContent = NsxLibraryManager.Models.NsxLibrary.RatingsContent;
@@ -21,28 +21,20 @@ using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 namespace NsxLibraryManager.Services;
 
-public class TitleLibraryService : ITitleLibraryService
+public class TitleLibraryService(
+    NsxLibraryDbContext nsxLibraryDbContext,
+    TitledbDbContext titledbDbContext,
+    IFileInfoService fileInfoService,
+    IRenamerService renamerService,
+    ISettingsService settingsService,
+    ILogger<TitleLibraryService> logger)
+    : ITitleLibraryService
 {
-    private readonly NsxLibraryDbContext _nsxLibraryDbContext;
-    private readonly TitledbDbContext _titledbDbContext;
-    private readonly IFileInfoService _fileInfoService;
-    private readonly UserSettings _settings;
-    private readonly ILogger<TitleLibraryService> _logger;
+    private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
+    private readonly TitledbDbContext _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
+    private readonly IRenamerService _renamerService = renamerService;
+    private readonly UserSettings _settings = settingsService.GetUserSettings();
 
-
-    public TitleLibraryService(
-        NsxLibraryDbContext nsxLibraryDbContext,
-        TitledbDbContext titledbDbContext,
-        IFileInfoService fileInfoService,
-        ISettingsService settingsService,
-        ILogger<TitleLibraryService> logger)
-    {
-        _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
-        _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
-        _fileInfoService = fileInfoService;
-        _settings = settingsService.GetUserSettings();
-        _logger = logger;
-    }
 
     private static Task<Title> AddTitleLanguages(Title nsxLibraryTitle, Models.Titledb.Title titledbTitle)
     {
@@ -135,9 +127,9 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task<IEnumerable<string>> GetLibraryFilesAsync()
     {
-        var filesResult = await _fileInfoService.GetFileNames(_settings.LibraryPath, _settings.Recursive);
+        var filesResult = await fileInfoService.GetFileNames(_settings.LibraryPath, _settings.Recursive);
         if (filesResult.IsSuccess) return filesResult.Value;
-        _logger.LogError("Error getting files from library: {Error}", filesResult.Error);
+        logger.LogError("Error getting files from library: {Error}", filesResult.Error);
         return Array.Empty<string>();
     }
 
@@ -162,20 +154,20 @@ public class TitleLibraryService : ITitleLibraryService
 
         if (titledbTitle is null)
         {
-            var metaFromFileName = await _fileInfoService.GetFileInfoFromFileName(libraryTitle.FileName);
+            var metaFromFileName = await fileInfoService.GetFileInfoFromFileName(libraryTitle.FileName);
 
             nsxLibraryTitle.TitleName = string.IsNullOrEmpty(libraryTitle.TitleName)
                 ? metaFromFileName.TitleName
                 : libraryTitle.TitleName;
 
             //If no Type try use the filename
-            if (libraryTitle.Type == TitleLibraryType.Unknown)
+            if (libraryTitle.Type == TitleContentType.Unknown)
             {
                 nsxLibraryTitle.ContentType = metaFromFileName.Type switch
                 {
-                    TitleLibraryType.Base => TitleContentType.Base,
-                    TitleLibraryType.Update => TitleContentType.Update,
-                    TitleLibraryType.DLC => TitleContentType.DLC,
+                    TitleContentType.Base => TitleContentType.Base,
+                    TitleContentType.Update => TitleContentType.Update,
+                    TitleContentType.DLC => TitleContentType.DLC,
                     _ => TitleContentType.Unknown
                 };
             }
@@ -183,9 +175,9 @@ public class TitleLibraryService : ITitleLibraryService
             {
                 nsxLibraryTitle.ContentType = libraryTitle.Type switch
                 {
-                    TitleLibraryType.Base => TitleContentType.Base,
-                    TitleLibraryType.Update => TitleContentType.Update,
-                    TitleLibraryType.DLC => TitleContentType.DLC,
+                    TitleContentType.Base => TitleContentType.Base,
+                    TitleContentType.Update => TitleContentType.Update,
+                    TitleContentType.DLC => TitleContentType.DLC,
                     _ => TitleContentType.Unknown
                 };
             }
@@ -242,7 +234,7 @@ public class TitleLibraryService : ITitleLibraryService
         nsxLibraryTitle.Region = titledbTitle.Region;
         nsxLibraryTitle.ReleaseDate = titledbTitle.ReleaseDate;
         // prefer size from actual file
-        nsxLibraryTitle.Size = await _fileInfoService.GetFileSize(libraryTitle.FileName);
+        nsxLibraryTitle.Size = await fileInfoService.GetFileSize(libraryTitle.FileName);
         // prefer the title name from titledb
         nsxLibraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(titledbTitle.TitleName);
         nsxLibraryTitle.UpdatesCount = titledbTitle.UpdatesCount;
@@ -550,7 +542,7 @@ public class TitleLibraryService : ITitleLibraryService
         var dirFiles = new Dictionary<string, LibraryTitle>();
         foreach (var fileName in libDirFiles)
         {
-            if (_fileInfoService.TryGetFileInfoFromFileName(fileName, out var fileInfo))
+            if (fileInfoService.TryGetFileInfoFromFileName(fileName, out var fileInfo))
             {
                 dirFiles.Add(fileName, fileInfo);
             }
@@ -615,7 +607,7 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task<Result<bool>> AddLibraryTitleAsync(LibraryTitle title)
     {
-        _logger.LogDebug("Adding file: {filename} from library", title.FileName);
+        logger.LogDebug("Adding file: {filename} from library", title.FileName);
         var libraryTitle = await ProcessFileAsync(title.FileName);
 
         switch (libraryTitle)
@@ -662,18 +654,18 @@ public class TitleLibraryService : ITitleLibraryService
 
     public async Task<Result<bool>> UpdateLibraryTitleAsync(LibraryTitle title)
     {
-        _logger.LogDebug("Updating file: {filename} from library", title.FileName);
+        logger.LogDebug("Updating file: {filename} from library", title.FileName);
         var removeResult = await RemoveLibraryTitleAsync(title);
         if (removeResult.IsFailure)
         {
-            _logger.LogError(removeResult.Error);
+            logger.LogError(removeResult.Error);
             return removeResult;
         }
 
         var addTitleResult = await AddLibraryTitleAsync(title);
         if (addTitleResult.IsSuccess) return addTitleResult;
         
-        _logger.LogError(addTitleResult.Error);
+        logger.LogError(addTitleResult.Error);
         return addTitleResult;
 
     }
@@ -763,7 +755,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
 
     public async Task<Result<bool>> RemoveLibraryTitleAsync(LibraryTitle title)
     {
-        _logger.LogDebug("Removing file: {filename} from library", title.FileName);
+        logger.LogDebug("Removing file: {filename} from library", title.FileName);
         var libraryTitle =
             _nsxLibraryDbContext.Titles.FirstOrDefault(x =>
                 x.ApplicationId == title.TitleId && x.FileName == title.FileName);
@@ -798,7 +790,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error removing file: {filename} from library", title.FileName);
+            logger.LogError(ex, "Error removing file: {filename} from library", title.FileName);
         }
 
 
@@ -809,11 +801,11 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
     {
         try
         {
-            _logger.LogDebug("Processing file: {file}", file);
-            var libraryTitle = await _fileInfoService.GetFileInfo(file, detailed: false);
+            logger.LogDebug("Processing file: {file}", file);
+            var libraryTitle = await fileInfoService.GetFileInfo(file, detailed: false);
             if (libraryTitle is null)
             {
-                _logger.LogError("Unable to get File Information from file : {file}", file);
+                logger.LogError("Unable to get File Information from file : {file}", file);
                 return null;
             }
 
@@ -825,7 +817,7 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error processing file: {file}", file);
+            logger.LogError(e, "Error processing file: {file}", file);
             return null;
         }
     }
@@ -845,7 +837,18 @@ private async Task<IEnumerable<Title>> GetRelatedTitlesAsync(Title libraryTitle,
 
             foreach (var file in collectionFiles)
             {
-
+                var fileTemplate = _renamerService.GetRenameTemplate(RenameType.Collection, file.ContentType, file.PackageType);
+                if (fileTemplate.IsSuccess)
+                {
+                    /*
+                    var newFileName = await _renamerService.CalculateSampleFileName(fileTemplate.Value, file.ContentType, file.FileName, renameType);
+                    fileList.Add(new RenameTitle
+                    {
+                        FileName = file.FileName,
+                        NewFileName = newFileName
+                    });
+                    */
+                }
             }
         }
         

@@ -1,4 +1,4 @@
-﻿using NsxLibraryManager.Models.Dto;
+﻿using NsxLibraryManager.Shared.Dto;
 
 namespace NsxLibraryManager.ViewModels.TitleDb;
 

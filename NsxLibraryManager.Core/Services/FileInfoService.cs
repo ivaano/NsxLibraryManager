@@ -2,13 +2,11 @@
 using Common.Services;
 using LibHac.Ncm;
 using Microsoft.Extensions.Logging;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.Exceptions;
-using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.Services;
 
@@ -98,12 +96,12 @@ public class FileInfoService : IFileInfoService
             libraryTitle.TitleVersion = (uint)versionNumber;
             if (string.IsNullOrEmpty(dlcName) && versionNumber == 0)
             {
-                libraryTitle.Type = TitleLibraryType.Base;
+                libraryTitle.Type = TitleContentType.Base;
             } 
             
             if (string.IsNullOrEmpty(dlcName) && versionNumber > 0)
             {
-                libraryTitle.Type = TitleLibraryType.Update;
+                libraryTitle.Type = TitleContentType.Update;
             }
             
             if (!string.IsNullOrEmpty(dlcName))
@@ -112,7 +110,7 @@ public class FileInfoService : IFileInfoService
                 {
                     dlcName = dlcName[3..].Trim(); 
                 }
-                libraryTitle.Type = TitleLibraryType.DLC;
+                libraryTitle.Type = TitleContentType.DLC;
                 libraryTitle.TitleName = $"{libraryTitle.TitleName} - {dlcName}"; 
             }
         }
@@ -212,12 +210,12 @@ public class FileInfoService : IFileInfoService
 
         if (string.IsNullOrEmpty(dlcName) && versionNumber == 0)
         {
-            title.Type = TitleLibraryType.Base;
+            title.Type = TitleContentType.Base;
         } 
             
         if (string.IsNullOrEmpty(dlcName) && versionNumber > 0)
         {
-            title.Type = TitleLibraryType.Update;
+            title.Type = TitleContentType.Update;
         }
             
         if (!string.IsNullOrEmpty(dlcName))
@@ -226,7 +224,7 @@ public class FileInfoService : IFileInfoService
             {
                 dlcName = dlcName[3..].Trim(); 
             }
-            title.Type = TitleLibraryType.DLC;
+            title.Type = TitleContentType.DLC;
             title.TitleName = $"{title.TitleName} - {dlcName}"; 
         }
         
@@ -313,9 +311,9 @@ public class FileInfoService : IFileInfoService
         //title.AvailableVersion = availableVersion >> 16;
         title.Type = packageInfo.Contents.Type switch
         {
-                ContentMetaType.Application => TitleLibraryType.Base,
-                ContentMetaType.Patch => TitleLibraryType.Update,
-                ContentMetaType.AddOnContent => TitleLibraryType.DLC,
+                ContentMetaType.Application => TitleContentType.Base,
+                ContentMetaType.Patch => TitleContentType.Update,
+                ContentMetaType.AddOnContent => TitleContentType.DLC,
                 _ => title.Type
         };
 

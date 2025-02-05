@@ -2,13 +2,13 @@
 using LibHac.Tools.FsSystem.NcaUtils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
 
 namespace Tests.Services;
 
@@ -51,7 +51,7 @@ public class FileInfoServiceTests
         Assert.Equal(TestTitleName, result.TitleName);
         Assert.Equal(TestPublisher, result.Publisher);
         Assert.Equal(Path.GetFullPath(fileName), result.FileName);
-        Assert.Equal(TitleLibraryType.Base, result.Type);
+        Assert.Equal(TitleContentType.Base, result.Type);
         Assert.Equal(AccuratePackageType.NSP, result.PackageType);
     }
 

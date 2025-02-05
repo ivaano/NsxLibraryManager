@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Text.RegularExpressions;
 using LibHac.Util;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Extensions;
 

@@ -1,12 +1,10 @@
 ﻿using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.Models;
-using NsxLibraryManager.Core.Models.Dto;
 using NsxLibraryManager.Extensions;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Providers;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 using Radzen.Blazor;
 
@@ -23,9 +21,6 @@ public partial class TitleDbTitle
     [Parameter] 
     public string? TitleId { get; set; }
     private LibraryTitleDto? LibraryTitleDto { get; set; }
-
-    public IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
-    public IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
     
     public string HtmlDescription { get; set; } = string.Empty;
     
@@ -58,7 +53,6 @@ public partial class TitleDbTitle
         HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
         LibraryTitleDto = title;
         AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;
-
     }
     
     private async Task LoadDlcData(LoadDataArgs args)

@@ -2,10 +2,10 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Settings;
 using Radzen;
 using Radzen.Blazor;
 using NsxLibraryManager.Utils;

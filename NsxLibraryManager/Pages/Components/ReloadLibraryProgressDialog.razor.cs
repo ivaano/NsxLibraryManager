@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;

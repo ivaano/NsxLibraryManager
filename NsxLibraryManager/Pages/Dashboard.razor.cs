@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 
 namespace NsxLibraryManager.Pages;
 

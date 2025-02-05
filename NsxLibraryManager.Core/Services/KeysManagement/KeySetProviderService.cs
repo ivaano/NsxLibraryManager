@@ -2,7 +2,7 @@
 using LibHac.Common.Keys;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 using NsxLibraryManager.Utils;
 
 namespace NsxLibraryManager.Core.Services.KeysManagement;

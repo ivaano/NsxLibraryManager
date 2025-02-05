@@ -2,11 +2,9 @@ using System.Text;
 using Common.Contracts;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
-using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +13,7 @@ using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Settings;
 using Radzen;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
@@ -48,7 +47,6 @@ builder.Services
     });
 await builder.TitleDbDownloader();
 
-builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<NsxLibraryDbContext>(options =>

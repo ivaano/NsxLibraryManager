@@ -1,5 +1,5 @@
-﻿using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.FileLoading.Interface;
+﻿using NsxLibraryManager.Core.FileLoading.Interface;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.FileLoading;
 

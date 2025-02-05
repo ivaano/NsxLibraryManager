@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 using ILogger = Castle.Core.Logging.ILogger;
 
 namespace Tests.Services;
@@ -34,7 +34,7 @@ public class DownloadServiceTests
         };
         var options = Options.Create(appSettings);
         
-        _downloadService = new DownloadService(options, _httpClientFactory, _logger);
+        _downloadService = new DownloadService(_httpClientFactory, _logger);
     }
    
 }
