@@ -660,11 +660,17 @@ public class TitleLibraryService(
 
     public async Task<Result<int>> UpdateLibraryTitleAsync(LibraryTitleDto title)
     {
-        var removeResult = await RemoveLibraryTitleAsync(title);
-        if (removeResult.IsFailure) return Result.Failure<int>(removeResult.Error!);
+        //update by filename only
+        if (title.Id == 0)
+        {
+            var removeResult = await RemoveLibraryTitleAsync(title);
+            if (removeResult.IsFailure) return Result.Failure<int>(removeResult.Error!);
 
-        var addTitleResult = await AddLibraryTitleAsync(title);
-        if (addTitleResult.IsFailure) return Result.Failure<int>(removeResult.Error!);
+            var addTitleResult = await AddLibraryTitleAsync(title);
+            if (addTitleResult.IsFailure) return Result.Failure<int>(removeResult.Error!);
+            return Result.Success(1);
+
+        }
 
         var libraryTitle = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.Id == title.Id);
         if (libraryTitle is null) Result.Failure<int>("Title not found");
