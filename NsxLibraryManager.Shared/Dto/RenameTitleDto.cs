@@ -1,6 +1,6 @@
-﻿namespace NsxLibraryManager.Core.Models;
+﻿namespace NsxLibraryManager.Shared.Dto;
 
-public record RenameTitle(
+public record RenameTitleDto(
     string SourceFileName, 
     string? DestinationFileName,
     string? TitleId, 

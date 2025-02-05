@@ -1,12 +1,13 @@
 ﻿@page "/PackageRenamer"
 @using NsxLibraryManager.Core.Models
+@using NsxLibraryManager.Shared.Dto
 @using NsxLibraryManager.Shared.Enums
 <PageTitle>Renamer</PageTitle>
 <RadzenTabs @bind-SelectedIndex=@selectedTabIndex>
 <Tabs>
 <RadzenTabsItem Text="Renamer">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
-        <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitle" AllowSorting="true" AllowPaging="true" PageSize="100"
+        <RadzenDataGrid @ref="_renameGrid" Data="@_renameTitles" TItem="RenameTitleDto" AllowSorting="true" AllowPaging="true" PageSize="100"
                         AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                         AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
                         IsLoading="@_isLoading" AllowColumnReorder="true" PageSizeOptions="@_pageSizeOptions" ShowPagingSummary="true" style="height: 95vh">
@@ -17,20 +18,20 @@
                 <RadzenText TextStyle="TextStyle.Caption">Output Path: @_outputPathDisplay </RadzenText>
             </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn TItem="RenameTitle" Property="SourceFileName" Title="Source File" Width="200px">
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="SourceFileName" Title="Source File" Width="200px">
                     <Template Context="renameTitle">
                         <p style="white-space:pre-wrap">@renameTitle.SourceFileName</p>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="RenameTitle" Property="DestinationFileName" Title="Destination" Width="200px">
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="DestinationFileName" Title="Destination" Width="200px">
                     <Template Context="renameTitle">
                         <p style="white-space:pre-wrap">@renameTitle.DestinationFileName</p>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="RenameTitle" Property="TitleId" Title="Title Id" Width="100px"/>
-                <RadzenDataGridColumn TItem="RenameTitle" Property="TitleName" Title="Name" Width="100px"/>
-                <RadzenDataGridColumn TItem="RenameTitle" Property="Error" Title="Error" Width="50px"/>
-                <RadzenDataGridColumn TItem="RenameTitle" Property="ErrorMessage" Title="Error Message" Width="200px">
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="TitleId" Title="Title Id" Width="100px"/>
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="TitleName" Title="Name" Width="100px"/>
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="Error" Title="Error" Width="50px"/>
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="ErrorMessage" Title="Error Message" Width="200px">
                     <Template Context="renameTitle">
                         <p style="white-space:pre-wrap">@renameTitle.ErrorMessage</p>
                     </Template>

@@ -15,9 +15,9 @@ public interface IFileInfoService
 
     Task<Result<LibraryTitleDto>> GetFileInfo(string filePath, bool detailed);
     
-    Task<LibraryTitle> GetFileInfoFromFileName(string filePath);
-    bool TryGetFileInfoFromFileName(string filePath, out LibraryTitle libraryTitle);
+    Task<LibraryTitleDto> GetFileInfoFromFileName(string filePath);
+    bool TryGetFileInfoFromFileName(string filePath, out LibraryTitleDto libraryTitle);
 
-    Task<long?> GetFileSize(string filePath);
+    Task<long> GetFileSize(string filePath);
     Task<string?> GetFileIcon(string filePath);
 }

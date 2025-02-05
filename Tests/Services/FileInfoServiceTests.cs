@@ -45,14 +45,16 @@ public class FileInfoServiceTests
         
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(TestTitleId, result.TitleId);
-        Assert.Equal(TestApplicationTitleId, result.ApplicationTitleId);
-        Assert.Equal(TestPatchTitleId, result.PatchTitleId);
-        Assert.Equal(TestTitleName, result.TitleName);
-        Assert.Equal(TestPublisher, result.Publisher);
-        Assert.Equal(Path.GetFullPath(fileName), result.FileName);
-        Assert.Equal(TitleContentType.Base, result.Type);
-        Assert.Equal(AccuratePackageType.NSP, result.PackageType);
+        Assert.True(result.IsSuccess);
+        var libraryTitle = result.Value;
+        Assert.Equal(TestTitleId, libraryTitle.ApplicationId);
+        Assert.Equal(TestApplicationTitleId, libraryTitle.OtherApplicationId);
+        Assert.Equal(TestPatchTitleId, libraryTitle.PatchTitleId);
+        Assert.Equal(TestTitleName, libraryTitle.TitleName);
+        Assert.Equal(TestPublisher, libraryTitle.Publisher);
+        Assert.Equal(Path.GetFullPath(fileName), libraryTitle.FileName);
+        Assert.Equal(TitleContentType.Base, libraryTitle.ContentType);
+        Assert.Equal(AccuratePackageType.NSP, libraryTitle.PackageType);
     }
 
     [Fact]
