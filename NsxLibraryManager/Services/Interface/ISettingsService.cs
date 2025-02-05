@@ -1,5 +1,5 @@
-﻿using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.Settings;
+﻿using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Services.Interface;
 

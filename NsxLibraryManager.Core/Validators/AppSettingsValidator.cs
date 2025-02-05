@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Core.Validators;
 

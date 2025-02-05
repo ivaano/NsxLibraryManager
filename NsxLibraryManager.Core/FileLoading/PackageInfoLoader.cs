@@ -3,10 +3,10 @@ using LibHac.Common.Keys;
 using LibHac.Fs;
 using LibHac.FsSystem;
 using LibHac.Tools.Fs;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.FileLoading;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Services.Interface;
 

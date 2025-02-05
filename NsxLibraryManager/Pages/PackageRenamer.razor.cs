@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.Mapping;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Mapping;
+using NsxLibraryManager.Shared.Settings;
 using Radzen;
 using Radzen.Blazor;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;

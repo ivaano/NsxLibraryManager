@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 using Radzen.Blazor;
 

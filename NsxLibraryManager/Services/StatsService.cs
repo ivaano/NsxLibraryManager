@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Settings;
 using Radzen;
 
 namespace NsxLibraryManager.Services;

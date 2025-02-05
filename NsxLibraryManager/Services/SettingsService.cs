@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
 using Common.Contracts;
 using Microsoft.EntityFrameworkCore;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Services.KeysManagement;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Settings;
 using NsxLibraryManager.Utils;
 using Settings = NsxLibraryManager.Models.NsxLibrary.Settings;
 

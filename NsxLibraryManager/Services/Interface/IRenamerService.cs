@@ -1,6 +1,7 @@
-﻿using NsxLibraryManager.Core.Enums;
+﻿using Common.Services;
 using NsxLibraryManager.Core.Models;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Services.Interface;
 
@@ -12,6 +13,7 @@ public interface IRenamerService
     Task<BundleRenamerSettings> LoadRenamerSettingsAsync(BundleRenamerSettings settings);
     Task<CollectionRenamerSettings> LoadRenamerSettingsAsync(CollectionRenamerSettings settings);
     Task<IEnumerable<RenameTitle>> RenameFilesAsync(IEnumerable<RenameTitle> filesToRename);
+    Result<string> GetRenameTemplate(RenameType renameType, TitleContentType contentType, AccuratePackageType accuratePackageType);
     Task<bool> DeleteEmptyFoldersAsync(string sourceFolder);
     Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings);
     Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(BundleRenamerSettings settings);

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Models.NsxLibrary;
+using NsxLibraryManager.Shared.Settings;
 using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 namespace NsxLibraryManager.Data;

@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using NsxLibraryManager.Core.Settings;
 using NsxLibraryManager.Models.Titledb;
 using Version = NsxLibraryManager.Models.Titledb.Version;
 

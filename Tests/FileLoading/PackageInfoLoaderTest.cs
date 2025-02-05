@@ -5,7 +5,7 @@ using NSubstitute;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace Tests.FileLoading;
 

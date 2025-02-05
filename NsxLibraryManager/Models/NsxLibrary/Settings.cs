@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Models.NsxLibrary;
 

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Core.Validators;
 

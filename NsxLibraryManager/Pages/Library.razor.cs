@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Pages.Components;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using Radzen;
 using Radzen.Blazor;
 

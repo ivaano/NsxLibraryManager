@@ -1,13 +1,11 @@
 ﻿using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using NsxLibraryManager.Core.Enums;
-using NsxLibraryManager.Core.Models;
-using NsxLibraryManager.Core.Models.Dto;
 using NsxLibraryManager.Extensions;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Providers;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 using Radzen.Blazor;
 
@@ -27,24 +25,22 @@ public partial class Title
     [Parameter]
     public string? TitleId { get; set; }
 
-    private IEnumerable<GameVersions> GameVersions { get; set; } = new List<GameVersions>();
-    private IEnumerable<Dlc> GameDlcs { get; set; } = new List<Dlc>();
     //carousel
     private RadzenCarousel _carousel = default!;
-    private bool auto = true;
-    private double interval = 4000;
-    private bool started = true;
-    private int selectedIndex;
+    private bool _auto = true;
+    private double _interval = 4000;
+    private bool _started = true;
+    private int _selectedIndex;
     
     //readmore/less
-    private bool IsExpanded { get; set; } = false;
+    private bool IsExpanded { get; set; }
     private string MaxHeight => IsExpanded ? "none" : "300px";
     private ElementReference textRef;
 
     private string TextToDisplay => IsExpanded ? HtmlDescription : GetTruncatedText();
     private void Toggle()
     {
-        if (started)
+        if (_started)
         {
             _carousel.Stop();
         }
@@ -53,7 +49,7 @@ public partial class Title
             _carousel.Start();
         }
 
-        started = !started;
+        _started = !_started;
     }
     private LibraryTitleDto? LibraryTitleDto { get; set; }
     private string HtmlDescription { get; set; } = string.Empty;
@@ -61,16 +57,16 @@ public partial class Title
     private AgeRatingAgency AgeRatingAgency { get; set; }
 
     //dlc grid
-    private RadzenDataGrid<DlcDto> _dlcGrid;
+    private RadzenDataGrid<DlcDto>? _dlcGrid;
     private bool _dlcIsLoading;
     private int _dlcCount;
-    private IEnumerable<DlcDto> _dlcs;
+    private IEnumerable<DlcDto>? _dlcs;
     
     //updates grid
-    private RadzenDataGrid<UpdateDto> _updatesGrid;
+    private RadzenDataGrid<UpdateDto>? _updatesGrid;
     private bool _updatesIsLoading;
     private int _updatesCount;
-    private IEnumerable<UpdateDto> _updates;
+    private IEnumerable<UpdateDto>? _updates;
 
     
     private string GetTruncatedText()

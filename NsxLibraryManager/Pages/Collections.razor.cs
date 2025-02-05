@@ -1,7 +1,7 @@
 ﻿using Common.Services;
 using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using Radzen;
 using Radzen.Blazor;
 

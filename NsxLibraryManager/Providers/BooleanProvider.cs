@@ -2,18 +2,13 @@
 
 public class BooleanProvider : IFormatProvider, ICustomFormatter
 {
-    public string Format(string format, object arg, IFormatProvider formatProvider)
+    public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
-        return object.Equals(arg, true) ? "Yes" : object.Equals(arg, false) ? "No" : "No value";
+        return Equals(arg, true) ? "Yes" : Equals(arg, false) ? "No" : "No value";
     }
 
-    public object GetFormat(Type formatType)
+    public object? GetFormat(Type? formatType)
     {
-        if (formatType == typeof(ICustomFormatter))
-        {
-            return this;
-        }
-
-        return null;
+        return formatType == typeof(ICustomFormatter) ? this : null;
     }
 }

@@ -1,14 +1,12 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.Services.Interface;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Core.Services;
 
 public sealed partial class DownloadService(
-    IOptions<UserSettings> options,
     IHttpClientFactory httpClientFactory,
     ILogger<DownloadService> logger)
     : IDownloadService

@@ -1,9 +1,9 @@
 ﻿using Common.Services;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Models;
-using NsxLibraryManager.Models.Dto;
 using NsxLibraryManager.Models.NsxLibrary;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 
 namespace NsxLibraryManager.Services.Interface;

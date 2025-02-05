@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.FileLoading;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.Models;
 
@@ -23,7 +23,7 @@ public class LibraryTitle
     public string? Collection { get; set; }
     public string? Publisher { get; set; }
     public uint TitleVersion { get; set; }
-    public TitleLibraryType Type { get; set; }
+    public TitleContentType Type { get; set; }
     public AccuratePackageType PackageType { get; set; }
     public required string FileName { get; set; }
     public string? BannerUrl { get; set; }
