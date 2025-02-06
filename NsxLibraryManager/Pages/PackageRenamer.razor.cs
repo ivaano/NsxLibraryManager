@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Providers;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
@@ -36,8 +37,8 @@ public partial class PackageRenamer
     private TitlePackageType _currentTitlePackage = TitlePackageType.None;
     private readonly Dictionary<TitlePackageType, TemplateFieldInfo> _templateFields = new();
     private int selectedTabIndex = 0;
-    private readonly Dictionary<TemplateField, string> _templateFieldMappings =
-        RenamerTemplateFields.TemplateFieldMappings;
+    private readonly Dictionary<TemplateField, string> _templateFieldMappings = RenamerTemplateFields.TemplateFieldMappings;
+    private readonly BooleanProvider _myBooleanProvider = new();
 
     private readonly Dictionary<string, string> _validationErrors = new()
     {

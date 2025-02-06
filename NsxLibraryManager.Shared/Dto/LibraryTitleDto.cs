@@ -21,8 +21,8 @@ public class LibraryTitleDto
     public string? Intro { get; init; }
     public DateTime? LastWriteTime { get; set; }
     public IEnumerable<LanguageDto>? Languages { get; init; }
-    public int? LatestOwnedUpdateVersion { get; init; }
-    public int? LatestVersion { get; init; }
+    public uint LatestOwnedUpdateVersion { get; init; }
+    public uint LatestVersion { get; init; }
     public long? NsuId { get; init; }
     public int? NumberOfPlayers { get; init; }
     public string? OtherApplicationId { get; init; }
@@ -43,9 +43,8 @@ public class LibraryTitleDto
     public Collection<ScreenshotDto>? Screenshots { get; init; }
     public long Size { get; set; }
     public string? TitleName { get; set; }
-    public uint TitleVersion { get; set; }
     public Collection<UpdateDto>? Updates { get; init; }
     public int? UpdatesCount { get; set; }
-    public int? Version { get; init; }
+    public uint Version { get; init; }
     public Collection<VersionDto>? Versions { get; init; }
 }

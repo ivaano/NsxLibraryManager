@@ -11,10 +11,10 @@ public sealed class Title : BaseTitle
     public int? OwnedDlcs { get; set; }
     
     //Title Version
-    public int? Version { get; set; }
+    public uint Version { get; set; }
     
     //For basetitles and dlc only
-    public int? LatestOwnedUpdateVersion { get; set; }
+    public uint LatestOwnedUpdateVersion { get; set; }
 
     public AccuratePackageType PackageType { get; set; }
     

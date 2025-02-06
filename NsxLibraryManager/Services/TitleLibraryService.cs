@@ -202,7 +202,7 @@ public class TitleLibraryService(
             nsxLibraryTitle.Rating = libraryTitle.Rating;
             nsxLibraryTitle.ReleaseDate = libraryTitle.ReleaseDate;
             nsxLibraryTitle.Size = metaFromFileName.Size;
-            nsxLibraryTitle.Version = (int?)libraryTitle.TitleVersion;
+            nsxLibraryTitle.Version = libraryTitle.Version;
 
             /*
             if (libraryTitle.Type == TitleLibraryType.Base)
@@ -242,7 +242,7 @@ public class TitleLibraryService(
         // prefer the title name from titledb
         nsxLibraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(titledbTitle.TitleName);
         nsxLibraryTitle.UpdatesCount = titledbTitle.UpdatesCount;
-        nsxLibraryTitle.Version = (int?)libraryTitle.TitleVersion;
+        nsxLibraryTitle.Version = libraryTitle.Version;
 
         if (titledbTitle.Screenshots != null)
         {
@@ -832,25 +832,55 @@ public class TitleLibraryService(
                 .Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates())
                 .ToListAsync();
 
-            foreach (var file in collectionFiles)
+            foreach (var libraryTitle in collectionFiles)
             {
                 var fileTemplate =
-                    _renamerService.GetRenameTemplate(RenameType.Collection, file.ContentType, file.PackageType);
+                    _renamerService.GetRenameTemplate(RenameType.Collection, libraryTitle.ContentType, libraryTitle.PackageType);
                 if (fileTemplate.IsSuccess)
                 {
-                    /*
-                    var newFileName = await _renamerService.CalculateSampleFileName(fileTemplate.Value, file.ContentType, file.FileName, renameType);
-                    fileList.Add(new RenameTitle
+                    if (libraryTitle.ContentType is TitleContentType.Update or TitleContentType.DLC &&
+                        string.IsNullOrEmpty(libraryTitle.OtherApplicationName))
                     {
-                        FileName = file.FileName,
-                        NewFileName = newFileName
-                    });
-                    */
+                        var otherTitle = await _nsxLibraryDbContext.Titles
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(t => t.ApplicationId == libraryTitle.OtherApplicationId);
+                        if (otherTitle is not null) libraryTitle.OtherApplicationName = otherTitle.TitleName;
+                    }
+                    var newFileName = await _renamerService.GetNewFileName(fileTemplate.Value, libraryTitle, RenameType.Collection);
+                    if (newFileName.IsFailure)
+                    {
+                        fileList.Add(new RenameTitleDto
+                        {
+                            SourceFileName = libraryTitle.FileName ?? string.Empty,
+                            DestinationFileName = string.Empty,
+                            TitleId = libraryTitle.ApplicationId,
+                            TitleName = libraryTitle.TitleName,
+                            Error = true,
+                            ErrorMessage = newFileName.Error,
+                        });  
+                        continue;
+                    }
+                    
+                    if (newFileName.IsSuccess)
+                    {
+                        fileList.Add(new RenameTitleDto
+                        {
+                            SourceFileName = libraryTitle.FileName ?? string.Empty,
+                            DestinationFileName = newFileName.Value,
+                            TitleId = libraryTitle.ApplicationId,
+                            TitleName = libraryTitle.TitleName,
+                            Error = false,
+                            ErrorMessage = string.Empty,
+                            Id = libraryTitle.Id,
+                            UpdateLibrary = true
+                        });  
+                    }
                 }
             }
         }
 
 
-        return Result.Failure<IEnumerable<RenameTitleDto>>("No Files");
+        return Result.Success(fileList.AsEnumerable());
+        //return Result.Failure<IEnumerable<RenameTitleDto>>("No Files");
     }
 }

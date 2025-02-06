@@ -51,19 +51,18 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Property="Version" Title="Version" Visible="false" Width="100px">
                 <Template Context="libraryTitle">
-                    @if (libraryTitle.Version is not null)
-                    {
-                        var shortVer = (libraryTitle.Version.ToString() ?? string.Empty).VersionShifted();
-                        @if (shortVer > 0)
-                        {
-                            <span>@libraryTitle.Version <span class="rz-text-caption">(@shortVer)</span></span>
-                        }
-                        else
-                        {
-                            <span>@libraryTitle.Version</span>
-                        }
-
-                    }
+@{
+    var shortVer = (libraryTitle.Version.ToString() ?? string.Empty).VersionShifted();
+    @if (shortVer > 0)
+    {
+        <span>@libraryTitle.Version <span class="rz-text-caption">(@shortVer)</span></span>
+    }
+    else
+    {
+        <span>@libraryTitle.Version</span>
+    }
+}
+                    
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Property="Collection.Name" Title="Collection" Visible="false"/>
@@ -101,8 +100,7 @@
             <RadzenDataGridColumn Property="NumberOfPlayers" Title="Players" Width="50px" Visible="false"/>
             <RadzenDataGridColumn Property="LatestVersion" Title="Latest Version" Visible="false" Width="50px">
                 <Template Context="libraryTitle">
-                    @if (libraryTitle.LatestVersion is not null)
-                    {
+                    @{
                         var shortVer = (libraryTitle.LatestVersion.ToString() ?? string.Empty).VersionShifted();
                         @if (shortVer > 0)
                         {

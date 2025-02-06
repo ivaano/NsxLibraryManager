@@ -54,14 +54,12 @@ public class BaseTitle
     
     public int? Rating { get; set; }
     public long? Size { get; set; }
-    
     public int? NumberOfPlayers { get; set; }
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(2)]
     public string? Region { get; set; }
-    
-    public int? LatestVersion { get; set; }
+    public uint LatestVersion { get; set; }
     public int? UpdatesCount { get; set; }
     public int? DlcCount { get; set; }
     

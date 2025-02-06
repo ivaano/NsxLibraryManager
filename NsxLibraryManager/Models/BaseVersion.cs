@@ -10,7 +10,7 @@ public class BaseVersion
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    public int VersionNumber { get; set; }
+    public uint VersionNumber { get; set; }
     public string VersionDate { get; set; }
     public int TitleId { get; set; }
 

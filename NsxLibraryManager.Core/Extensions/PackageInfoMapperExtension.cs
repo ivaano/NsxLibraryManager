@@ -20,7 +20,7 @@ public static class PackageInfoMapperExtension
             ApplicationId = packageInfo.Contents.TitleId ?? string.Empty,
             TitleName = packageInfo.Contents.Name,
             Publisher = packageInfo.Contents.Publisher,
-            TitleVersion = packageInfo.Contents.Version.Version,
+            Version = packageInfo.Contents.Version.Version,
             PackageType = packageInfo.AccuratePackageType,
             FileName = Path.GetFullPath(filePath),
             LastWriteTime = File.GetLastWriteTime(filePath),

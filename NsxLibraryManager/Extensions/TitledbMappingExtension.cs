@@ -63,7 +63,7 @@ public static class TitledbMappingExtension
                 ApplicationId = d.ApplicationId,
                 TitleName = d.TitleName,
                 Size = d.Size.GetValueOrDefault(),
-                Version = d.LatestVersion.GetValueOrDefault(),
+                Version = d.LatestVersion,
                 Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
                 {
                     Url = x.Url

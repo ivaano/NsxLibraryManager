@@ -14,6 +14,7 @@ public interface IRenamerService
     Task<BundleRenamerSettings> LoadRenamerSettingsAsync(BundleRenamerSettings settings);
     Task<CollectionRenamerSettings> LoadRenamerSettingsAsync(CollectionRenamerSettings settings);
     Task<IEnumerable<RenameTitleDto>> RenameFilesAsync(IEnumerable<RenameTitleDto> filesToRename);
+    Task<Result<string>> GetNewFileName(string renameTemplate, LibraryTitleDto libraryTitle, RenameType renameType);
     Result<string> GetRenameTemplate(RenameType renameType, TitleContentType contentType, AccuratePackageType accuratePackageType);
     Task<bool> DeleteEmptyFoldersAsync(string sourceFolder);
     Task<FluentValidation.Results.ValidationResult> ValidateRenamerSettingsAsync(PackageRenamerSettings settings);

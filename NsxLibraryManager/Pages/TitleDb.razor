@@ -62,8 +62,7 @@
                     Title="Version"
                     Width="90px">
                     <Template Context="title">
-                        @if (title.LatestVersion is not null)
-                        {
+                        @{
                             var shortVer = (title.LatestVersion.ToString() ?? string.Empty).VersionShifted();
                             @if (shortVer > 0)
                             {

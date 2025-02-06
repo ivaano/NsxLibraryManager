@@ -99,7 +99,7 @@ public partial class Title
                 null,
             Version = libraryApplicationIds.Contains(t.ApplicationId) ? 
                 libraryApplicationIds[t.ApplicationId].First().Version : 
-                null,
+                0,
             Size = t.Size,
             Owned = libraryApplicationIds.Contains(t.ApplicationId)
         }).AsQueryable();
