@@ -2,7 +2,7 @@
 
 public class RenameTitleDto
 {
-    public int? Id { get; set; }
+    public int Id { get; set; }
     public bool UpdateLibrary { get; set; } = false;
     public required string SourceFileName { get; set; }
     public string? DestinationFileName { get; set; }

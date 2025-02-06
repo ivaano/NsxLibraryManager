@@ -15,7 +15,7 @@ public class LibraryTitleDto
     public Collection<DlcDto>? Dlc { get; init; }
     public int? DlcCount { get; set; }
     public string? FileName { get; set; }
-    public int? Id { get; init; }
+    public int Id { get; init; }
     public string? IconUrl { get; init; }
     public bool IsDemo { get; init; }
     public string? Intro { get; init; }
@@ -27,7 +27,6 @@ public class LibraryTitleDto
     public int? NumberOfPlayers { get; init; }
     public string? OtherApplicationId { get; init; }
     public string? OtherApplicationName { get; set; }
-
     public Collection<DlcDto>? OwnedDlcs { get; init; }
     public int? OwnedDlcCount { get; init; }
     public Collection<UpdateDto>? OwnedUpdates { get; init; }

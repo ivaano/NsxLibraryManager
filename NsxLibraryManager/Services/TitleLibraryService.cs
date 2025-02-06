@@ -863,17 +863,31 @@ public class TitleLibraryService(
                     
                     if (newFileName.IsSuccess)
                     {
+                        if (newFileName.Value != libraryTitle.FileName)
+                        {
+                            fileList.Add(new RenameTitleDto
+                            {
+                                SourceFileName = libraryTitle.FileName ?? string.Empty,
+                                DestinationFileName = newFileName.Value,
+                                TitleId = libraryTitle.ApplicationId,
+                                TitleName = libraryTitle.TitleName,
+                                Error = false,
+                                ErrorMessage = string.Empty,
+                                Id = libraryTitle.Id,
+                                UpdateLibrary = true
+                            });
+                            continue;
+                        }
                         fileList.Add(new RenameTitleDto
                         {
                             SourceFileName = libraryTitle.FileName ?? string.Empty,
                             DestinationFileName = newFileName.Value,
                             TitleId = libraryTitle.ApplicationId,
                             TitleName = libraryTitle.TitleName,
-                            Error = false,
-                            ErrorMessage = string.Empty,
-                            Id = libraryTitle.Id,
-                            UpdateLibrary = true
+                            Error = true,
+                            ErrorMessage = "Same File Name as Original",
                         });  
+
                     }
                 }
             }
