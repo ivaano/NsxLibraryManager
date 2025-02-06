@@ -19,6 +19,7 @@ namespace NsxLibraryManager.Services;
 
 public class RenamerService(
     TitledbDbContext titledbDbContext,
+    NsxLibraryDbContext nsxLibraryDbContext,
     IValidator<PackageRenamerSettings> validatorPackage,
     IValidator<BundleRenamerSettings> validatorBundle,
     IValidator<CollectionRenamerSettings> validatorCollection,
@@ -27,6 +28,7 @@ public class RenamerService(
     : IRenamerService
 {
     private readonly TitledbDbContext _titledbDbContext = titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
+    private readonly NsxLibraryDbContext _nsxLibraryDbContext = nsxLibraryDbContext ?? throw new ArgumentNullException(nameof(nsxLibraryDbContext));
     private PackageRenamerSettings _packageRenamerSettings = null!;
     private BundleRenamerSettings _bundleRenamerSettings = null!;
     private CollectionRenamerSettings _collectionRenamerSettings = null!;
@@ -94,8 +96,16 @@ public class RenamerService(
         return validationResult;
     }
     #endregion
-    
-    public Task<IEnumerable<RenameTitleDto>> RenameFilesAsync(IEnumerable<RenameTitleDto> filesToRename)
+
+    private async Task<Result<bool>> UpdateLibraryTitleFileNameAsync(int id, string fileName)
+    {
+        var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.Id == id);
+        if (title is null) return Result.Failure<bool>("Title not found");
+        title.FileName = fileName;
+        await _nsxLibraryDbContext.SaveChangesAsync();
+        return Result.Success(true);
+    }
+    public async Task<IEnumerable<RenameTitleDto>> RenameFilesAsync(IEnumerable<RenameTitleDto> filesToRename)
     {
         var renamedFiles = new List<RenameTitleDto>();
         foreach (var renameTitleDto in filesToRename)
@@ -117,6 +127,11 @@ public class RenamerService(
                 if (renameTitleDto.DestinationFileName is not null)
                 {
                     File.Move(renameTitleDto.SourceFileName, renameTitleDto.DestinationFileName);
+                    if (renameTitleDto is { UpdateLibrary: true, Id: > 0 })
+                    {
+                        await UpdateLibraryTitleFileNameAsync(renameTitleDto.Id,
+                            renameTitleDto.DestinationFileName);
+                    }
                     renameTitleDto.RenamedSuccessfully = true;
                     renamedFiles.Add(renameTitleDto);
                 }
@@ -137,7 +152,7 @@ public class RenamerService(
             }
         }
 
-        return Task.FromResult(renamedFiles.AsEnumerable());
+        return renamedFiles.AsEnumerable();
     }
 
     public async Task<Result<string>> GetNewFileName(string renameTemplate, LibraryTitleDto libraryTitle, RenameType renameType)
@@ -539,7 +554,6 @@ public class RenamerService(
                 DestinationFileName = newPath,
                 TitleName = fileInfo.TitleName,
                 TitleId = fileInfo.ApplicationId,
-                RenamedSuccessfully = true
             });
 
         }

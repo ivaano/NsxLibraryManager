@@ -21,7 +21,6 @@ public interface ITitleLibraryService
     public Task<Result<LibraryTitleDto>> GetTitleByApplicationId(string applicationId);
     public int GetTitlesCountByContentType(TitleContentType contentType);
     public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId);
-
     public Task<Result<GetBaseTitlesResultDto>> GetTitles(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingDlc(LoadDataArgs args);
