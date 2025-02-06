@@ -98,46 +98,51 @@ public class RenamerService(
     public Task<IEnumerable<RenameTitleDto>> RenameFilesAsync(IEnumerable<RenameTitleDto> filesToRename)
     {
         var renamedFiles = new List<RenameTitleDto>();
-        foreach (var file in filesToRename)
+        foreach (var renameTitleDto in filesToRename)
         {
-            if (file.Error || file.RenamedSuccessfully)
+            if (renameTitleDto.Error || renameTitleDto.RenamedSuccessfully)
             {
-                renamedFiles.Add(file);
+                renamedFiles.Add(renameTitleDto);
                 continue;
             }
             
             try
             {
-                var newDirName = Path.GetDirectoryName(file.DestinationFileName);
+                var newDirName = Path.GetDirectoryName(renameTitleDto.DestinationFileName);
                 if (!Path.Exists(newDirName) && newDirName is not null)
                 { 
                     Directory.CreateDirectory(newDirName);
                 }
                 
-                if (file.DestinationFileName is not null)
+                if (renameTitleDto.DestinationFileName is not null)
                 {
-                    File.Move(file.SourceFileName, file.DestinationFileName);
-                    renamedFiles.Add(file with { RenamedSuccessfully = true });
+                    File.Move(renameTitleDto.SourceFileName, renameTitleDto.DestinationFileName);
+                    renameTitleDto.RenamedSuccessfully = true;
+                    renamedFiles.Add(renameTitleDto);
                 }
                 else
                 {
-                    var renameTitle = file with { Error = true, ErrorMessage = "Empty destination file name" };
-                    renamedFiles.Add(renameTitle);
+                    renameTitleDto.Error = true;
+                    renameTitleDto.ErrorMessage = "Empty destination file name";
+                    renamedFiles.Add(renameTitleDto);
                 }
             }
             catch (Exception e)
             {
-                logger.LogError("Error renaming file {file} - {message}", file.SourceFileName, e.Message);
-                renamedFiles.Add(file with
-                {
-                    RenamedSuccessfully = false,
-                    Error = true,
-                    ErrorMessage = e.Message
-                });
+                logger.LogError("Error renaming file {file} - {message}", renameTitleDto.SourceFileName, e.Message);
+                renameTitleDto.RenamedSuccessfully = false;
+                renameTitleDto.Error = true;
+                renameTitleDto.ErrorMessage = e.Message;
+                renamedFiles.Add(renameTitleDto);
             }
         }
 
         return Task.FromResult(renamedFiles.AsEnumerable());
+    }
+
+    public async Task<Result<string>> GetNewFileName(string renameTemplate, LibraryTitleDto libraryTitle, RenameType renameType)
+    {
+         return Result.Success(await TemplateReplaceAsync(renameTemplate, libraryTitle, renameType));
     }
 
     public Result<string> GetRenameTemplate(RenameType renameType, TitleContentType contentType, AccuratePackageType accuratePackageType)
@@ -407,7 +412,7 @@ public class RenamerService(
                 TemplateField.CollectionName => fileInfo.Collection?.Name,
                 TemplateField.TitleName      => safeTitleName,
                 TemplateField.TitleId        => fileInfo.ApplicationId,
-                TemplateField.Version        => fileInfo.TitleVersion.ToString(),
+                TemplateField.Version        => fileInfo.Version.ToString(),
                 TemplateField.Extension      => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName        => safeAppTitleName,
                 TemplateField.Region         =>  fileInfo.Region,
@@ -492,8 +497,12 @@ public class RenamerService(
             var fileInfoResult = await GetAggregatedFileInfo(file);
             if (fileInfoResult.IsFailure)
             {
-                fileList.Add(new RenameTitleDto(file, string.Empty, string.Empty, string.Empty, false, true,
-                    fileInfoResult.Error));
+                fileList.Add(new RenameTitleDto
+                {
+                    SourceFileName = file,
+                    Error = true,
+                    ErrorMessage = fileInfoResult.Error
+                });
                 continue;
             }
 
@@ -501,21 +510,38 @@ public class RenamerService(
             var (newPath, error, errorMessage) = await TryBuildNewFileNameAsync(fileInfo, file, renameType);
             if (error)
             {
-                fileList.Add(new RenameTitleDto(file, string.Empty, string.Empty, string.Empty, false, error,
-                    errorMessage));
+                fileList.Add(new RenameTitleDto
+                {
+                    SourceFileName = file,
+                    Error = true,
+                    ErrorMessage = errorMessage
+                });
                 continue;
             }
 
             (newPath, error, errorMessage) = await ValidateDestinationFileAsync(file, newPath);
             if (error)
             {
-                fileList.Add(new RenameTitleDto(file, newPath, fileInfo.ApplicationId, fileInfo.TitleName, false, error,
-                    errorMessage));
+                fileList.Add(new RenameTitleDto
+                {
+                    SourceFileName = file,
+                    Error = true,
+                    TitleName = fileInfo.TitleName,
+                    TitleId = fileInfo.ApplicationId,
+                    ErrorMessage = errorMessage
+                });
                 continue;
             }
 
-            fileList.Add(new RenameTitleDto(file, newPath, fileInfo.ApplicationId, fileInfo.TitleName, false, error,
-                errorMessage));
+            fileList.Add(new RenameTitleDto
+            {
+                SourceFileName = file,
+                DestinationFileName = newPath,
+                TitleName = fileInfo.TitleName,
+                TitleId = fileInfo.ApplicationId,
+                RenamedSuccessfully = true
+            });
+
         }
 
         return fileList;

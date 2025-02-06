@@ -30,7 +30,7 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="RenameTitleDto" Property="TitleId" Title="Title Id" Width="100px"/>
                 <RadzenDataGridColumn TItem="RenameTitleDto" Property="TitleName" Title="Name" Width="100px"/>
-                <RadzenDataGridColumn TItem="RenameTitleDto" Property="Error" Title="Error" Width="50px"/>
+                <RadzenDataGridColumn TItem="RenameTitleDto" Property="Error" Title="Error" Width="50px" FormatString="{0}" FormatProvider="@_myBooleanProvider"/>
                 <RadzenDataGridColumn TItem="RenameTitleDto" Property="ErrorMessage" Title="Error Message" Width="200px">
                     <Template Context="renameTitle">
                         <p style="white-space:pre-wrap">@renameTitle.ErrorMessage</p>

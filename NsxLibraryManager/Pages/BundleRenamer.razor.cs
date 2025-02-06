@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Core.Models;
+using NsxLibraryManager.Providers;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
@@ -53,6 +54,7 @@ public partial class BundleRenamer : ComponentBase
     private bool _renameButtonDisabled = true;
     private string _inputPathDisplay = string.Empty;
     private string _outputPathDisplay = string.Empty;
+    private readonly BooleanProvider _myBooleanProvider = new();
 
 
     

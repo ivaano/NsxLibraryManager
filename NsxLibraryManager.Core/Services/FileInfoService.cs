@@ -106,7 +106,7 @@ public class FileInfoService : IFileInfoService
             {
                 ApplicationId = titleId,
                 TitleName = string.IsNullOrEmpty(dlcName) ? titleName : $"{titleName} - {dlcName}",
-                TitleVersion = titleVersion,
+                Version = titleVersion,
                 ContentType = type,
                 PackageType = AccuratePackageType.Unknown,
                 Size = 0,
@@ -125,7 +125,7 @@ public class FileInfoService : IFileInfoService
             {
                 ApplicationId = string.Empty,
                 TitleName = string.Empty,
-                TitleVersion = 0,
+                Version = 0,
                 ContentType = TitleContentType.Unknown,
                 PackageType = AccuratePackageType.Unknown,
                 Size = 0,
@@ -215,7 +215,7 @@ public class FileInfoService : IFileInfoService
             _ when extension.Equals(XczExtension, StringComparison.OrdinalIgnoreCase) => AccuratePackageType.XCZ,
             _ => throw new ArgumentOutOfRangeException($"Unknown Extension for file {fileName}")
         };
-        _ = int.TryParse(version, out var versionNumber) ? versionNumber : 0;
+        _ = uint.TryParse(version, out var versionNumber) ? versionNumber : 0;
 
 
             
@@ -223,7 +223,7 @@ public class FileInfoService : IFileInfoService
         {
             ApplicationId = id,
             TitleName = name,
-            TitleVersion = (uint)versionNumber,
+            Version = versionNumber,
             FileName = Path.GetFullPath(fileName),
             LastWriteTime = File.GetLastWriteTime(fileName),
             PackageType = packageType,

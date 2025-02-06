@@ -23,8 +23,7 @@
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestOwnedUpdateVersion" Title="Version" Visible="true" Width="50px"/>
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestOwnedUpdateVersion" Title="Short Version" Visible="true" Width="50px">
                     <Template Context="libraryTitle">
-                        @if (libraryTitle.LatestOwnedUpdateVersion is not null)
-                        {
+                        @{
                             var shortVer = (libraryTitle.LatestOwnedUpdateVersion.ToString() ?? string.Empty).VersionShifted();
                             @if (shortVer > 0)
                             {
@@ -40,8 +39,7 @@
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestVersion" Title="Latest Version" Visible="true" Width="50px"/>
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestVersion" Title="Short Latest Version" Visible="true" Width="50px">
                     <Template Context="libraryTitle">
-                        @if (libraryTitle.LatestVersion is not null)
-                        {
+                        @{
                             var shortVer = (libraryTitle.LatestVersion.ToString() ?? string.Empty).VersionShifted();
                             @if (shortVer > 0)
                             {
