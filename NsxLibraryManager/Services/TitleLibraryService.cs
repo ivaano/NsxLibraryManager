@@ -361,6 +361,18 @@ public class TitleLibraryService(
         
         return await ApplyAdditionalFilters(query, args);
     }
+    
+    public async Task<GetBaseTitlesResultDto> GetDlcTitlesWithMissingLastUpdate(LoadDataArgs args)
+    {
+        var query = _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Where(t => t.ContentType == TitleContentType.DLC)
+            .Where(t => t.Versions != null && t.Versions.Count > 0 && t.LatestOwnedUpdateVersion < t.LatestVersion)
+            .Include(x => x.Versions.OrderByDescending(v => v.VersionNumber).Take(1))
+            .AsQueryable();
+        
+        return await ApplyAdditionalFilters(query, args);
+    }
 
     public async Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingDlc(LoadDataArgs args)
     {

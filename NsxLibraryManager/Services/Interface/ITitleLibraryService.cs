@@ -23,6 +23,7 @@ public interface ITitleLibraryService
     public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId);
     public Task<Result<GetBaseTitlesResultDto>> GetTitles(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args);
+    public Task<GetBaseTitlesResultDto> GetDlcTitlesWithMissingLastUpdate(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingDlc(LoadDataArgs args);
     public Task SaveLibraryReloadDate(bool refresh = false);
     public Task<LibraryUpdate?> GetLastLibraryUpdateAsync();
