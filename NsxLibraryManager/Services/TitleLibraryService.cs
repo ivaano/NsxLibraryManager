@@ -204,6 +204,7 @@ public class TitleLibraryService(
             nsxLibraryTitle.Size = metaFromFileName.Size;
             nsxLibraryTitle.Version = libraryTitle.Version;
 
+           
             /*
             if (libraryTitle.Type == TitleLibraryType.Base)
             {
@@ -271,6 +272,11 @@ public class TitleLibraryService(
             }
 
             nsxLibraryTitle.Versions = versions;
+        }
+        
+        if (libraryTitle.ContentType == TitleContentType.DLC)
+        {
+            nsxLibraryTitle.LatestOwnedUpdateVersion = libraryTitle.Version;
         }
 
         return nsxLibraryTitle;
@@ -364,11 +370,11 @@ public class TitleLibraryService(
     
     public async Task<GetBaseTitlesResultDto> GetDlcTitlesWithMissingLastUpdate(LoadDataArgs args)
     {
+       
         var query = _nsxLibraryDbContext.Titles
             .AsNoTracking()
             .Where(t => t.ContentType == TitleContentType.DLC)
-            .Where(t => t.Versions != null && t.Versions.Count > 0 && t.LatestOwnedUpdateVersion < t.LatestVersion)
-            .Include(x => x.Versions.OrderByDescending(v => v.VersionNumber).Take(1))
+            .Where(t => t.LatestOwnedUpdateVersion < t.LatestVersion)
             .AsQueryable();
         
         return await ApplyAdditionalFilters(query, args);
