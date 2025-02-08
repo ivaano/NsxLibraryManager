@@ -1,0 +1,39 @@
+﻿@page "/DuplicateTitles"
+@using NsxLibraryManager.Shared.Dto
+<RadzenTabs @bind-SelectedIndex="@selectedTabIndex">
+    <Tabs>
+        <RadzenTabsItem Text="Renamer">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenDataGrid 
+                    @ref="_duplicateTitlesGrid" 
+                    Data="@_duplicateTitles" 
+                    TItem="LibraryTitleDto"
+                    Count="@_count"
+                    AllowSorting="true" 
+                    AllowPaging="true" 
+                    PageSize="100"
+                    AllowFiltering="true" 
+                    FilterMode="FilterMode.SimpleWithMenu" 
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowColumnResize="true" 
+                    PagerHorizontalAlign="HorizontalAlign.Center" 
+                    ColumnWidth="200px" 
+                    AllowColumnPicking="true"
+                    IsLoading="@isLoading" 
+                    AllowColumnReorder="true" 
+                    PageSizeOptions="@_pageSizeOptions" 
+                    ShowPagingSummary="true" style="height: 95vh">
+                    <HeaderTemplate>
+                        <RadzenButton Text="Scan Library Titles" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="Id" Title="Id" Width="100px"/>
+                        <RadzenDataGridColumn Property="FileName" Title="FileName" Width="200px"/>
+                        <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" />
+                        <RadzenDataGridColumn Property="TitleName" Title="Name" />
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenStack>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>

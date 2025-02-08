@@ -290,6 +290,25 @@ public class TitleLibraryService(
             .Count(t => t.ContentType == titleContentType);
     }
 
+    public async Task<Result<GetBaseTitlesResultDto>> GetFirstDuplicateTitles()
+    {
+        var firstRecords = _nsxLibraryDbContext.Titles
+            .GroupBy(t => t.ApplicationId)
+            .Where(g => g.Count() >= 2) 
+            .Select(g => g.First().MapLibraryTitleDtoNoDlcOrUpdates())
+            ;
+        
+
+        var count = await firstRecords.CountAsync();
+        var successResult = new GetBaseTitlesResultDto
+        {
+            Count = count,
+            Titles = firstRecords
+        };
+        
+        return Result.Success(successResult);
+    }
+
     private static async Task<GetBaseTitlesResultDto> ApplyAdditionalFilters(IQueryable<Title> query, LoadDataArgs args)
     {
         if (!string.IsNullOrEmpty(args.Filter))
