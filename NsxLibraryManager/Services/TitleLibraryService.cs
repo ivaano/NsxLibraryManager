@@ -479,12 +479,15 @@ public class TitleLibraryService(
             .Select(x => new
             {
                 Collection = x,
-                TitlesCount = x.Titles.Count()
+                TitlesCount = x.Titles.Count(),
+                BaseTitlesCount = x.Titles.Count(t => t.ContentType == TitleContentType.Base),
+                DlcTitlesCount = x.Titles.Count(t => t.ContentType == TitleContentType.DLC),
+                UpdatesTitlesCount = x.Titles.Count(t => t.ContentType == TitleContentType.Update)
+
             })
             .OrderBy(c => c.Collection.Name)
-            .Select(x => x.Collection.MapToCollectionDto(x.TitlesCount))
+            .Select(x => x.Collection.MapToCollectionDto(x.TitlesCount, x.BaseTitlesCount, x.DlcTitlesCount, x.UpdatesTitlesCount))
             .ToListAsync();
-
 
         return collections.Count > 0
             ? Result.Success<IEnumerable<CollectionDto>>(collections)
