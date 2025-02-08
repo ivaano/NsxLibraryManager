@@ -18,12 +18,13 @@
     </RadzenPanelMenuItem>
     <RadzenPanelMenuItem Visible="@_initialConfig" Text="Title DB" Icon="archive" Path="titledb"/>
     <RadzenPanelMenuItem Visible="@_initialConfig" Text="File Organizer" Icon="engineering">
-        <RadzenPanelMenuItem Text="Renamers" Icon="package">
+        <RadzenPanelMenuItem Text="Renamers" Icon="move_item">
             <RadzenPanelMenuItem Text="By Package Type" Icon="package" Path="PackageRenamer"/>
             <RadzenPanelMenuItem Text="By Bundle" Icon="package_2" Path="BundleRenamer"/>
         </RadzenPanelMenuItem>
-        <RadzenPanelMenuItem Text="Library" Icon="package_2">
-            <RadzenPanelMenuItem Text="By Collection" Icon="package_2" Path="CollectionRenamer"/>
+        <RadzenPanelMenuItem Text="Library" Icon="category">
+            <RadzenPanelMenuItem Text="Collection Renamer" Icon="moved_location" Path="CollectionRenamer" MouseEnter="@(args => ShowTooltip(args, "This renamer will organize on your library files based on your collections.") )"/>
+            <RadzenPanelMenuItem Text="Duplicate Titles" Icon="content_copy" Path="DuplicateTitles" MouseEnter="@(args => ShowTooltip(args, "Find duplicate titles in your library.") )"/>
         </RadzenPanelMenuItem>
 
         <RadzenPanelMenuItem Visible="false" Text="Cleaner" Icon="cleaning_services" Path="cleaner"/>
