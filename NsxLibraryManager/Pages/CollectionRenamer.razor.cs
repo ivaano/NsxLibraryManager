@@ -84,15 +84,12 @@ public partial class CollectionRenamer : ComponentBase
     private async Task InitializeSettings()
     {
         _settings = await SettingsService.GetCollectionRenamerSettings();
-        if (string.IsNullOrEmpty(_settings.InputPath))
-        {
-            var userSettings = SettingsService.GetUserSettings();
-           
-            _settings.InputPath = userSettings.LibraryPath.EndsWith(Path.DirectorySeparatorChar) 
-                ? userSettings.LibraryPath 
-                : userSettings.LibraryPath + Path.DirectorySeparatorChar;
-            _settings.OutputBasePath = _settings.InputPath;
-        }
+        var userSettings = SettingsService.GetUserSettings();
+        _settings.InputPath = userSettings.LibraryPath.EndsWith(Path.DirectorySeparatorChar) 
+            ? userSettings.LibraryPath 
+            : userSettings.LibraryPath + Path.DirectorySeparatorChar;
+        _settings.OutputBasePath = _settings.InputPath;
+
         _inputPathDisplay = _settings.InputPath;
         _outputPathDisplay = _settings.OutputBasePath;
         _ = await RenamerService.LoadRenamerSettingsAsync(_settings);
