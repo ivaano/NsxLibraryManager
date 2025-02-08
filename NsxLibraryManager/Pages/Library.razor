@@ -20,6 +20,9 @@
             TItem="LibraryTitleDto"
             Data="@_libraryTitles"
             LoadData="@LoadData"
+            AllowRowSelectOnRowClick="true"
+            SelectionMode="DataGridSelectionMode.Multiple"
+            @bind-Value="@selectedTitles"
             AllowColumnReorder="true"
             PageSize="@_pageSize" 
             PageSizeOptions="@_pageSizeOptions" 
@@ -37,6 +40,7 @@
             ShowPagingSummary="true" 
             style="height: 89vh">
             <HeaderTemplate>
+                <RadzenButton Click="@(_ => EditSelected())" Text="Edit Selected" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/> |
                 <RadzenButton Click="@(_ => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
                 <RadzenButton Click="@(_ => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
                 <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>

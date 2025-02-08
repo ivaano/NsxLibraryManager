@@ -29,7 +29,7 @@ public partial class Library : IDisposable
     private int _pageSize = 100;
     private int _count;
     private IEnumerable<string>? _selectedCategories;
-
+    private IList<LibraryTitleDto> selectedTitles;
     private int _baseCount;
     private int _patchCount;
     private int _dlcCount;
@@ -185,6 +185,26 @@ public partial class Library : IDisposable
             await DialogService.OpenAsync<ReloadLibraryProgressDialog>(
                 "Reloading library...", paramsDialog, dialogOptions);
             await InitialLoad();
+            await _grid.Reload();
+        }
+    }
+
+    private async Task EditSelected()
+    {
+        var result = await DialogService.OpenAsync<TitleMassEditDialog>($"Edit Multiple Titles",
+            new Dictionary<string, object>() { { "SelectedTitles", selectedTitles } },
+            new DialogOptions()
+            {
+                Width = "90%", 
+                Height = "768px", 
+                CloseDialogOnEsc = true, 
+                CloseDialogOnOverlayClick = true, 
+                Draggable = true, 
+                Style = "background:var(--rz-base-900)"
+            });
+        
+        if (result is true) 
+        {
             await _grid.Reload();
         }
     }
