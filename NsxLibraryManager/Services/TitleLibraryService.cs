@@ -290,25 +290,26 @@ public class TitleLibraryService(
             .Count(t => t.ContentType == titleContentType);
     }
 
-    public async Task<Result<GetBaseTitlesResultDto>> GetFirstDuplicateTitles(TitleContentType contentType)
+    public async Task<Result<GetBaseTitlesResultDto>> GetDuplicateTitles(TitleContentType contentType)
     {
 
-        var duplicateFileNames = _nsxLibraryDbContext.Titles
+        var duplicateFileNames = await _nsxLibraryDbContext.Titles
             .AsNoTracking()
             .Where(t => t.ContentType == contentType)
             .GroupBy(t => t.ApplicationId)
             .Where(g => g.Count() >= 2)
             .Select(g => g.Key)
-            .ToList();
+            .ToListAsync();
 
         var allDuplicateTitles = _nsxLibraryDbContext.Titles
             .AsNoTracking()
             .Where(t => duplicateFileNames.Contains(t.ApplicationId))
-            .OrderByDescending(t => t.ApplicationId)
+            .OrderBy(t => t.TitleName)
+            .ThenBy(t => t.ApplicationId)
             .ThenByDescending(t => t.Version)
-            .Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
+            .Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates()).ToList();
 
-        var count = await allDuplicateTitles.CountAsync();
+        var count = allDuplicateTitles.Count;
         var successResult = new GetBaseTitlesResultDto
         {
             Count = count,
