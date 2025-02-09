@@ -23,6 +23,8 @@ public partial class DuplicateTitles : ComponentBase
     private int _countBaseTitles;
     private int _countUpdatesTitles;
     private int _countDlcTitles;
+    private IList<LibraryTitleDto>? _selectedBaseTitles;
+
     private async Task LoadFiles()
     {
         try
@@ -70,5 +72,10 @@ public partial class DuplicateTitles : ComponentBase
             isLoading = false;
             StateHasChanged();
         }
+    }
+
+    private void ChechboxSelectRow(LibraryTitleDto title)
+    {
+        _duplicateBaseTitlesGrid.SelectRow(title);
     }
 }
