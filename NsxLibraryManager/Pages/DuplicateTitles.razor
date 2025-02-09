@@ -16,7 +16,9 @@
                     FilterMode="FilterMode.SimpleWithMenu" 
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     AllowColumnResize="true" 
-                    PagerHorizontalAlign="HorizontalAlign.Center" 
+                    PagerHorizontalAlign="HorizontalAlign.Center"
+                    SelectionMode="DataGridSelectionMode.Multiple"
+                    @bind-Value="@_selectedBaseTitles"
                     ColumnWidth="200px" 
                     AllowColumnPicking="true"
                     IsLoading="@isLoading" 
@@ -28,9 +30,10 @@
                         <RadzenButton Text="Scan Library Titles" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
                     </HeaderTemplate>
                     <Columns>
+
                         <RadzenDataGridColumn Property="Id" Title="Id" Width="50px"/>
                         <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="100px"/>
-                        <RadzenDataGridColumn Property="TitleName" Title="Name" />
+                        <RadzenDataGridColumn Property="TitleName" Title="Name"/>
                         <RadzenDataGridColumn Property="Version" Title="Version" Width="100px"/>
                         <RadzenDataGridColumn Property="FileName" Title="FileName" Width="300px">
                             <Template Context="libraryTitle">
