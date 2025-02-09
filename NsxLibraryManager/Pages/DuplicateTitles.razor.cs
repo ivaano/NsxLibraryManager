@@ -30,7 +30,7 @@ public partial class DuplicateTitles : ComponentBase
             isLoading = true;
             if (selectedTabIndex == 0)
             {
-                var duplicateResult = await TitleLibraryService.GetFirstDuplicateTitles(TitleContentType.Base);
+                var duplicateResult = await TitleLibraryService.GetDuplicateTitles(TitleContentType.Base);
                 if (duplicateResult.IsSuccess)
                 {
                     _countBaseTitles = duplicateResult.Value.Count;
@@ -42,7 +42,7 @@ public partial class DuplicateTitles : ComponentBase
             }
             if (selectedTabIndex == 1)
             {
-                var duplicateResult = await TitleLibraryService.GetFirstDuplicateTitles(TitleContentType.Update);
+                var duplicateResult = await TitleLibraryService.GetDuplicateTitles(TitleContentType.Update);
                 if (duplicateResult.IsSuccess)
                 {
                     _countUpdatesTitles = duplicateResult.Value.Count;
@@ -54,7 +54,7 @@ public partial class DuplicateTitles : ComponentBase
             }
             if (selectedTabIndex == 2)
             {
-                var duplicateResult = await TitleLibraryService.GetFirstDuplicateTitles(TitleContentType.DLC);
+                var duplicateResult = await TitleLibraryService.GetDuplicateTitles(TitleContentType.DLC);
                 if (duplicateResult.IsSuccess)
                 {
                     _countDlcTitles = duplicateResult.Value.Count;
