@@ -13,6 +13,7 @@ public class RenamerTemplateFields
         { TemplateField.Version, "{Version}" },
         { TemplateField.Extension, "{Extension}" },
         { TemplateField.AppName, "{AppName}" },
+        { TemplateField.PackageType, "{PackageType}" },
         { TemplateField.PatchId, "{PatchId}" },
         { TemplateField.PatchCount, "{PatchCount}" },
         { TemplateField.DlcCount, "{DlcCount}" },

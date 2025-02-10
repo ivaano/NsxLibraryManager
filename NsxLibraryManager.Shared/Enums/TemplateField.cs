@@ -9,6 +9,7 @@ public enum TemplateField
     Version,
     Extension,
     AppName,
+    PackageType,
     PatchId,
     PatchCount,
     Region,

@@ -19,6 +19,7 @@ public class LibraryTitleDto
     public string? IconUrl { get; init; }
     public bool IsDemo { get; init; }
     public string? Intro { get; init; }
+    public bool IsDuplicate { get; set; }
     public DateTime? LastWriteTime { get; set; }
     public IEnumerable<LanguageDto>? Languages { get; init; }
     public uint LatestOwnedUpdateVersion { get; init; }

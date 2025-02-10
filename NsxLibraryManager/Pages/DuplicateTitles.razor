@@ -7,6 +7,7 @@
                 <RadzenDataGrid 
                     @ref="_duplicateBaseTitlesGrid" 
                     Data="@_duplicateBaseTitles" 
+                    LoadData="@LoadData"
                     TItem="LibraryTitleDto"
                     Count="@_countBaseTitles"
                     AllowSorting="false" 
@@ -21,13 +22,15 @@
                     @bind-Value="@_selectedBaseTitles"
                     ColumnWidth="200px" 
                     AllowColumnPicking="true"
-                    IsLoading="@isLoading" 
+                    IsLoading="@_isLoading" 
                     AllowColumnReorder="true" 
                     PageSizeOptions="@_pageSizeOptions" 
                     ShowPagingSummary="true" 
                     style="height: 89vh">
                     <HeaderTemplate>
-                        <RadzenButton Text="Scan Library Titles" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                        <RadzenButton Text="@_baseSelectTitlesText" Click="@SelectDuplicates" ButtonStyle="ButtonStyle.Info" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Delete Selected Titles" Click="@DeleteDuplicates"  ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Backup Path: @_backupPath</RadzenText>
                     </HeaderTemplate>
                     <Columns>
 
@@ -51,6 +54,7 @@
                 <RadzenDataGrid
                     @ref="_duplicateUpdatesTitlesGrid"
                     Data="@_duplicateUpdatesTitles"
+                    LoadData="@LoadData"
                     TItem="LibraryTitleDto"
                     Count="@_countUpdatesTitles"
                     AllowSorting="false"
@@ -61,15 +65,19 @@
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     AllowColumnResize="true"
                     PagerHorizontalAlign="HorizontalAlign.Center"
+                    SelectionMode="DataGridSelectionMode.Multiple"
+                    @bind-Value="@_selectedUpdatesTitles"
                     ColumnWidth="200px"
                     AllowColumnPicking="true"
-                    IsLoading="@isLoading"
+                    IsLoading="@_isLoading"
                     AllowColumnReorder="true"
                     PageSizeOptions="@_pageSizeOptions"
                     ShowPagingSummary="true" 
                     style="height: 89vh">
                     <HeaderTemplate>
-                        <RadzenButton Text="Scan Library Titles" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                        <RadzenButton Text="@_updatesSelectTitlesText" Click="@SelectDuplicates" ButtonStyle="ButtonStyle.Info" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Delete Selected Titles" Click="@DeleteDuplicates"  ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Backup Path: @_backupPath</RadzenText>                   
                     </HeaderTemplate>
                     <Columns>
                         <RadzenDataGridColumn Property="Id" Title="Id" Width="50px"/>
@@ -92,6 +100,7 @@
                 <RadzenDataGrid
                     @ref="_duplicateDlcTitlesGrid"
                     Data="@_duplicateDlcTitles"
+                    LoadData="@LoadData"
                     TItem="LibraryTitleDto"
                     Count="@_countDlcTitles"
                     AllowSorting="false"
@@ -102,15 +111,19 @@
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     AllowColumnResize="true"
                     PagerHorizontalAlign="HorizontalAlign.Center"
+                    SelectionMode="DataGridSelectionMode.Multiple"
+                    @bind-Value="@_selectedDlcTitles"
                     ColumnWidth="200px"
                     AllowColumnPicking="true"
-                    IsLoading="@isLoading"
+                    IsLoading="@_isLoading"
                     AllowColumnReorder="true"
                     PageSizeOptions="@_pageSizeOptions"
                     ShowPagingSummary="true" 
                     style="height: 89vh">
                     <HeaderTemplate>
-                        <RadzenButton Text="Scan Library Titles" Click="@LoadFiles" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                        <RadzenButton Text="@_dlcSelectTitlesText" Click="@SelectDuplicates" ButtonStyle="ButtonStyle.Info" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Delete Selected Titles" Click="@DeleteDuplicates"  ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Backup Path: @_backupPath</RadzenText>                    
                     </HeaderTemplate>
                     <Columns>
                         <RadzenDataGridColumn Property="Id" Title="Id" Width="50px"/>
@@ -127,6 +140,6 @@
                     </Columns>
                 </RadzenDataGrid>
             </RadzenStack>
-        </RadzenTabsItem>        
+        </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>

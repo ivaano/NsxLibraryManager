@@ -70,24 +70,52 @@
                         </RadzenColumn>
                     </RadzenRow>
                 </RadzenFormField>
-                <RadzenFormField Text="Library Path">
-                    <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath" />
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["LibraryPath"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["LibraryPath"]</div>    
-                        }
-                        <div class="rz-text-caption">
-                            Folder where the library files are located.
-                        </div>
-                    </Helper>
-                </RadzenFormField>
-                <div class="rz-text-align-right   ; ">
-                    <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
-                    <RadzenLabel Text="Recursive" Component="Recursive" Style="margin-left: 8px; vertical-align: middle;"/>
-                </div>
+                <RadzenFieldset Text="Paths">
+                    <RadzenRow Gap="1.2rem">
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <RadzenStack>
+                                <RadzenFormField Text="Library Path">
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
+                                    </ChildContent>
+                                    <Helper>
+                                        @if (@_validationErrors["LibraryPath"] != string.Empty)
+                                        {
+                                            <div class="rz-message rz-messages-error">@_validationErrors["LibraryPath"]</div>
+                                        }
+                                        <div class="rz-text-caption">
+                                            Folder where the library files are located.
+                                        </div>
+                                    </Helper>
+                                </RadzenFormField>
+                                <RadzenRow JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="2" class="rz-text-align-right;">
+                                        <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
+                                        <RadzenLabel Text="Recursive" Component="Recursive" Style="margin-left: 8px; vertical-align: middle;"/>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <RadzenStack>
+                            <RadzenFormField Text="Backup Path">
+                                <ChildContent>
+                                    <RadzenTextBox @bind-Value="@_config.BackupPath" Name="BackupPath"/>
+                                </ChildContent>
+                                <Helper>
+                                    @if (@_validationErrors["BackupPath"] != string.Empty)
+                                    {
+                                        <div class="rz-message rz-messages-error">@_validationErrors["BackupPath"]</div>
+                                    }
+                                    <div class="rz-text-caption">
+                                        Folder where the deleted files will be placed.
+                                    </div>
+                                </Helper>
+                            </RadzenFormField>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenFieldset>
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>

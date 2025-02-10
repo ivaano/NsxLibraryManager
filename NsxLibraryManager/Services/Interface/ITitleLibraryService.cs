@@ -22,6 +22,8 @@ public interface ITitleLibraryService
     public Task<Result<LibraryTitleDto>> GetTitleByApplicationId(string applicationId);
     public int GetTitlesCountByContentType(TitleContentType contentType);
     public Task<Result<GetBaseTitlesResultDto>> GetDuplicateTitles(TitleContentType contentType);
+    public Task<Result<bool>> RemoveDuplicateTitles(IList<LibraryTitleDto> titleDtos);
+    public Task<Result<bool>> RemoveDuplicateTitle(LibraryTitleDto titleDto);
     public Task<IQueryable<DlcDto>> GetTitleDlcsAsQueryable(string applicationId);
     public Task<Result<GetBaseTitlesResultDto>> GetTitles(LoadDataArgs args);
     public Task<GetBaseTitlesResultDto> GetBaseTitlesWithMissingLastUpdate(LoadDataArgs args);
