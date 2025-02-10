@@ -36,7 +36,7 @@ public class TitleLibraryService(
         titledbDbContext ?? throw new ArgumentNullException(nameof(titledbDbContext));
 
     private readonly IRenamerService _renamerService = renamerService;
-    private readonly UserSettings _settings = settingsService.GetUserSettings();
+    private readonly UserSettings _userSettings = settingsService.GetUserSettings();
 
 
     private static Task<Title> AddTitleLanguages(Title nsxLibraryTitle, Models.Titledb.Title titledbTitle)
@@ -132,7 +132,7 @@ public class TitleLibraryService(
 
     public async Task<IEnumerable<string>> GetLibraryFilesAsync()
     {
-        var filesResult = await fileInfoService.GetFileNames(_settings.LibraryPath, _settings.Recursive);
+        var filesResult = await fileInfoService.GetFileNames(_userSettings.LibraryPath, _userSettings.Recursive);
         if (filesResult.IsSuccess) return filesResult.Value;
         logger.LogError("Error getting files from library: {Error}", filesResult.Error);
         return Array.Empty<string>();
@@ -307,16 +307,52 @@ public class TitleLibraryService(
             .OrderBy(t => t.TitleName)
             .ThenBy(t => t.ApplicationId)
             .ThenByDescending(t => t.Version)
-            .Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates()).ToList();
+            .Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates())
+            .ToList();
 
-        var count = allDuplicateTitles.Count;
+        var processedTitles = allDuplicateTitles
+            .GroupBy(t => t.ApplicationId)
+            .SelectMany(group =>
+            {
+                var titles = group.ToList();
+                for (var i = 1; i < titles.Count; i++)
+                {
+                    titles[i].IsDuplicate = true;
+                }
+                return titles;
+            })
+            .ToList();
+        
+        var count = processedTitles.Count;
         var successResult = new GetBaseTitlesResultDto
         {
             Count = count,
-            Titles = allDuplicateTitles
+            Titles = processedTitles
         };
         
         return Result.Success(successResult);
+    }
+
+    public async Task<Result<bool>> RemoveDuplicateTitles(IList<LibraryTitleDto> titleDtos)
+    {
+        foreach (var titleDto in titleDtos)
+        {
+            await RemoveDuplicateTitle(titleDto);
+        }
+
+        return Result.Success(true);
+    }
+
+    public async Task<Result<bool>> RemoveDuplicateTitle(LibraryTitleDto titleDto)
+    {
+        var sourceFile = titleDto.FileName;
+        if (!string.IsNullOrEmpty(_userSettings.BackupPath) && !string.IsNullOrEmpty(sourceFile))
+        {
+            var destinationFile = Path.Combine(_userSettings.BackupPath, Path.GetFileName(sourceFile));
+            File.Move(sourceFile, destinationFile);
+        }
+        await RemoveLibraryTitleAsync(titleDto);
+        return Result.Success(true);
     }
 
     private static async Task<GetBaseTitlesResultDto> ApplyAdditionalFilters(IQueryable<Title> query, LoadDataArgs args)
@@ -577,7 +613,7 @@ public class TitleLibraryService(
             BaseTitleCount = GetTitlesCountByContentType(TitleContentType.Base),
             UpdateTitleCount = GetTitlesCountByContentType(TitleContentType.Update),
             DlcTitleCount = GetTitlesCountByContentType(TitleContentType.DLC),
-            LibraryPath = _settings.LibraryPath
+            LibraryPath = _userSettings.LibraryPath
         };
         _nsxLibraryDbContext.LibraryUpdates.Add(reloadRecord);
         await _nsxLibraryDbContext.SaveChangesAsync();

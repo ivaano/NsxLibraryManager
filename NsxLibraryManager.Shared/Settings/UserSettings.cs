@@ -9,6 +9,7 @@ public class UserSettings
     public string TitleDatabase { get; set; } = string.Empty;
     public string LibraryDatabase { get; set; } = string.Empty;
     public string LibraryPath { get; set; } = string.Empty;
+    public string BackupPath { get; set; } = string.Empty;
     public bool Recursive { get; set; } = true;
     public string ProdKeys { get; set; } = string.Empty;
     public string TitleKeys { get; set; } = string.Empty;

@@ -432,6 +432,7 @@ public class RenamerService(
                 TemplateField.AppName        => safeAppTitleName,
                 TemplateField.Region         =>  fileInfo.Region,
                 TemplateField.PatchId        => fileInfo.PatchTitleId,
+                TemplateField.PackageType    => fileInfo.PackageType.ToString().ToUpper(),
                 TemplateField.Size           => fileInfo.Size.ToHumanReadableBytes(),
                 TemplateField.PatchCount     => fileInfo.UpdatesCount.ToString(),
                 TemplateField.DlcCount       => fileInfo.DlcCount.ToString(),

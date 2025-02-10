@@ -36,6 +36,7 @@ public partial class Settings
         { "TitleDatabase", string.Empty },
         { "ProdKeys", string.Empty},
         { "LibraryPath", string.Empty },
+        { "BackupPath", string.Empty },
         { "DownloadSettings.TitleDbPath", string.Empty },
         { "DownloadSettings.TitleDbUrl", string.Empty },
         { "DownloadSettings.CnmtsUrl", string.Empty },
