@@ -130,6 +130,14 @@
                         }
                     </Template>
                 </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="UserRating" Title="User Rating" Width="100px" Visible="false">
+                    <Template Context="libraryTitle">
+                        <RadzenRating TValue="int" Value="@libraryTitle.UserRating" Change=@(args => OnUserRatingChange(args, libraryTitle))  />
+
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="CreatedAt" Title="Created" Width="100px" Visible="false"/>
+                <RadzenDataGridColumn Property="UpdatedAt" Title="Last Updated" Width="100px" Visible="false"/>
 
                 <RadzenDataGridColumn Title="Edit" UniqueID="Edit" Visible="false" Reorderable="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" Width="80px">
                     <Template Context="libraryTitle">

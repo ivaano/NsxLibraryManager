@@ -37,6 +37,14 @@
                             <RadzenTextBox Disabled="true" Placeholder="@_libraryTitleDto.Publisher" Style="width: 100%;" Name="Id" />
                         </RadzenColumn>
                     </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenLabel Text="Rate this game" Component="Id"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="9">
+                            <RadzenRating @bind-Value="@_userRating" />
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RadzenStack>
                 
             </RadzenFieldset>

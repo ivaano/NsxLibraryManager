@@ -10,6 +10,8 @@ public class LibraryTitleDto
     public IEnumerable<CategoryDto>? Categories { get; init; }
     public CollectionDto? Collection { get; set; }
     public TitleContentType ContentType { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public string? Description { get; init; }
     public string? Developer { get; init; }
     public Collection<DlcDto>? Dlc { get; init; }
@@ -45,6 +47,7 @@ public class LibraryTitleDto
     public string? TitleName { get; set; }
     public Collection<UpdateDto>? Updates { get; init; }
     public int? UpdatesCount { get; set; }
+    public int UserRating { get; set; }
     public uint Version { get; init; }
     public Collection<VersionDto>? Versions { get; init; }
 }

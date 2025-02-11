@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NsxLibraryManager.Data;
 
@@ -10,9 +11,11 @@ using NsxLibraryManager.Data;
 namespace NsxLibraryManager.Migrations.NsxLibrary
 {
     [DbContext(typeof(NsxLibraryDbContext))]
-    partial class NsxLibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210200925_AddUserratingToLibraryTitle")]
+    partial class AddUserratingToLibraryTitle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
@@ -221,9 +224,6 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
                     b.Property<byte>("ContentType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Description")
                         .HasMaxLength(5000)
                         .HasColumnType("TEXT");
@@ -306,9 +306,6 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
                     b.Property<string>("TitleName")
                         .HasMaxLength(200)
                         .HasColumnType("VARCHAR");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
 
                     b.Property<int?>("UpdatesCount")
                         .HasColumnType("INTEGER");

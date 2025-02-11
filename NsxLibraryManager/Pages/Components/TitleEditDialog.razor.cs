@@ -28,7 +28,7 @@ public partial class TitleEditDialog : ComponentBase
     private string _relatedDlcTitle = string.Empty;      
     private bool _disableCollectionDropdown;
     private string _disableCollectionDropdownMessage = string.Empty;
-    
+    private int _userRating;
     protected override async Task OnParametersSetAsync()
     {
         await LoadTitle();
@@ -53,6 +53,7 @@ public partial class TitleEditDialog : ComponentBase
         {
             _libraryTitleDto = titleResult.Value;
             _dropdownValue = _libraryTitleDto.Collection?.Id ?? 0;
+            _userRating = _libraryTitleDto.UserRating;
             if (_libraryTitleDto.ContentType != TitleContentType.Base && _libraryTitleDto.OtherApplicationId is not null)
             {
                 var baseTitleResult = await TitleLibraryService.GetTitleByApplicationId(_libraryTitleDto.OtherApplicationId);
@@ -96,7 +97,8 @@ public partial class TitleEditDialog : ComponentBase
         {
             _libraryTitleDto.Collection = null;
         }
-        
+        _libraryTitleDto.UserRating = _userRating;
+      
 
         var updatedTitles = await TitleLibraryService.UpdateLibraryTitleAsync(_libraryTitleDto);
         if (updatedTitles.IsSuccess)

@@ -775,8 +775,9 @@ public class TitleLibraryService(
         var libraryTitle = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.Id == title.Id);
         if (libraryTitle is null) return Result.Failure<int>("Title not found");
 
-        var updatedCount = await UpdateCollectionAssociationsAsync(libraryTitle, title);
-        await _nsxLibraryDbContext.SaveChangesAsync();
+        var updatedCollectionCount = await UpdateCollectionAssociationsAsync(libraryTitle, title);
+        libraryTitle.UserRating = title.UserRating;
+        var updatedCount = await _nsxLibraryDbContext.SaveChangesAsync();
         return Result.Success(updatedCount);
     }
 
