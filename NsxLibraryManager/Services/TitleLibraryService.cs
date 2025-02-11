@@ -348,7 +348,13 @@ public class TitleLibraryService(
         var sourceFile = titleDto.FileName;
         if (!string.IsNullOrEmpty(_userSettings.BackupPath) && !string.IsNullOrEmpty(sourceFile))
         {
-            var destinationFile = Path.Combine(_userSettings.BackupPath, Path.GetFileName(sourceFile));
+            var fileName = Path.GetFileName(sourceFile);
+            var destinationFile = Path.Combine(_userSettings.BackupPath, fileName);
+            if (File.Exists(destinationFile))
+            {
+                var guid = Guid.NewGuid().ToString("N"); 
+                destinationFile = Path.Combine(_userSettings.BackupPath, $"{guid}_{fileName}");
+            }
             File.Move(sourceFile, destinationFile);
         }
         await RemoveLibraryTitleAsync(titleDto);

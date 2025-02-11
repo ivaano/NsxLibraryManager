@@ -26,9 +26,15 @@
                     <Helper>
                         <div class="rz-text-caption">
                             <text>Can't change database while app is running, change it in config.json and restart the app.</text>
-                        </div>                        
+                        </div>
                     </Helper>
                 </RadzenFormField>
+                <RadzenRow AlignItems="AlignItems.Start" >
+                    <RadzenColumn Size="6" >
+                        <RadzenButton Text="Export UserData" class="rz-m-0"/>
+                        <RadzenButton Text="Import UserData" class="rz-m-0"/>
+                    </RadzenColumn>
+                </RadzenRow>
                 <RadzenFormField Text="Keys">
                     <RadzenRow Gap="2rem" RowGap="2rem" class="rz-m-0 rz-m-md-12">
                         <RadzenColumn Size="6">
@@ -54,7 +60,7 @@
                                 </RadzenFormField>
                             </RadzenStack>
                             <RadzenStack>
-                                <RadzenText TextStyle="TextStyle.Caption">Missing keys will be derived from existing keys if possible, 
+                                <RadzenText TextStyle="TextStyle.Caption">Missing keys will be derived from existing keys if possible,
                                     keys are necessary to read the nsp packages, if no keys are provided we will try to load them from the path @homeDirKeysFilePath
                                     if we dont find a keys there thw system will rely on the file name to get the title info from titledb, but any operation that needs to identify a title
                                     will be severily limited. Most of the time prod.keys is enough to get the package info.</RadzenText>
@@ -62,10 +68,10 @@
                         </RadzenColumn>
                         <RadzenColumn Size="6">
                             <RadzenCard Variant="Variant.Outlined">
-                                <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose keyfiles" 
+                                <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose keyfiles"
                                               Auto="true" Multiple="true" Url="api/upload/keys" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select file" } })"
                                               Progress=@(args => OnUploadProgress(args, "Drag and drop files to upload")) Complete="@OnUploadComplete" Error="@OnUploadError" Style="width: 100%"/>
-                                <RadzenButton  Text="Remove Current Keys" Click=@(args => ClearKeys()) class="rz-mt-4"/>
+                                <RadzenButton Text="Remove Current Keys" Click=@(args => ClearKeys()) class="rz-mt-4"/>
                             </RadzenCard>
                         </RadzenColumn>
                     </RadzenRow>
@@ -98,20 +104,20 @@
                         </RadzenColumn>
                         <RadzenColumn Size="12" SizeSM="6">
                             <RadzenStack>
-                            <RadzenFormField Text="Backup Path">
-                                <ChildContent>
-                                    <RadzenTextBox @bind-Value="@_config.BackupPath" Name="BackupPath"/>
-                                </ChildContent>
-                                <Helper>
-                                    @if (@_validationErrors["BackupPath"] != string.Empty)
-                                    {
-                                        <div class="rz-message rz-messages-error">@_validationErrors["BackupPath"]</div>
-                                    }
-                                    <div class="rz-text-caption">
-                                        Folder where the deleted files will be placed.
-                                    </div>
-                                </Helper>
-                            </RadzenFormField>
+                                <RadzenFormField Text="Backup Path">
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value="@_config.BackupPath" Name="BackupPath"/>
+                                    </ChildContent>
+                                    <Helper>
+                                        @if (@_validationErrors["BackupPath"] != string.Empty)
+                                        {
+                                            <div class="rz-message rz-messages-error">@_validationErrors["BackupPath"]</div>
+                                        }
+                                        <div class="rz-text-caption">
+                                            Folder where the deleted files will be placed.
+                                        </div>
+                                    </Helper>
+                                </RadzenFormField>
                             </RadzenStack>
                         </RadzenColumn>
                     </RadzenRow>

@@ -114,7 +114,7 @@ that I could run on a server and access it from any device.
 ## TODO
 - [x] Implement the file organizer.
 - [x] Support more Regions.
-- [ ] Ability to add custom information to each title (favorite, rating).
+- [x] Ability to add custom information to each title (favorite, rating).
 - [ ] Ability to download and store banners and screenshots locally.
 - [ ] Optimization.
 
