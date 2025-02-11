@@ -57,5 +57,41 @@ public class NsxLibraryDbContext : DbContext
                     .WithMany(t => t.TitleCategories)
                     .HasForeignKey(tc => tc.TitleId)
             );
+        
+        modelBuilder.Entity<Title>()
+            .Property(e => e.CreatedAt)
+            .IsRequired();
+
+        modelBuilder.Entity<Title>()
+            .Property(e => e.UpdatedAt)
+            .IsRequired();
     }
+    
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker
+            .Entries()
+            .Where(e => e.Entity.GetType().GetProperties()
+                            .Any(p => p.Name is "CreatedAt" or "UpdatedAt") &&
+                        e.State is EntityState.Added or EntityState.Modified);
+
+        foreach (var entityEntry in entries)
+        {
+            var createdAtProperty = entityEntry.Entity.GetType().GetProperty("CreatedAt");
+            var updatedAtProperty = entityEntry.Entity.GetType().GetProperty("UpdatedAt");
+
+            if (entityEntry.State == EntityState.Added && createdAtProperty != null)
+            {
+                createdAtProperty.SetValue(entityEntry.Entity, DateTime.UtcNow);
+            }
+
+            if (updatedAtProperty != null)
+            {
+                updatedAtProperty.SetValue(entityEntry.Entity, DateTime.UtcNow);
+            }
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
+    
 }

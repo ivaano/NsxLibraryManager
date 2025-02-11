@@ -20,6 +20,9 @@ public partial class Library : IDisposable
     [Inject]
     protected DialogService DialogService { get; set; } = null!;
     
+    [Inject]
+    protected NotificationService NotificationService { get; set; } = null!;
+    
     //grid
     private DataGridSettings _settings = null!;
     private RadzenDataGrid<LibraryTitleDto> _grid = null!;
@@ -51,6 +54,17 @@ public partial class Library : IDisposable
                 InvokeAsync(SaveStateAsync);
             }
         }
+    }
+    
+    private void ShowNotification(NotificationSeverity severity, string summary, string detail, int duration = 4000)
+    {
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = severity, 
+            Summary = summary, 
+            Detail = detail, 
+            Duration = duration
+        });
     }
     
     protected override async Task OnInitializedAsync()
@@ -148,7 +162,16 @@ public partial class Library : IDisposable
     {
         await DialogService.OpenAsync<Title>($"{title.TitleName}",
             new Dictionary<string, object>() { { "TitleId", title.ApplicationId } },
-            new DialogOptions() { Width = "90%", Height = "768px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, Draggable = true, Style = "background:var(--rz-base-900)"});
+            new DialogOptions()
+            {
+                AutoFocusFirstElement = false,
+                Width = "90%", 
+                Height = "768px", 
+                CloseDialogOnEsc = true, 
+                CloseDialogOnOverlayClick = true, 
+                Draggable = true, 
+                Style = "background:var(--rz-base-900)"
+            });
     }
     
     private async Task RefreshLibrary()
@@ -230,7 +253,19 @@ public partial class Library : IDisposable
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-
+    }
+    
+    private async Task OnUserRatingChange(int rating, LibraryTitleDto title)
+    {
+        title.UserRating = rating;
+        var updatedTitleResult = await TitleLibraryService.UpdateLibraryTitleAsync(title);
+        if (updatedTitleResult.IsSuccess)
+        {
+            ShowNotification(
+                NotificationSeverity.Success, 
+                "Rating Updated", 
+                $"{title.TitleName} user rating updated");
+        }
     }
     
     protected virtual void Dispose(bool disposing)

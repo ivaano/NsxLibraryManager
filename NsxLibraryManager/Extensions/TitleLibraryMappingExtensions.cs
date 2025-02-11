@@ -61,7 +61,10 @@ public static class TitleLibraryMappingExtensions
             Size = title.Size ?? 0,
             TitleName = title.TitleName,
             UpdatesCount = title.UpdatesCount ?? 0,
+            UserRating = title.UserRating,
             Version = title.Version,
+            CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(title.CreatedAt, TimeZoneInfo.Local),
+            UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(title.UpdatedAt, TimeZoneInfo.Local),
             Categories = new List<CategoryDto>((title.Categories).Select(x => new CategoryDto
                     {
                         Name = x.Name,
@@ -171,6 +174,9 @@ public static class TitleLibraryMappingExtensions
             OwnedDlcCount = title.OwnedDlcs ?? 0,
             OwnedUpdatesCount = title.OwnedUpdates ?? 0,
             ReleaseDate = title.ReleaseDate,
+            UserRating = title.UserRating,
+            CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(title.CreatedAt, TimeZoneInfo.Local),
+            UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(title.UpdatedAt, TimeZoneInfo.Local),
             Versions = new Collection<VersionDto>(
                 title.Versions
                     .Select(x => new VersionDto()

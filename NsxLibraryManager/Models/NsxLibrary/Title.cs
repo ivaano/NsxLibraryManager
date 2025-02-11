@@ -9,6 +9,15 @@ public sealed class Title : BaseTitle
 {
     public int? OwnedUpdates { get; set; }
     public int? OwnedDlcs { get; set; }
+    public int UserRating { get; set; }
+    public bool Favorite {get; set;}
+    
+    public DateTime CreatedAt  { get; set; } 
+    public DateTime UpdatedAt  { get; set; }
+    
+    [Column(TypeName = "VARCHAR")]
+    [StringLength(200)]
+    public long? Notes { get; set; }
     
     //Title Version
     public uint Version { get; set; }
