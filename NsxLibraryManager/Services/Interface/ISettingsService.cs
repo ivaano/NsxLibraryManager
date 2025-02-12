@@ -1,4 +1,6 @@
-﻿using NsxLibraryManager.Shared.Enums;
+﻿using Common.Services;
+using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Services.Interface;
@@ -11,7 +13,8 @@ public interface ISettingsService
     public Task<PackageRenamerSettings> SavePackageRenamerSettings(PackageRenamerSettings packageRenamerSettings);
     public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings bundleRenamerSettings);
     public Task<CollectionRenamerSettings> SaveCollectionRenamerSettings(CollectionRenamerSettings collectionRenamerSettings);
-    
+    public Task<Result<byte[]>> ExportUserData();
+    public Task<Result<int>> ImportUserData(string filePath);
     public string GetSettingByType(SettingsEnum key);
     
     public UserSettings GetUserSettings();

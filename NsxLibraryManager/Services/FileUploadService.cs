@@ -5,10 +5,10 @@ namespace NsxLibraryManager.Services;
 
 public class FileUploadService : IFileUploadService
 {
-    private readonly string[] allowedExtensions = [".keys", ".key"];
     private readonly long maxFileSize = 10 * 1024 * 1024; 
     
-    public async Task<FileUploadResponse> UploadFileAsync(IFormFile? file, string uploadDirectory)
+    public async Task<FileUploadResponse> UploadFileAsync(IFormFile? file, string uploadDirectory,
+        string[] allowedExtensions)
     {
         try
         {

@@ -126,12 +126,53 @@ public partial class Settings
         }
     }
 
-    private void OnUploadComplete(UploadCompleteEventArgs args)
+    private async Task OnUploadUserDataComplete(UploadCompleteEventArgs args)
     {
         var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
+
+        try
+        {
+            var uploadedFiles = args.JsonResponse.Deserialize<FileUploadResponse>(options);
+            if (uploadedFiles is null) return;
+            var importResult = await SettingsService.ImportUserData(uploadedFiles.FilePath);
+            if (importResult.IsSuccess)
+            {
+                ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Import Success!", 
+                    Detail = $"{importResult.Value} records updated", 
+                    Duration = 20000,
+                    CloseOnClick = true 
+                });
+            }
+            StateHasChanged();
+        }
+        catch (JsonException ex)
+        {
+            ShowNotification(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error, 
+                Summary = "Upload Error", 
+                Detail = ex.Message, 
+                Duration = 20000,
+                CloseOnClick = true 
+            });
+        }
+        LoadConfiguration();
+
+    }
+    
+    private void OnUploadKeysComplete(UploadCompleteEventArgs args)
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         try
         {
             var uploadedFiles = args.JsonResponse.Deserialize<List<FileUploadResponse>>(options);
@@ -211,7 +252,7 @@ public partial class Settings
             LoadConfiguration();
         }
     }
-    
+   
     private Task ReloadApp()
     {
         ApplicationLifetime.StopApplication();

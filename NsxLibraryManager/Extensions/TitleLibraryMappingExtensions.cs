@@ -31,6 +31,16 @@ public static class TitleLibraryMappingExtensions
             };
         return null;
     }
+
+    public static ExportUserDataDto MapExportUserDataDto(this Title title)
+    {
+        return new ExportUserDataDto
+        {
+            ApplicationId = title.ApplicationId,
+            Collection = title.Collection?.Name,
+            UserRating = title.UserRating
+        };
+    }
     
     public static LibraryTitleDto MapLibraryTitleDtoNoDlcOrUpdates(this Title title)
     {

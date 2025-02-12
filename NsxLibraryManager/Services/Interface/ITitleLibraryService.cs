@@ -17,6 +17,7 @@ public interface ITitleLibraryService
     public Task<Result<bool>> AddLibraryTitleAsync(LibraryTitleDto title);
     public Task<Result<int>> UpdateMultipleLibraryTitlesAsync(IEnumerable<LibraryTitleDto> titles);
     public Task<Result<int>> UpdateLibraryTitleAsync(LibraryTitleDto titleDto);
+
     public Task<Result<bool>> RemoveLibraryTitleAsync(LibraryTitleDto title);
     public Task<bool> SaveContentCounts(Dictionary<string, int> updateCounts, TitleContentType contentType);
     public Task<Result<LibraryTitleDto>> GetTitleByApplicationId(string applicationId);
