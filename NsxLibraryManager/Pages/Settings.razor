@@ -30,9 +30,25 @@
                     </Helper>
                 </RadzenFormField>
                 <RadzenRow AlignItems="AlignItems.Start" >
-                    <RadzenColumn Size="6" >
-                        <RadzenButton Text="Export UserData" class="rz-m-0"/>
-                        <RadzenButton Text="Import UserData" class="rz-m-0"/>
+                    <RadzenColumn Size="6">
+                        <div class="rz-fileupload" style="width: 100%">
+                            <div class="rz-fileupload-buttonbar">
+                                <a href="/api/download/userdata">
+                                    <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Export UserData" class="rz-m-0"/>
+                                </a>
+                                <text class="rz-text-caption">Only user data is exported (ratings, collections).</text>
+                            </div>
+                        </div>
+
+                    </RadzenColumn>
+                    <RadzenColumn Size="6">
+                        <RadzenUpload Url="/api/upload/userdata"
+                                      ChooseText="Import UserData"
+                                      Progress=@(args => OnUploadProgress(args, "Single file upload"))
+                                      Complete="@OnUploadUserDataComplete" Error="@OnUploadError"
+                                      Style="width: 100%;"
+                                      InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
+                        </RadzenUpload>
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenFormField Text="Keys">
@@ -70,7 +86,7 @@
                             <RadzenCard Variant="Variant.Outlined">
                                 <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose keyfiles"
                                               Auto="true" Multiple="true" Url="api/upload/keys" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select file" } })"
-                                              Progress=@(args => OnUploadProgress(args, "Drag and drop files to upload")) Complete="@OnUploadComplete" Error="@OnUploadError" Style="width: 100%"/>
+                                              Progress=@(args => OnUploadProgress(args, "Drag and drop files to upload")) Complete="@OnUploadKeysComplete" Error="@OnUploadError" Style="width: 100%"/>
                                 <RadzenButton Text="Remove Current Keys" Click=@(args => ClearKeys()) class="rz-mt-4"/>
                             </RadzenCard>
                         </RadzenColumn>

@@ -1,10 +1,16 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using Common.Contracts;
+using Common.Services;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
+using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 using NsxLibraryManager.Shared.Settings;
 using NsxLibraryManager.Utils;
@@ -209,7 +215,6 @@ public class SettingsService(
         }
 
     }
-
     public string GetSettingByType(SettingsEnum settingEnumType)
     {
         Load();
@@ -239,4 +244,86 @@ public class SettingsService(
             _ => new UserSettingValue(key, string.Empty)
         };
     }
+    
+    /// <summary>
+    /// ExportUser Data only exports user generated data, for now UserRating and Collections.
+    /// </summary>
+    /// <returns>Result</returns>
+    public async Task<Result<byte[]>> ExportUserData()
+    {
+        //get titles with ratings or collections
+        var titles = await _nsxLibraryDbContext.Titles
+            .AsNoTracking()
+            .Include(x => x.Collection)
+            .Where(x => x.UserRating > 0 || x.Collection != null)
+            .OrderBy(t => t.ApplicationId)
+            .Select(x => x.MapExportUserDataDto())
+            .ToListAsync();
+
+        var csvBytes = CsvGenerator.GenerateCsv(titles);
+        return Result.Success(csvBytes);
+    }
+
+    private Result<List<ExportUserDataDto>> ReadUserDataCsv(string filePath)
+    {
+        try
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture) 
+            {
+                HasHeaderRecord = true
+            };
+
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, config);
+            return Result.Success(csv.GetRecords<ExportUserDataDto>().ToList()); 
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<List<ExportUserDataDto>>($"Error reading CSV: {ex.Message}");
+        }
+    }
+    public async Task<Result<int>> ImportUserData(string filePath)
+    {
+        var readCsvResult = ReadUserDataCsv(filePath);
+        if (readCsvResult.IsSuccess)
+        {
+            var userData = readCsvResult.Value;
+            var noUpdateCount = 0;
+            foreach (var row in userData)
+            {
+                var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
+                if (title is null)
+                {
+                    noUpdateCount++;
+                    continue;
+                }
+
+                title.UserRating = row.UserRating;
+                if (!string.IsNullOrEmpty(row.Collection))
+                {
+                    //check collection exists
+                    var collection =
+                        await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(x => x.Name == row.Collection);
+                    if (collection is not null)
+                    {
+                        collection.Titles.Add(title);
+                    }
+                    else
+                    {
+                        var newCollection = new Collection
+                        {
+                            Name = row.Collection
+                        };
+                        newCollection.Titles.Add(title);
+                        _nsxLibraryDbContext.Collections.Add(newCollection);
+                    }
+
+                }
+            }
+        }
+        var updateCount = await _nsxLibraryDbContext.SaveChangesAsync();
+
+        return Result.Success(updateCount);
+    }
+    
 }
