@@ -31,7 +31,6 @@ public partial class TitleDbTitle
     private RadzenCarousel _carousel = default!;
     private bool auto = true;
     private double interval = 4000;
-    private bool started = true;
     private int selectedIndex;
     
     //dlc grid
@@ -44,7 +43,7 @@ public partial class TitleDbTitle
     private RadzenDataGrid<UpdateDto> _updatesGrid;
     private bool _updatesIsLoading;
     private int _updatesCount;
-    private IEnumerable<UpdateDto> _updates;
+    private IEnumerable<UpdateDto> _updates = default!;
 
     protected override async Task OnInitializedAsync()
     {

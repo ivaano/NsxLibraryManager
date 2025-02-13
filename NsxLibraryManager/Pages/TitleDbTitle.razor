@@ -190,7 +190,7 @@
             <Items>
                 @if (LibraryTitleDto?.Screenshots is not null)
                 {
-                    @foreach (var screenshot in LibraryTitleDto?.Screenshots)
+                    @foreach (var screenshot in LibraryTitleDto?.Screenshots!)
                     {
                         <RadzenCarouselItem>
                             <RadzenImage Path="@screenshot.Url" class="rz-h-100"/>

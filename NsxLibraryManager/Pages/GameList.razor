@@ -4,10 +4,10 @@
 
 <RadzenCard>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
-    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
+    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value?.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
 </RadzenCard>
 
-<RadzenDataList IsLoading="@IsLoading" 
+<RadzenDataList IsLoading="@_isLoading" 
                 Data="@_games" TItem="LibraryTitleDto" AllowPaging="true">
     <Template Context="game">
         <RadzenCard Style="width: 100%; padding: 5px">
@@ -96,7 +96,7 @@
 
     </Template>
 </RadzenDataList>
-<RadzenPager @ref="@pager" Density="@Density.Compact" ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
+<RadzenPager @ref="@_pager" Density="@Density.Compact" ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
              HorizontalAlign="HorizontalAlign.Right" Count="_count"
              PageSize="@_pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>
              

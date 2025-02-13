@@ -214,7 +214,7 @@ public class SettingsService(
             
             return userSettings;
         }
-        catch (JsonException ex)
+        catch (JsonException)
         {
             return GetDefaultSettings();
         }

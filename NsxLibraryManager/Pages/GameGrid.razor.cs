@@ -25,7 +25,7 @@ public partial class GameGrid : IDisposable
     private FilterDescriptor? _filterDescriptor;
     private const string ApplicationIdPattern = "^[0-9A-F]{16}$";
     private static readonly RegexOptions RegexFlags = RegexOptions.IgnoreCase | RegexOptions.Compiled;
-    private RadzenPager pager;
+    private RadzenPager _pager = default!;
     private AgeRatingAgency AgeRatingAgency { get; set; }
     protected override async Task OnInitializedAsync()
     {
@@ -78,7 +78,7 @@ public partial class GameGrid : IDisposable
         {
             await InitialLoad();
             _filterDescriptor = null;
-            await pager.FirstPage();
+            await _pager.FirstPage();
             return;
         }
         
@@ -117,7 +117,7 @@ public partial class GameGrid : IDisposable
 
     public void Dispose()
     {
-        pager.Dispose();
+        _pager.Dispose();
         _games = null!;
     }
 }

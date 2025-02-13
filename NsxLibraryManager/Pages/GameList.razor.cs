@@ -20,12 +20,12 @@ public partial class GameList
     private readonly string _pagingSummaryFormat = "Displaying page {0} of {1} (total {2} games)";
     private readonly int _pageSize = 5;
     private int _count;
-    public bool IsLoading;
+    private bool _isLoading;
     private IEnumerable<LibraryTitleDto> _games = default!;
     private FilterDescriptor? _filterDescriptor;
     private const string ApplicationIdPattern = "^[0-9A-F]{16}$";
     private static readonly RegexOptions RegexFlags = RegexOptions.IgnoreCase | RegexOptions.Compiled;
-    private RadzenPager pager;
+    private RadzenPager _pager = default!;
     private AgeRatingAgency AgeRatingAgency { get; set; }
     protected override async Task OnInitializedAsync()
     {
@@ -58,7 +58,7 @@ public partial class GameList
 
     private async Task LoadData(LoadDataArgs args)
     {
-        IsLoading = true;
+        _isLoading = true;
         const string baseFilter = "ContentType = 128";
         args.Filter = string.IsNullOrEmpty(args.Filter) ? 
             baseFilter : $"({baseFilter}) and ({args.Filter})";
@@ -70,16 +70,16 @@ public partial class GameList
             _games = loadData.Value.Titles;
             _count = loadData.Value.Count;            
         }
-        IsLoading = false;
+        _isLoading = false;
     }
 
-    private async Task OnFilterChange(string value, string name)
+    private async Task OnFilterChange(string? value, string name)
     {
         if (string.IsNullOrEmpty(value))
         {
             await InitialLoad();
             _filterDescriptor = null;
-            await pager.FirstPage();
+            await _pager.FirstPage();
             return;
         }
         

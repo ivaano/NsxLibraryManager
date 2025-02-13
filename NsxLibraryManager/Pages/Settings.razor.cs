@@ -26,9 +26,9 @@ public partial class Settings
     private UserSettings _config = default!;
     private bool _databaseFieldDisabled = true;
     private ValidationResult? _validationResult;
-    private RadzenUpload uploadDD;
-    private string homeDirKeysFilePath;
-    private string theme = string.Empty;
+    private RadzenUpload _uploadDd = default!;
+    private string _homeDirKeysFilePath = string.Empty;
+    private string _theme = string.Empty;
     
     private readonly Dictionary<string, string> _validationErrors = new()
     {
@@ -107,7 +107,7 @@ public partial class Settings
         var homeUserFolder = PathHelper.HomeUserDir;
         if (homeUserFolder is not null)
         {
-            homeDirKeysFilePath = Path.Combine(homeUserFolder, ".switch").ToFullPath();
+            _homeDirKeysFilePath = Path.Combine(homeUserFolder, ".switch").ToFullPath();
         }
     }
 

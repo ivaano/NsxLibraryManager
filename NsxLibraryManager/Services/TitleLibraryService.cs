@@ -701,6 +701,7 @@ public class TitleLibraryService(
 
     public async Task<Result<bool>> AddLibraryTitleAsync(LibraryTitleDto title)
     {
+        if (title.FileName is null) return Result.Failure<bool>("Filename missing");
         logger.LogDebug("Adding file: {Filename} from library", title.FileName);
         var libraryTitle = await ProcessFileAsync(title.FileName);
 

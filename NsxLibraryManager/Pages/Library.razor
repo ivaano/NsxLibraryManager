@@ -56,7 +56,7 @@
                     </HeaderTemplate>
                     <Template Context="data">
                         <RadzenCheckBox TabIndex="-1" TriState="false" Value="@(_selectedTitles != null && _selectedTitles.Contains(data))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
-                                        TValue="bool" Change=@(args => { if(!true) { _grid.SelectRow(data); }}) />
+                                        TValue="bool" Change=@(args => { }) />
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="150px"/>
