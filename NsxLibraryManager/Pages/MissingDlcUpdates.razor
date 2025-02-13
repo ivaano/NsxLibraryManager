@@ -1,0 +1,61 @@
+﻿@page "/MissingDlcUpdates"
+@using NsxLibraryManager.Extensions
+@using NsxLibraryManager.Shared.Dto
+<PageTitle>Nsx Library - Missing Updates</PageTitle>
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+        <RadzenDataGrid @ref="_grid" Data="@_libraryTitles" LoadData="@LoadData"
+                        PageSize="@_pageSize" PageSizeOptions="@_pageSizeOptions" PageSizeChanged="@(args => _pageSize = args)"
+                        Count="@_count"  IsLoading="@_isLoading" AllowSorting="true" AllowPaging="true"
+                        AllowFiltering="true" FilterMode="FilterMode.SimpleWithMenu" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        AllowColumnResize="true" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px" AllowColumnPicking="true"
+                        ShowPagingSummary="true" style="height: 95vh">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="ApplicationId" Title="Title Id" Width="100px"/>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="TitleName" SortOrder="SortOrder.Ascending" Title="Name" Width="350px">
+                    <Template Context="libraryTitle">
+                        <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" @onclick="_ => OpenDetails(libraryTitle)"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestOwnedUpdateVersion" Title="Version" Visible="true" Width="50px"/>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestOwnedUpdateVersion" Title="Short Version" Visible="true" Width="50px">
+                    <Template Context="libraryTitle">
+                        @{
+                            var shortVer = (libraryTitle.LatestOwnedUpdateVersion.ToString() ?? string.Empty).VersionShifted();
+                            @if (shortVer > 0)
+                            {
+                                <span>@shortVer</span>
+                            }
+                            else
+                            {
+                                <span>0</span>
+                            }
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestVersion" Title="Latest Version" Visible="true" Width="50px"/>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="LatestVersion" Title="Short Latest Version" Visible="true" Width="50px">
+                    <Template Context="libraryTitle">
+                        @{
+                            var shortVer = (libraryTitle.LatestVersion.ToString() ?? string.Empty).VersionShifted();
+                            @if (shortVer > 0)
+                            {
+                                <span>@shortVer</span>
+                            }
+                            else
+                            {
+                                <span>0</span>
+                            }
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="Region" Title="Region" Visible="true" Width="50px"/>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="UpdatesCount" Title="Available Updates" Visible="true" Width="50px"/>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="OwnedUpdatesCount" Title="Owned Updates" Visible="true" Width="50px" Sortable="true" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenStack>

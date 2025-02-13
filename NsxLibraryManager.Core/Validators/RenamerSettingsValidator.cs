@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Core.Validators;
 
-public class RenamerSettingsValidator : AbstractValidator<RenamerSettings>
+public class RenamerSettingsValidator : AbstractValidator<PackageRenamerSettings>
 {
     public RenamerSettingsValidator()
     {

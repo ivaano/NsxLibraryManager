@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.13 AS base
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.406-jammy AS build
 WORKDIR /src
 COPY . .
 RUN dotnet restore "NsxLibraryManager/NsxLibraryManager.csproj"
@@ -13,9 +13,10 @@ FROM build AS publish
 RUN dotnet publish "NsxLibraryManager.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-RUN chown app:app /app
+COPY --from=publish /app/publish /app
+RUN mkdir -p /app/backup
+RUN mkdir -p /app/renamer/in /app/renamer/out
+RUN chown app:app /app -R
 USER app
-RUN mkdir -p /app/titledb
+WORKDIR /app
 ENTRYPOINT ["dotnet", "NsxLibraryManager.dll"]

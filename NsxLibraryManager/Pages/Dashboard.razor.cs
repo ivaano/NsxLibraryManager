@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Models.Stats;
-using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 
 namespace NsxLibraryManager.Pages;
 
 public partial class Dashboard
 {
     [Inject]
-    protected IDataService DataService { get; set; } = default!;
+    protected IStatsService StatsService { get; set; } = null!;
     
-    private CategoryDataItem[] _categories = Array.Empty<CategoryDataItem>();
-    private PublisherDataItem[] _publishers = Array.Empty<PublisherDataItem>();
-    private ContentDistributionItem[] _contentDistribution = Array.Empty<ContentDistributionItem>();
-    private PackageDistributionItem[] _packageDistribution = Array.Empty<PackageDistributionItem>();
+    private CategoryCountDto[] _categories = [];
+    private PublisherCountDto[] _publishers = [];
+    private ContentDistributionCountDto[] _contentDistribution = [];
+    private PackageDistributionCountDto[] _packageDistribution = [];
     
     private const bool ShowDataLabels = true;
 
@@ -23,41 +23,10 @@ public partial class Dashboard
 
     private Task LoadData()
     {
-        var stats = DataService.GetLibraryTitlesStats();
-        _categories = stats.CategoriesGames.Select(x => new CategoryDataItem { Category = x.Key, Count = x.Value }).Take(10).ToArray();
-        _publishers = stats.PublisherGames.Select(x => new PublisherDataItem() { Publisher = x.Key, Count = x.Value }).Take(10).ToArray();
-        var type = typeof(ContentDistribution);
-        var properties = type.GetProperties();
-        _contentDistribution = (from property in properties let value = property.GetValue(stats.ContentDistribution) let count = (int)value! let name = property.Name select new ContentDistributionItem { Type = name, Count = count }).OrderByDescending(x => x.Count).ToArray();
-        type = typeof(PackageDistribution);
-        properties = type.GetProperties();
-        _packageDistribution = (from property in properties let value = property.GetValue(stats.PackageDistribution) let count = (int)value! let name = property.Name select new PackageDistributionItem { Type = name, Count = count }).OrderByDescending(x => x.Count).ToArray();
-        
+        _categories = StatsService.GetTopCategories();
+        _publishers = StatsService.GetTopPublishers();
+        _contentDistribution = StatsService.GetTopContentDistribution();
+        _packageDistribution = StatsService.GetTopPackageDistribution();
         return Task.CompletedTask;
     }
-}
-
-internal class PublisherDataItem
-{
-    public required string Publisher { get; set; }
-    public int Count { get; set; }
-    
-}
-
-internal class CategoryDataItem
-{
-    public required string Category { get; set; }
-    public int Count { get; set; }
-}
-
-internal class ContentDistributionItem
-{
-    public required string Type { get; set; }
-    public int Count { get; set; }
-}
-
-internal class PackageDistributionItem
-{
-    public required string Type { get; set; }
-    public int Count { get; set; }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Data;
+using NsxLibraryManager.Services.Interface;
 using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;
@@ -7,13 +9,15 @@ namespace NsxLibraryManager.Pages.Components;
 
 public partial class RefreshTitleDbProgressDialog : IDisposable
 {
-    public string DownloadingInfo { get; set; }
+    private string DownloadingInfo { get; set; }
 
-    [Inject]
-    protected DialogService DialogService { get; set; }
-    [Inject]
-    protected ITitleDbService TitleDbService { get; set; }
+    [Inject] protected DialogService DialogService { get; set; }
+    [Inject] protected ISettingsService SettingsService { get; set; }
     
+    [Inject] protected IDownloadService DownloadService { get; set; }
+    
+    [Inject] protected ITitledbService TitledbService { get; set; }
+    [Inject] protected TitledbDbContext DbContext { get; set; } = default!;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -22,23 +26,37 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
         }
     }
     
-    private async Task DoWork()
+    private async Task DoWork(CancellationToken cancellationToken = default)
     {
         await InvokeAsync(
                 async () =>
                 {
-                    DownloadingInfo = "cnmts";
+                    DownloadingInfo = "Checking latest titledb version...";
                     StateHasChanged();
-                    await TitleDbService.ImportCnmtsAsync();
-                    DownloadingInfo = "versions";
-                    StateHasChanged();
-                    await TitleDbService.ImportVersionsAsync();
-                    var regions = TitleDbService.GetRegionsToImport();
-                    foreach (var region in regions)
+
+                    var settings = SettingsService.GetUserSettings();
+                    var latestVersion = await DownloadService.GetVersionsFile(settings.DownloadSettings.VersionUrl, cancellationToken);
+                    var dbHistory = DbContext.History.OrderByDescending(h => h.TimeStamp).FirstOrDefault();
+                    var getNewVersion = false;
+                    if (dbHistory is not null)
                     {
-                        DownloadingInfo = $"region {region}";
+                        if (dbHistory.VersionNumber != latestVersion)
+                        {
+                            getNewVersion = true;
+                        }
+                    }
+                    else
+                    {
+                        getNewVersion = true;
+                    }
+
+                    if (getNewVersion)
+                    {
+                        DownloadingInfo = $"Downloading version titledb version {latestVersion} ...";
                         StateHasChanged();
-                        await TitleDbService.ImportRegionAsync(region);
+
+                        var compressedFilePath = await DownloadService.GetLatestTitleDb(settings.DownloadSettings, cancellationToken);
+                        await TitledbService.ReplaceDatabase(compressedFilePath, cancellationToken);
                     }
                 });
         DialogService.Close();

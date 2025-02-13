@@ -1,5 +1,5 @@
 ﻿using LibHac.Tools.Fs;
-using NsxLibraryManager.Core.Enums;
+using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.FileLoading;
 

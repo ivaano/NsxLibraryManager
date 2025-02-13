@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Common.Contracts;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
-using NsxLibraryManager.Core.Settings;
+using NsxLibraryManager.Shared.Settings;
 
 namespace Tests.FileLoading;
 
@@ -17,24 +18,23 @@ public class PackageInfoLoaderTest
     {
         var packageTypelogger = Substitute.For<ILogger<IPackageTypeAnalyzer>>();
         var keySetProviderServiceLogger = Substitute.For<ILogger<IKeySetProviderService>>();
-        var appSettings = new AppSettings
+        var settingsMediator = Substitute.For<ISettingsMediator>();
+        var appSettings = new UserSettings
         {
-                TitleDatabase = "titledb",
-                LibraryPath = "library",
-                ProdKeys = string.Empty,
-                DownloadSettings = new DownloadSettings
-                {
-                        TimeoutInSeconds = 0,
-                        TitleDbPath = "/tmp",
-                        RegionUrl = string.Empty,
-                        CnmtsUrl = string.Empty,
-                        VersionsUrl = string.Empty,
-                        Regions = new List<string>{"US"}
-                }
+            TitleDatabase = "titledb",
+            LibraryPath = "library",
+            ProdKeys = string.Empty,
+            DownloadSettings = new DownloadSettings
+            {
+                TimeoutInSeconds = 0,
+                TitleDbPath = "/tmp",
+                TitleDbUrl = "title",
+                VersionUrl = "version"
+            },
         };
         var options = Options.Create(appSettings);
         _packageTypeAnalyzer = new PackageTypeAnalyzer(packageTypelogger);
-        _keySetProviderService = new KeySetProviderService(options, keySetProviderServiceLogger);
+        _keySetProviderService = new KeySetProviderService(options, keySetProviderServiceLogger, settingsMediator);
     }
 
     [Fact]

@@ -1,5 +1,4 @@
 ﻿@page "/settings"
-@using Microsoft.Extensions.Configuration.UserSecrets
 
 <PageTitle>Settings</PageTitle>
 <RadzenRow>
@@ -22,86 +21,143 @@
             <RadzenStack>
                 <RadzenFormField Text="Database Path">
                     <ChildContent>
-                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleDatabase" Name="TitleDatabase"/>
+                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.LibraryDatabase" Name="LibraryDatabase"/>
                     </ChildContent>
                     <Helper>
-                        @if (@_validationErrors["TitleDatabase"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["TitleDatabase"]</div>    
-                        }
                         <div class="rz-text-caption">
-                            @if (_databaseFieldDisabled)
-                            {
-                                <text>Can't change database while app is running, change it in config.json and restart the app.</text>
-                            }
-                            else
-                            {
-                                <text>* required</text>
-                            }
-                        </div>                        
-                    </Helper>
-                </RadzenFormField>
-                <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
-                    <ChildContent>
-                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["ProdKeys"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["TitleDatabase"]</div>    
-                        }
-                        <div class="rz-text-caption">  
-                            @if (_databaseFieldDisabled)
-                            {
-                                <text>Can't change prod keys file while app is running, change it in config.json and restart the app.</text>
-                            }
-                            else
-                            {
-                                <text>Location to prod.keys file, if no location is given the app will look in</text>
-                                @NsxLibraryManager.Utils.PathHelper.HomeUserDir
-                                <text>folder.</text>
-                            }                            
+                            <text>Can't change database while app is running, change it in config.json and restart the app.</text>
                         </div>
                     </Helper>
                 </RadzenFormField>
-                <RadzenFormField Text="Library Path">
-                    <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath" />
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["LibraryPath"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["LibraryPath"]</div>    
-                        }
-                        <div class="rz-text-caption">
-                            Folder where the library files are located.
+                <RadzenRow AlignItems="AlignItems.Start" >
+                    <RadzenColumn Size="6">
+                        <div class="rz-fileupload" style="width: 100%">
+                            <div class="rz-fileupload-buttonbar">
+                                <a href="/api/download/userdata">
+                                    <RadzenButton ButtonStyle="ButtonStyle.Success" Text="Export UserData" class="rz-m-0"/>
+                                </a>
+                                <text class="rz-text-caption">Only user data is exported (ratings, collections).</text>
+                            </div>
                         </div>
-                    </Helper>
+
+                    </RadzenColumn>
+                    <RadzenColumn Size="6">
+                        <RadzenUpload Url="/api/upload/userdata"
+                                      ChooseText="Import UserData"
+                                      Progress=@(args => OnUploadProgress(args, "Single file upload"))
+                                      Complete="@OnUploadUserDataComplete" Error="@OnUploadError"
+                                      Style="width: 100%;"
+                                      InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
+                        </RadzenUpload>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenFormField Text="Keys">
+                    <RadzenRow Gap="2rem" RowGap="2rem" class="rz-m-0 rz-m-md-12">
+                        <RadzenColumn Size="6">
+                            <RadzenStack>
+                                <RadzenFormField AllowFloatingLabel="false" Text="Prod Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ProdKeys" Name="ProdKeys"/>
+                                    </ChildContent>
+                                </RadzenFormField>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenFormField AllowFloatingLabel="false" Text="Title Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.TitleKeys" Name="TitleKeys"/>
+                                    </ChildContent>
+                                </RadzenFormField>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenFormField AllowFloatingLabel="false" Text="Console Keys File">
+                                    <ChildContent>
+                                        <RadzenTextBox Disabled="@_databaseFieldDisabled" @bind-Value="@_config.ConsoleKeys" Name="ConsoleKeys"/>
+                                    </ChildContent>
+                                </RadzenFormField>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenText TextStyle="TextStyle.Caption">Missing keys will be derived from existing keys if possible,
+                                    keys are necessary to read the nsp packages, if no keys are provided we will try to load them from the path @_homeDirKeysFilePath
+                                    if we dont find a keys there thw system will rely on the file name to get the title info from titledb, but any operation that needs to identify a title
+                                    will be severily limited. Most of the time prod.keys is enough to get the package info.</RadzenText>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenCard Variant="Variant.Outlined">
+                                <RadzenUpload id="ddUpload" @ref="_uploadDd" ChooseText="Drag and drop here or click to choose keyfiles"
+                                              Auto="true" Multiple="true" Url="api/upload/keys" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select file" } })"
+                                              Progress=@(args => OnUploadProgress(args, "Drag and drop files to upload")) Complete="@OnUploadKeysComplete" Error="@OnUploadError" Style="width: 100%"/>
+                                <RadzenButton Text="Remove Current Keys" Click=@(args => ClearKeys()) class="rz-mt-4"/>
+                            </RadzenCard>
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RadzenFormField>
-                <div class="rz-text-align-right   ; ">
-                    <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
-                    <RadzenLabel Text="Recursive" Component="Recursive" Style="margin-left: 8px; vertical-align: middle;"/>
-                </div>
+                <RadzenFieldset Text="Paths">
+                    <RadzenRow Gap="1.2rem">
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <RadzenStack>
+                                <RadzenFormField Text="Library Path">
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
+                                    </ChildContent>
+                                    <Helper>
+                                        @if (@_validationErrors["LibraryPath"] != string.Empty)
+                                        {
+                                            <div class="rz-message rz-messages-error">@_validationErrors["LibraryPath"]</div>
+                                        }
+                                        <div class="rz-text-caption">
+                                            Folder where the library files are located.
+                                        </div>
+                                    </Helper>
+                                </RadzenFormField>
+                                <RadzenRow JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+                                    <RadzenColumn Size="2" class="rz-text-align-right;">
+                                        <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
+                                        <RadzenLabel Text="Recursive" Component="Recursive" Style="margin-left: 8px; vertical-align: middle;"/>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <RadzenStack>
+                                <RadzenFormField Text="Backup Path">
+                                    <ChildContent>
+                                        <RadzenTextBox @bind-Value="@_config.BackupPath" Name="BackupPath"/>
+                                    </ChildContent>
+                                    <Helper>
+                                        @if (@_validationErrors["BackupPath"] != string.Empty)
+                                        {
+                                            <div class="rz-message rz-messages-error">@_validationErrors["BackupPath"]</div>
+                                        }
+                                        <div class="rz-text-caption">
+                                            Folder where the deleted files will be placed.
+                                        </div>
+                                    </Helper>
+                                </RadzenFormField>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenFieldset>
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
 </RadzenFieldset>
 
-<RadzenFieldset Text="Download Settings" Style="background-color: #38474e">
+<RadzenFieldset Text="Download Settings" >
     <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
-                <RadzenFormField Text="TitleDb Path">
+                <RadzenFormField Text="TitleDb Url">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbPath"></RadzenTextBox>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbUrl"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        @if (@_validationErrors["DownloadSettings.TitleDbPath"] != string.Empty)
+                        @if (@_validationErrors["DownloadSettings.TitleDbUrl"] != string.Empty)
                         {
-                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TitleDbPath"]</div>    
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TitleDbUrl"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Folder where Title Db files will be downloaded.
+                            Where to get the SQL-TitleDb.
                         </div>                        
                     </Helper>
                 </RadzenFormField>
@@ -109,17 +165,17 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
-                <RadzenFormField Text="Timeout">
+                <RadzenFormField Text="TitleDb Version">
                     <ChildContent>
-                        <RadzenNumeric @bind-Value="@_config.DownloadSettings.TimeoutInSeconds"></RadzenNumeric>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionUrl"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        @if (@_validationErrors["DownloadSettings.TimeoutInSeconds"] != string.Empty)
+                        @if (@_validationErrors["DownloadSettings.VersionUrl"] != string.Empty)
                         {
-                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TimeoutInSeconds"]</div>    
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.VersionUrl"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Timeout for the download in seconds.
+                            Url for the version file for SQL-Titledb.
                         </div>                            
                     </Helper>
                 </RadzenFormField>
@@ -129,49 +185,17 @@
     <RadzenRow Gap="1.2rem">
         <RadzenColumn Size="12" SizeSM="12">
             <RadzenStack>
-                <RadzenFormField Text="RegionUrl">
+                <RadzenFormField Text="Title Db Path">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.RegionUrl"></RadzenTextBox>
+                        <RadzenTextBox @bind-Value="@_config.TitleDatabase" Disabled="true"></RadzenTextBox>
                     </ChildContent>
                     <Helper>
-                        @if (@_validationErrors["DownloadSettings.RegionUrl"] != string.Empty)
+                        @if (@_validationErrors["DownloadSettings.TitleDbPath"] != string.Empty)
                         {
-                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.RegionUrl"]</div>    
+                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.TitleDbPath"]</div>    
                         }
                         <div class="rz-text-caption">
-                            Url where we are going to fetch titledb region files, the {region} placeholder will be replaced with the selected regions.
-                        </div>                           
-                    </Helper>
-                </RadzenFormField>
-            </RadzenStack>
-            <RadzenStack>
-                <RadzenFormField Text="CnmtsUrl">
-                    <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.CnmtsUrl"></RadzenTextBox>
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["DownloadSettings.CnmtsUrl"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.CnmtsUrl"]</div>    
-                        }
-                        <div class="rz-text-caption">
-                            Url where we are going to fetch the cnmts.json file.
-                        </div>                          
-                    </Helper>
-                </RadzenFormField>
-            </RadzenStack>
-            <RadzenStack>
-                <RadzenFormField Text="VersionsUrl">
-                    <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionsUrl"></RadzenTextBox>
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["DownloadSettings.VersionsUrl"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.VersionsUrl"]</div>    
-                        }
-                        <div class="rz-text-caption">
-                            Url where we are going to fetch the versions.json file.
+                            Location of SQL-TitleDb.
                         </div>                             
                     </Helper>
                 </RadzenFormField>
@@ -182,38 +206,47 @@
         </RadzenColumn>
 
     </RadzenRow>
-    <RadzenRow Gap="1.2rem">
-        <RadzenColumn Size="12" SizeSM="6">
-            <RadzenStack>
-                <RadzenFormField Text="Regions">
-                    <ChildContent>
-                        <div class="rz-p-sm-12 rz-text-align-left">
+    <RadzenRow>
+        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
 
-                            <RadzenListBox @bind-Value="@_regionsValue" Data="@_regions" TextProperty="Name" ValueProperty="Name"
-                                           Multiple="true" AllowClear="false" Placeholder="Select regions" Style="width: 100%; max-width: 400px; height: 200px"
-                                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select all regions" } })">
-
-                            </RadzenListBox>
-                        </div>
-                    </ChildContent>
-                    <Helper>
-                        @if (@_validationErrors["DownloadSettings.Regions"] != string.Empty)
-                        {
-                            <div class="rz-message rz-messages-error">@_validationErrors["DownloadSettings.Regions"]</div>    
-                        }
-                        <div class="rz-text-caption">
-                            Regions we are going to fetch, for now only US region has been tested.
-                        </div>                           
-                    </Helper>
-
-                </RadzenFormField>
-            </RadzenStack>
+        </RadzenStack>
+    </RadzenRow>
+</RadzenFieldset>
+<RadzenFieldset Text="Misc">
+    <RadzenRow Gap="1rem">
+        <RadzenColumn Size="6">
+            <RadzenCard Variant="Variant.Outlined">
+                <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
+                        <RadzenLabel Text="UI Theme" />
+                        <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
+                        </RadzenDropDown>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeSM="6">
-            <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
-                <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
-                <RadzenButton Variant="Variant.Outlined" Click="@ReloadApp" class="rz-ripple">Shut Down Application</RadzenButton>
-            </RadzenRow>
+        <RadzenColumn Size="6">
         </RadzenColumn>
     </RadzenRow>
 </RadzenFieldset>
+<RadzenRow Gap="1.2rem">
+    <RadzenColumn Size="12" SizeSM="12">
+        <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
+            <RadzenButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Click="@SaveConfiguration" class="rz-ripple">Save Configuration</RadzenButton>
+        </RadzenRow>
+    </RadzenColumn>
+</RadzenRow>
+<style>
+    #ddUpload {
+        left: 0;
+        --rz-upload-button-bar-background-color: transparent;
+        --rz-upload-button-bar-padding: 0;
+    }
+
+    #ddUpload .rz-fileupload-buttonbar .rz-fileupload-choose {
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        padding: 50px 0;
+    }
+</style>

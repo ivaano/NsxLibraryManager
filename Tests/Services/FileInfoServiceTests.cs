@@ -2,13 +2,13 @@
 using LibHac.Tools.FsSystem.NcaUtils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NsxLibraryManager.Core.Enums;
 using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
 
 namespace Tests.Services;
 
@@ -25,10 +25,9 @@ public class FileInfoServiceTests
 
     public FileInfoServiceTests()
     {
-        var titleDbService = Substitute.For<ITitleDbService>();
         _packageInfoLoader = Substitute.For<IPackageInfoLoader>();
         ILogger<FileInfoService> logger = Substitute.For<ILogger<FileInfoService>>();
-        _fileInfoService = new FileInfoService(_packageInfoLoader, titleDbService, logger);
+        _fileInfoService = new FileInfoService(_packageInfoLoader, logger);
     }
 
     
@@ -46,14 +45,16 @@ public class FileInfoServiceTests
         
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(TestTitleId, result.TitleId);
-        Assert.Equal(TestApplicationTitleId, result.ApplicationTitleId);
-        Assert.Equal(TestPatchTitleId, result.PatchTitleId);
-        Assert.Equal(TestTitleName, result.TitleName);
-        Assert.Equal(TestPublisher, result.Publisher);
-        Assert.Equal(Path.GetFullPath(fileName), result.FileName);
-        Assert.Equal(TitleLibraryType.Base, result.Type);
-        Assert.Equal(AccuratePackageType.NSP, result.PackageType);
+        Assert.True(result.IsSuccess);
+        var libraryTitle = result.Value;
+        Assert.Equal(TestTitleId, libraryTitle.ApplicationId);
+        Assert.Equal(TestApplicationTitleId, libraryTitle.OtherApplicationId);
+        Assert.Equal(TestPatchTitleId, libraryTitle.PatchTitleId);
+        Assert.Equal(TestTitleName, libraryTitle.TitleName);
+        Assert.Equal(TestPublisher, libraryTitle.Publisher);
+        Assert.Equal(Path.GetFullPath(fileName), libraryTitle.FileName);
+        Assert.Equal(TitleContentType.Base, libraryTitle.ContentType);
+        Assert.Equal(AccuratePackageType.NSP, libraryTitle.PackageType);
     }
 
     [Fact]
@@ -117,7 +118,7 @@ public class FileInfoServiceTests
 
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(Path.GetFullPath(filePath), result.First());
+        Assert.Equal(Path.GetFullPath(filePath), result.Value.First());
     }
     
     [Fact]
@@ -131,7 +132,7 @@ public class FileInfoServiceTests
         
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(3, result.Count());
+        Assert.Equal(3, result.Value.Count());
     }
     
     [Fact]
@@ -146,7 +147,7 @@ public class FileInfoServiceTests
 
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(4, result.Count());
+        Assert.Equal(4, result.Value.Count());
     }
     
     private static IPackageInfo GetBasePackageInfo(PackageType packageType = PackageType.NSP, 

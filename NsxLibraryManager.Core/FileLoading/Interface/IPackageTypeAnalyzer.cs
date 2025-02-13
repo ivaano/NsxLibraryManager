@@ -1,4 +1,4 @@
-﻿using NsxLibraryManager.Core.Enums;
+﻿using NsxLibraryManager.Shared.Enums;
 
 namespace NsxLibraryManager.Core.FileLoading.Interface;
 

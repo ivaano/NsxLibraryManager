@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NsxLibraryManager.Core.Services.Interface;
+using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;
@@ -10,10 +11,9 @@ public partial class ReloadLibraryProgressDialog : IDisposable
     protected DialogService DialogService { get; set; }
     [Inject]
     protected ITitleLibraryService TitleLibraryService { get; set; }
-    [Inject]
-    protected ILogger<ReloadLibraryProgressDialog> Logger { get; set; }
-    public double ProgressCompleted { get; set; }
-    public int FileCount { get; set; }
+
+    private double ProgressCompleted { get; set; }
+    private int FileCount { get; set; }
 
     private IEnumerable<string> FilesEnumerable { get; set; }
 
@@ -30,28 +30,56 @@ public partial class ReloadLibraryProgressDialog : IDisposable
         await InvokeAsync(
             async () =>
             {
-                FilesEnumerable = await TitleLibraryService.GetFilesAsync();
+                FilesEnumerable = await TitleLibraryService.GetLibraryFilesAsync();
                 var fileList = FilesEnumerable.ToList();
                 FileCount = fileList.Count;
                 if (FileCount > 0)
                 {
-                    TitleLibraryService.DropLibrary();
+                    await TitleLibraryService.DropLibrary();
                 }
+
+                var updateCounts = new Dictionary<string, int>();
+                var dlcCounts = new Dictionary<string, int>();
                 foreach (var file in fileList)
                 {
-                    var result = await TitleLibraryService.ProcessFileAsync(file);
+                    var title = await TitleLibraryService.ProcessFileAsync(file);
+
+                    if (title is { ContentType: TitleContentType.Update, OtherApplicationId: not null })
+                    {
+                        updateCounts[title.OtherApplicationId] = updateCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
+                    }
+                    
+                    if (title is { ContentType: TitleContentType.DLC, OtherApplicationId: not null })
+                    {
+                        dlcCounts[title.OtherApplicationId] = dlcCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
+                    }
                     ProgressCompleted++;
                     StateHasChanged();                    
                 }
-
+      
+                await TitleLibraryService.SaveContentCounts(updateCounts, TitleContentType.Update);
+                await TitleLibraryService.SaveContentCounts(dlcCounts, TitleContentType.DLC);
+                
+                await TitleLibraryService.SaveLibraryReloadDate();
             });
         DialogService.Close();
     }
     
-    void IDisposable.Dispose()
+    public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing) return;
         FileCount = 0;
         ProgressCompleted = 0;
         FilesEnumerable = new List<string>();
+        if (TitleLibraryService is not null)
+        {
+            TitleLibraryService = null;
+        }
     }
 }

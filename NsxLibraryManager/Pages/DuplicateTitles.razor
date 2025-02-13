@@ -1,0 +1,145 @@
+﻿@page "/DuplicateTitles"
+@using NsxLibraryManager.Shared.Dto
+<RadzenTabs @bind-SelectedIndex="@selectedTabIndex">
+    <Tabs>
+        <RadzenTabsItem Text="Duplicates Base">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenDataGrid 
+                    @ref="_duplicateBaseTitlesGrid" 
+                    Data="@_duplicateBaseTitles" 
+                    LoadData="@LoadData"
+                    TItem="LibraryTitleDto"
+                    Count="@_countBaseTitles"
+                    AllowSorting="false" 
+                    AllowPaging="true" 
+                    PageSize="100"
+                    AllowFiltering="true" 
+                    FilterMode="FilterMode.SimpleWithMenu" 
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowColumnResize="true" 
+                    PagerHorizontalAlign="HorizontalAlign.Center"
+                    SelectionMode="DataGridSelectionMode.Multiple"
+                    @bind-Value="@_selectedBaseTitles"
+                    ColumnWidth="200px" 
+                    AllowColumnPicking="true"
+                    IsLoading="@_isLoading" 
+                    AllowColumnReorder="true" 
+                    PageSizeOptions="@_pageSizeOptions" 
+                    ShowPagingSummary="true" 
+                    style="height: 89vh">
+                    <HeaderTemplate>
+                        <RadzenButton Text="@_baseSelectTitlesText" Click="@SelectDuplicates" ButtonStyle="ButtonStyle.Info" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Delete Selected Titles" Click="@DeleteDuplicates"  ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Backup Path: @_backupPath</RadzenText>
+                    </HeaderTemplate>
+                    <Columns>
+
+                        <RadzenDataGridColumn Property="Id" Title="Id" Width="50px"/>
+                        <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="100px"/>
+                        <RadzenDataGridColumn Property="TitleName" Title="Name"/>
+                        <RadzenDataGridColumn Property="Version" Title="Version" Width="100px"/>
+                        <RadzenDataGridColumn Property="FileName" Title="FileName" Width="300px">
+                            <Template Context="libraryTitle">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @libraryTitle.FileName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenStack>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Duplicates Updates">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenDataGrid
+                    @ref="_duplicateUpdatesTitlesGrid"
+                    Data="@_duplicateUpdatesTitles"
+                    LoadData="@LoadData"
+                    TItem="LibraryTitleDto"
+                    Count="@_countUpdatesTitles"
+                    AllowSorting="false"
+                    AllowPaging="true"
+                    PageSize="100"
+                    AllowFiltering="true"
+                    FilterMode="FilterMode.SimpleWithMenu"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowColumnResize="true"
+                    PagerHorizontalAlign="HorizontalAlign.Center"
+                    SelectionMode="DataGridSelectionMode.Multiple"
+                    @bind-Value="@_selectedUpdatesTitles"
+                    ColumnWidth="200px"
+                    AllowColumnPicking="true"
+                    IsLoading="@_isLoading"
+                    AllowColumnReorder="true"
+                    PageSizeOptions="@_pageSizeOptions"
+                    ShowPagingSummary="true" 
+                    style="height: 89vh">
+                    <HeaderTemplate>
+                        <RadzenButton Text="@_updatesSelectTitlesText" Click="@SelectDuplicates" ButtonStyle="ButtonStyle.Info" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Delete Selected Titles" Click="@DeleteDuplicates"  ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Backup Path: @_backupPath</RadzenText>                   
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="Id" Title="Id" Width="50px"/>
+                        <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="100px"/>
+                        <RadzenDataGridColumn Property="TitleName" Title="Name" />
+                        <RadzenDataGridColumn Property="Version" Title="Version" Width="100px"/>
+                        <RadzenDataGridColumn Property="FileName" Title="FileName" Width="300px">
+                            <Template Context="libraryTitle">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @libraryTitle.FileName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenStack>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Duplicates DLC">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenDataGrid
+                    @ref="_duplicateDlcTitlesGrid"
+                    Data="@_duplicateDlcTitles"
+                    LoadData="@LoadData"
+                    TItem="LibraryTitleDto"
+                    Count="@_countDlcTitles"
+                    AllowSorting="false"
+                    AllowPaging="true"
+                    PageSize="100"
+                    AllowFiltering="true"
+                    FilterMode="FilterMode.SimpleWithMenu"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    AllowColumnResize="true"
+                    PagerHorizontalAlign="HorizontalAlign.Center"
+                    SelectionMode="DataGridSelectionMode.Multiple"
+                    @bind-Value="@_selectedDlcTitles"
+                    ColumnWidth="200px"
+                    AllowColumnPicking="true"
+                    IsLoading="@_isLoading"
+                    AllowColumnReorder="true"
+                    PageSizeOptions="@_pageSizeOptions"
+                    ShowPagingSummary="true" 
+                    style="height: 89vh">
+                    <HeaderTemplate>
+                        <RadzenButton Text="@_dlcSelectTitlesText" Click="@SelectDuplicates" ButtonStyle="ButtonStyle.Info" class=".rz-shadow-2"/>
+                        <RadzenButton Text="Delete Selected Titles" Click="@DeleteDuplicates"  ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                        <RadzenText TextStyle="TextStyle.Caption">Backup Path: @_backupPath</RadzenText>                    
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="Id" Title="Id" Width="50px"/>
+                        <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="100px"/>
+                        <RadzenDataGridColumn Property="TitleName" Title="Name" />
+                        <RadzenDataGridColumn Property="Version" Title="Version" Width="100px"/>
+                        <RadzenDataGridColumn Property="FileName" Title="FileName" Width="300px">
+                            <Template Context="libraryTitle">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @libraryTitle.FileName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenStack>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>

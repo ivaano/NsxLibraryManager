@@ -1,15 +1,16 @@
 ﻿@page "/Title/{titleId}"
-@using NsxLibraryManager.Utils
+@using NsxLibraryManager.Extensions
+
 
 <PageTitle>Title</PageTitle>
 <RadzenRow>
     <RadzenColumn Size="12" SizeMD="6">
-        <RadzenImage Path="@(LibraryTitle?.BannerUrl.NullImageToEmpty())" Style="width: 100%; border-radius: 20px;"></RadzenImage>
+        <RadzenImage Path="@(LibraryTitleDto?.BannerUrl.NullImageToEmpty())" Style="width: 100%; border-radius: 20px;"></RadzenImage>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenRow Style="padding-bottom: 5px" Gap="3px">
             <RadzenColumn>
-                <RadzenText Text="@(LibraryTitle?.TitleName.NullStringToEmpty())" TextStyle="TextStyle.H4"/>
+                <RadzenText Text="@(LibraryTitleDto?.TitleName.NullStringToEmpty())" TextStyle="TextStyle.H4"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -24,7 +25,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.ReleaseDate.ToString("MMM dd, yyyy"))" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.ReleaseDate.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px;">
@@ -39,7 +40,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.NumberOfPlayers.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -54,7 +55,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Category.ListToString())" TextStyle="TextStyle.Body1"/>
+                <RadzenText Text="@(LibraryTitleDto?.Categories.ListCategories())" TextStyle="TextStyle.Body1"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -69,7 +70,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Publisher.NullStringToEmpty())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Publisher.NullStringToEmpty())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -84,7 +85,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.RatingContent.ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Rating.AgeRating(AgeRatingAgency))" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -95,11 +96,11 @@
                     </svg>
                 </span>
                 <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
-                    Game File Size:
+                    File Size:
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(GameFileSize)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Size.ToHumanReadableBytes())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -114,7 +115,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Languages.ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.Languages.Select(x => x.LanguageCode).ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -134,7 +135,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.TitleId)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.ApplicationId)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -149,11 +150,11 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitle?.Type.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@(LibraryTitleDto?.ContentType.ToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>        
         <RadzenRow Style="padding-bottom: 5px">
-            @if (LibraryTitle?.FileName != "")
+            @if (LibraryTitleDto?.FileName != "")
             {
                 <RadzenColumn Style="display: inline-flex; align-items: center;">
                     <span class="rz-pr-2">
@@ -166,165 +167,106 @@
                     </RadzenText>
                 </RadzenColumn>
                 <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                    <RadzenText Text="@(LibraryTitle?.FileName)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                    <RadzenText Text="@(LibraryTitleDto?.FileName)" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
                 </RadzenColumn>
             }
 
         </RadzenRow>
     </RadzenColumn>
 </RadzenRow>
-<RadzenRow Style="padding-top: 10px">
-    <RadzenColumn Size="7">
-        <RadzenText Text="@(LibraryTitle?.Intro)" TextStyle="TextStyle.H6"/>
-        <p class="rz-text-body1">
-            @((MarkupString)HtmlDescription)
-        </p>
-    </RadzenColumn>
-    <RadzenColumn>
+<RadzenRow Style="padding-top: 10px; padding-bottom: 3px">
+    <RadzenColumn Size="5">
+        <RadzenText Text="@(LibraryTitleDto?.Intro)" TextStyle="TextStyle.H6"/>
+        
+        <div class="text-container">
+            <p @ref="textRef" class="text-content" style="max-height: @MaxHeight;" @onclick="ToggleText">
+                @((MarkupString)TextToDisplay)
+            </p>
+            <RadzenButton Click=@(args => ToggleText()) Icon=@(IsExpanded ? "remove" : "add") Text=@(IsExpanded ? "Read Less" : "Read More") ButtonStyle="ButtonStyle.Primary" Variant="Variant.Text"/>
 
-        <div id="screenshotsCarousel" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-indicators">
-                @if (LibraryTitle?.Screenshots != null)
-                {
-                    var imageCount = 0;
-                    foreach (var image in LibraryTitle.Screenshots)
-                    {
-                        if (image == LibraryTitle.Screenshots[0])
-                        {
-                            <button type="button" data-bs-target="#screenshotsCarousel" data-bs-slide-to="@imageCount" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        }
-                        else
-                        {
-                            <button type="button" data-bs-target="#screenshotsCarousel" data-bs-slide-to="@imageCount" aria-label="Slide 2"></button>
-                        }
-                        imageCount++;
-                    }
-                }
-            </div>
-
-            <div class="carousel-inner">
-                @if (LibraryTitle?.Screenshots != null)
-                {
-                    foreach (var image in LibraryTitle.Screenshots)
-                    {
-                        if (image == LibraryTitle.Screenshots[0])
-                        {
-                            <div class="carousel-item active">
-                                <img src="@image" class="d-block w-100" alt="@image">
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="carousel-item">
-                                <img src="@image" class="d-block w-100" alt="@image">
-                            </div>
-                        }
-                    }
-                }
-
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#screenshotsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#screenshotsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
         </div>
+    </RadzenColumn>
+    <RadzenColumn Size="7">
+
+        <RadzenCarousel @ref="_carousel" @bind-SelectedIndex="@_selectedIndex" Auto="@_auto" Interval="@_interval"
+                        PagerOverlay="true" ButtonShade="Shade.Default" Style="height: 366px;" class="rz-mx-auto">
+            <Items>
+                @if (LibraryTitleDto?.Screenshots is not null)
+                {
+                    @foreach (var screenshot in LibraryTitleDto?.Screenshots)
+                    {
+                        <RadzenCarouselItem>
+                                <RadzenImage Path="@screenshot.Url" class="rz-h-100"/>
+                        </RadzenCarouselItem>
+                    }
+                }
+            </Items>
+        </RadzenCarousel>
+        
+        
     </RadzenColumn>
 </RadzenRow>
 <RadzenRow>
-    <RadzenColumn Size="7">
-        <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 100%;">
-            <HeaderTemplate>
-                <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
-                    <RadzenIcon Icon="update" class="rz-mr-1"/><b>DLC</b>
-                </RadzenText>
-            </HeaderTemplate>
-            <ChildContent>
-                <RadzenRow>
-                    <RadzenColumn Size="3">
-                        <RadzenText TextStyle="TextStyle.H6">TitleId</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="7">
-                        <RadzenText TextStyle="TextStyle.H6">Name</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="1">
-                        <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="1">
-                        <RadzenText TextStyle="TextStyle.H6">Status</RadzenText>
-                    </RadzenColumn>
-                </RadzenRow>
-                @foreach (var dlc in GameDlcs)
-                {
-                    <RadzenRow>
-                        <RadzenColumn Size="3">
-                            @dlc.TitleId.ToUpper()
-                        </RadzenColumn>
-                        <RadzenColumn Size="7">
-                            <RadzenLink Path="@($"/Title/{dlc.TitleId}")" Text="@dlc.TitleName"/>
-                        </RadzenColumn>
-                        <RadzenColumn Size="1" Style="text-align: center">@dlc.TitleVersion.VersionShifted()</RadzenColumn>
-                        @if (@dlc.Owned)
-                        {
-                            <RadzenColumn Size="1" class="rz-background-color-success-lighter">Owned</RadzenColumn>
-                        }
-                        else
-                        {
-                            <RadzenColumn Size="1" class="rz-background-color-danger-lighter">Missing</RadzenColumn>
-                        }
+    <RadzenTabs TabPosition="@TabPosition.Top" RenderMode="TabRenderMode.Client" >
+        <Tabs>
+            <RadzenTabsItem Text="DLC">
+                <RadzenDataGrid style="height: 50vh" @ref="_dlcGrid" IsLoading="@_dlcIsLoading" Count="@_dlcCount"
+                                Data="@_dlcs" LoadData="@LoadDlcData" AllowSorting="true" AllowColumnResize="true"
+                                AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" PageSize="100"
+                                ShowPagingSummary="true">
+                    <Columns>
+                        <RadzenDataGridColumn Property="ApplicationId" Filterable="true" Title="ID" Width="60px" TextAlign="TextAlign.Center" FilterMode="FilterMode.Advanced"/>
+                        <RadzenDataGridColumn Property="TitleName" Filterable="false" Title="Name" Width="120px" TextAlign="TextAlign.Left">
+                            <Template Context="dlc">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @dlc.TitleName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="FileName" Filterable="false" Title="Name" Width="120px" TextAlign="TextAlign.Left">
+                            <Template Context="dlc">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @dlc.FileName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Size" Filterable="false" Title="Size" Width="30px" TextAlign="TextAlign.Center">
+                            <Template Context="dlc">
+                                @dlc.Size.ToHumanReadableBytes()
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center" SortOrder="SortOrder.Descending" FormatString="{0}" FormatProvider="@_myBooleanProvider"/>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Updates">
+                <RadzenDataGrid style="height: 50vh" @ref="_updatesGrid" IsLoading="@_updatesIsLoading" Count="@_updatesCount"
+                                Data="@_updates" LoadData="@LoadUpdateData" AllowSorting="true" AllowColumnResize="true"
+                                AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" PageSize="100"
+                                ShowPagingSummary="true">
+                    <Columns>
+                        <RadzenDataGridColumn Property="ApplicationId" Filterable="true" Title="ID" Width="60px" TextAlign="TextAlign.Center" FilterMode="FilterMode.Advanced"/>
+                        <RadzenDataGridColumn Property="FileName" Filterable="false" Title="File Name" Width="120px" TextAlign="TextAlign.Left">
+                            <Template Context="updateDto">
+                                <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                                    @updateDto.FileName
+                                </div>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Size" Filterable="false" Title="Size" Width="30px" TextAlign="TextAlign.Center">
+                            <Template Context="updateDto">
+                                @updateDto.Size.ToHumanReadableBytes()
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Date" Filterable="false" Title="Date" Width="30px" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" SortOrder="SortOrder.Descending" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="ShortVersion" Filterable="false" Title="Short Version" Width="30px" SortOrder="SortOrder.Descending" TextAlign="TextAlign.Center"/>
+                        <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center"  FormatString="{0}" FormatProvider="@_myBooleanProvider"/>
 
-                    </RadzenRow>
-                }
-            </ChildContent>
-        </RadzenPanel>
-
-    </RadzenColumn>
-    <RadzenColumn Size="5">
-        <RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 100%;">
-            <HeaderTemplate>
-                <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
-                    <RadzenIcon Icon="update" class="rz-mr-1"/><b>Patches</b>
-                </RadzenText>
-            </HeaderTemplate>
-            <ChildContent>
-                <RadzenRow>
-                    <RadzenColumn Size="4">
-                        <RadzenText TextStyle="TextStyle.H6">Date</RadzenText>
-                    </RadzenColumn>                    
-                    <RadzenColumn Size="4">
-                        <RadzenText TextStyle="TextStyle.H6">TitleId</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="2" Style="text-align: center">
-                        <RadzenText TextStyle="TextStyle.H6">Version</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="2" Style="text-align: center">
-                        <RadzenText TextStyle="TextStyle.H6">Status</RadzenText>
-                    </RadzenColumn>
-                </RadzenRow>
-                @foreach (var version in GameVersions.Reverse())
-                {
-                    <RadzenRow>
-                        <RadzenColumn Size="4">
-                            <RadzenLink Path="@($"/Title/{version.TitleId}")" Text="@version.Date"/>
-                        </RadzenColumn>
-                        <RadzenColumn Size="4">
-                            @version.TitleId.ToUpper()
-                        </RadzenColumn>                        
-                        <RadzenColumn Size="2" Style="text-align: center">@version.Version.VersionShifted()</RadzenColumn>
-                        @if (@version.Owned)
-                        {
-                            <RadzenColumn Size="2" class="rz-background-color-success-lighter" Style="text-align: center">Owned</RadzenColumn>
-                        }
-                        else
-                        {
-                            <RadzenColumn Size="2" Style="text-align: center">Missing</RadzenColumn>
-                        }
-                    </RadzenRow>
-                }
-            </ChildContent>
-        </RadzenPanel>
-    </RadzenColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
 </RadzenRow>

@@ -1,9 +1,11 @@
-﻿namespace NsxLibraryManager.Core.Services.Interface;
+﻿using NsxLibraryManager.Shared.Settings;
+
+namespace NsxLibraryManager.Core.Services.Interface;
 
 public interface IDownloadService
 {
-    Task<string> GetRegionFile(string region, CancellationToken cancellationToken);
-    Task<string> GetCnmtsFile(CancellationToken cancellationToken);
-    Task<string> GetVersionsFile(CancellationToken cancellationToken);
-    Task DownloadFileAsync(string url, string destFilePath, CancellationToken cancellationToken);
+    Task<string> GetVersionsFile(string versionUrl, CancellationToken cancellationToken);
+    
+    Task<string> GetLatestTitleDb(DownloadSettings downloadSettings, CancellationToken cancellationToken);
+    Task DownloadFileAsync(string url, string destFilePath, int timeOut, CancellationToken cancellationToken);
 }

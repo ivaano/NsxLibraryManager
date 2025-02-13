@@ -1,0 +1,60 @@
+﻿@page "/TitleMassEditDialog"
+    <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+        <RadzenColumn Size="12">
+            <RadzenStack>
+                <RadzenFieldset Text="Archival Info">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow>
+                            <RadzenColumn Size="12" SizeMD="12">
+                                <RadzenRow>
+                                    <RadzenText TextStyle="TextStyle.Caption">
+                                        Collections are used to organize your library files,
+                                        if you specify a collection to this title all related titles (base, updates, dlc) will be updated to use
+                                        this collection.
+                                    </RadzenText>
+                                </RadzenRow>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Collection" Component="CollectionId"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenDropDown
+                                    LoadData="LoadCollectionsData"
+                                    Data="@_collections"
+                                    @bind-Value="_dropdownValue"
+                                    TextProperty="Name"
+                                    ValueProperty="Id"
+                                    AllowClear="true"
+                                    Placeholder="Select something"
+                                    Style="width: 100%;"
+                                    Name="Collection">
+                                </RadzenDropDown>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Related patches"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenLabel Text="@_relatedPatchTitle"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Related Dlc"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenLabel Text="@_relatedDlcTitle"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenFieldset>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" Click="@(args => OnSubmit())" />
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+    </RadzenStack>
