@@ -173,12 +173,6 @@ public partial class Title
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        /*
-        if (firstRender)
-        {
-            await JsRuntime.InvokeVoidAsync("scrollDialogToTop");
-        }
-        */
         await base.OnAfterRenderAsync(firstRender);
     }
     

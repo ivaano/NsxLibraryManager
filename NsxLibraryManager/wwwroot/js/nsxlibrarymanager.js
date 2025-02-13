@@ -8,14 +8,7 @@ function setFocus(field) {
     input.focus();
 }
 
-function scrollDialogToTop() {
-    const dialogContent = document.querySelector('.rz-dialog-content');
-    if (dialogContent) {
-        dialogContent.scrollTop = 0;
-    }
-}
-
-function deleteAllCookies() {
+window.deleteAllCookies = function () {
     let cookies = document.cookie.split(";");
 
     for (let i = 0; i < cookies.length; i++) {
@@ -25,3 +18,4 @@ function deleteAllCookies() {
         document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     }
 }
+

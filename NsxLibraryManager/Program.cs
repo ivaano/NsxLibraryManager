@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Common.Contracts;
 using NsxLibraryManager.Core.FileLoading;
@@ -8,6 +9,8 @@ using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager;
 using NsxLibraryManager.Data;
@@ -103,14 +106,9 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-
-
-
-//app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAntiforgery();
@@ -119,6 +117,46 @@ app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapControllers();
 
 app.EnsureDatabaseMigrated<NsxLibraryDbContext>();
+
+
+if (app.Environment.IsProduction())
+{
+    var noBrowser = args.Contains("--no-browser");
+    var isWindows = OperatingSystem.IsWindows();
+    if (!noBrowser && isWindows)
+    {
+        app.Lifetime.ApplicationStarted.Register(() =>
+        {
+            var logger = app.Logger;
+            
+            var server = app.Services.GetRequiredService<IServer>();
+            var addressesFeature = server.Features.Get<IServerAddressesFeature>();
+            var serverUrl = string.Empty;
+            if (addressesFeature != null && addressesFeature.Addresses.Count != 0) 
+            {
+                serverUrl = addressesFeature.Addresses.FirstOrDefault(a =>
+                             a.StartsWith("https", StringComparison.OrdinalIgnoreCase)) ?? 
+                         addressesFeature.Addresses.FirstOrDefault(a =>
+                             a.StartsWith("http", StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                logger.LogWarning("No server addresses registered. Unable to open browser.");
+                return;
+            }
+
+            try
+            {
+                logger.LogInformation("Opening browser to {Url}", serverUrl);
+                Process.Start(new ProcessStartInfo(serverUrl!) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to open browser");
+            }
+        });
+    }
+}
 
 app.Run();    
 
