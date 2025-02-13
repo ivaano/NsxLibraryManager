@@ -7,6 +7,7 @@ using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Core.Validators;
 using FluentValidation;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager;
 using NsxLibraryManager.Data;
@@ -35,7 +36,6 @@ if (validatorResult.defaultConfigCreated)
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // configuration.
 builder.Configuration.AddConfiguration(initialConfig);
 builder.Services
@@ -51,6 +51,8 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
     options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value));
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<NsxLibraryDbContext>();
 builder.Services.AddDbContext<TitledbDbContext>(options =>
     options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:TitledbDBConnection").Value));
 
@@ -88,7 +90,6 @@ builder.Services.AddRadzenCookieThemeService(options =>
     options.Duration = TimeSpan.FromDays(365);
 });
 
-
 //Static web assets for linux development https://learn.microsoft.com/en-us/aspnet/core/razor-pages/ui-class?view=aspnetcore-7.0&tabs=visual-studio#consume-content-from-a-referenced-rcl
 if (builder.Environment.IsEnvironment("DeveLinux"))
 {
@@ -105,6 +106,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
+
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();

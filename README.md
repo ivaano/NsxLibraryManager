@@ -48,12 +48,26 @@ that I could run on a server and access it from any device.
 > Please use absolute paths, relative paths might not work because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`
 
 ## Docker
-- Download the latest release
+### GHCR
+- To run the container from the ghcr registry you need to mount the library folder, for example:
+  -`docker run 'ghcr.io/ivaano/nsxlibrarymanager:master' -p 8080:8080 --mount type=bind,source=/home/ivan/library,target=/app/library nsxlibrarymanager`
+- additionally you can also mount the following optional folders:
+  - renamer (used to put the files you want to rename that are not in the library) `--mount type=bind,source=/home/ivan/dumps,target=/app/renamer/in`
+  - backup (used to move titles when removing duplicates) `--mount type=bind,source=/home/ivan/backup,target=/app/backup`
+  - config (used to store app configuration) `--mount type=bind,source=/home/ivan/config,target=/app/config`
+  - data (used to store app databases) `--mount type=bind,source=/home/ivan/data,target=/app/data`
+
+### Manual
+- Download the latest release source
 - Extract the zip/gz file
 - build the image `docker build -t nsxlibrarymanager .`
-- you can mount the keys, titledb and library folders to the container, for example:
-  -`docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/nsxlib/keys,target=/app/keys --mount type=bind,source=/home/ivan/nsxlib/library,target=/app/library nsxlibrarymanager`
-
+- you need to mount the library folder folder to the container, for example mounting only the library folder:
+  -`docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/library,target=/app/library nsxlibrarymanager:latest`
+- additionally you can also mount the following optional folders:
+  - renamer (used to put the files you want to rename that are not in the library) `--mount type=bind,source=/home/ivan/dumps,target=/app/renamer/in`
+  - backup (used to move titles when removing duplicates) `--mount type=bind,source=/home/ivan/backup,target=/app/backup`
+  - config (used to store app configuration) `--mount type=bind,source=/home/ivan/config,target=/app/config`
+  - data (used to store app databases) `--mount type=bind,source=/home/ivan/data,target=/app/data`
 
  ## Usage
 - Games
@@ -108,8 +122,9 @@ that I could run on a server and access it from any device.
 ![DetailDlcUpdates](./screenshots/gamedetail-2.png)
 ![MissingDLC](./screenshots/missingdlc.png)
 ![MissingUpdates](./screenshots/missingupdates.png)
-![Renamer](./screenshots/renamer.png)
-![RenamerSettings](./screenshots/renamer-settings.png)
+![PackageRenamer](./screenshots/packagerenamer.png)
+![BundleRenamer](./screenshots/bundlerenamer.png)
+![LibraryRenamer](./screenshots/collectionrenamer.png)
 
 ## TODO
 - [x] Implement the file organizer.

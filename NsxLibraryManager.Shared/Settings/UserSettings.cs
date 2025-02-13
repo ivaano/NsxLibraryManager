@@ -15,6 +15,7 @@ public class UserSettings
     public string TitleKeys { get; set; } = string.Empty;
     public string ConsoleKeys { get; set; } = string.Empty;
     public string UiTheme { get; set; } = string.Empty;
+    public bool IsConfigured { get; set; }
 
     public AgeRatingAgency AgeRatingAgency { get; set; } = AgeRatingAgency.Esrb;
 

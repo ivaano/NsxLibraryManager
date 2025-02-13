@@ -44,7 +44,9 @@ public class SettingsService(
     {
         var libraryDbPath = configuration.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value.CleanDatabasePath();
         var titleDbPath = configuration.GetSection("NsxLibraryManager:TitledbDbConnection").Value.CleanDatabasePath();
-
+        var inContainer = bool.TryParse(configuration["DOTNET_RUNNING_IN_CONTAINER"], out var value) && value;
+        var defaultLibraryPath = inContainer ? "/app/library" : "your_library_path";
+        var defaultBackupPath = inContainer ? "/app/backup" : "your_backup_path";
         
         return new UserSettings
         {
@@ -60,8 +62,10 @@ public class SettingsService(
             ProdKeys = GetKeyLocation(IKeySetProviderService.DefaultProdKeysFileName),
             TitleKeys = GetKeyLocation(IKeySetProviderService.DefaultTitleKeysFileName),
             ConsoleKeys = GetKeyLocation(IKeySetProviderService.DefaultConsoleKeysFileName),
-            LibraryPath = "your_library_path",
-            Recursive = true
+            LibraryPath = defaultLibraryPath,
+            BackupPath = defaultBackupPath,
+            Recursive = true,
+            IsConfigured = false
         };
     }
     
@@ -152,6 +156,7 @@ public class SettingsService(
 
     public bool SaveUserSettings(UserSettings userSettings)
     {
+        userSettings.IsConfigured = true;
         var serializedSettings = JsonSerializer.Serialize(userSettings);
         SetValue(SettingsEnum.UserSettings, serializedSettings);
         return true;

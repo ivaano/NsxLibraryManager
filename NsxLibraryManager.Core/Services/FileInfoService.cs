@@ -169,9 +169,6 @@ public class FileInfoService : IFileInfoService
         
         return true;            
     }
-
-
-    
     
     public async Task<LibraryTitleDto> GetFileInfoFromFileName(string fileName)
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Shared.Settings;
@@ -6,7 +7,7 @@ using Version = NsxLibraryManager.Models.NsxLibrary.Version;
 
 namespace NsxLibraryManager.Data;
 
-public class NsxLibraryDbContext : DbContext
+public class NsxLibraryDbContext : DbContext, IDataProtectionKeyContext
 {
     private readonly UserSettings _configuration;
     public DbSet<Category> Categories { get; set; }
@@ -20,7 +21,7 @@ public class NsxLibraryDbContext : DbContext
     public DbSet<TitleCategory> TitleCategory { get; set; }
     public DbSet<Version> Versions { get; set; }
     public DbSet<LibraryUpdate> LibraryUpdates { get; set; }
-
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
     public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<UserSettings> configuration) :
         base(options)

@@ -20,7 +20,6 @@ public partial class Settings
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private IValidator<UserSettings> UserSettingsValidator { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
-    
     [Inject] private ThemeService ThemeService { get; set; } = default!;
 
 
@@ -61,8 +60,6 @@ public partial class Settings
                 Duration = 60000
             });
         }
-
-        //await ValidateFields();
     }
 
     private async Task<bool> ValidateFields()
@@ -116,7 +113,6 @@ public partial class Settings
 
     private void OnUploadProgress(UploadProgressArgs args, string name)
     {
-
         if (args.Progress == 100)
         {
             foreach (var file in args.Files)
