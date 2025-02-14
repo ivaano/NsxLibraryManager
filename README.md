@@ -50,7 +50,7 @@ that I could run on a server and access it from any device.
 ## Docker
 ### GHCR
 - To run the container from the ghcr registry you need to mount the library folder, for example:
-  -`docker run 'ghcr.io/ivaano/nsxlibrarymanager:master' -p 8080:8080 --mount type=bind,source=/home/ivan/library,target=/app/library nsxlibrarymanager`
+  - `docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/roms/library,target=/app/library ghcr.io/ivaano/nsxlibrarymanager:master` 
 - additionally you can also mount the following optional folders:
   - renamer (used to put the files you want to rename that are not in the library) `--mount type=bind,source=/home/ivan/dumps,target=/app/renamer/in`
   - backup (used to move titles when removing duplicates) `--mount type=bind,source=/home/ivan/backup,target=/app/backup`
