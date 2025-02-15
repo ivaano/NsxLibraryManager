@@ -86,6 +86,11 @@
 
                 <RadzenDataGridColumn Property="Publisher" Title="Publisher"/>
                 <RadzenDataGridColumn Property="ContentType" Title="Type" Width="80px"/>
+                <RadzenDataGridColumn Property="Rating" Title="Age Rating" Visible="false" Width="80px">
+                    <Template Context="libraryTitle">
+                        @(libraryTitle?.Rating.AgeRating(AgeRatingAgency))
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="PackageType" Title="Package Type" Visible="false" Width="130px"/>
                 <RadzenDataGridColumn Property="FileName" Title="Filename" Width="250px">
                     <Template Context="libraryTitle">
