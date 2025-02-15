@@ -1,15 +1,12 @@
 name: Docker
-
 on:
   push:
     tags: ['v*.*.*']
   release:
     types: [created]
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +14,6 @@ jobs:
       contents: read
       packages: write
       id-token: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,6 +40,10 @@ jobs:
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=ref,event=branch
+            type=ref,event=pr
 
       - name: Build and push Docker image
         id: build-and-push
@@ -51,7 +51,7 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'release' }}
-          tags: ${{ github.ref }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -59,6 +59,6 @@ jobs:
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'release' }}
         env:
-          TAGS: ${{ github.ref }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+          COSIGN_EXPERIMENTAL: "true"
+        run: |
+          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
