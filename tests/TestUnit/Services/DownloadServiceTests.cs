@@ -6,7 +6,7 @@ using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Shared.Settings;
 
-namespace Tests.Services;
+namespace TestUnit.Services;
 
 public class DownloadServiceTests
 {

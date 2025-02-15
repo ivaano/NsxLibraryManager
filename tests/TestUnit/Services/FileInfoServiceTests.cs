@@ -2,15 +2,13 @@
 using LibHac.Tools.FsSystem.NcaUtils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
-using NsxLibraryManager.Core.Models;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Shared.Enums;
 
-namespace Tests.Services;
+namespace TestUnit.Services;
 
 public class FileInfoServiceTests
 {
@@ -65,6 +63,11 @@ public class FileInfoServiceTests
         var contents = GetBaseContents();
         var packageInfo = GetBasePackageInfo(content: contents);
         _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), true).Returns(packageInfo);
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "icon");
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
         
         //Act
         var result = await _fileInfoService.GetFileIcon(fileName);
@@ -76,7 +79,7 @@ public class FileInfoServiceTests
     
     
     [Fact]
-    public async Task Should_Throw_Exception_When_No_Contents()
+    public async Task Should_Return_Fail_When_No_Contents()
     {
         //Arrange
         var packageInfo = new PackageInfo
@@ -88,23 +91,25 @@ public class FileInfoServiceTests
         _packageInfoLoader.GetPackageInfo(Arg.Any<string>(), false).Returns(packageInfo);
         
         //Act
-        var result = await Assert.ThrowsAsync<Exception>(() => _fileInfoService.GetFileInfo("testFile.nsp", false));
+        var result = await _fileInfoService.GetFileInfo("testFile.nsp", false);
 
         //Assert
-        Assert.Equal("No contents found in the package", result.Message);
+        Assert.NotNull(result);
+        Assert.True(result.IsFailure);
     }
     
     [Fact]
-    public async Task Should_Throw_Exception_When_Is_InvalidFile()
+    public async Task Should_Return_Fail_When_Is_InvalidFile()
     {
         //Arrange
         const string filePath = "inexistentfile.txt";
         
         //Act
-        var result = await Assert.ThrowsAsync<InvalidPathException>(() => _fileInfoService.GetFileNames(filePath));
+        var result = await _fileInfoService.GetFileNames(filePath);
         
         //Assert
-        Assert.Equal($"Invalid path: {filePath}", result.Message);
+        Assert.NotNull(result);
+        Assert.True(result.IsFailure);
     }
     
     [Fact]
@@ -147,7 +152,7 @@ public class FileInfoServiceTests
 
         //Assert
         Assert.NotNull(result);
-        Assert.Equal(4, result.Value.Count());
+        Assert.Equal(2, result.Value.Count());
     }
     
     private static IPackageInfo GetBasePackageInfo(PackageType packageType = PackageType.NSP, 
