@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using NsxLibraryManager.Pages.Components;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 using Radzen.Blazor;
 
@@ -22,6 +23,8 @@ public partial class Library : IDisposable
     
     [Inject]
     protected NotificationService NotificationService { get; set; } = null!;
+    [Inject]
+    private ISettingsService SettingsService { get; set; } = null!;
     
     //grid
     private DataGridSettings _settings = null!;
@@ -40,7 +43,7 @@ public partial class Library : IDisposable
     private string _lastUpdated = string.Empty;
 
     private IEnumerable<string> _categories = [];
-    
+    private AgeRatingAgency AgeRatingAgency { get; set; }
 
     private const string SettingsParamaterName = "SqlLibraryGridSettings";
     private DataGridSettings? Settings 
@@ -113,6 +116,7 @@ public partial class Library : IDisposable
         _patchCount = lastUpdated?.UpdateTitleCount ?? 0;
         _dlcCount = lastUpdated?.DlcTitleCount ?? 0;
         _lastUpdated = lastUpdated?.DateUpdated.ToString("MM/dd/yyyy h:mm tt") ?? "Never";
+        AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;
 
         var categoriesResult = await TitleLibraryService.GetCategoriesAsync();
         if (categoriesResult.IsSuccess)
