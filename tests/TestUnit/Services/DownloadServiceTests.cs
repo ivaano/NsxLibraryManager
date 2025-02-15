@@ -1,14 +1,12 @@
 ﻿using System.Net;
-using Castle.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NsxLibraryManager.Core.Services;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Shared.Settings;
-using ILogger = Castle.Core.Logging.ILogger;
 
-namespace Tests.Services;
+namespace TestUnit.Services;
 
 public class DownloadServiceTests
 {

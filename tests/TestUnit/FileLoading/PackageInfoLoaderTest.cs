@@ -2,12 +2,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using NsxLibraryManager.Core.Exceptions;
 using NsxLibraryManager.Core.FileLoading;
 using NsxLibraryManager.Core.FileLoading.Interface;
 using NsxLibraryManager.Core.Services.KeysManagement;
 using NsxLibraryManager.Shared.Settings;
 
-namespace Tests.FileLoading;
+namespace TestUnit.FileLoading;
 
 public class PackageInfoLoaderTest
 {
@@ -63,17 +64,14 @@ public class PackageInfoLoaderTest
         Assert.NotNull(result);
     }    
     
-    [Fact]
+    [Fact ]
     public void Should_Load_Failed_Nsz_FilePackageInfo()
     {
         //Arrange
         var packageInfoLoader = new PackageInfoLoader(_packageTypeAnalyzer, _keySetProviderService);
-        
-        //Act
-        var result = packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test-fail.nsz", false);
-        
-        //Assert
-        Assert.NotNull(result);
+
+        //ActAssert
+        var result = Assert.Throws<FileNotSupportedException>(() =>  packageInfoLoader.GetPackageInfo(@"N:\roms\prueba\test-fail.nsz", false));
     }
     
     [Fact]
