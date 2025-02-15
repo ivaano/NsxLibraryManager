@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Shared", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUnit", "tests\TestUnit\TestUnit.csproj", "{D31D7030-698D-40A4-89C0-20E1E2B99535}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIntegration", "Tests\TestIntegration\TestIntegration.csproj", "{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,5 +53,9 @@ Global
 		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
