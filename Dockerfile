@@ -4,7 +4,7 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0.406-jammy AS build
 WORKDIR /src
-COPY source/. .
+COPY src/. .
 RUN dotnet restore "NsxLibraryManager/NsxLibraryManager.csproj"
 WORKDIR "/src/NsxLibraryManager"
 RUN dotnet build "NsxLibraryManager.csproj" -c Release -o /app/build
