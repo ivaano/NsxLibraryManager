@@ -6,7 +6,8 @@ on:
     types: [created]
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # Convert repository name to lowercase
+  IMAGE_NAME: ${{ github.repository_owner }}/nsxlibrarymanager
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -68,6 +69,8 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: "true"
         run: |
-          IMAGE_TO_SIGN="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}"
+          # Ensure lowercase repository name
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE_TO_SIGN="${{ env.REGISTRY }}/${REPO_LOWER}@${{ steps.build-and-push.outputs.digest }}"
           echo "Signing image: $IMAGE_TO_SIGN"
           cosign sign --yes "$IMAGE_TO_SIGN"
