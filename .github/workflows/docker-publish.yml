@@ -34,7 +34,8 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      
+      # Extract metadata (tags, labels) for Docker
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
@@ -42,9 +43,14 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value={{tag}}
             type=ref,event=branch
             type=ref,event=pr
-
+            type=sha
+      
+      # Build and push Docker image with Buildx
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
@@ -55,10 +61,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
+      
+      # Sign the published Docker image
       - name: Sign the published Docker image
-        if: ${{ github.event_name != 'release' }}
+        if: ${{ github.event_name != 'release' && steps.build-and-push.outputs.digest != '' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
         run: |
+          echo "Signing image with digest: ${{ steps.build-and-push.outputs.digest }}"
           cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
