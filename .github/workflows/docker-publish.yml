@@ -68,5 +68,6 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: "true"
         run: |
-          echo "Signing image with digest: ${{ steps.build-and-push.outputs.digest }}"
-          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          IMAGE_TO_SIGN="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}"
+          echo "Signing image: $IMAGE_TO_SIGN"
+          cosign sign --yes "$IMAGE_TO_SIGN"
