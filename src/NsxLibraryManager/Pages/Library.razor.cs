@@ -216,6 +216,19 @@ public partial class Library : IDisposable
         }
     }
 
+    private async Task FtpSelected()
+    {
+        var result = await DialogService.OpenAsync<FtpSendDialog>($"Send by Ftp Multiple Titles",
+            new Dictionary<string, object>() { { "SelectedTitles", _selectedTitles } },
+            new DialogOptions()
+            {
+                CloseDialogOnEsc = true, 
+                CloseDialogOnOverlayClick = true, 
+                Draggable = true, 
+                Style = "background:var(--rz-base-900)"
+            });
+    }
+
     private async Task EditSelected()
     {
         var result = await DialogService.OpenAsync<TitleMassEditDialog>($"Edit Multiple Titles",
