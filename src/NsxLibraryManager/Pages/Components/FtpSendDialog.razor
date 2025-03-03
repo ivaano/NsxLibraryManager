@@ -1,5 +1,44 @@
 ﻿@page "/FtpSendDialog"
-<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
-    <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" Click="@(args => OnSubmit())" />
-    <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
-</RadzenStack>
+
+    <RadzenStack>
+        <RadzenRow>
+            <RadzenColumn Size="12" SizeMD="2" Style="float: none; text-align: right">
+                <RadzenLabel Component="Protocol" style="width: 100%" Text="Protocol:"></RadzenLabel>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="10">
+                <RadzenTextBox style="display: block; width: 100%" Name="Protocol" Value="FTP - File Transfer Protocol" ReadOnly="true" Disabled="true"></RadzenTextBox>
+                <RadzenRequiredValidator Component="Protocol" style="position: absolute"></RadzenRequiredValidator>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="2" Style="text-align: right">
+                <RadzenLabel Component="Host" style="width: 100%" Text="Host:"></RadzenLabel>
+            </RadzenColumn>
+            <RadzenColumn Size="7" >
+                <RadzenTextBox  @bind-Value="_ftpClientSettings.Host"  style="display: block; width: 100%" Name="Host"></RadzenTextBox>
+                <RadzenRequiredValidator Component="Host" style="position: absolute"></RadzenRequiredValidator>
+            </RadzenColumn>
+            <RadzenColumn Size="1" Style="text-align: right">
+                <RadzenLabel Component="Port" style="width: 100%" Text="Port:"></RadzenLabel>
+            </RadzenColumn>
+            <RadzenColumn Size="2" >
+                <RadzenNumeric  @bind-Value="_ftpClientSettings.Port" style="display: block; width: 100%" Name="Port"></RadzenNumeric>
+                <RadzenRequiredValidator Component="Port" style="position: absolute"></RadzenRequiredValidator>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="12" SizeMD="2" Style="float: none; text-align: right">
+                <RadzenLabel Component="LogonType" style="width: 100%" Text="Logon Type:"></RadzenLabel>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="10">
+                <RadzenTextBox style="display: block; width: 100%" Name="LogonType" Value="Anonymous" ReadOnly="true" Disabled="true"></RadzenTextBox>
+                <RadzenRequiredValidator Component="LogonType" style="position: absolute"></RadzenRequiredValidator>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+            <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Send" Click="@(args => OnSubmit())" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+        </RadzenStack>
+    </RadzenStack>
+
+

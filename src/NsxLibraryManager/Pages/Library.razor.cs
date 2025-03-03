@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Pages.Components;
+using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
@@ -23,8 +24,12 @@ public partial class Library : IDisposable
     
     [Inject]
     protected NotificationService NotificationService { get; set; } = null!;
+    
     [Inject]
     private ISettingsService SettingsService { get; set; } = null!;
+    
+    [Inject]
+    private FtpStateService FtpStateService { get; set; } = null!;
     
     //grid
     private DataGridSettings _settings = null!;
@@ -72,8 +77,20 @@ public partial class Library : IDisposable
     
     protected override async Task OnInitializedAsync()
     {
+        FtpStateService.OnTransferCompleted += HandleFtpStatusChanged;
         await base.OnInitializedAsync();
         await InitialLoad();
+    }
+    
+    private void HandleFtpStatusChanged(FtpCompletedTransfer completedTransfer)
+    {
+        InvokeAsync(() =>
+        {
+            ShowNotification(
+                NotificationSeverity.Success, 
+                "Upload completed", 
+                $"{completedTransfer.Filename} uploaded succesfully");
+        });
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)

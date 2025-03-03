@@ -24,12 +24,13 @@ public class FtpBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
+        _stateService.OnStatusUpdate += HandleFtpStatus;
+        _stateService.OnTransferCompleted += HandleFtpCompleted;
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                //await DoFtpWork();
-
                 await ProcessUploadQueue(stoppingToken);
 
                 await Task.WhenAny(
@@ -248,8 +249,14 @@ public class FtpBackgroundService : BackgroundService
         }
     }
 
-    private async Task DoFtpWork()
+    private void HandleFtpStatus(FtpStatusUpdate status)
     {
-        //do ftp transfer
+        _logger.LogDebug($"Background Service: Transfer {status.TransferId} - {status.TransferredBytes}");
+        // Perform further processing of the status update
+    }
+
+    private void HandleFtpCompleted(FtpCompletedTransfer completedTransfer)
+    {
+        _logger.LogInformation($"Complete Transfer Event: {completedTransfer.TransferId}");
     }
 }
