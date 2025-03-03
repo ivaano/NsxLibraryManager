@@ -252,7 +252,6 @@ public class FtpBackgroundService : BackgroundService
     private void HandleFtpStatus(FtpStatusUpdate status)
     {
         _logger.LogDebug($"Background Service: Transfer {status.TransferId} - {status.TransferredBytes}");
-        // Perform further processing of the status update
     }
 
     private void HandleFtpCompleted(FtpCompletedTransfer completedTransfer)
