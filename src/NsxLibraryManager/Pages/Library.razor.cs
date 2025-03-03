@@ -46,7 +46,8 @@ public partial class Library : IDisposable
     private int _dlcCount;
     private string _libraryPath = string.Empty;
     private string _lastUpdated = string.Empty;
-
+    private IList<int> _selectedTitleIds = new List<int>();
+    private bool ActionsDisabled => _selectedTitles == null || _selectedTitles.Count == 0;
     private IEnumerable<string> _categories = [];
     private AgeRatingAgency AgeRatingAgency { get; set; }
 
@@ -301,7 +302,27 @@ public partial class Library : IDisposable
                 $"{title.TitleName} user rating updated");
         }
     }
+
+    private async Task OnClickActions(RadzenSplitButtonItem item, string buttonName)
+    {
+        if (item is not null)
+        {
+            switch (item.Value)
+            {
+                case "FtpSelected":
+                    await FtpSelected();
+                    break;
+                case "EditSelected":
+                    await EditSelected();
+                    break;
+                case "ClearSelected":
+                    _selectedTitles = null;
+                    break;
+            }
+        }
+    }
     
+
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)

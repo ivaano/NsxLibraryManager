@@ -197,6 +197,8 @@ public class FtpBackgroundService : BackgroundService
         try
         {
             // upload a file with progress tracking
+            _logger.LogInformation("Starting file upload: {FileName}, ID: {Id}", request.FileName, request.Id);
+
             var result = ftp.UploadFile(request.FileName, request.RemotePath, FtpRemoteExists.Overwrite, false,
                 FtpVerify.None, Progress);
 

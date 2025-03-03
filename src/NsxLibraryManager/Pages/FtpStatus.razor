@@ -1,0 +1,14 @@
+@page "/FtpStatus"
+<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+    <Columns>
+        @foreach (var column in columns)
+        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @context[@column.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>

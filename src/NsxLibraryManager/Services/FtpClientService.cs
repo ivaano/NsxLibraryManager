@@ -21,4 +21,9 @@ public class FtpClientService : IFtpClientService
         var resulta = _backgroundService.QueueFileUpload(localPath, remotePath, host, port);
         return Result.Success(true);
     }
+
+    public Task<Result<string>> GetQueuedFiles()
+    {
+        throw new NotImplementedException();
+    }
 }

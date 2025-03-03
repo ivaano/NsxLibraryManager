@@ -10,6 +10,7 @@ public class FtpStateService
     
     public List<FtpStatusUpdate> CurrentTransfers { get; private set; } = [];
     public List<FtpCompletedTransfer> CompletedTransfers { get; private set; } = [];
+    
 
     public void UpdateStatus(FtpStatusUpdate update)
     {
