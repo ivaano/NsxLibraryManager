@@ -1,14 +1,32 @@
-@page "/FtpStatus"
-<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+@page "/ftpStatus"
+@using NsxLibraryManager.Extensions
+@using NsxLibraryManager.Shared.Dto
+<RadzenDataGrid 
+    @ref="grid" 
+    Data="@data" 
+    TItem="FtpStatusGridDto"
+    AllowColumnResize="true"
+    AllowFiltering="false" 
+    AllowPaging="true" 
+    PageSize="100"
+    AllowSorting="false">
     <Columns>
-        @foreach (var column in columns)
-        {
-            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
-                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
-                <Template>
-                    @context[@column.Key]
-                </Template>
-            </RadzenDataGridColumn>
-        }
+        <RadzenDataGridColumn Property="TransferId" Title="Transfer Id" />
+        <RadzenDataGridColumn Property="Filename" Title="File Name" />
+        <RadzenDataGridColumn Property="ProgressPercentage" Title="Completed">
+            <Template Context="ftpStatus">
+                @($"{ftpStatus.ProgressPercentage:0.00}%")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="TotalBytes" Title="Total Bytes">
+            <Template Context="ftpStatus">
+                @ftpStatus.TotalBytes.ToHumanReadableBytes()
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="TransferredBytes" Title="Transferred Bytes" >
+            <Template Context="ftpStatus">
+                @ftpStatus.TransferredBytes.ToHumanReadableBytes()
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>

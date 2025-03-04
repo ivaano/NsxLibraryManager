@@ -50,12 +50,15 @@ public class FtpBackgroundService : BackgroundService
         }
     }
     
-    public string QueueFileUpload(string fileName, string remotePath, string ftpHost, int ftpPort)
+    public string QueueFileUpload(string filePath, string remotePath, string ftpHost, int ftpPort)
     {
+        var  fileInfo = new FileInfo(filePath);
         var request = new FtpUploadRequest
         {
             Id = Guid.NewGuid().ToString(),
-            FileName = fileName,
+            FileName = fileInfo.Name,
+            LocalFilePath = filePath,
+            TotalBytes = fileInfo.Length,
             RemotePath = remotePath,
             FtpHost = ftpHost,
             FtpPort = ftpPort,
@@ -67,14 +70,19 @@ public class FtpBackgroundService : BackgroundService
         {
             _uploadQueue.Enqueue(request);
             _signal.Release();
-            _logger.LogInformation("Queued file upload: {fileName}, ID: {id}", fileName, request.Id);
+            _logger.LogInformation("Queued file upload: {fileName}, ID: {id}", filePath, request.Id);
             return request.Id;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error queuing file for upload: {fileName}", fileName);
+            _logger.LogError(ex, "Error queuing file for upload: {fileName}", filePath);
             throw;
         }
+    }
+
+    public List<FtpUploadRequest> GetUploadQueue()
+    {
+        return _uploadQueue.ToList();
     }
     
     public FtpUploadStatus GetUploadStatus(string id)
@@ -104,7 +112,7 @@ public class FtpBackgroundService : BackgroundService
             {
                 Id = id,
                 Status = completedTransfer.Success ? 
-                    UploadStatusType.Completed : UploadStatusType.Failed,
+                UploadStatusType.Completed : UploadStatusType.Failed,
                 FileName = completedTransfer.Filename,
                 Progress = completedTransfer.Success ? 100 : 0,
                 StartTime = completedTransfer.StartTime,
@@ -171,20 +179,20 @@ public class FtpBackgroundService : BackgroundService
     
     private async Task UploadFile(FtpUploadRequest request)
     {
-        if (!File.Exists(request.FileName))
+        if (!File.Exists(request.LocalFilePath))
         {
-            throw new FileNotFoundException("File for upload was not found", request.FileName);
+            throw new FileNotFoundException("File for upload was not found", request.LocalFilePath);
         }
         
-        var fileInfo = new FileInfo(request.FileName);
         
         // Start the transfer status
         _stateService.UpdateStatus(new FtpStatusUpdate
         {
             TransferId = request.Id,
             Filename = request.FileName,
+            LocalFilePath = request.LocalFilePath,
             Direction = TransferDirection.Upload,
-            TotalBytes = fileInfo.Length,
+            TotalBytes = request.TotalBytes,
             TransferredBytes = 0,
             StartTime = DateTime.Now,
             LastUpdateTime = DateTime.Now
@@ -199,7 +207,7 @@ public class FtpBackgroundService : BackgroundService
             // upload a file with progress tracking
             _logger.LogInformation("Starting file upload: {FileName}, ID: {Id}", request.FileName, request.Id);
 
-            var result = ftp.UploadFile(request.FileName, request.RemotePath, FtpRemoteExists.Overwrite, false,
+            var result = ftp.UploadFile(request.LocalFilePath, request.RemotePath, FtpRemoteExists.Overwrite, false,
                 FtpVerify.None, Progress);
 
 
@@ -207,8 +215,9 @@ public class FtpBackgroundService : BackgroundService
             {
                 TransferId = request.Id,
                 Filename = request.FileName,
+                LocalFilePath = request.LocalFilePath,
                 Direction = TransferDirection.Upload,
-                TotalBytes = fileInfo.Length,
+                TotalBytes = request.TotalBytes,
                 Success = result == FtpStatus.Success,
                 StartTime = request.Timestamp,
                 CompletionTime = DateTime.Now
@@ -236,11 +245,12 @@ public class FtpBackgroundService : BackgroundService
             }
             else
             {
-                // percent done = (p.Progress * 100)
                 _stateService.UpdateStatus(new FtpStatusUpdate
                 {
                     TransferId = request.Id,
                     Filename = request.FileName,
+                    LocalFilePath = request.LocalFilePath,
+                    TotalBytes = request.TotalBytes,
                     Direction = TransferDirection.Upload,
                     Progress = p.Progress,
                     TransferredBytes = p.TransferredBytes,

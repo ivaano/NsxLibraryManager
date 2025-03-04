@@ -1,6 +1,7 @@
 ﻿using Common.Services;
 using FluentFTP;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Settings;
 
 namespace NsxLibraryManager.Services;
@@ -16,14 +17,15 @@ public class FtpClientService : IFtpClientService
         _backgroundService = serviceProvider.GetServices<IHostedService>().OfType<FtpBackgroundService>().First();
     }
 
-    public async Task<Result<bool>> UploadFile(string localPath, string remotePath, string host, int port)
+    public Task<Result<bool>> UploadFile(string localPath, string remotePath, string host, int port)
     {
         var resulta = _backgroundService.QueueFileUpload(localPath, remotePath, host, port);
-        return Result.Success(true);
+        return Task.FromResult(Result.Success(true));
     }
 
-    public Task<Result<string>> GetQueuedFiles()
+    public Task<Result<List<FtpUploadRequest>>> GetQueuedFiles()
     {
-        throw new NotImplementedException();
+        var queuedFiles = _backgroundService.GetUploadQueue();
+        return Task.FromResult(Result.Success(queuedFiles));
     }
 }

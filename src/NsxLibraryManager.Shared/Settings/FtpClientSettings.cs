@@ -2,7 +2,7 @@
 
 public class FtpClientSettings
 {
-    public required string Host { get; set; }
-    public int Port { get; set; }
-    public required string RemotePath { get; set; }
+    public string Host { get; set; } = string.Empty;
+    public int Port { get; set; } = 21;
+    public string RemotePath { get; set; } = "/";
 }
