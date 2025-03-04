@@ -24,8 +24,6 @@ public class FtpBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await Task.Yield();
-        _stateService.OnStatusUpdate += HandleFtpStatus;
-        _stateService.OnTransferCompleted += HandleFtpCompleted;
         
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -259,15 +257,5 @@ public class FtpBackgroundService : BackgroundService
                 });
             }
         }
-    }
-
-    private void HandleFtpStatus(FtpStatusUpdate status)
-    {
-        _logger.LogDebug($"Background Service: Transfer {status.TransferId} - {status.TransferredBytes}");
-    }
-
-    private void HandleFtpCompleted(FtpCompletedTransfer completedTransfer)
-    {
-        _logger.LogInformation($"Complete Transfer Event: {completedTransfer.TransferId}");
     }
 }
