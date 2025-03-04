@@ -144,6 +144,11 @@ public class SettingsService(
 
     public Task<PackageRenamerSettings> GetPackageRenamerSettings() =>
         GetSerializedSettings<PackageRenamerSettings>(SettingsEnum.RenamePackageType);
+    public Task<FtpClientSettings> GetFtpClientSettings() =>
+        GetSerializedSettings<FtpClientSettings>(SettingsEnum.FtpClientSettings);
+    
+    public Task<FtpClientSettings> SaveFtpClientSettings(FtpClientSettings settings) =>
+        SaveSerializedSettings(settings, SettingsEnum.FtpClientSettings);
     
     public Task<BundleRenamerSettings> SaveBundleRenamerSettings(BundleRenamerSettings settings) =>
         SaveSerializedSettings(settings, SettingsEnum.RenameBundle);

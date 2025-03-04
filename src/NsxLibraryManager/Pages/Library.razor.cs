@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using NsxLibraryManager.Pages.Components;
+using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
@@ -23,8 +24,12 @@ public partial class Library : IDisposable
     
     [Inject]
     protected NotificationService NotificationService { get; set; } = null!;
+    
     [Inject]
     private ISettingsService SettingsService { get; set; } = null!;
+    
+    [Inject]
+    private FtpStateService FtpStateService { get; set; } = null!;
     
     //grid
     private DataGridSettings _settings = null!;
@@ -41,7 +46,8 @@ public partial class Library : IDisposable
     private int _dlcCount;
     private string _libraryPath = string.Empty;
     private string _lastUpdated = string.Empty;
-
+    private IList<int> _selectedTitleIds = new List<int>();
+    private bool ActionsDisabled => _selectedTitles == null || _selectedTitles.Count == 0;
     private IEnumerable<string> _categories = [];
     private AgeRatingAgency AgeRatingAgency { get; set; }
 
@@ -72,8 +78,20 @@ public partial class Library : IDisposable
     
     protected override async Task OnInitializedAsync()
     {
+        FtpStateService.OnTransferCompleted += HandleFtpStatusChanged;
         await base.OnInitializedAsync();
         await InitialLoad();
+    }
+    
+    private void HandleFtpStatusChanged(FtpCompletedTransfer completedTransfer)
+    {
+        InvokeAsync(() =>
+        {
+            ShowNotification(
+                NotificationSeverity.Success, 
+                "Upload completed", 
+                $"{completedTransfer.Filename} uploaded succesfully");
+        });
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -216,6 +234,19 @@ public partial class Library : IDisposable
         }
     }
 
+    private async Task FtpSelected()
+    {
+        var result = await DialogService.OpenAsync<FtpSendDialog>($"Send by Ftp Multiple Titles",
+            new Dictionary<string, object>() { { "SelectedTitles", _selectedTitles } },
+            new DialogOptions()
+            {
+                CloseDialogOnEsc = true, 
+                CloseDialogOnOverlayClick = true, 
+                Draggable = true, 
+                Style = "background:var(--rz-base-900)"
+            });
+    }
+
     private async Task EditSelected()
     {
         var result = await DialogService.OpenAsync<TitleMassEditDialog>($"Edit Multiple Titles",
@@ -271,7 +302,27 @@ public partial class Library : IDisposable
                 $"{title.TitleName} user rating updated");
         }
     }
+
+    private async Task OnClickActions(RadzenSplitButtonItem item, string buttonName)
+    {
+        if (item is not null)
+        {
+            switch (item.Value)
+            {
+                case "FtpSelected":
+                    await FtpSelected();
+                    break;
+                case "EditSelected":
+                    await EditSelected();
+                    break;
+                case "ClearSelected":
+                    _selectedTitles = null;
+                    break;
+            }
+        }
+    }
     
+
     protected virtual void Dispose(bool disposing)
     {
         if (disposing)

@@ -5,7 +5,8 @@ public enum SettingsEnum
     RenamePackageType,
     RenameBundle,
     RenameCollection,
-    UserSettings
+    UserSettings,
+    FtpClientSettings,
     //LibraryPath,
     //LibraryPathRecursive
 }

@@ -42,7 +42,13 @@
             ShowPagingSummary="true" 
             style="height: 89vh">
             <HeaderTemplate>
-                <RadzenButton Click="@(_ => EditSelected())" Text="Edit Selected" ButtonStyle="ButtonStyle.Secondary" class=".rz-shadow-2"/> |
+                <RadzenSplitButton Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Light" AlwaysOpenPopup="true" DropDownIcon="keyboard_double_arrow_down" Click=@(args => OnClickActions(args, "Actions")) Text="Actions" Disabled="@ActionsDisabled">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Edit Selected" Value="EditSelected" Icon="edit"/>
+                        <RadzenSplitButtonItem Text="Send Selected to FTP" Value="FtpSelected" Icon="publish" />
+                        <RadzenSplitButtonItem Text="Clear Selection" Value="ClearSelected" Icon="clear_all" />
+                    </ChildContent>
+                </RadzenSplitButton> |
                 <RadzenButton Click="@(_ => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
                 <RadzenButton Click="@(_ => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
                 <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>

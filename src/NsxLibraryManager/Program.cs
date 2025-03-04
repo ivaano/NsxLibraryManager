@@ -66,6 +66,8 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 //nsx services
 if (validatorResult.valid)
 {
+    builder.Services.AddHostedService<FtpBackgroundService>();
+    builder.Services.AddSingleton<FtpStateService>();
     builder.Services.AddScoped<ISettingsService, SettingsService>();
     builder.Services.AddScoped<ISettingsMediator, SettingsService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
@@ -74,6 +76,7 @@ if (validatorResult.valid)
     builder.Services.AddTransient<IKeySetProviderService, KeySetProviderService>();
     builder.Services.AddTransient<IStatsService, StatsService>();
     builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
+    builder.Services.AddTransient<IFtpClientService, FtpClientService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
     builder.Services.AddScoped<ITitledbService, TitledbService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();
