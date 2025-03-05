@@ -448,7 +448,7 @@ public class RenamerService(
         return Task.FromResult(newPath);
     }
 
-    private async Task<Result<LibraryTitleDto>> GetAggregatedFileInfo(string fileLocation)
+    private async Task<Result<LibraryTitleDto>> GetAggregatedFileInfo(string fileLocation, bool useEnglishNaming)
     {
         try
         {
@@ -475,9 +475,31 @@ public class RenamerService(
                 }
                 return Result.Success(fileInfo);
             }
-
             //prefer Name  from titledb instead of the file
             fileInfo.TitleName = titledbTitle.TitleName;
+            
+            if (titledbTitle.Region is not null)
+            {
+                if (_packageRenamerSettings.RegionsToCheckForEnglishNaming.Split(',')
+                    .Select(s => s.Trim())
+                    .Any(s => s.Equals(titledbTitle.Region.Trim(), StringComparison.OrdinalIgnoreCase)))
+                {
+                    var applicationId = titledbTitle.ContentType switch
+                    {
+                        TitleContentType.Base => titledbTitle.ApplicationId,
+                        TitleContentType.Update => titledbTitle.OtherApplicationId,
+                        _ => titledbTitle.ApplicationId
+                    };
+                    
+                    var nswName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == applicationId);
+                    if (nswName is not null)
+                    {
+                        fileInfo.TitleName = nswName.TitleName;
+                        fileInfo.Publisher = nswName.Publisher;
+                    }                    
+                }                
+            }
+
             fileInfo.UpdatesCount = titledbTitle.UpdatesCount;
             fileInfo.DlcCount = titledbTitle.DlcCount;
 
@@ -494,7 +516,7 @@ public class RenamerService(
             return Result.Failure<LibraryTitleDto>(e.Message);
         }
     }
-    
+
     public async Task<IEnumerable<RenameTitleDto>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
     {
@@ -505,12 +527,19 @@ public class RenamerService(
         }
 
         var files = filesResult.Value;
-        
+        var useEnglishNaming = renameType switch
+        {
+            RenameType.PackageType => _packageRenamerSettings.UseEnglishNaming,
+            RenameType.Bundle => _bundleRenamerSettings.UseEnglishNaming,
+            RenameType.Collection => _collectionRenamerSettings.UseEnglishNaming,
+            _ => false
+        };
+
         var fileList = new List<RenameTitleDto>();
         foreach (var file in files)
         {
             logger.LogInformation("Analyzing {}", file);
-            var fileInfoResult = await GetAggregatedFileInfo(file);
+            var fileInfoResult = await GetAggregatedFileInfo(file, useEnglishNaming);
             if (fileInfoResult.IsFailure)
             {
                 fileList.Add(new RenameTitleDto

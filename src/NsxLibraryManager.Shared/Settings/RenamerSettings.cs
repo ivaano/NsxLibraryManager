@@ -9,4 +9,8 @@ public abstract class RenamerSettings
     public string UnknownPlaceholder { get; set; } = "Unknown";
     public bool TitlesForceUppercase { get; set ; } = true;
     public bool DeleteEmptyFolders { get; set ; } = true;
+    
+    public bool UseEnglishNaming { get; set; } = true;
+    
+    public string RegionsToCheckForEnglishNaming { get; set; } = "JP,CN,KO";
 }
