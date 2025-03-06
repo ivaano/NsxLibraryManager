@@ -13,6 +13,7 @@ using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 using NsxLibraryManager.Shared.Mapping;
 using NsxLibraryManager.Shared.Settings;
+using NsxLibraryManager.Utils;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 namespace NsxLibraryManager.Services;
@@ -477,28 +478,40 @@ public class RenamerService(
             }
             //prefer Name  from titledb instead of the file
             fileInfo.TitleName = titledbTitle.TitleName;
-            
-            if (titledbTitle.Region is not null)
+
+            if (useEnglishNaming)
             {
-                if (_packageRenamerSettings.RegionsToCheckForEnglishNaming.Split(',')
-                    .Select(s => s.Trim())
-                    .Any(s => s.Equals(titledbTitle.Region.Trim(), StringComparison.OrdinalIgnoreCase)))
+                if (LanguageChecker.IsNonEnglish(fileInfo.TitleName))
                 {
                     var applicationId = titledbTitle.ContentType switch
                     {
                         TitleContentType.Base => titledbTitle.ApplicationId,
                         TitleContentType.Update => titledbTitle.OtherApplicationId,
+                        TitleContentType.DLC => titledbTitle.OtherApplicationId,
                         _ => titledbTitle.ApplicationId
                     };
-                    
+
                     var nswName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == applicationId);
                     if (nswName is not null)
                     {
-                        fileInfo.TitleName = nswName.TitleName;
+                        if (titledbTitle.ContentType is TitleContentType.DLC)
+                        {
+                            var nswDlcName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == titledbTitle.ApplicationId);
+                            if (nswDlcName is not null)
+                            {
+                                fileInfo.TitleName = nswDlcName.TitleName;
+                            }
+                        }
+                        else
+                        {
+                            fileInfo.TitleName = nswName.TitleName;
+                        }
                         fileInfo.Publisher = nswName.Publisher;
-                    }                    
-                }                
+                        fileInfo.OtherApplicationName = nswName.TitleName;
+                    }
+                }
             }
+
 
             fileInfo.UpdatesCount = titledbTitle.UpdatesCount;
             fileInfo.DlcCount = titledbTitle.DlcCount;
@@ -506,6 +519,8 @@ public class RenamerService(
             if (titledbTitle.ContentType == TitleContentType.Base
                 || string.IsNullOrEmpty(titledbTitle.OtherApplicationId)) return Result.Success(fileInfo);
 
+            if (fileInfo.OtherApplicationName is not null) return Result.Success(fileInfo);
+            
             var parentTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == titledbTitle.OtherApplicationId);
             fileInfo.OtherApplicationName = parentTitle?.TitleName;
 

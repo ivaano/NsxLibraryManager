@@ -11,6 +11,5 @@ public abstract class RenamerSettings
     public bool DeleteEmptyFolders { get; set ; } = true;
     
     public bool UseEnglishNaming { get; set; } = true;
-    
-    public string RegionsToCheckForEnglishNaming { get; set; } = "JP,CN,KO";
+
 }

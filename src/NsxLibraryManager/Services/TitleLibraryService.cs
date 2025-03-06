@@ -233,8 +233,6 @@ public class TitleLibraryService(
         nsxLibraryTitle.OwnedDlcs = 0;
         nsxLibraryTitle.OwnedUpdates = 0;
         nsxLibraryTitle.PackageType = libraryTitle.PackageType;
-        // prefer the publisher from the file
-        nsxLibraryTitle.Publisher = titledbTitle.Publisher.ConvertNullOrEmptyTo(libraryTitle.Publisher);
         nsxLibraryTitle.Rating = titledbTitle.Rating;
         nsxLibraryTitle.Region = titledbTitle.Region;
         nsxLibraryTitle.ReleaseDate = titledbTitle.ReleaseDate;
@@ -242,6 +240,40 @@ public class TitleLibraryService(
         nsxLibraryTitle.Size = await fileInfoService.GetFileSize(libraryTitle.FileName!);
         // prefer the title name from titledb
         nsxLibraryTitle.TitleName = libraryTitle.TitleName.ConvertNullOrEmptyTo(titledbTitle.TitleName);
+        // prefer the publisher from the file
+        nsxLibraryTitle.Publisher = titledbTitle.Publisher.ConvertNullOrEmptyTo(libraryTitle.Publisher);
+        
+        if (_userSettings.UseEnglishNaming)
+        {
+            if (LanguageChecker.IsNonEnglish(nsxLibraryTitle.TitleName))
+            {
+                var applicationId = titledbTitle.ContentType switch
+                {
+                    TitleContentType.Base => titledbTitle.ApplicationId,
+                    TitleContentType.Update => titledbTitle.OtherApplicationId,
+                    TitleContentType.DLC => titledbTitle.OtherApplicationId,
+                    _ => titledbTitle.ApplicationId
+                };
+                    
+                var nswName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == applicationId);
+                if (nswName is not null)
+                {
+                    if (titledbTitle.ContentType is TitleContentType.DLC)
+                    {
+                        var nswDlcName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == titledbTitle.ApplicationId);
+                        if (nswDlcName is not null)
+                        {
+                            nsxLibraryTitle.TitleName = nswDlcName.TitleName;
+                        }
+                    }
+                    else
+                    {
+                        nsxLibraryTitle.TitleName = nswName.TitleName;
+                    }
+                    nsxLibraryTitle.Publisher = nswName.Publisher;
+                } 
+            }
+        }
         nsxLibraryTitle.UpdatesCount = titledbTitle.UpdatesCount;
         nsxLibraryTitle.Version = libraryTitle.Version;
 
