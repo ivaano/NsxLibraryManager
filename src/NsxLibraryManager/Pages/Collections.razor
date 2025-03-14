@@ -1,0 +1,58 @@
+﻿@page "/collections"
+@using NsxLibraryManager.Shared.Dto
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+    <RadzenDataGrid
+        @ref="_grid"
+        TItem="CollectionDto"
+        Data="@_collections"
+        EditMode="DataGridEditMode.Single"
+        ShowEmptyMessage="false"
+        RowUpdate="@OnUpdateRow" 
+        RowCreate="@OnCreateRow" 
+        PageSize="@_pageSize"
+        PageSizeOptions="@_pageSizeOptions"
+        PageSizeChanged="@(args => _pageSize = args)"
+        Count="@_count"
+        IsLoading="@_isLoading"
+        AllowAlternatingRows="false"
+        AllowSorting="true"
+        AllowPaging="true"
+        AllowFiltering="true"
+        FilterMode="FilterMode.SimpleWithMenu"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        AllowColumnResize="true"
+        PagerHorizontalAlign="HorizontalAlign.Center"
+        ColumnWidth="200px" AllowColumnPicking="true"
+        ShowPagingSummary="true"
+        >
+        <HeaderTemplate>
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Add New Collection" Click="@InsertRow" Disabled="@_newRecordInsertDisabled"/>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn Property="Id" Title="Collection ID" Width="90px" Frozen="true" />
+            <RadzenDataGridColumn Property="Name" Title="Collection" Width="280px" SortOrder="SortOrder.Ascending">
+                <EditTemplate Context="collection">
+                    <RadzenTextBox @bind-Value="collection.Name"  Style="width:100%; display: block" Name="Name" aria-label="Enter name" />
+                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="TitlesCount" Title="Titles in Collection" Width="150px" />
+            <RadzenDataGridColumn Property="BaseTitlesCount" Title="Base Titles" Width="150px" />
+            <RadzenDataGridColumn Property="DlcTitlesCount" Title="DLC Titles" Width="150px" />
+            <RadzenDataGridColumn Property="UpdatesTitlesCount" Title="Update Titles" Width="150px" />
+
+            <RadzenDataGridColumn Context="collection" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="collection">
+                    <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" Click="@(() => InsertAfterRow(collection))" title="Add new row after this row"  Disabled="@_newRecordInsertDisabled"/>
+                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => EditRow(collection))" @onclick:stopPropagation="true" />
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(collection))" @onclick:stopPropagation="true" />
+                </Template>
+                <EditTemplate Context="collection">
+                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(collection))" aria-label="Save"/>
+                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(collection))" aria-label="Cancel"/>
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(collection))" aria-label="Delete" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>

@@ -1,0 +1,124 @@
+@page "/TitleEditDialog/{titleId}"
+<RadzenTemplateForm Data="@_libraryTitleDto" @onsubmit="OnSubmit">
+    <RadzenRow Gap="2rem" class="rz-p-0 rz-p-lg-4">
+        <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack>
+            <RadzenFieldset Text="Title Info">
+                <RadzenStack Gap="1rem">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenLabel Text="Id" Component="Id"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="9">
+                            <RadzenTextBox Disabled="true" Placeholder="@_libraryTitleDto.Id.ToString()" Style="width: 100%;" Name="Id" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenLabel Text="Application Id" Component="Id"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="9">
+                            <RadzenTextBox Disabled="true" Placeholder="@_libraryTitleDto.ApplicationId" Style="width: 100%;" Name="Id" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenLabel Text="Name" Component="Id"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="9">
+                            <RadzenTextBox Disabled="true" Placeholder="@_libraryTitleDto.TitleName" Style="width: 100%;" Name="Id" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenLabel Text="Publisher" Component="Id"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="9">
+                            <RadzenTextBox Disabled="true" Placeholder="@_libraryTitleDto.Publisher" Style="width: 100%;" Name="Id" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenLabel Text="Rate this game" Component="Id"/>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="9">
+                            <RadzenRating @bind-Value="@_userRating" />
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+                
+            </RadzenFieldset>
+        </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="6">
+            <RadzenStack>
+                <RadzenFieldset Text="Archival Info">
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow>
+                            <RadzenColumn Size="12" SizeMD="12">
+                                <RadzenRow>
+                                    <RadzenText TextStyle="TextStyle.Caption">
+                                        Collections are used to organize your library files,
+                                        if you specify a collection to this title all related titles (base, updates, dlc) will be updated to use
+                                        this collection.
+                                    </RadzenText>
+                                </RadzenRow>
+
+                                @if (_disableCollectionDropdown)
+                                {
+                                    <RadzenRow >
+                                        <RadzenColumn class="rz-background-color-danger-lighter rz-color-on-danger-lighter rz-text-align-center rz-p-2">
+                                        <RadzenText TextStyle="TextStyle.Caption">
+                                            @_disableCollectionDropdownMessage
+                                        </RadzenText>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+                                }
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Collection" Component="CollectionId"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenDropDown
+                                    LoadData="LoadCollectionsData"
+                                    Data="@_collections"
+                                    @bind-Value="_dropdownValue"
+                                    TextProperty="Name"
+                                    ValueProperty="Id"
+                                    AllowClear="true"
+                                    Placeholder="Select something"
+                                    Style="width: 100%;"
+                                    Disabled="_disableCollectionDropdown"
+                                    Name="Collection">
+                                </RadzenDropDown>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Related patches"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenLabel Text="@_relatedPatchTitle"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12" SizeMD="4">
+                                <RadzenLabel Text="Related Dlc"/>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeMD="8">
+                                <RadzenLabel Text="@_relatedDlcTitle"/>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenFieldset>
+            </RadzenStack>
+        </RadzenColumn>
+
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" class="rz-mt-8 rz-mb-4">
+        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Large" Icon="save" Text="Save" />
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Large" Icon="cancel" Text="Cancel" Click="@Cancel" />
+    </RadzenStack>
+</RadzenTemplateForm>

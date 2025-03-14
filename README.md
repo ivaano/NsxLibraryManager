@@ -27,43 +27,91 @@ that I could run on a server and access it from any device.
 ## Install
 - Download the latest release
 - Extract the zip/gz file
-- Create `titledb\config.json` and customize it to your needs:
-  - `TitleDatabase`: Path where the db file is going to be stored, this is required and must end with `.db`. **Use a fast drive for this file, like a NVMe**.
-  - `LibraryPath`: Path to your library.
-  - `Recursive`: If true, it will search recursively in the library path.
-  - `TitleDbPath`: Path where we are going to download titledb json Files to add them to the db.
-  - `RegionUrl`: Url to download the region file.
-  - `CnmtsUrl`: Url to download the cnmts file.
-  - `VersionUrl`: Url to download the version file.
-  - `Regions`: List of regions to download.
-  - `ProdKeys`: Path to your prod.keys file, if this value is not set, program will look in the same folder as the executable, or you can put them in `$HOME/.switch/prod.keys`.
-- Alternative to creating the file manually, run the application once and it will create a default config file you can use the the browser to edit it.
-
-> [!WARNING]
-> Be sure that the paths you put on `config.json` are valid, the application doesn't create the paths if they don't exists.
+- Run the application
+  - On Windows, run `NsxLibraryManager.exe`
+  - On Linux, run `./NsxLibraryManager`
+  - On Mac, run `./NsxLibraryManager`
+- Open your browser and go to [http://localhost:5000](http://localhost:5000).
+  - If you want to change the port, you need to define the host and port in `appsettings.json` or in the `ASPNETCORE_URLS ` Environment Variable. On `appsettings.json` add this section to listen on localhost port 5050:
+    ```json
+    "Kestrel": {
+        "EndPoints": {
+            "Http": {
+                "Url": "http://localhost:5050"
+            }
+        }
+    }
+    ```
+- On first run `titledb` will be downloaded, and the configuration screen will be shown first you need to set the paths to your library and prod.keys file.
 
 > [!NOTE]  
 > Please use absolute paths, relative paths might not work because the function to build paths is a little wonky for example `~/Library` will not work as expected on linux, as the final result will be `/ApplicationPath/~/Library` instead of `/home/user/Library`
 
 ## Docker
-- Download the latest release
+### GHCR
+- To run the container from the ghcr registry you need to mount the library folder, for example:
+  - `docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/roms/library,target=/app/library ghcr.io/ivaano/nsxlibrarymanager:latest` 
+- additionally you can also mount the following optional folders:
+  - renamer (used to put the files you want to rename that are not in the library) `--mount type=bind,source=/home/ivan/dumps,target=/app/renamer/in`
+  - backup (used to move titles when removing duplicates) `--mount type=bind,source=/home/ivan/backup,target=/app/backup`
+  - config (used to store app configuration) `--mount type=bind,source=/home/ivan/config,target=/app/config`
+  - data (used to store app databases) `--mount type=bind,source=/home/ivan/data,target=/app/data`
+
+### Manual
+- Download the latest release source
 - Extract the zip/gz file
 - build the image `docker build -t nsxlibrarymanager .`
-- you can mount the keys, titledb and library folders to the container, for example:
-  -`docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/nsxlib/keys,target=/app/keys --mount type=bind,source=/home/ivan/nsxlib/library,target=/app/library nsxlibrarymanager`
-
+- you need to mount the library folder folder to the container, for example mounting only the library folder:
+  -`docker run --name nsxlibrarymanager -p 8080:8080 --mount type=bind,source=/home/ivan/library,target=/app/library nsxlibrarymanager:latest`
+- additionally you can also mount the following optional folders:
+  - renamer (used to put the files you want to rename that are not in the library) `--mount type=bind,source=/home/ivan/dumps,target=/app/renamer/in`
+  - backup (used to move titles when removing duplicates) `--mount type=bind,source=/home/ivan/backup,target=/app/backup`
+  - config (used to store app configuration) `--mount type=bind,source=/home/ivan/config,target=/app/config`
+  - data (used to store app databases) `--mount type=bind,source=/home/ivan/data,target=/app/data`
 
  ## Usage
-- Run the `NsxLibraryManager.exe` file.
-- If you are running it for the first time, you will need to download the region, cnmts and version files.
-- Open your browser and go to [http://localhost:5000](http://localhost:5000).
-- On first run you will need to update titledb, go to Titledb and click on **Update Titledb** button.
-- After that, go to Library and click on **Reload Library**
-- If new files are added to your library, you can use the **Refresh Library** button to update the database.
-- Reload Library will drop the table and create it again.
-
+- Games
+  - List
+    - Used to quickly find a game in your library, you can see the name, publisher, size, titleId and the Icon image. 
+  - Card
+    - This is a compact list of the games in your library showing only the icon image, so you can browse through your library.
 > [!TIP]
-> To setup the port or the listening address, you can use the `--urls` parameter, for example `./NsxLibraryManager.exe --urls http://*:6666` will listen on any interface on port 6666.
+> You can filter by Name or TitleId.
+- Library
+  - Library Titles
+    - This is a list of all the titles in your library, its purpose is to show you all the files you have in your library, you can sort and filter by any field.
+    - Edit Selected
+      - This will allow you to edit the selected titles, you can add them to a collection, or remove them from a collection.
+    - Refresh Library
+      - This will search for files added or removed from the library and update the database.
+    - Reload Library
+      - This will clear the database and reanalyze all the files in your library.
+> [!CAUTION]
+> Reload Library will remove all the information in the database, including collections.
+  - Missing Updates
+    - This will show you all the games that don't have the latest update, as well as how many updates the title has. 
+  - Missing DLC
+    - This will show you all the games that have missing DLC.
+  - Missing DLC Updates
+    - This will show you all the games that have missing DLC updates.
+  - Collections
+    - Here you can view and create collections, to add games to a collection you need to do it on the library titles grid by selecting the games you want to add to a collection and clicking on edit selected, alternatively you can add use the edit button on each title row to add the title to a collection, when a title is added to a collection all related titles will be added too.
+> [!TIP]
+> the changes made to library titles grid, like column size columns shown. filters and sorting are saved to your browser local storage so you don't need to set them every time.
+- TitleDb
+  - This is a local copy of the titledb, you can search for a titleId and see all the information related to that titleId.
+- File Organizer
+  - Renamers: This are independant renamers that don't need any information from your library, they will rename the files based on file metadata and titledb information.
+    - By Package Type
+      - Useful to rename by content type (base, update, dlc). (all base in one folder, all updates in another, etc)
+    - By Bundle Type
+      - Useful to rename by titleId, grouping all related titles in one folder.
+  - Library: 
+    - Collection Renamer
+      - This organizes the files in your library based on the collection they are in.
+    - Duplicate Titles
+      - Find all the duplicate titles in your library.
+
 
 ## Screenshots
 ![Dashboard](./screenshots/dashboard.png)
@@ -74,13 +122,14 @@ that I could run on a server and access it from any device.
 ![DetailDlcUpdates](./screenshots/gamedetail-2.png)
 ![MissingDLC](./screenshots/missingdlc.png)
 ![MissingUpdates](./screenshots/missingupdates.png)
-![Renamer](./screenshots/renamer.png)
-![RenamerSettings](./screenshots/renamer-settings.png)
+![PackageRenamer](./screenshots/packagerenamer.png)
+![BundleRenamer](./screenshots/bundlerenamer.png)
+![LibraryRenamer](./screenshots/collectionrenamer.png)
 
 ## TODO
 - [x] Implement the file organizer.
-- [ ] Support more Regions.
-- [ ] Ability to add custom information to each title (favorite, rating).
+- [x] Support more Regions.
+- [x] Ability to add custom information to each title (favorite, rating).
 - [ ] Ability to download and store banners and screenshots locally.
 - [ ] Optimization.
 

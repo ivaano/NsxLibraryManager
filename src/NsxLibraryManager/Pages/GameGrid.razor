@@ -1,0 +1,50 @@
+﻿@page "/gameGrid"
+@using Microsoft.AspNetCore.Http.Extensions
+@using NsxLibraryManager.Extensions
+
+<RadzenCard>
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
+    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
+</RadzenCard>
+<RadzenStack>
+@{
+    var groupSize = 5; 
+    var gameList = _games.ToList(); 
+    var totalCards = _games.Count();
+}
+
+@for (var i = 0; i < totalCards; i += groupSize)
+{
+    var currentGroup = gameList.Skip(i).Take(groupSize);
+        <RadzenCardGroup Responsive="true" Style="padding-bottom: 3px">
+            @foreach (var game in currentGroup)
+            {
+                <RadzenCard Style="padding: 0; margin: 0" Variant="Variant.Outlined">
+                    @if (!string.IsNullOrEmpty(game.IconUrl))
+                    {
+                        <RadzenStack Orientation="Orientation.Horizontal" Style="max-width: 245px; padding: 0; margin: 0; min-width: 147px">
+                            <RadzenLink Path="@GetTitleUrl(game.ApplicationId)" Text="@game.TitleName" target="_blank">
+                                <RadzenImage Path="@game.IconUrl" Style="width: 100%; height: 100%;"/>
+                            </RadzenLink>
+                        </RadzenStack>
+                    }
+                    else
+                    {
+                        <RadzenStack Orientation="Orientation.Horizontal" Style="max-width: 245px; padding: 0; margin: 0; min-width: 147px">
+                            <RadzenLink Path="@GetTitleUrl(game.ApplicationId)" Text="@game.TitleName" target="_blank">
+                                <RadzenImage Path="images/no-image.jpg" Style="width: 100%; height: 100%; "/>
+                            </RadzenLink>
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal" Style="max-width: 245px; padding: 0; margin: 0; min-width: 147px">
+                            @game.TitleName
+                        </RadzenStack>
+                    }
+                </RadzenCard>
+            }
+        </RadzenCardGroup>
+}
+</RadzenStack>
+<RadzenPager @ref="@_pager" Density="@Density.Compact" ShowPagingSummary="true" PagingSummaryFormat="@_pagingSummaryFormat"
+             HorizontalAlign="HorizontalAlign.Right" Count="_count"
+             PageSize="@_pageSize" PageNumbersCount="5" PageChanged="@PageChanged"/>
+             

@@ -1,0 +1,36 @@
+﻿<RadzenStack AlignItems="AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
+    <RadzenImage Path="images/logo.png" style="width: 54px; height: 39px;"></RadzenImage>
+    <RadzenText Text="Nsx Library Manager" TextStyle="TextStyle.Subtitle1" class="rz-mb-0" />
+</RadzenStack>
+<RadzenPanelMenu DisplayStyle="MenuItemDisplayStyle.IconAndText" Multiple="false">
+    <RadzenPanelMenuItem Visible="@_initialConfig" Text="Dashboard" Icon="analytics" Path="/dashboard"/>
+    <RadzenPanelMenuItem Visible="@_initialConfig" Text="Games" Icon="sports_esports">
+        <RadzenPanelMenuItem Text="List" Icon="view_list" Path="gameList"/>
+        <RadzenPanelMenuItem Text="Card" Icon="apps" Path="gameGrid"/>
+    </RadzenPanelMenuItem>
+    <RadzenPanelMenuItem Visible="@_initialConfig" Text="Library" Icon="inventory_2">
+        <RadzenPanelMenuItem Text="Library Titles" Icon="library_books" Path="library"/>
+        <RadzenPanelMenuItem Text="Missing Updates" Icon="update" Path="MissingUpdates"/>
+        <RadzenPanelMenuItem Text="Missing DLC" Icon="deployed_code_history" Path="MissingDlc"/>
+        <RadzenPanelMenuItem Text="Missing DLC Updates" Icon="deployed_code_update" Path="MissingDlcUpdates"/>
+
+        <RadzenPanelMenuItem Text="Collections" Icon="library_add" Path="collections"/>
+        <RadzenPanelMenuItem Text="Ftp Transfers Status" Icon="publish" Path="FtpStatus"/>
+    </RadzenPanelMenuItem>
+    <RadzenPanelMenuItem Visible="@_initialConfig" Text="Title DB" Icon="archive" Path="titledb"/>
+    <RadzenPanelMenuItem Visible="@_initialConfig" Text="File Organizer" Icon="engineering">
+        <RadzenPanelMenuItem Text="Renamers" Icon="move_item">
+            <RadzenPanelMenuItem Text="By Package Type" Icon="package" Path="PackageRenamer"/>
+            <RadzenPanelMenuItem Text="By Bundle" Icon="package_2" Path="BundleRenamer"/>
+        </RadzenPanelMenuItem>
+        <RadzenPanelMenuItem Text="Library" Icon="category">
+            <RadzenPanelMenuItem Text="Collection Renamer" Icon="moved_location" Path="CollectionRenamer" MouseEnter="@(args => ShowTooltip(args, "This renamer will organize on your library files based on your collections.") )"/>
+            <RadzenPanelMenuItem Text="Duplicate Titles" Icon="content_copy" Path="DuplicateTitles" MouseEnter="@(args => ShowTooltip(args, "Find duplicate titles in your library.") )"/>
+        </RadzenPanelMenuItem>
+
+        <RadzenPanelMenuItem Visible="false" Text="Cleaner" Icon="cleaning_services" Path="cleaner"/>
+    </RadzenPanelMenuItem>
+    <RadzenPanelMenuItem Text="Settings" Icon="settings" Path="settings"/>
+
+</RadzenPanelMenu>
+

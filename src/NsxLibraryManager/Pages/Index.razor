@@ -1,0 +1,34 @@
+﻿@page "/"
+@using FluentValidation
+@using NsxLibraryManager.Services.Interface
+@using NsxLibraryManager.Shared.Settings
+<h3>Index</h3>
+
+@code {
+    [Inject] private IJSRuntime Js { get; set; } = default!;
+    [Inject] private ISettingsService SettingsService { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+    [Inject] private IValidator<UserSettings> ConfigValidator { get; set; } = default!;
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var appSettings = SettingsService.GetUserSettings();
+
+        if (appSettings.IsConfigured)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Js.InvokeVoidAsync("deleteAllCookies");
+            NavigationManager.NavigateTo("/settings");
+        }
+    }
+}

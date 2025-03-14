@@ -1,0 +1,161 @@
+﻿@page "/library"
+@using NsxLibraryManager.Extensions
+@using NsxLibraryManager.Shared.Dto
+<PageTitle>Nsx Library Manager</PageTitle>
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+        <RadzenRow Style="width: 100%">
+            <RadzenColumn Size="6">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Library Location: <strong>@_libraryPath</strong></RadzenText>
+            </RadzenColumn>
+            <RadzenColumn Size="6" Style="text-align: right">
+                <RadzenText TextStyle="TextStyle.Subtitle1"> <strong>@_baseCount</strong> Games, <strong>@_patchCount</strong> Updates and <strong>@_dlcCount</strong> DLCs in library </RadzenText>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
+        <RadzenDataGrid 
+            @ref="_grid"
+            @bind-Settings="@Settings"
+            TItem="LibraryTitleDto"
+            Data="@_libraryTitles"
+            LoadData="@LoadData"
+            AllowRowSelectOnRowClick="true"
+            SelectionMode="DataGridSelectionMode.Multiple"
+            @bind-Value="@_selectedTitles"
+            AllowColumnReorder="true"
+            PageSize="@_pageSize" 
+            PageSizeOptions="@_pageSizeOptions" 
+            PageSizeChanged="@(args => _pageSize = args)"
+            Count="@_count"
+            IsLoading="@_isLoading"
+            AllowColumnPicking="true"
+            ColumnsPickerAllowFiltering="true"
+            AllowSorting="true"
+            AllowPaging="true"
+            AllowFiltering="true"
+            FilterMode="FilterMode.SimpleWithMenu"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            AllowColumnResize="true" 
+            PagerHorizontalAlign="HorizontalAlign.Center" 
+            ColumnWidth="200px" 
+            ShowPagingSummary="true" 
+            style="height: 89vh">
+            <HeaderTemplate>
+                <RadzenSplitButton Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Light" AlwaysOpenPopup="true" DropDownIcon="keyboard_double_arrow_down" Click=@(args => OnClickActions(args, "Actions")) Text="Actions" Disabled="@ActionsDisabled">
+                    <ChildContent>
+                        <RadzenSplitButtonItem Text="Edit Selected" Value="EditSelected" Icon="edit"/>
+                        <RadzenSplitButtonItem Text="Send Selected to FTP" Value="FtpSelected" Icon="publish" />
+                        <RadzenSplitButtonItem Text="Clear Selection" Value="ClearSelected" Icon="clear_all" />
+                    </ChildContent>
+                </RadzenSplitButton> |
+                <RadzenButton Click="@(_ => RefreshLibrary())" Text="Refresh Library" ButtonStyle="ButtonStyle.Primary" class=".rz-shadow-2"/>
+                <RadzenButton Click="@(_ => ReloadLibrary())" Text="Reload Library" ButtonStyle="ButtonStyle.Danger" class=".rz-shadow-2"/>
+                <RadzenText TextStyle="TextStyle.Caption">Last updated @_lastUpdated</RadzenText>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Title="Select" UniqueID="Select" Width="60px" Sortable="false" Filterable="false" Visible="false" >
+                    <HeaderTemplate>
+                        <RadzenCheckBox TabIndex="-1" TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select all items" }})"
+                                        Value="@(_selectedTitles == null || _selectedTitles?.Any() != true ? false : !_libraryTitles.All(i => _selectedTitles.Contains(i)) ? null : _libraryTitles.Any(i => _selectedTitles.Contains(i)))"
+                                        Change="@(args => _selectedTitles = args == true ? _libraryTitles.ToList() : null)" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox TabIndex="-1" TriState="false" Value="@(_selectedTitles != null && _selectedTitles.Contains(data))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select item" }})"
+                                        TValue="bool" Change=@(args => { }) />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="ApplicationId" Title="Title Id" Width="150px"/>
+                <RadzenDataGridColumn Property="OtherApplicationId" Title="Other Application Id" Width="150px" Visible="false"/>
+                <RadzenDataGridColumn Property="TitleName" SortOrder="SortOrder.Ascending" Title="Name" Width="300px">
+                    <Template Context="libraryTitle">
+                        <RadzenLink href="javascript:void(0)" Text="@libraryTitle.TitleName" @onclick="_ => OpenDetails(libraryTitle)"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Version" Title="Version" Visible="false" Width="100px">
+                    <Template Context="libraryTitle">
+                        @{
+                            var shortVer = (libraryTitle.Version.ToString() ?? string.Empty).VersionShifted();
+                            @if (shortVer > 0)
+                            {
+                                <span>@libraryTitle.Version <span class="rz-text-caption">(@shortVer)</span></span>
+                            }
+                            else
+                            {
+                                <span>@libraryTitle.Version</span>
+                            }
+                        }
+
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Collection.Name" Title="Collection" Visible="false"/>
+
+                <RadzenDataGridColumn Property="Publisher" Title="Publisher"/>
+                <RadzenDataGridColumn Property="ContentType" Title="Type" Width="80px"/>
+                <RadzenDataGridColumn Property="Rating" Title="Age Rating" Visible="false" Width="80px">
+                    <Template Context="libraryTitle">
+                        @(libraryTitle?.Rating.AgeRating(AgeRatingAgency))
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="PackageType" Title="Package Type" Visible="false" Width="130px"/>
+                <RadzenDataGridColumn Property="FileName" Title="Filename" Width="250px">
+                    <Template Context="libraryTitle">
+                        <div style="white-space: normal; word-break: break-word; min-width: 0; max-height: 100px; overflow-y: auto;">
+                            @libraryTitle.FileName
+                        </div>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Categories" Title="Categories" Sortable="false" Filterable="true">
+                    <FilterTemplate>
+                        <RadzenDropDown @bind-Value="@_selectedCategories" Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Category" } })"
+                                        Change=@OnSelectedCategoriesChange Data="@(_categories)" AllowClear="true" Multiple="true"/>
+                    </FilterTemplate>
+                    <Template>
+                        @if (context.Categories is not null)
+                        {
+                            @string.Join(", ", context.Categories.Select(c => c.Name))
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Size" Title="Size" Width="100px">
+                    <Template Context="libraryTitle">
+                        @libraryTitle.Size.ToHumanReadableBytes();
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Region" Title="Region" Visible="false" Width="110px"/>
+                <RadzenDataGridColumn Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="110px"/>
+                <RadzenDataGridColumn Property="LastWriteTime" Title="Date Modified" FormatString="{0:d}" Visible="false" Width="110px"/>
+                <RadzenDataGridColumn Property="NumberOfPlayers" Title="Players" Width="50px" Visible="false"/>
+                <RadzenDataGridColumn Property="LatestVersion" Title="Latest Version" Visible="false" Width="50px">
+                    <Template Context="libraryTitle">
+                        @{
+                            var shortVer = (libraryTitle.LatestVersion.ToString() ?? string.Empty).VersionShifted();
+                            @if (shortVer > 0)
+                            {
+                                <span>@libraryTitle.LatestVersion <span class="rz-text-caption">(@shortVer)</span></span>
+                            }
+                            else
+                            {
+                                <span>@libraryTitle.LatestVersion</span>
+                            }
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="UserRating" Title="User Rating" Width="100px" Visible="false">
+                    <Template Context="libraryTitle">
+                        <RadzenRating TValue="int" Value="@libraryTitle.UserRating" Change=@(args => OnUserRatingChange(args, libraryTitle))  />
+
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="CreatedAt" Title="Created" Width="100px" Visible="false"/>
+                <RadzenDataGridColumn Property="UpdatedAt" Title="Last Updated" Width="100px" Visible="false"/>
+
+                <RadzenDataGridColumn Title="Edit" UniqueID="Edit" Visible="false" Reorderable="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right" Width="80px">
+                    <Template Context="libraryTitle">
+                        <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => EditRow(libraryTitle))" @onclick:stopPropagation="true"/>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenStack>

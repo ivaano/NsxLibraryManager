@@ -1,0 +1,62 @@
+﻿@using NsxLibraryManager.Shared.Settings
+@inject IHostEnvironment Env
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="icon" href="favicon.png" />
+    <link href="css/site.css" rel="stylesheet" />
+
+    <HeadOutlet @rendermode="InteractiveServer" />
+
+    <RadzenTheme Theme="standard-dark" @rendermode="InteractiveServer" />
+
+</head>
+<body class="rz-scrollbars">
+<Routes @rendermode="InteractiveServer" />
+
+<div id="blazor-error-ui" data-nosnippet>
+    @if (Env.IsDevelopment())
+    {
+        <text>
+            An unhandled exception has occurred. See browser dev tools for details.
+        </text>
+    }
+    else
+    {
+        <text>
+            An error has occurred. This app may no longer respond until reloaded.
+        </text>
+    }
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+<script src="js/nsxlibrarymanager.js"></script>
+<script src="_framework/blazor.web.js"></script>
+
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+</body>
+</html>
+@code {
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    [Inject]
+    private ThemeService? ThemeService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var theme = HttpContext?.Request.Cookies[AppConstants.ThemeCookie];
+
+        if (!string.IsNullOrEmpty(theme))
+        {
+            ThemeService?.SetTheme(theme, false);
+        }
+        
+    }
+}

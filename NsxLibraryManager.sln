@@ -1,12 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager", "NsxLibraryManager\NsxLibraryManager.csproj", "{29510E4F-B514-42CE-A410-1810E072AF6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager", "src\NsxLibraryManager\NsxLibraryManager.csproj", "{29510E4F-B514-42CE-A410-1810E072AF6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Core", "NsxLibraryManager.Core\NsxLibraryManager.Core.csproj", "{5B05680B-E816-47FB-B7D5-B0903693F866}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Core", "src\NsxLibraryManager.Core\NsxLibraryManager.Core.csproj", "{5B05680B-E816-47FB-B7D5-B0903693F866}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Utils", "NsxLibraryManager.Utils\NsxLibraryManager.Utils.csproj", "{FAD2D99E-5F68-44FB-8992-A441A9E8D443}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Utils", "src\NsxLibraryManager.Utils\NsxLibraryManager.Utils.csproj", "{FAD2D99E-5F68-44FB-8992-A441A9E8D443}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{25CADB3E-5069-4226-9773-A3E34DAA7F7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Contracts", "src\Common.Contracts\Common.Contracts.csproj", "{14C24CC3-66C0-4174-B399-03B0D8CED2F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Services", "src\Common.Services\Common.Services.csproj", "{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NsxLibraryManager.Shared", "src\NsxLibraryManager.Shared\NsxLibraryManager.Shared.csproj", "{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUnit", "tests\TestUnit\TestUnit.csproj", "{D31D7030-698D-40A4-89C0-20E1E2B99535}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIntegration", "tests\TestIntegration\TestIntegration.csproj", "{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,9 +37,25 @@ Global
 		{FAD2D99E-5F68-44FB-8992-A441A9E8D443}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAD2D99E-5F68-44FB-8992-A441A9E8D443}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FAD2D99E-5F68-44FB-8992-A441A9E8D443}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25CADB3E-5069-4226-9773-A3E34DAA7F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14C24CC3-66C0-4174-B399-03B0D8CED2F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC3384D6-9D8A-421C-BF8D-ADE4D90FE62E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D31D7030-698D-40A4-89C0-20E1E2B99535}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB70D8B5-6F86-48E1-BADD-F4388AF161F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

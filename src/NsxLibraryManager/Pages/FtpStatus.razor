@@ -1,0 +1,32 @@
+@page "/ftpStatus"
+@using NsxLibraryManager.Extensions
+@using NsxLibraryManager.Shared.Dto
+<RadzenDataGrid 
+    @ref="grid" 
+    Data="@data" 
+    TItem="FtpStatusGridDto"
+    AllowColumnResize="true"
+    AllowFiltering="false" 
+    AllowPaging="true" 
+    PageSize="100"
+    AllowSorting="false">
+    <Columns>
+        <RadzenDataGridColumn Property="TransferId" Title="Transfer Id" />
+        <RadzenDataGridColumn Property="Filename" Title="File Name" />
+        <RadzenDataGridColumn Property="ProgressPercentage" Title="Completed">
+            <Template Context="ftpStatus">
+                @($"{ftpStatus.ProgressPercentage:0.00}%")
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="TotalBytes" Title="Total Bytes">
+            <Template Context="ftpStatus">
+                @ftpStatus.TotalBytes.ToHumanReadableBytes()
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="TransferredBytes" Title="Transferred Bytes" >
+            <Template Context="ftpStatus">
+                @ftpStatus.TransferredBytes.ToHumanReadableBytes()
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>

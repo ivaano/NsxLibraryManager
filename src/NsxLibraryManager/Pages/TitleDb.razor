@@ -1,0 +1,118 @@
+﻿@page "/titledb"
+@using NsxLibraryManager.Extensions
+@using NsxLibraryManager.Shared.Dto
+<PageTitle>Title From DbTitle</PageTitle>
+<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Normal" Wrap="FlexWrap.NoWrap" Gap="1rem">
+
+        <RadzenDataGrid @ref="_grid" 
+                        IsLoading="@_isLoading"
+                        @bind-Settings="@Settings"
+                        TItem="LibraryTitleDto"
+                        LoadData="@LoadData"
+                        Data="@_titles"
+                        Count="@_count" 
+                        PageSize="@_pageSize"
+                        PageSizeOptions="@_pageSizeOptions" 
+                        PageSizeChanged="@(args => _pageSize = args)"
+                        AllowFiltering="true" 
+                        AllowColumnResize="true" 
+                        AllowAlternatingRows="false"
+                        FilterMode="FilterMode.Advanced" 
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        AllowSorting="true" 
+                        AllowPaging="true" 
+                        PagerHorizontalAlign="HorizontalAlign.Center"
+                        ShowPagingSummary="true" 
+                        ColumnWidth="200px" 
+                        AllowColumnPicking="true"
+                        LogicalFilterOperator="LogicalFilterOperator.And" 
+                        style="height: 90vh">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.Caption">Db Version: @_dbVersion - Last updated @_lastUpdated</RadzenText>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn 
+                    Property="ApplicationId" 
+                    Title="ContentType" 
+                    Width="90px" />
+                <RadzenDataGridColumn
+                    Property="OtherApplicationId"
+                    Title="Other Application Id"
+                    Width="90px" />
+                <RadzenDataGridColumn
+                    Property="ContentType"
+                    Title="Type"
+                    Width="90px" />
+                <RadzenDataGridColumn 
+                    Property="TitleName" 
+                    Title="Name" 
+                    Width="300px" >
+                    <Template Context="title">
+                        <RadzenLink href="javascript:void(0)" Text="@title.TitleName" @onclick="_ => OpenDetails(title)"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="NumberOfPlayers"
+                    Title="Players"
+                    Width="90px" />
+                <RadzenDataGridColumn
+                    Property="LatestVersion"
+                    Title="Version"
+                    Width="90px">
+                    <Template Context="title">
+                        @{
+                            var shortVer = (title.LatestVersion.ToString() ?? string.Empty).VersionShifted();
+                            @if (shortVer > 0)
+                            {
+                                <span>@title.LatestVersion <span class="rz-text-caption">(@shortVer)</span></span>
+                            }
+                            else
+                            {
+                                <span>@title.LatestVersion</span>
+                            }
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="Publisher"
+                    Title="Publisher"/>
+                <RadzenDataGridColumn Property="Categories" Title="Categories"  Sortable="false" Filterable="true">
+                    <FilterTemplate>
+                        <RadzenDropDown @bind-Value="@_selectedCategories" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Category" }})"
+                                        Change=@OnSelectedCategoriesChange Data="@(_categories)"  AllowClear="true" Multiple="true" />
+                    </FilterTemplate>
+                    <Template>
+                        @if (context.Categories is not null)
+                        {
+                            @string.Join(", ", context.Categories.Select(c => c.Name))
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="ReleaseDate"
+                    Title="Release Date"
+                    FormatString="{0:d}" 
+                    Width="110px" />
+                <RadzenDataGridColumn
+                    Property="Region"
+                    Title="Region"
+                    Width="110px" />
+                <RadzenDataGridColumn
+                    Property="Size"
+                    Title="Size"
+                    Width="90px" >
+                    <Template Context="title">
+                        @title.Size.ToHumanReadableBytes()
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="DlcCount"
+                    Title="DLC"
+                    Width="90px" />
+            </Columns>
+
+        </RadzenDataGrid>
+    </RadzenStack>
+</RadzenStack>

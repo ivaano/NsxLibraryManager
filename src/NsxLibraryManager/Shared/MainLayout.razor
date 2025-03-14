@@ -1,0 +1,19 @@
+﻿@inherits LayoutComponentBase
+@inject CookieThemeService CookieThemeService
+<RadzenComponents />
+
+<PageTitle>NsxLibraryManager</PageTitle>
+
+<RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+        <NavMenu></NavMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+            @Body
+    </RadzenBody>
+</RadzenLayout>
