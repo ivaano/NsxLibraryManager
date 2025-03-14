@@ -17,10 +17,16 @@ public class FtpClientService : IFtpClientService
         _backgroundService = serviceProvider.GetServices<IHostedService>().OfType<FtpBackgroundService>().First();
     }
 
-    public Task<Result<bool>> UploadFile(string localPath, string remotePath, string host, int port)
+    public Task<Result<bool>> QueueFileUpload(string localPath, string remotePath, string host, int port)
     {
         var resulta = _backgroundService.QueueFileUpload(localPath, remotePath, host, port);
         return Task.FromResult(Result.Success(true));
+    }
+
+    public async Task<Result<bool>> RemoveQueuedFileUpload(string queuedFileId)
+    {
+        var toca = _backgroundService.RemoveQueuedFileUpload(queuedFileId);
+        return Result.Success(true);
     }
 
     public Task<Result<List<FtpUploadRequest>>> GetQueuedFiles()

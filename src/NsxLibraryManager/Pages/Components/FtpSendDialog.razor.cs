@@ -28,6 +28,7 @@ public partial class FtpSendDialog : ComponentBase
     
     
     private FtpClientSettings _ftpClientSettings;
+    private bool _disableButtons = false;
     
     
     [Parameter]
@@ -43,12 +44,14 @@ public partial class FtpSendDialog : ComponentBase
         if (localPath is null) return Result.Failure<bool>("Invalid file path");
         var fileName = Path.GetFileName(localPath);
         var remotePath = string.Join("/", [_ftpClientSettings.RemotePath, fileName]);
-        var queueResult = await FtpClientService.UploadFile(localPath, remotePath, _ftpClientSettings.Host, _ftpClientSettings.Port);
+        var queueResult = await FtpClientService.QueueFileUpload(localPath, remotePath, _ftpClientSettings.Host, _ftpClientSettings.Port);
         return queueResult;
     }
     
     private async Task OnSubmit()
     {
+        _disableButtons = true;
+        await Task.Delay(1);
         await SettingsService.SaveFtpClientSettings(_ftpClientSettings);
         var queuedSuccessCount = 0;
         foreach (var title in SelectedTitles)

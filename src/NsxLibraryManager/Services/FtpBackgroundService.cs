@@ -9,8 +9,8 @@ public class FtpBackgroundService : BackgroundService
 {
     private readonly ILogger<FtpBackgroundService> _logger;
 
-    private readonly ConcurrentQueue<FtpUploadRequest> _uploadQueue = new ConcurrentQueue<FtpUploadRequest>();
-    private readonly SemaphoreSlim _signal = new SemaphoreSlim(0);
+    private readonly ConcurrentQueue<FtpUploadRequest> _uploadQueue = new();
+    private readonly SemaphoreSlim _signal = new(0);
     private readonly FtpStateService _stateService;
 
     public FtpBackgroundService(
@@ -76,6 +76,44 @@ public class FtpBackgroundService : BackgroundService
             _logger.LogError(ex, "Error queuing file for upload: {fileName}", filePath);
             throw;
         }
+    }
+
+    public bool RemoveQueuedFileUpload(string queuedFileId)
+    {
+        if (string.IsNullOrEmpty(queuedFileId))
+        {
+            _logger.LogWarning("Attempted to remove queued file with null or empty ID");
+            return false;
+        }
+
+        var found = false;
+        var tempQueue = new ConcurrentQueue<FtpUploadRequest>();
+    
+        while (_uploadQueue.TryDequeue(out var request))
+        {
+            if (request.Id != queuedFileId)
+            {
+                tempQueue.Enqueue(request);
+            }
+            else
+            {
+                found = true;
+                _logger.LogInformation("Removed queued file upload: {fileName}, ID: {id}", 
+                    request.FileName, request.Id);
+            }
+        }
+    
+        while (tempQueue.TryDequeue(out var request))
+        {
+            _uploadQueue.Enqueue(request);
+        }
+    
+        if (!_uploadQueue.IsEmpty && found)
+        {
+            _signal.Release();
+        }
+    
+        return found;
     }
 
     public List<FtpUploadRequest> GetUploadQueue()
