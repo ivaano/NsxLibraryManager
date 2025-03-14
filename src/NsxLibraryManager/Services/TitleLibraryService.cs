@@ -245,7 +245,7 @@ public class TitleLibraryService(
         
         if (_userSettings.UseEnglishNaming)
         {
-            if (LanguageChecker.IsNonEnglish(nsxLibraryTitle.TitleName))
+            if (LanguageChecker.IsNonEnglish(nsxLibraryTitle.TitleName) || LanguageChecker.IsNonEnglish(nsxLibraryTitle.Publisher))
             {
                 var applicationId = titledbTitle.ContentType switch
                 {
