@@ -13,6 +13,7 @@ using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 using NsxLibraryManager.Shared.Mapping;
 using NsxLibraryManager.Shared.Settings;
+using NsxLibraryManager.Utils;
 using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 namespace NsxLibraryManager.Services;
@@ -448,7 +449,7 @@ public class RenamerService(
         return Task.FromResult(newPath);
     }
 
-    private async Task<Result<LibraryTitleDto>> GetAggregatedFileInfo(string fileLocation)
+    private async Task<Result<LibraryTitleDto>> GetAggregatedFileInfo(string fileLocation, bool useEnglishNaming)
     {
         try
         {
@@ -475,15 +476,51 @@ public class RenamerService(
                 }
                 return Result.Success(fileInfo);
             }
-
             //prefer Name  from titledb instead of the file
             fileInfo.TitleName = titledbTitle.TitleName;
+
+            if (useEnglishNaming)
+            {
+                if (LanguageChecker.IsNonEnglish(fileInfo.TitleName))
+                {
+                    var applicationId = titledbTitle.ContentType switch
+                    {
+                        TitleContentType.Base => titledbTitle.ApplicationId,
+                        TitleContentType.Update => titledbTitle.OtherApplicationId,
+                        TitleContentType.DLC => titledbTitle.OtherApplicationId,
+                        _ => titledbTitle.ApplicationId
+                    };
+
+                    var nswName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == applicationId);
+                    if (nswName is not null)
+                    {
+                        if (titledbTitle.ContentType is TitleContentType.DLC)
+                        {
+                            var nswDlcName = _titledbDbContext.NswReleaseTitles.FirstOrDefault(x => x.ApplicationId == titledbTitle.ApplicationId);
+                            if (nswDlcName is not null)
+                            {
+                                fileInfo.TitleName = nswDlcName.TitleName;
+                            }
+                        }
+                        else
+                        {
+                            fileInfo.TitleName = nswName.TitleName;
+                        }
+                        fileInfo.Publisher = nswName.Publisher;
+                        fileInfo.OtherApplicationName = nswName.TitleName;
+                    }
+                }
+            }
+
+
             fileInfo.UpdatesCount = titledbTitle.UpdatesCount;
             fileInfo.DlcCount = titledbTitle.DlcCount;
 
             if (titledbTitle.ContentType == TitleContentType.Base
                 || string.IsNullOrEmpty(titledbTitle.OtherApplicationId)) return Result.Success(fileInfo);
 
+            if (fileInfo.OtherApplicationName is not null) return Result.Success(fileInfo);
+            
             var parentTitle = await _titledbDbContext.Titles.FirstOrDefaultAsync(t => t.ApplicationId == titledbTitle.OtherApplicationId);
             fileInfo.OtherApplicationName = parentTitle?.TitleName;
 
@@ -494,7 +531,7 @@ public class RenamerService(
             return Result.Failure<LibraryTitleDto>(e.Message);
         }
     }
-    
+
     public async Task<IEnumerable<RenameTitleDto>> GetFilesToRenameAsync(
         string inputPath, RenameType renameType, bool recursive = false)
     {
@@ -505,12 +542,19 @@ public class RenamerService(
         }
 
         var files = filesResult.Value;
-        
+        var useEnglishNaming = renameType switch
+        {
+            RenameType.PackageType => _packageRenamerSettings.UseEnglishNaming,
+            RenameType.Bundle => _bundleRenamerSettings.UseEnglishNaming,
+            RenameType.Collection => _collectionRenamerSettings.UseEnglishNaming,
+            _ => false
+        };
+
         var fileList = new List<RenameTitleDto>();
         foreach (var file in files)
         {
             logger.LogInformation("Analyzing {}", file);
-            var fileInfoResult = await GetAggregatedFileInfo(file);
+            var fileInfoResult = await GetAggregatedFileInfo(file, useEnglishNaming);
             if (fileInfoResult.IsFailure)
             {
                 fileList.Add(new RenameTitleDto

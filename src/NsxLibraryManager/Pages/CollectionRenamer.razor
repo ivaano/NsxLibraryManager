@@ -116,14 +116,22 @@
                                                    @onclick="@(args => OnTemplateFieldClick(TitlePackageType.BundleDlc, args))"
                                     />
                                 </RadzenFormField>
-                                <div class="rz-text-align-right">
-                                    <RadzenCheckBox Name="TitlesForceUppercase"
-                                                    @bind-Value="@_settings.TitlesForceUppercase" 
-                                                    MouseEnter="@(args => ShowTooltip("Convert TitleName and AppName to Title Case when renaming.", args) )"/>
-                                    <RadzenLabel Text="TitleName and AppName to TitleCase" 
-                                                 Component="TitlesForceUppercase"
-                                                 Style="margin-left: 8px; vertical-align: middle;"/>
-                                </div>
+                                <RadzenRow class="rz-text-align-center">
+                                    <RadzenColumn Size="6">
+                                        <RadzenCheckBox Name="UseEnglishNaming"
+                                                        @bind-Value="@_settings.UseEnglishNaming"
+                                                        MouseEnter="@(args => ShowTooltip("For titles in Asia regions (JP, CN, KO, HK) prefer Nswdb for title name", args) )"/>
+                                        <RadzenLabel Text="Try to use english naming." Component="UseEnglishNaming" Style="margin-left: 8px; vertical-align: middle;"/>
+                                    </RadzenColumn>
+                                    <RadzenColumn Size="6">
+                                        <RadzenCheckBox Name="TitlesForceUppercase"
+                                                        @bind-Value="@_settings.TitlesForceUppercase"
+                                                        MouseEnter="@(args => ShowTooltip("Convert TitleName and AppName to Title Case when renaming.", args) )"/>
+                                        <RadzenLabel Text="TitleName and AppName to TitleCase"
+                                                     Component="TitlesForceUppercase"
+                                                     Style="margin-left: 8px; vertical-align: middle;"/>
+                                    </RadzenColumn>
+                                </RadzenRow>
                             </RenamerFieldSet>
                             <RadzenRow Style="margin-top: .5rem;" JustifyContent="JustifyContent.Center">
                                 <RadzenButton Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Light" Click="@LoadDefaultTemplate" class="rz-ripple">Default Configuration</RadzenButton>

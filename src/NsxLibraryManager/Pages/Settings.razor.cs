@@ -14,8 +14,8 @@ namespace NsxLibraryManager.Pages;
 
 public partial class Settings
 {
-    
     [Inject] private ISettingsService SettingsService { get; set; } = default!;
+    [Inject] private TooltipService TooltipService { get; set; } = default!;
     [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private IValidator<UserSettings> UserSettingsValidator { get; set; } = default!;
@@ -259,6 +259,9 @@ public partial class Settings
     {
         NotificationService.Notify(message);
     }
+    
+    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null!) => 
+        TooltipService.Open(elementReference, message, options);
 }
 
 

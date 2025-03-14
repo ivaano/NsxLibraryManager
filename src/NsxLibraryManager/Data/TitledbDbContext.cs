@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
 using NsxLibraryManager.Models.Titledb;
 using Version = NsxLibraryManager.Models.Titledb.Version;
 
@@ -9,7 +7,6 @@ namespace NsxLibraryManager.Data;
 
 public class TitledbDbContext : DbContext
 {
-    //private readonly UserSettings _configuration;
     public DbSet<Title> Titles { get; set; }
     public DbSet<Screenshot> Screenshots { get; set; }
     public DbSet<Cnmt> Cnmts { get; set; }
@@ -24,6 +21,8 @@ public class TitledbDbContext : DbContext
     public DbSet<RatingContent> RatingContents { get; set; }
     public DbSet<TitleRatingContent> TitleRatingContents { get; set; }
     public DbSet<History> History { get; set; }
+    public DbSet<NswReleaseTitle> NswReleaseTitles { get; set; }
+
 
     public TitledbDbContext(DbContextOptions<TitledbDbContext> options) :
         base(options)

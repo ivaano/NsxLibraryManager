@@ -16,7 +16,8 @@ public class UserSettings
     public string ConsoleKeys { get; set; } = string.Empty;
     public string UiTheme { get; set; } = string.Empty;
     public bool IsConfigured { get; set; }
-
+    
+    public bool UseEnglishNaming { get; set; } = true;
     public AgeRatingAgency AgeRatingAgency { get; set; } = AgeRatingAgency.Esrb;
 
     public required DownloadSettings DownloadSettings { get; set; }

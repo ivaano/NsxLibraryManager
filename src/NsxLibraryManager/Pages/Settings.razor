@@ -3,11 +3,6 @@
 <PageTitle>Settings</PageTitle>
 <RadzenRow>
     <RadzenColumn Size="12">
-        <RadzenText Text="Settings" TextStyle="TextStyle.H3" TagName="TagName.H1"/>
-    </RadzenColumn>
-</RadzenRow>
-<RadzenRow>
-    <RadzenColumn Size="12">
         @if (Configuration.GetValue<string>("IsDefaultConfigCreated") == "True")
         {
             <RadzenText Text="Default configuration created"/>
@@ -77,9 +72,9 @@
                             </RadzenStack>
                             <RadzenStack>
                                 <RadzenText TextStyle="TextStyle.Caption">Missing keys will be derived from existing keys if possible,
-                                    keys are necessary to read the nsp packages, if no keys are provided we will try to load them from the path @_homeDirKeysFilePath
-                                    if we dont find a keys there thw system will rely on the file name to get the title info from titledb, but any operation that needs to identify a title
-                                    will be severily limited. Most of the time prod.keys is enough to get the package info.</RadzenText>
+                                    keys are necessary to read the nsp packages, if no keys are provided system will try to load them from the path @_homeDirKeysFilePath
+                                    if no keys are found there either the file name will be used to get the title info from titledb, but any operation that needs to identify a title
+                                    will be limited. Most of the time prod.keys is enough to get the package info.</RadzenText>
                             </RadzenStack>
                         </RadzenColumn>
                         <RadzenColumn Size="6">
@@ -136,6 +131,25 @@
                                 </RadzenFormField>
                             </RadzenStack>
                         </RadzenColumn>
+                    </RadzenRow>
+                </RadzenFieldset>
+                <RadzenFieldset Text="Library settings">
+                    <RadzenRow>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenRow>
+                                <RadzenColumn Size="6">
+                                    <RadzenSwitch Name="UseEnglishNaming" @bind-Value="@_config.UseEnglishNaming" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" MouseEnter="@(args => ShowTooltip("For titles in Asia regions (JP, CN, KO, HK) prefer Nswdb for title name", args))"/>
+                                    <RadzenLabel Text="Try to use english naming." Component="UseEnglishNaming" Style="margin-left: 8px; vertical-align: middle;"/>
+                                </RadzenColumn>
+                                <RadzenColumn Size="6">
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenRow class="rz-text-align-center">
+                            </RadzenRow>
+                        </RadzenColumn>
+
                     </RadzenRow>
                 </RadzenFieldset>
             </RadzenStack>

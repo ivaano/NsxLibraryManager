@@ -37,7 +37,7 @@ public class LibraryTitleDto
     public AccuratePackageType PackageType { get; set; }
     public int? PatchNumber { get; set; }
     public string? PatchTitleId { get; set; }
-    public string? Publisher { get; init; }
+    public string? Publisher { get; set; }
     public int? Rating { get; init; }
     public IEnumerable<RatingContentDto>? RatingsContent { get; init; }
     public DateTime? ReleaseDate { get; init; }

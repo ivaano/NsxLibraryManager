@@ -7,7 +7,7 @@ using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages;
 
-public partial class FtpStatus : ComponentBase
+public partial class FtpStatus : ComponentBase, IDisposable
 {
     RadzenDataGrid<FtpStatusGridDto> grid;
     
@@ -19,7 +19,8 @@ public partial class FtpStatus : ComponentBase
 
     private IEnumerable<FtpStatusGridDto> data { get; set; }
     
-
+    private System.Timers.Timer _refreshTimer;
+    private bool _disposed = false;
 
     private async Task RefreshData()
     {
@@ -63,14 +64,13 @@ public partial class FtpStatus : ComponentBase
         data = gridData.AsEnumerable();
     }
     
-    
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         await RefreshData();       
-        var timer = new System.Timers.Timer(1000);
-        timer.Elapsed += async (s, e) =>
+        _refreshTimer = new System.Timers.Timer(1000);
+        _refreshTimer.Elapsed += async (s, e) =>
         {
             await InvokeAsync(async () =>
             {
@@ -80,8 +80,24 @@ public partial class FtpStatus : ComponentBase
             });
         };
 
-        timer.Start();
+        _refreshTimer.Start();
     }
-    
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            _refreshTimer?.Stop();
+            _refreshTimer?.Dispose();
+        }
+
+        _disposed = true;
+    }
 }
