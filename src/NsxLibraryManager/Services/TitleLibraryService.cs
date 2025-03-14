@@ -808,7 +808,6 @@ public class TitleLibraryService(
             var addTitleResult = await AddLibraryTitleAsync(title);
             if (addTitleResult.IsFailure) return Result.Failure<int>(removeResult.Error!);
             return Result.Success(1);
-
         }
 
         var libraryTitle = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.Id == title.Id);
