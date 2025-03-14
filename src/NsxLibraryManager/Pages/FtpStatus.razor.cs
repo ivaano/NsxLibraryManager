@@ -83,6 +83,11 @@ public partial class FtpStatus : ComponentBase, IDisposable
         _refreshTimer.Start();
     }
 
+    private async Task DeleteUpload(string transferId)
+    {
+        var deleteResult = await FtpClientService.RemoveQueuedFileUpload(transferId);
+    }
+
     public void Dispose()
     {
         Dispose(true);
