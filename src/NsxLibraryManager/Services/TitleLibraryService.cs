@@ -122,6 +122,7 @@ public class TitleLibraryService(
 
     public async Task<bool> DropLibrary()
     {
+        await fileInfoService.DeleteIconDirectoryFiles();
         await _nsxLibraryDbContext.Screenshots.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.Versions.ExecuteDeleteAsync();
         await _nsxLibraryDbContext.Titles.ExecuteDeleteAsync();
@@ -159,7 +160,7 @@ public class TitleLibraryService(
         if (titledbTitle is null)
         {
             var metaFromFileName = await fileInfoService.GetFileInfoFromFileName(libraryTitle.FileName!);
-
+            
             nsxLibraryTitle.TitleName = string.IsNullOrEmpty(libraryTitle.TitleName)
                 ? metaFromFileName.TitleName
                 : libraryTitle.TitleName;
@@ -186,11 +187,17 @@ public class TitleLibraryService(
                 };
             }
 
+            var iconUrl = libraryTitle.IconUrl;
+            if (nsxLibraryTitle.ContentType == TitleContentType.Base)
+            { 
+                iconUrl = await fileInfoService.GetFileIcon(libraryTitle.FileName!);
+            }
+
             nsxLibraryTitle.BannerUrl = libraryTitle.BannerUrl;
             nsxLibraryTitle.Description = libraryTitle.Description;
             nsxLibraryTitle.Developer = libraryTitle.Developer;
             nsxLibraryTitle.DlcCount = libraryTitle.DlcCount ?? 0;
-            nsxLibraryTitle.IconUrl = libraryTitle.IconUrl;
+            nsxLibraryTitle.IconUrl = iconUrl;
             nsxLibraryTitle.Intro = libraryTitle.Intro;
             nsxLibraryTitle.LastWriteTime = libraryTitle.LastWriteTime;
             nsxLibraryTitle.NsuId = libraryTitle.NsuId;
@@ -203,14 +210,6 @@ public class TitleLibraryService(
             nsxLibraryTitle.ReleaseDate = libraryTitle.ReleaseDate;
             nsxLibraryTitle.Size = metaFromFileName.Size;
             nsxLibraryTitle.Version = libraryTitle.Version;
-
-           
-            /*
-            if (libraryTitle.Type == TitleLibraryType.Base)
-            {
-                title.IconUrl = await _fileInfoService.GetFileIcon(libraryTitle.FileName);
-            }
-            */
             return nsxLibraryTitle;
         }
 

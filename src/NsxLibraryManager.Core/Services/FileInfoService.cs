@@ -251,9 +251,6 @@ public class FileInfoService : IFileInfoService
         return title;
     }
 
-
-
-
     public IEnumerable<string> GetDirectoryFiles(string filePath)
     {
         var files = Directory.GetFiles(filePath);
@@ -286,17 +283,38 @@ public class FileInfoService : IFileInfoService
         if (packageInfo.Contents is null)
             throw new Exception("No contents found in the package");
 
-        if (packageInfo.Contents.Icon is not null)
-        {
-            var fileName = Guid.NewGuid() + ".jpg";
-            var path = Path.Combine("images", "icon");
-            var iconPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", path, fileName);
-            await File.WriteAllBytesAsync(iconPath, packageInfo.Contents.Icon);
-            iconUri = $"images/icon/{fileName}";
-        }
+        if (packageInfo.Contents.Icon is null) return iconUri;
+        var guid = Guid.NewGuid();
+        var fileName = guid.ToString("N") + ".jpg";
+        var path = Path.Combine("images", "icon");
+        var iconPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", path, fileName);
+        await File.WriteAllBytesAsync(iconPath, packageInfo.Contents.Icon);
+        iconUri = $"images/icon/{fileName}";
         return iconUri;
     }
-    
+
+    public Task<Result<bool>> DeleteIconDirectoryFiles()
+    {
+        var path = Path.Combine("images", "icon");
+        var iconPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", path);
+        var iconFiles = Directory.GetFiles(iconPath);
+        var deleteSuccess = true;
+        foreach (var iconFile in iconFiles)
+        {
+            try
+            {
+                File.Delete(iconFile);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to delete icon file {iconFile} - {e.Message}");
+                deleteSuccess = false;
+            }
+        }
+
+        return Task.FromResult(deleteSuccess ? Result.Success(deleteSuccess) : Result.Failure<bool>("Failed to delete icon files"));
+    }
+
     public Task<Result<LibraryTitleDto>> GetFileInfo(string filePath, bool detailed)
     {
         PackageInfo packageInfo;

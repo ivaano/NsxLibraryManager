@@ -20,4 +20,5 @@ public interface IFileInfoService
 
     Task<long> GetFileSize(string filePath);
     Task<string?> GetFileIcon(string filePath);
+    Task<Result<bool>> DeleteIconDirectoryFiles();
 }
