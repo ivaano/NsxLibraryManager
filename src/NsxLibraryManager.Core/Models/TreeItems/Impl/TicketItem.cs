@@ -1,8 +1,8 @@
-﻿using LibHac.Fs;
-using LibHac.Fs.Fsa;
-using LibHac.FsSystem;
+﻿using System;
+using LibHac.Fs;
 using LibHac.Spl;
 using LibHac.Tools.Es;
+using LibHac.Tools.Fs;
 
 namespace NsxLibraryManager.Core.Models.TreeItems.Impl;
 
@@ -10,12 +10,10 @@ public class TicketItem : PartitionFileEntryItemBase
 {
     private readonly Ticket _ticket;
 
-    public TicketItem(Ticket ticket, PartitionFileEntry partitionFileEntry, IFile file, PartitionFileSystemItemBase parentItem) : base(partitionFileEntry, file, parentItem)
+    public TicketItem(Ticket ticket, DirectoryEntryEx ticketFileEntry, PartitionFileSystemItemBase parentItem) : base(ticketFileEntry, parentItem)
     {
         _ticket = ticket ?? throw new ArgumentNullException(nameof(ticket));
     }
-
-    public override IEnumerable<IItem> ChildItems { get { yield break; } }
 
     public override string Format => nameof(Ticket);
 

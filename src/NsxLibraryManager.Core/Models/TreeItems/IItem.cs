@@ -24,13 +24,8 @@ public interface IItem : IDisposable
     /// <summary>
     /// Get the direct child items
     /// </summary>
-    IEnumerable<IItem> ChildItems { get; }
+    IReadOnlyList<IItem> ChildItems { get; }
         
-    /// <summary>
-    /// Returns true if an error exists in descendants
-    /// </summary>
-    bool HasErrorInDescendants { get; }
-
     /// <summary>
     /// Get the name of the wrapped LibHac object
     /// </summary>
@@ -45,5 +40,10 @@ public interface IItem : IDisposable
     /// Occurred errors related to this item
     /// </summary>
     IItemErrors Errors { get; }
+
+    /// <summary>
+    /// Get the errors of all descendants excluding errors of this item
+    /// </summary>
+    IReadOnlyList<ItemError> DescendantErrors { get; }
 
 }

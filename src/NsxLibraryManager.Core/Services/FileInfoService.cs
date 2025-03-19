@@ -24,13 +24,16 @@ public class FileInfoService : IFileInfoService
     private const string TitleFilePattern = @"^(.*?)(?:\s*\[(DLC.*?)\])?\s*\[([0-9a-fA-F]+)\]\[v(\d+)\]";
     const string TitleIdPattern = @"\[([0-9A-F]{16})\]";
     const string TitleNamePattern = @"^(.*?)(?:\s*\[)";
+    private readonly IFileLoader _fileLoader;
 
     public FileInfoService(
+            IFileLoader fileLoader,
             IPackageInfoLoader packageInfoLoader, 
             ILogger<FileInfoService> logger)
     {
         _packageInfoLoader = packageInfoLoader ?? throw new ArgumentNullException(nameof(packageInfoLoader));
         _logger = logger;
+        _fileLoader = fileLoader ?? throw new ArgumentNullException(nameof(fileLoader));
     }
 
     public Task<bool> IsDirectoryEmpty(string? path)
@@ -317,6 +320,7 @@ public class FileInfoService : IFileInfoService
 
     public Task<Result<LibraryTitleDto>> GetFileInfo(string filePath, bool detailed)
     {
+        var caco = _fileLoader.Load(filePath);
         PackageInfo packageInfo;
         try
         {

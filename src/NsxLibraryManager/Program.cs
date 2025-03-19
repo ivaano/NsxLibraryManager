@@ -84,7 +84,11 @@ if (validatorResult.valid)
     builder.Services.AddScoped<IValidator<PackageRenamerSettings>, RenamerSettingsValidator>();    
     builder.Services.AddScoped<IValidator<BundleRenamerSettings>, BundleSettingsValidator>();    
     builder.Services.AddScoped<IValidator<CollectionRenamerSettings>, CollectionSettingsValidator>();    
-    builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    
+    builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();
+
+    builder.Services.AddTransient<IFileLoader, FileLoader>();
+    builder.Services.AddTransient<IFileItemLoader, FileItemLoader>();
+    builder.Services.AddSingleton<IFileOverviewLoader, FileOverviewLoader>();
 }
 builder.Services.AddControllersWithViews();
 
