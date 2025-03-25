@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Settings;
 using Radzen;
 using Radzen.Blazor;
@@ -16,11 +17,20 @@ public partial class Settings
 {
     [Inject] private ISettingsService SettingsService { get; set; } = default!;
     [Inject] private TooltipService TooltipService { get; set; } = default!;
-    [Inject] private IHostApplicationLifetime ApplicationLifetime  { get; set; } = default!;
+    [Inject] private IHostApplicationLifetime ApplicationLifetime { get; set; } = default!;
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private IValidator<UserSettings> UserSettingsValidator { get; set; } = default!;
     [Inject] private NotificationService NotificationService { get; set; } = default!;
     [Inject] private ThemeService ThemeService { get; set; } = default!;
+    [Inject] private ITitleLibraryService TitleLibraryService { get; set; } = null!;
+    
+    private RadzenDataGrid<LibraryLocationDto> _additionalLibraryPathsGrid = null!;
+    private IEnumerable<LibraryLocationDto> _libraryLocationData = null!;
+    private bool _isLoading;
+    private int _count;
+    private bool _newRecordInsertDisabled;
+    
+    private IEnumerable<CollectionDto> _collections = null!;
 
 
     private UserSettings _config = default!;
@@ -29,11 +39,11 @@ public partial class Settings
     private RadzenUpload _uploadDd = default!;
     private string _homeDirKeysFilePath = string.Empty;
     private string _theme = string.Empty;
-    
+
     private readonly Dictionary<string, string> _validationErrors = new()
     {
         { "TitleDatabase", string.Empty },
-        { "ProdKeys", string.Empty},
+        { "ProdKeys", string.Empty },
         { "LibraryPath", string.Empty },
         { "BackupPath", string.Empty },
         { "DownloadSettings.TitleDbPath", string.Empty },
@@ -43,7 +53,7 @@ public partial class Settings
         { "DownloadSettings.TimeoutInSeconds", string.Empty },
         { "DownloadSettings.Regions", string.Empty }
     };
-    
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -54,9 +64,10 @@ public partial class Settings
             _databaseFieldDisabled = false;
             ShowNotification(new NotificationMessage
             {
-                Severity = NotificationSeverity.Warning, 
-                Summary = "Default configuration created", 
-                Detail = "A default config.json file has been created, set the correct paths for the application to work.", 
+                Severity = NotificationSeverity.Warning,
+                Summary = "Default configuration created",
+                Detail =
+                    "A default config.json file has been created, set the correct paths for the application to work.",
                 Duration = 60000
             });
         }
@@ -74,34 +85,39 @@ public partial class Settings
                     _validationErrors.TryGetValue(failure.PropertyName, out var value)
                         ? $"{value} {failure.ErrorMessage}"
                         : failure.ErrorMessage;
-                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Configuration Error", Detail = failure.ErrorMessage, Duration = 3000 });
+                ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error, Summary = "Configuration Error",
+                    Detail = failure.ErrorMessage, Duration = 3000
+                });
             }
         }
+
         return _validationResult.IsValid;
     }
-    
+
     private void ChangeTheme(string value)
     {
         ThemeService.SetTheme(value);
         _config.UiTheme = value;
     }
-    
+
     private async Task SaveConfiguration()
     {
         var validateFields = await ValidateFields();
         if (!validateFields) return;
-        
+
         SettingsService.SaveUserSettings(_config);
         ShowNotification(new NotificationMessage
         {
-            Severity = NotificationSeverity.Success, 
-            Summary = "Configuration Saved!", 
-            Detail = "Settings have been saved.", 
+            Severity = NotificationSeverity.Success,
+            Summary = "Configuration Saved!",
+            Detail = "Settings have been saved.",
             Duration = 4000
         });
     }
-    
-    private void LoadConfiguration()
+
+    private async Task LoadConfiguration()
     {
         _config = SettingsService.GetUserSettings();
         var homeUserFolder = PathHelper.HomeUserDir;
@@ -109,6 +125,8 @@ public partial class Settings
         {
             _homeDirKeysFilePath = Path.Combine(homeUserFolder, ".switch").ToFullPath();
         }
+
+        await LoadLibraryPathData();
     }
 
     private void OnUploadProgress(UploadProgressArgs args, string name)
@@ -138,30 +156,31 @@ public partial class Settings
             {
                 ShowNotification(new NotificationMessage
                 {
-                    Severity = NotificationSeverity.Success, 
-                    Summary = "Import Success!", 
-                    Detail = $"{importResult.Value} records updated", 
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Import Success!",
+                    Detail = $"{importResult.Value} records updated",
                     Duration = 20000,
-                    CloseOnClick = true 
+                    CloseOnClick = true
                 });
             }
+
             StateHasChanged();
         }
         catch (JsonException ex)
         {
             ShowNotification(new NotificationMessage
             {
-                Severity = NotificationSeverity.Error, 
-                Summary = "Upload Error", 
-                Detail = ex.Message, 
+                Severity = NotificationSeverity.Error,
+                Summary = "Upload Error",
+                Detail = ex.Message,
                 Duration = 20000,
-                CloseOnClick = true 
+                CloseOnClick = true
             });
         }
-        LoadConfiguration();
 
+        LoadConfiguration();
     }
-    
+
     private void OnUploadKeysComplete(UploadCompleteEventArgs args)
     {
         var options = new JsonSerializerOptions
@@ -184,21 +203,22 @@ public partial class Settings
                     CloseOnClick = true
                 });
             }
+
             StateHasChanged();
         }
         catch (JsonException ex)
         {
             ShowNotification(new NotificationMessage
             {
-                Severity = NotificationSeverity.Error, 
-                Summary = "Upload Error", 
-                Detail = ex.Message, 
+                Severity = NotificationSeverity.Error,
+                Summary = "Upload Error",
+                Detail = ex.Message,
                 Duration = 20000,
-                CloseOnClick = true 
+                CloseOnClick = true
             });
         }
-        LoadConfiguration();
 
+        LoadConfiguration();
     }
 
     private void OnUploadError(UploadErrorEventArgs args)
@@ -222,14 +242,14 @@ public partial class Settings
         {
             errorDetail = e.Message;
         }
-        
+
         ShowNotification(new NotificationMessage
         {
-            Severity = NotificationSeverity.Error, 
-            Summary = summary, 
-            Detail = errorDetail, 
+            Severity = NotificationSeverity.Error,
+            Summary = summary,
+            Detail = errorDetail,
             Duration = 20000,
-            CloseOnClick = true 
+            CloseOnClick = true
         });
     }
 
@@ -248,7 +268,7 @@ public partial class Settings
             LoadConfiguration();
         }
     }
-   
+
     private Task ReloadApp()
     {
         ApplicationLifetime.StopApplication();
@@ -259,14 +279,104 @@ public partial class Settings
     {
         NotificationService.Notify(message);
     }
+
+    private async void OnUpdateRow(LibraryLocationDto libraryLocationDto)
+    {
+    }
     
-    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null!) => 
+    private async void OnCreateRow(LibraryLocationDto libraryLocationDto)
+    {
+        CancelEdit(libraryLocationDto);
+
+        ShowNotification(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Error, 
+            Summary = "Error Adding Collection", 
+            Detail = "detail", 
+            Duration = 4000
+        });
+    }
+    
+    private async Task LoadLibraryPathData()
+    {
+        _isLoading = true;
+        var result = await TitleLibraryService.GetCollections();
+        if (result.IsSuccess)
+        {
+            _collections = result.Value;
+        }
+        else
+        {
+            _collections = [];
+        }
+
+        _libraryLocationData = [];
+        _count = 0;
+        _isLoading = false;
+    }
+    
+    private async Task InsertRow()
+    {
+        if (!_additionalLibraryPathsGrid.IsValid) return;
+        var libraryLocation = new LibraryLocationDto();
+        _newRecordInsertDisabled = true;
+        await _additionalLibraryPathsGrid.InsertRow(libraryLocation);
+    }
+    
+    private async Task InsertNewLibraryLocation(LibraryLocationDto row)
+    {
+        if (!_additionalLibraryPathsGrid.IsValid) return;
+        _newRecordInsertDisabled = true;
+        var libraryLocation = new LibraryLocationDto();
+        await _additionalLibraryPathsGrid.InsertAfterRow(libraryLocation, row);
+    }
+    
+    private async Task EditLibraryLocation(LibraryLocationDto libraryLocation)
+    {
+        if (!_additionalLibraryPathsGrid.IsValid) return;
+        await _additionalLibraryPathsGrid.EditRow(libraryLocation);
+    }
+    
+    private async Task DeleteLibraryLocation(LibraryLocationDto libraryLocation)
+    {
+        if (_libraryLocationData.Contains(libraryLocation))
+        {
+            /*
+            var result = await TitleLibraryService.RemoveCollection(collectionDto);
+            if (result.IsSuccess)
+            {
+                await LoadData();
+            }
+            else
+            {
+                CancelEdit(collectionDto);
+                ShowNotification(
+                    NotificationSeverity.Error, 
+                    "Error Adding Collection", 
+                    result.Error ?? "Unknown Error");
+            }
+            */
+        }
+        else
+        {
+            _additionalLibraryPathsGrid.CancelEditRow(libraryLocation);
+        }
+
+        await _additionalLibraryPathsGrid.Reload();
+    }
+    
+    
+    private void CancelEdit(LibraryLocationDto libraryLocation)
+    {
+        _newRecordInsertDisabled = false;
+        _additionalLibraryPathsGrid.CancelEditRow(libraryLocation);
+    }
+    
+    private async Task SaveNewLibraryLocation(LibraryLocationDto libraryLocation)
+    {
+        await _additionalLibraryPathsGrid.UpdateRow(libraryLocation);
+    }
+
+    private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null!) =>
         TooltipService.Open(elementReference, message, options);
-}
-
-
-
-public class Region
-{
-    public string Name { get; set; } = string.Empty;
 }
