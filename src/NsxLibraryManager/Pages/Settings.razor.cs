@@ -290,13 +290,13 @@ public partial class Settings
         NotificationService.Notify(message);
     }
 
-    private async void OnUpdateLibraryLocationRow(LibraryLocation libraryLocation)
+    private void OnUpdateLibraryLocationRow(LibraryLocation libraryLocation)
     {
         _config.LibraryLocations.Add(libraryLocation);
         _newRecordInsertDisabled = false;
     }
     
-    private async void OnCreateLibraryLocationRow(LibraryLocation libraryLocation)
+    private void OnCreateLibraryLocationRow(LibraryLocation libraryLocation)
     {
         _config.LibraryLocations.Add(libraryLocation);
         _newRecordInsertDisabled = false;

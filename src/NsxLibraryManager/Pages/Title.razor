@@ -1,5 +1,6 @@
 ﻿@page "/Title/{titleId}"
 @using NsxLibraryManager.Extensions
+@using NsxLibraryManager.Shared.Dto
 
 
 <PageTitle>Title</PageTitle>
@@ -55,7 +56,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitleDto?.Categories.ListCategories())" TextStyle="TextStyle.Body1"/>
+                <RadzenText Text="@((LibraryTitleDto?.Categories ?? Array.Empty<CategoryDto>()).ListCategories())" TextStyle="TextStyle.Body1"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -115,7 +116,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitleDto?.Languages.Select(x => x.LanguageCode).ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
+                <RadzenText Text="@((LibraryTitleDto?.Languages ?? Array.Empty<LanguageDto>()).Select(x => x.LanguageCode).ListToString())" TextStyle="TextStyle.Body1" Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
         <RadzenRow Style="padding-bottom: 5px">
@@ -193,7 +194,7 @@
             <Items>
                 @if (LibraryTitleDto?.Screenshots is not null)
                 {
-                    @foreach (var screenshot in LibraryTitleDto?.Screenshots)
+                    @foreach (var screenshot in LibraryTitleDto?.Screenshots!)
                     {
                         <RadzenCarouselItem>
                                 <RadzenImage Path="@screenshot.Url" class="rz-h-100"/>
