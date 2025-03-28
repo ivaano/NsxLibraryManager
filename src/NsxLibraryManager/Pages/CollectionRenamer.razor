@@ -3,7 +3,7 @@
 @using NsxLibraryManager.Shared.Dto
 @using NsxLibraryManager.Shared.Enums
 
-<RadzenTabs @bind-SelectedIndex="@selectedTabIndex">
+<RadzenTabs @bind-SelectedIndex="@selectedTabIndex" Change="@OnChangeTab">
     <Tabs>
         <RadzenTabsItem Text="Renamer">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Gap="1rem">
@@ -49,12 +49,8 @@
                             <RenamerFieldSet Text="Input">
                                 <RadzenFormField Text="Input Path (Library Path)" Variant="@Variant" Style="width: 100%; padding: 1px">
                                     <ChildContent>
-                                        <RadzenTextBox 
-                                            @bind-Value="@_settings.InputPath" 
-                                            id="InputPath" 
-                                            Name="InputPath" 
-                                            Disabled="true" 
-                                            Style="font-family: monospace;" />
+                                        <RadzenDropDown @bind-Value="@_settings.InputPath" Data="@_libraryLocations" TextProperty="Path" ValueProperty="Path" Style="width: 100%;" Name="DropDownInputPath" />
+
                                     </ChildContent>
                                     <Helper>
                                         <div class="rz-message rz-messages-error ">@_validationErrors["InputPath"]</div>
@@ -87,9 +83,8 @@
                             <RenamerFieldSet Text="Output">
                                 <RadzenFormField Text="Base Path (Library Path)" Variant="@Variant" Style="width: 100%; padding: 1px">
                                     <ChildContent>
-                                        <RadzenTextBox @bind-Value="@_settings.OutputBasePath" id="OutputBasePath" Name="OutputBasePath"
-                                                       Style="font-family: monospace;"
-                                                       Disabled="true"/>
+                                        <RadzenDropDown @bind-Value="@_settings.OutputBasePath" Data="@_libraryLocations" TextProperty="Path" ValueProperty="Path" Style="width: 100%;" Name="DropDownOutputPath" />
+
                                     </ChildContent>
                                     <Helper>
                                         <div class="rz-message rz-messages-error ">@_validationErrors["OutputBasePath"]</div>

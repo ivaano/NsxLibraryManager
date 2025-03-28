@@ -2,8 +2,11 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.JSInterop;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
+using NsxLibraryManager.Providers;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Settings;
@@ -23,13 +26,16 @@ public partial class Settings
     [Inject] private NotificationService NotificationService { get; set; } = default!;
     [Inject] private ThemeService ThemeService { get; set; } = default!;
     [Inject] private ITitleLibraryService TitleLibraryService { get; set; } = null!;
+    [Inject] private DialogService DialogService { get; set; } = default!;
+
     
-    private RadzenDataGrid<LibraryLocationDto> _additionalLibraryPathsGrid = null!;
-    private IEnumerable<LibraryLocationDto> _libraryLocationData = null!;
+    private RadzenDataGrid<LibraryLocation> _additionalLibraryPathsGrid = null!;
+    private IEnumerable<LibraryLocation> _libraryLocationData = null!;
     private bool _isLoading;
     private int _count;
     private bool _newRecordInsertDisabled;
-    
+    private readonly BooleanProvider _myBooleanProvider = new();
+    private bool _settingsSaved = true;
     private IEnumerable<CollectionDto> _collections = null!;
 
 
@@ -39,6 +45,8 @@ public partial class Settings
     private RadzenUpload _uploadDd = default!;
     private string _homeDirKeysFilePath = string.Empty;
     private string _theme = string.Empty;
+    private string _libraryPathValidationMessage = string.Empty;
+    
 
     private readonly Dictionary<string, string> _validationErrors = new()
     {
@@ -62,6 +70,7 @@ public partial class Settings
         if (configExists)
         {
             _databaseFieldDisabled = false;
+            _settingsSaved = false;
             ShowNotification(new NotificationMessage
             {
                 Severity = NotificationSeverity.Warning,
@@ -115,6 +124,7 @@ public partial class Settings
             Detail = "Settings have been saved.",
             Duration = 4000
         });
+        _settingsSaved = true;
     }
 
     private async Task LoadConfiguration()
@@ -280,82 +290,64 @@ public partial class Settings
         NotificationService.Notify(message);
     }
 
-    private async void OnUpdateRow(LibraryLocationDto libraryLocationDto)
+    private async void OnUpdateLibraryLocationRow(LibraryLocation libraryLocation)
     {
+        _config.LibraryLocations.Add(libraryLocation);
+        _newRecordInsertDisabled = false;
     }
     
-    private async void OnCreateRow(LibraryLocationDto libraryLocationDto)
+    private async void OnCreateLibraryLocationRow(LibraryLocation libraryLocation)
     {
-        CancelEdit(libraryLocationDto);
-
-        ShowNotification(new NotificationMessage
-        {
-            Severity = NotificationSeverity.Error, 
-            Summary = "Error Adding Collection", 
-            Detail = "detail", 
-            Duration = 4000
-        });
+        _config.LibraryLocations.Add(libraryLocation);
+        _newRecordInsertDisabled = false;
     }
     
     private async Task LoadLibraryPathData()
     {
         _isLoading = true;
-        var result = await TitleLibraryService.GetCollections();
-        if (result.IsSuccess)
-        {
-            _collections = result.Value;
-        }
-        else
-        {
-            _collections = [];
-        }
 
-        _libraryLocationData = [];
-        _count = 0;
+        var result = await TitleLibraryService.GetCollections();
+        _collections = result.IsSuccess ? result.Value : [];
+
+        _libraryLocationData = _config.LibraryLocations;
+        _count = _libraryLocationData.Count();
         _isLoading = false;
     }
     
     private async Task InsertRow()
     {
+        _settingsSaved = false;
         if (!_additionalLibraryPathsGrid.IsValid) return;
-        var libraryLocation = new LibraryLocationDto();
+        var libraryLocation = new LibraryLocation();
         _newRecordInsertDisabled = true;
         await _additionalLibraryPathsGrid.InsertRow(libraryLocation);
     }
     
-    private async Task InsertNewLibraryLocation(LibraryLocationDto row)
+    private async Task InsertNewLibraryLocation(LibraryLocation row)
     {
         if (!_additionalLibraryPathsGrid.IsValid) return;
         _newRecordInsertDisabled = true;
-        var libraryLocation = new LibraryLocationDto();
+        var libraryLocation = new LibraryLocation();
         await _additionalLibraryPathsGrid.InsertAfterRow(libraryLocation, row);
     }
     
-    private async Task EditLibraryLocation(LibraryLocationDto libraryLocation)
+    private async Task EditLibraryLocation(LibraryLocation libraryLocation)
     {
         if (!_additionalLibraryPathsGrid.IsValid) return;
+        if (_libraryLocationData.Contains(libraryLocation))
+        {
+            _config.LibraryLocations.Remove(libraryLocation);
+        }
+
         await _additionalLibraryPathsGrid.EditRow(libraryLocation);
     }
     
-    private async Task DeleteLibraryLocation(LibraryLocationDto libraryLocation)
+    private async Task DeleteLibraryLocation(LibraryLocation libraryLocation)
     {
         if (_libraryLocationData.Contains(libraryLocation))
         {
-            /*
-            var result = await TitleLibraryService.RemoveCollection(collectionDto);
-            if (result.IsSuccess)
-            {
-                await LoadData();
-            }
-            else
-            {
-                CancelEdit(collectionDto);
-                ShowNotification(
-                    NotificationSeverity.Error, 
-                    "Error Adding Collection", 
-                    result.Error ?? "Unknown Error");
-            }
-            */
+            _config.LibraryLocations.Remove(libraryLocation);
+            await LoadLibraryPathData();
         }
         else
         {
@@ -366,15 +358,61 @@ public partial class Settings
     }
     
     
-    private void CancelEdit(LibraryLocationDto libraryLocation)
+    private void CancelEdit(LibraryLocation libraryLocation)
     {
         _newRecordInsertDisabled = false;
         _additionalLibraryPathsGrid.CancelEditRow(libraryLocation);
     }
     
-    private async Task SaveNewLibraryLocation(LibraryLocationDto libraryLocation)
+    private async Task SaveNewLibraryLocation(LibraryLocation libraryLocation)
     {
         await _additionalLibraryPathsGrid.UpdateRow(libraryLocation);
+    }
+    
+    private bool ValidatePath(string path)
+    {
+        
+        var exists = _config.LibraryLocations.Any(item => item.Path == path);
+        if (exists)
+        {
+            _libraryPathValidationMessage = "Path already exists in the configuration.";
+            return false;
+        }
+        
+        if (!Directory.Exists(path))
+        {
+            _libraryPathValidationMessage = "Directory doesn't exist.";
+            return false;
+        }
+
+        return true;
+    }
+
+    private string GetCollectionName(int collectionId)
+    {
+        var collection = _collections.FirstOrDefault(x => x.Id == collectionId);
+        return  collection?.Name ?? string.Empty;
+    }
+
+    private void ConfigChanged()
+    {
+        _settingsSaved = false;
+    }
+    
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (!_settingsSaved)
+        {
+            var confirmationResult = await DialogService.Confirm(
+                $"Settings are not saved, do you really want to leave this page?", "Settings Not Saved",
+                new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+            if (confirmationResult is not true)
+            {
+                context.PreventNavigation();
+            }
+
+        }
+
     }
 
     private void ShowTooltip(string message, ElementReference elementReference, TooltipOptions options = null!) =>

@@ -1,5 +1,9 @@
 ﻿@page "/settings"
-@using NsxLibraryManager.Shared.Dto
+@using NsxLibraryManager.Shared.Settings
+
+
+<NavigationLock ConfirmExternalNavigation="true"
+                OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
 
 <PageTitle>Settings</PageTitle>
 <RadzenRow>
@@ -92,33 +96,9 @@
                     <RadzenRow Gap="1.2rem">
                         <RadzenColumn Size="12" SizeSM="6">
                             <RadzenStack>
-                                <RadzenFormField Text="Library Path">
-                                    <ChildContent>
-                                        <RadzenTextBox @bind-Value="@_config.LibraryPath" Name="LibraryPath"/>
-                                    </ChildContent>
-                                    <Helper>
-                                        @if (@_validationErrors["LibraryPath"] != string.Empty)
-                                        {
-                                            <div class="rz-message rz-messages-error">@_validationErrors["LibraryPath"]</div>
-                                        }
-                                        <div class="rz-text-caption">
-                                            Folder where the library files are located.
-                                        </div>
-                                    </Helper>
-                                </RadzenFormField>
-                                <RadzenRow JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
-                                    <RadzenColumn Size="2" class="rz-text-align-right;">
-                                        <RadzenCheckBox @bind-Value="@_config.Recursive" Name="Recursive"/>
-                                        <RadzenLabel Text="Recursive" Component="Recursive" Style="margin-left: 8px; vertical-align: middle;"/>
-                                    </RadzenColumn>
-                                </RadzenRow>
-                            </RadzenStack>
-                        </RadzenColumn>
-                        <RadzenColumn Size="12" SizeSM="6">
-                            <RadzenStack>
                                 <RadzenFormField Text="Backup Path">
                                     <ChildContent>
-                                        <RadzenTextBox @bind-Value="@_config.BackupPath" Name="BackupPath"/>
+                                        <RadzenTextBox @bind-Value="@_config.BackupPath"  @oninput="@ConfigChanged"  Name="BackupPath"/>
                                     </ChildContent>
                                     <Helper>
                                         @if (@_validationErrors["BackupPath"] != string.Empty)
@@ -126,11 +106,13 @@
                                             <div class="rz-message rz-messages-error">@_validationErrors["BackupPath"]</div>
                                         }
                                         <div class="rz-text-caption">
-                                            Folder where the deleted files will be placed.
+                                            Location where the deleted files will be placed, when removing duplicates.
                                         </div>
                                     </Helper>
                                 </RadzenFormField>
                             </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeSM="6">
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow>
@@ -138,17 +120,18 @@
                             <RadzenStack>
                                 <RadzenDataGrid
                                     @ref="_additionalLibraryPathsGrid"
-                                    TItem="LibraryLocationDto"
+                                    TItem="LibraryLocation"
                                     Data="@_libraryLocationData"
                                     EditMode="DataGridEditMode.Single"
                                     ShowEmptyMessage="false"
-                                    RowUpdate="@OnUpdateRow"
-                                    RowCreate="@OnCreateRow"
+                                    RowUpdate="@OnUpdateLibraryLocationRow"
+                                    RowCreate="@OnCreateLibraryLocationRow"
                                     Count="@_count"
                                     IsLoading="@_isLoading"
                                     AllowAlternatingRows="true"
                                     AllowSorting="false"
                                     AllowPaging="false"
+                                    PageSize="5"
                                     AllowFiltering="false"
                                     AllowColumnResize="true"
                                     PagerHorizontalAlign="HorizontalAlign.Center"
@@ -163,10 +146,10 @@
                                         <RadzenDataGridColumn Property="Path" Title="Library Path" Width="280px" SortOrder="SortOrder.Ascending">
                                             <EditTemplate Context="libraryData">
                                                 <RadzenTextBox @bind-Value="libraryData.Path"  Style="width:100%; display: block" Name="Name" aria-label="Enter name" />
-                                                <RadzenRequiredValidator Text="Path is required" Component="Name" Popup="true" />
+                                                <RadzenCustomValidator Component="Name" Validator="@(() => ValidatePath(libraryData.Path))" Text="@_libraryPathValidationMessage" Popup="false" />
                                             </EditTemplate>
                                         </RadzenDataGridColumn>
-                                        <RadzenDataGridColumn Property="Recursive" Title="Recursive" Width="50px">
+                                        <RadzenDataGridColumn Property="Recursive" Title="Recursive" Width="50px" FormatString="{0}" FormatProvider="@_myBooleanProvider">
                                             <EditTemplate Context="libraryData">
                                                 <RadzenCheckBox @bind-Value="@libraryData.Recursive" />
                                             </EditTemplate>
@@ -179,6 +162,9 @@
                                                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select Collection" }})">
                                                 </RadzenDropDown>
                                             </EditTemplate>
+                                            <Template Context="libraryData">
+                                                @GetCollectionName(libraryData.CollectionId)
+                                            </Template>
                                         </RadzenDataGridColumn>
 
                                         <RadzenDataGridColumn Context="libraryData" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
@@ -198,13 +184,20 @@
                             </RadzenStack>
                         </RadzenColumn>
                     </RadzenRow>
+                    <RadzenRow Gap="0">
+                        <RadzenColumn Size="12" SizeSM="6">
+                            <div class="rz-text-caption">
+                                To manage libraries across multiple locations, add each folder individually. Optionally assign a specific collection to any folder location—files added there will automatically join that collection. At least one folder must be added to your library.
+                            </div>
+                        </RadzenColumn>
+                    </RadzenRow>
                 </RadzenFieldset>
                 <RadzenFieldset Text="Library settings">
                     <RadzenRow>
                         <RadzenColumn Size="12" SizeMD="6">
                             <RadzenRow>
                                 <RadzenColumn Size="6">
-                                    <RadzenSwitch Name="UseEnglishNaming" @bind-Value="@_config.UseEnglishNaming" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" MouseEnter="@(args => ShowTooltip("For titles in Asia regions (JP, CN, KO, HK) prefer Nswdb for title name", args))"/>
+                                    <RadzenSwitch Name="UseEnglishNaming" @bind-Value="@_config.UseEnglishNaming" Change=@(args => ConfigChanged()) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" MouseEnter="@(args => ShowTooltip("For titles in Asia regions (JP, CN, KO, HK) prefer Nswdb for title name", args))"/>
                                     <RadzenLabel Text="Try to use english naming." Component="UseEnglishNaming" Style="margin-left: 8px; vertical-align: middle;"/>
                                 </RadzenColumn>
                                 <RadzenColumn Size="6">
@@ -229,7 +222,7 @@
             <RadzenStack>
                 <RadzenFormField Text="TitleDb Url">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbUrl"></RadzenTextBox>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.TitleDbUrl" @oninput="@ConfigChanged" ></RadzenTextBox>
                     </ChildContent>
                     <Helper>
                         @if (@_validationErrors["DownloadSettings.TitleDbUrl"] != string.Empty)
@@ -247,7 +240,7 @@
             <RadzenStack>
                 <RadzenFormField Text="TitleDb Version">
                     <ChildContent>
-                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionUrl"></RadzenTextBox>
+                        <RadzenTextBox @bind-Value="@_config.DownloadSettings.VersionUrl" @oninput="@ConfigChanged" ></RadzenTextBox>
                     </ChildContent>
                     <Helper>
                         @if (@_validationErrors["DownloadSettings.VersionUrl"] != string.Empty)
@@ -299,7 +292,7 @@
                 <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
                     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
                         <RadzenLabel Text="UI Theme" />
-                        <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
+                        <RadzenDropDown Name="ThemeDropDown" TValue="string"  Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
                         </RadzenDropDown>
                     </RadzenStack>
                 </RadzenStack>

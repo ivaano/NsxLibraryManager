@@ -1,6 +1,6 @@
-﻿namespace NsxLibraryManager.Shared.Dto;
+﻿namespace NsxLibraryManager.Shared.Settings;
 
-public class LibraryLocationDto
+public class LibraryLocation
 {
     public string Path { get; set; }
     public bool Recursive { get; set; }
