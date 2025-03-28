@@ -131,14 +131,23 @@ public class TitleLibraryService(
         return true;
     }
 
-    public async Task<IEnumerable<string>> GetLibraryFilesAsync()
+    public async Task<IEnumerable<LibraryFileDto>> GetLibraryFilesAsync()
     {
-        var filesResult = await fileInfoService.GetFileNames(_userSettings.LibraryPath, _userSettings.Recursive);
-        if (filesResult.IsSuccess) return filesResult.Value;
-        logger.LogError("Error getting files from library: {Error}", filesResult.Error);
-        return Array.Empty<string>();
+        var libraryFiles = new List<LibraryFileDto>();
+        foreach (var libraryLocation in _userSettings.LibraryLocations)
+        {
+            var filesResult = await fileInfoService.GetFileNames(libraryLocation.Path, libraryLocation.Recursive);
+            if (filesResult.IsSuccess)
+            {
+                libraryFiles.AddRange(filesResult.Value.Select(file => new LibraryFileDto { FileName = file, CollectionId = libraryLocation.CollectionId, }));
+            }
+            else
+            {
+                logger.LogError("Error getting files from library path {libraryPath}: {Error}",libraryLocation.Path, filesResult.Error);
+            }
+        }
+        return libraryFiles;
     }
-
 
     private async Task<Title?> AggregateLibraryTitle(LibraryTitleDto libraryTitle)
     {
@@ -642,7 +651,7 @@ public class TitleLibraryService(
             var previousDate = await GetLastLibraryUpdateAsync();
             dateCreated = previousDate?.DateCreated ?? DateTime.Now;
         }
-
+        
         var reloadRecord = new LibraryUpdate
         {
             DateCreated = dateCreated,
@@ -650,7 +659,7 @@ public class TitleLibraryService(
             BaseTitleCount = GetTitlesCountByContentType(TitleContentType.Base),
             UpdateTitleCount = GetTitlesCountByContentType(TitleContentType.Update),
             DlcTitleCount = GetTitlesCountByContentType(TitleContentType.DLC),
-            LibraryPath = _userSettings.LibraryPath
+            LibraryPath = string.Join(",", _userSettings.LibraryLocations.Select(x => x.Path))
         };
         _nsxLibraryDbContext.LibraryUpdates.Add(reloadRecord);
         await _nsxLibraryDbContext.SaveChangesAsync();
@@ -667,9 +676,9 @@ public class TitleLibraryService(
         var dirFiles = new Dictionary<string, LibraryTitleDto>();
         foreach (var fileName in libDirFiles)
         {
-            if (fileInfoService.TryGetFileInfoFromFileName(fileName, out var fileInfo))
+            if (fileInfoService.TryGetFileInfoFromFileName(fileName.FileName, out var fileInfo))
             {
-                dirFiles.Add(fileName, fileInfo);
+                dirFiles.Add(fileName.FileName, fileInfo);
             }
         }
 
@@ -730,11 +739,37 @@ public class TitleLibraryService(
             : Result.Failure<LibraryTitleDto>("Title not found");
     }
 
+    private int? FileBelongsToCollection(string fileName)
+    {
+        var libraryLocation = _userSettings.LibraryLocations;
+        foreach (var location in libraryLocation)
+        {
+            if (fileName.StartsWith(location.Path))
+            {
+                return location.CollectionId;
+            }
+        }
+        return null;
+    }
+
     public async Task<Result<bool>> AddLibraryTitleAsync(LibraryTitleDto title)
     {
         if (title.FileName is null) return Result.Failure<bool>("Filename missing");
         logger.LogDebug("Adding file: {Filename} from library", title.FileName);
-        var libraryTitle = await ProcessFileAsync(title.FileName);
+        
+        
+        var libraryFile = new LibraryFileDto
+        {
+            FileName = title.FileName,
+        };
+        var collectionId = FileBelongsToCollection(title.FileName);
+        if (collectionId is not null)
+        {
+            libraryFile.CollectionId = (int)collectionId;
+        }
+        var libraryTitle = await ProcessFileAsync(libraryFile);
+        
+        
 
         switch (libraryTitle)
         {
@@ -742,10 +777,40 @@ public class TitleLibraryService(
                 return Result.Failure<bool>($"Error processing file {title.FileName}");
             case { ContentType: TitleContentType.Update, OtherApplicationId: not null }:
             {
+                var titledbTitle = await _titledbDbContext
+                    .Titles
+                    .Include(v => v.Versions)
+                    .FirstOrDefaultAsync(t => t.ApplicationId == libraryTitle.OtherApplicationId);
+
                 var parentTitle = _nsxLibraryDbContext.Titles
                     .Include(x => x.Collection)
+                    .Include(v => v.Versions)
                     .FirstOrDefault(x => x.ApplicationId == libraryTitle.OtherApplicationId);
+                
+                if (titledbTitle?.Versions is not null && titledbTitle.Versions.Count > 0)
+                {
+                    var versions = new Collection<Version>();
+                    foreach (var version in titledbTitle.Versions)
+                    {
+                        var newVersion = parentTitle?.Versions
+                            .FirstOrDefault(x => x.VersionNumber == version.VersionNumber);
+                        if (newVersion is null)
+                        {
+                            versions.Add(new Version
+                            {
+                                VersionNumber = version.VersionNumber,
+                                VersionDate = version.VersionDate,
+                            });
+                        }
 
+                    }
+
+                    foreach (var version in versions)
+                    {
+                        parentTitle?.Versions.Add(version);
+                    }
+                }
+                
                 if (parentTitle?.Collection is not null)
                 {
                     libraryTitle.Collection = parentTitle.Collection;
@@ -899,6 +964,7 @@ public class TitleLibraryService(
         switch (libraryTitle)
         {
             case null:
+                logger.LogError("Title {applicationId} with filename {fileName} not found", title.ApplicationId, title.FileName);
                 return Result.Failure<bool>($"Title {title.ApplicationId} with filename {title.FileName} not found");
             case { ContentType: TitleContentType.Update, OtherApplicationId: not null }:
             {
@@ -932,27 +998,35 @@ public class TitleLibraryService(
         return Result.Success(true);
     }
 
-    public async Task<Title?> ProcessFileAsync(string file)
+    public async Task<Title?> ProcessFileAsync(LibraryFileDto libraryFile)
     {
         try
         {
-            logger.LogDebug("Processing file: {File}", file);
-            var libraryTitleResult = await fileInfoService.GetFileInfo(file, detailed: false);
+            logger.LogDebug("Processing file: {File}", libraryFile.FileName);
+            var libraryTitleResult = await fileInfoService.GetFileInfo(libraryFile.FileName, detailed: false);
             if (libraryTitleResult.IsFailure)
             {
-                logger.LogError("Unable to get File Information from file : {File}", file);
+                logger.LogError("Unable to get File Information from file : {File}", libraryFile.FileName);
                 return null;
             }
 
             var title = await AggregateLibraryTitle(libraryTitleResult.Value);
             if (title is null) return title;
+            if (libraryFile.CollectionId > 0)
+            {
+                var collection = _nsxLibraryDbContext.Collections.FirstOrDefault(x => x.Id == libraryFile.CollectionId);
+                if (collection is not null)
+                {
+                    title.Collection = collection;
+                }
+            }
             _nsxLibraryDbContext.Add(title);
             await _nsxLibraryDbContext.SaveChangesAsync();
             return title;
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error processing file: {File}", file);
+            logger.LogError(e, "Error processing file: {File}", libraryFile.FileName);
             return null;
         }
     }

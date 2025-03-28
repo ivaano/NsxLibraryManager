@@ -55,6 +55,7 @@ public partial class CollectionRenamer : ComponentBase
     private bool _renameButtonDisabled = true;
     private string _inputPathDisplay = string.Empty;
     private string _outputPathDisplay = string.Empty;
+    private List<LibraryLocation> _libraryLocations = default!;
 
 
     
@@ -84,11 +85,15 @@ public partial class CollectionRenamer : ComponentBase
     private async Task InitializeSettings()
     {
         _settings = await SettingsService.GetCollectionRenamerSettings();
+        
         var userSettings = SettingsService.GetUserSettings();
-        _settings.InputPath = userSettings.LibraryPath.EndsWith(Path.DirectorySeparatorChar) 
-            ? userSettings.LibraryPath 
-            : userSettings.LibraryPath + Path.DirectorySeparatorChar;
-        _settings.OutputBasePath = _settings.InputPath;
+        _libraryLocations = userSettings.LibraryLocations;
+        foreach (var libraryLocation in _libraryLocations)
+        {
+            libraryLocation.Path = libraryLocation.Path.EndsWith(Path.DirectorySeparatorChar) 
+                ? libraryLocation.Path 
+                : libraryLocation.Path + Path.DirectorySeparatorChar;
+        }
 
         _inputPathDisplay = _settings.InputPath;
         _outputPathDisplay = _settings.OutputBasePath;
@@ -326,6 +331,7 @@ public partial class CollectionRenamer : ComponentBase
             Duration = 4000
         };
         NotificationService.Notify(notificationMessage);
+        await InitializeSettings();
         await ResetGrid();
     }
     
@@ -380,6 +386,10 @@ public partial class CollectionRenamer : ComponentBase
             isLoading = false;
             _scanInputButtonDisabled = false;
         }
-
+    }
+    
+    private void OnChangeTab(int index)
+    {
+        StateHasChanged();
     }
 }

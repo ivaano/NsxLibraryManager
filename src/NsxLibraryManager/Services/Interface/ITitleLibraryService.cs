@@ -4,6 +4,7 @@ using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
+using NsxLibraryManager.Shared.Settings;
 using Radzen;
 
 namespace NsxLibraryManager.Services.Interface;
@@ -11,9 +12,9 @@ namespace NsxLibraryManager.Services.Interface;
 public interface ITitleLibraryService
 {
     public Task<bool> DropLibrary();
-    public Task<IEnumerable<string>> GetLibraryFilesAsync();
+    public Task<IEnumerable<LibraryFileDto>> GetLibraryFilesAsync();
     public Task<FileDelta> GetDeltaFilesInLibraryAsync();
-    public Task<Title?> ProcessFileAsync(string file);
+    public Task<Title?> ProcessFileAsync(LibraryFileDto libraryFile);
     public Task<Result<bool>> AddLibraryTitleAsync(LibraryTitleDto title);
     public Task<Result<int>> UpdateMultipleLibraryTitlesAsync(IEnumerable<LibraryTitleDto> titles);
     public Task<Result<int>> UpdateLibraryTitleAsync(LibraryTitleDto titleDto);

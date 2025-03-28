@@ -15,19 +15,8 @@ public class UserSettingsValidator : AbstractValidator<UserSettings>
                     context.AddFailure("prod.keys file must exist or leave empty to look in home folder.");
                 }
             });        
+        RuleFor(x => x.LibraryLocations).NotEmpty().WithMessage("At least one library location is required.");
 
-        RuleFor(x => x.LibraryPath)
-            .NotEmpty().WithMessage("Library path cannot be empty.");
-
-        RuleFor(x => x.LibraryPath)
-            .Custom((path, context) =>
-            {
-                if (!Directory.Exists(path))
-                {
-                    context.AddFailure("Library path does not exist.");
-                }
-            });
-        
         RuleFor(x => x.BackupPath)
             .Custom((path, context) =>
             {

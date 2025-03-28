@@ -62,7 +62,7 @@ public class SettingsService(
             ProdKeys = GetKeyLocation(IKeySetProviderService.DefaultProdKeysFileName),
             TitleKeys = GetKeyLocation(IKeySetProviderService.DefaultTitleKeysFileName),
             ConsoleKeys = GetKeyLocation(IKeySetProviderService.DefaultConsoleKeysFileName),
-            LibraryPath = defaultLibraryPath,
+            
             BackupPath = defaultBackupPath,
             Recursive = true,
             IsConfigured = false
