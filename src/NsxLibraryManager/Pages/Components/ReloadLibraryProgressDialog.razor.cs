@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
 using Radzen;
 
@@ -15,7 +16,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
     private double ProgressCompleted { get; set; }
     private int FileCount { get; set; }
 
-    private IEnumerable<string> FilesEnumerable { get; set; }
+    private IEnumerable<LibraryFileDto> FilesEnumerable { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -76,7 +77,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
         if (!disposing) return;
         FileCount = 0;
         ProgressCompleted = 0;
-        FilesEnumerable = new List<string>();
+        FilesEnumerable = new List<LibraryFileDto>();
         if (TitleLibraryService is not null)
         {
             TitleLibraryService = null;
