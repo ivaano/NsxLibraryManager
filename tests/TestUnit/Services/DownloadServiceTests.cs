@@ -28,7 +28,6 @@ public class DownloadServiceTests
         {
             DownloadSettings = downloadSettings,
             TitleDatabase = "titledb.db",
-            LibraryPath = "somepath",
         };
         var options = Options.Create(appSettings);
         

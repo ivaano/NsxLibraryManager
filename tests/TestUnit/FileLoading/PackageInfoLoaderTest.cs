@@ -23,7 +23,6 @@ public class PackageInfoLoaderTest
         var appSettings = new UserSettings
         {
             TitleDatabase = "titledb",
-            LibraryPath = "library",
             ProdKeys = string.Empty,
             DownloadSettings = new DownloadSettings
             {

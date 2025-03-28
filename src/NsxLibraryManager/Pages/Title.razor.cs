@@ -103,20 +103,24 @@ public partial class Title
             Size = t.Size,
             Owned = libraryApplicationIds.Contains(t.ApplicationId)
         }).AsQueryable();
-        
-        
-        if (!string.IsNullOrEmpty(args.Filter))
+
+        if (query is not null)
         {
-            query = query.Where(args.Filter);
-        }
+            if (!string.IsNullOrEmpty(args.Filter))
+            {
+                query = query.Where(args.Filter);
+            }
         
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
+            if (!string.IsNullOrEmpty(args.OrderBy))
+            {
+                query = query.OrderBy(args.OrderBy);
+            }
+
+        
+            _dlcCount = query.Count();
+            _dlcs = query.Skip(args.Skip!.Value).Take(args.Top!.Value).ToList();       
         }
 
-        _dlcCount = query.Count();
-        _dlcs = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
 
         _dlcIsLoading = false;
     }
