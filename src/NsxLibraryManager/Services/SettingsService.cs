@@ -292,13 +292,48 @@ public class SettingsService(
             return Result.Failure<List<ExportUserDataDto>>($"Error reading CSV: {ex.Message}");
         }
     }
+    
+    
     public async Task<Result<int>> ImportUserData(string filePath)
     {
+        var noUpdateCount = 0;
         var readCsvResult = ReadUserDataCsv(filePath);
         if (readCsvResult.IsSuccess)
         {
             var userData = readCsvResult.Value;
-            var noUpdateCount = 0;
+            var collections = userData.GroupByCollection();
+
+            foreach (var kvCollection in collections)
+            {
+                if (kvCollection.Key != "NoCollection")
+                {
+                    var collection =
+                        await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(x => x.Name == kvCollection.Key);
+                    if (collection is null)
+                    {
+                        collection = new Collection
+                        {
+                            Name = kvCollection.Key
+                        };
+                    }
+                    foreach (var row in kvCollection.Value)
+                    {
+                        
+                        var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
+                        if (title is null)
+                        {
+                            noUpdateCount++;
+                            continue;
+                        }
+                        collection.Titles.Add(title);
+                        title.UserRating = row.UserRating;
+                        newCollection.Titles.Add(title);
+                        _nsxLibraryDbContext.Collections.Add(newCollection);
+                    }
+                }
+            }
+            
+
             foreach (var row in userData)
             {
                 var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
