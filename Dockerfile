@@ -16,6 +16,7 @@ FROM base AS final
 COPY --from=publish /app/publish /app
 RUN mkdir -p /app/backup
 RUN mkdir -p /app/renamer/in /app/renamer/out
+RUN mkdir -p /app/wwwroot/images/icon
 RUN chown app:app /app -R
 USER app
 WORKDIR /app
