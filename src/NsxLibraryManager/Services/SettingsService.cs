@@ -292,45 +292,61 @@ public class SettingsService(
             return Result.Failure<List<ExportUserDataDto>>($"Error reading CSV: {ex.Message}");
         }
     }
+    
+    
     public async Task<Result<int>> ImportUserData(string filePath)
     {
+        var noUpdateCount = 0;
         var readCsvResult = ReadUserDataCsv(filePath);
         if (readCsvResult.IsSuccess)
         {
             var userData = readCsvResult.Value;
-            var noUpdateCount = 0;
-            foreach (var row in userData)
+            var collections = userData.GroupByCollection();
+
+            foreach (var kvCollection in collections)
             {
-                var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
-                if (title is null)
+                if (kvCollection.Key != "NoCollection")
                 {
-                    noUpdateCount++;
-                    continue;
-                }
-
-                title.UserRating = row.UserRating;
-                if (!string.IsNullOrEmpty(row.Collection))
-                {
-                    //check collection exists
                     var collection =
-                        await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(x => x.Name == row.Collection);
-                    if (collection is not null)
+                        await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(x => x.Name == kvCollection.Key);
+                    if (collection is null)
                     {
-                        collection.Titles.Add(title);
-                    }
-                    else
-                    {
-                        var newCollection = new Collection
+                        collection = new Collection
                         {
-                            Name = row.Collection
+                            Name = kvCollection.Key
                         };
-                        newCollection.Titles.Add(title);
-                        _nsxLibraryDbContext.Collections.Add(newCollection);
                     }
+                    foreach (var row in kvCollection.Value)
+                    {
+                        
+                        var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
+                        if (title is null)
+                        {
+                            noUpdateCount++;
+                            continue;
+                        }
+                        collection.Titles.Add(title);
+                        title.UserRating = row.UserRating;
+                        _nsxLibraryDbContext.Collections.Add(collection);
+                    }
+                }
+                else
+                {
+                    foreach (var row in kvCollection.Value)
+                    {
+                        var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
+                        if (title is null)
+                        {
+                            noUpdateCount++;
+                            continue;
+                        }
+                        title.UserRating = row.UserRating;
 
+                    }
                 }
             }
         }
+        
         var updateCount = await _nsxLibraryDbContext.SaveChangesAsync();
 
         return Result.Success(updateCount);

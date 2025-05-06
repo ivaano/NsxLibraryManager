@@ -158,7 +158,7 @@
 
                                         <RadzenDataGridColumn Property="CollectionId" Title="Collection">
                                             <EditTemplate Context="libraryData">
-                                                <RadzenDropDown @bind-Value="libraryData.CollectionId" Data="@_collections" ValueProperty="Id" TextProperty="Name" Style="width:100%; display: block;"
+                                                <RadzenDropDown @bind-Value="libraryData.CollectionId" Data="@_collections" ValueProperty="Id" TextProperty="Name" Placeholder="Select collection" Style="width:100%; display: block;"
                                                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select Collection" }})">
                                                 </RadzenDropDown>
                                             </EditTemplate>
