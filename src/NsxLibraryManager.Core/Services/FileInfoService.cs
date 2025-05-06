@@ -297,6 +297,12 @@ public class FileInfoService : IFileInfoService
     {
         var path = Path.Combine("images", "icon");
         var iconPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", path);
+        if (!Directory.Exists(iconPath))
+        {
+            _logger.LogInformation("Icon directory {IconPath} does not exist creating", iconPath);
+            Directory.CreateDirectory(iconPath);
+            return Task.FromResult(Result.Success(true));
+        }
         var iconFiles = Directory.GetFiles(iconPath);
         var deleteSuccess = true;
         foreach (var iconFile in iconFiles)
