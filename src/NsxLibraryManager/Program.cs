@@ -37,6 +37,14 @@ if (validatorResult.defaultConfigCreated)
     initialConfig = configBuilder.Build();
 }
 
+// create icon folder if it doesnt exists
+var path = Path.Combine("images", "icon");
+var iconPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", path);
+if (!Directory.Exists(iconPath))
+{
+    Directory.CreateDirectory(iconPath);
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // configuration.

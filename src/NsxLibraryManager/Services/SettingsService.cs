@@ -327,45 +327,26 @@ public class SettingsService(
                         }
                         collection.Titles.Add(title);
                         title.UserRating = row.UserRating;
-                        newCollection.Titles.Add(title);
-                        _nsxLibraryDbContext.Collections.Add(newCollection);
+                        _nsxLibraryDbContext.Collections.Add(collection);
                     }
                 }
-            }
-            
-
-            foreach (var row in userData)
-            {
-                var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
-                if (title is null)
+                else
                 {
-                    noUpdateCount++;
-                    continue;
-                }
-
-                title.UserRating = row.UserRating;
-                if (!string.IsNullOrEmpty(row.Collection))
-                {
-                    //check collection exists
-                    var collection =
-                        await _nsxLibraryDbContext.Collections.FirstOrDefaultAsync(x => x.Name == row.Collection);
-                    if (collection is not null)
+                    foreach (var row in kvCollection.Value)
                     {
-                        collection.Titles.Add(title);
-                    }
-                    else
-                    {
-                        var newCollection = new Collection
+                        var title = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.ApplicationId == row.ApplicationId);
+                        if (title is null)
                         {
-                            Name = row.Collection
-                        };
-                        newCollection.Titles.Add(title);
-                        _nsxLibraryDbContext.Collections.Add(newCollection);
-                    }
+                            noUpdateCount++;
+                            continue;
+                        }
+                        title.UserRating = row.UserRating;
 
+                    }
                 }
             }
         }
+        
         var updateCount = await _nsxLibraryDbContext.SaveChangesAsync();
 
         return Result.Success(updateCount);

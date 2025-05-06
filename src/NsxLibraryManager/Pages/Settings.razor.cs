@@ -307,7 +307,20 @@ public partial class Settings
         _isLoading = true;
 
         var result = await TitleLibraryService.GetCollections();
-        _collections = result.IsSuccess ? result.Value : [];
+        var noCollectionItem = new CollectionDto
+        {
+            Id = 0,
+            Name = "No Collection"
+        };
+        
+        var updatedCollections = new List<CollectionDto> { noCollectionItem };
+        if (result.IsSuccess)
+        {
+            updatedCollections.AddRange(result.Value);
+        }
+
+
+        _collections = updatedCollections;
 
         _libraryLocationData = _config.LibraryLocations;
         _count = _libraryLocationData.Count();
