@@ -69,6 +69,14 @@ that I could run on a server and access it from any device.
   - config (used to store app configuration) `--mount type=bind,source=/home/ivan/config,target=/app/config`
   - data (used to store app databases) `--mount type=bind,source=/home/ivan/data,target=/app/data`
 
+## Docker Compose
+edit the file `docker-compose.yml` and set the volumes for each of the folders needed (library, config, data optinal backup and rename), you can
+specify the user id and group id the application will run in the container, if no user PUID or PGID are specified the application will run
+as app user which is the default from the base image, in the image you can specify the image from github registry `ghcr.io/ivaano/nsxlibrarymanager:latest`
+or you can leave `nsxlibrarymanager:latest` and the image will be built from source. Once the `docker-compose.yml` file is ready simply run
+`docker compose up` to run the container.
+
+
  ## Usage
 - Games
   - List

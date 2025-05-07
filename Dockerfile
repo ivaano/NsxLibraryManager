@@ -1,8 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.13 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0.406-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
 WORKDIR /src
 COPY src/. .
 RUN dotnet restore "NsxLibraryManager/NsxLibraryManager.csproj"

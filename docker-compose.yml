@@ -4,7 +4,6 @@
     image: nsxlibrarymanager:latest
     build:
       context: .
-    user: "1000:1000"
     volumes:
       - /mnt/nfs/library:/app/library
       - /srv/nsxlibrarymanager/config:/app/config
@@ -12,4 +11,7 @@
       - /etc/localtime:/etc/localtime:ro
     ports:
       - '8080:8080'
+    environment:
+      - PUID=1000
+      - PGID=1000
     restart: always
