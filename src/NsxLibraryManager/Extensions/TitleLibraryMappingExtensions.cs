@@ -115,6 +115,7 @@ public static class TitleLibraryMappingExtensions
                     TitleName = d.TitleName,
                     FileName = d.FileName,
                     Version = d.Version,
+                    ReleaseDate = d.ReleaseDate,
                     Size = d.Size.GetValueOrDefault(),
                     Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
                     {
@@ -141,6 +142,7 @@ public static class TitleLibraryMappingExtensions
             {
                 ApplicationId = d.ApplicationId,
                 TitleName = d.TitleName,
+                ReleaseDate = d.ReleaseDate,
                 Size = d.Size.GetValueOrDefault(),
                 Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
                 {
