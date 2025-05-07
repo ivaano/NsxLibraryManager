@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # This script runs as root initially.
 # It reads the target user ID (PUID) and group ID (PGID) from environment variables.
