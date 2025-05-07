@@ -11,5 +11,6 @@ public record DlcDto()
     public long Size { get; init; }
     public bool Owned { get; set; }
     public string? FileName { get; init; }
+    public DateTime? ReleaseDate { get; init; }
     public Collection<ScreenshotDto>? Screenshots { get; init; }
 };

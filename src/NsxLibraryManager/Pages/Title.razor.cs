@@ -94,6 +94,7 @@ public partial class Title
             ApplicationId = t.ApplicationId,
             OtherApplicationId = t.OtherApplicationId,
             TitleName = t.TitleName,
+            ReleaseDate = t.ReleaseDate,
             FileName = libraryApplicationIds.Contains(t.ApplicationId) ? 
                 libraryApplicationIds[t.ApplicationId].First().FileName : 
                 null,

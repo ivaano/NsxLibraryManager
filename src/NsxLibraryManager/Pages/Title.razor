@@ -236,6 +236,7 @@
                                 @dlc.Size.ToHumanReadableBytes()
                             </Template>
                         </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="ReleaseDate" Title="Date" FormatString="{0:d}" Width="50px"/>
                         <RadzenDataGridColumn Property="Version" Filterable="false" Title="Version" Width="30px" TextAlign="TextAlign.Center"/>
                         <RadzenDataGridColumn Property="Owned" Filterable="true" Title="Owned" Width="30px" TextAlign="TextAlign.Center" SortOrder="SortOrder.Descending" FormatString="{0}" FormatProvider="@_myBooleanProvider"/>
                     </Columns>
