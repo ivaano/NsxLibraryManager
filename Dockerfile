@@ -17,7 +17,9 @@ COPY --from=publish /app/publish /app
 RUN mkdir -p /app/backup
 RUN mkdir -p /app/renamer/in /app/renamer/out
 RUN mkdir -p /app/wwwroot/images/icon
-RUN chown app:app /app -R
-USER app
+
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 WORKDIR /app
-ENTRYPOINT ["dotnet", "NsxLibraryManager.dll"]
+ENTRYPOINT ["/app/entrypoint.sh"]

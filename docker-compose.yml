@@ -1,0 +1,15 @@
+﻿services:
+  nsxlibrarymanager:
+    container_name: nsxlibrarymanager
+    image: nsxlibrarymanager:latest
+    build:
+      context: .
+    user: "1000:1000"
+    volumes:
+      - /mnt/nfs/library:/app/library
+      - /srv/nsxlibrarymanager/config:/app/config
+      - /srv/nsxlibrarymanager/data:/app/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - '8080:8080'
+    restart: always
