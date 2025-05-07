@@ -1,8 +1,9 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0.13 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+RUN apt-get update && apt-get install -y --no-install-recommends gosu && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0.406-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy AS build
 WORKDIR /src
 COPY src/. .
 RUN dotnet restore "NsxLibraryManager/NsxLibraryManager.csproj"
@@ -17,7 +18,9 @@ COPY --from=publish /app/publish /app
 RUN mkdir -p /app/backup
 RUN mkdir -p /app/renamer/in /app/renamer/out
 RUN mkdir -p /app/wwwroot/images/icon
-RUN chown app:app /app -R
-USER app
+
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 WORKDIR /app
-ENTRYPOINT ["dotnet", "NsxLibraryManager.dll"]
+ENTRYPOINT ["/app/entrypoint.sh"]

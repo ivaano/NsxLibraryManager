@@ -1,0 +1,17 @@
+﻿services:
+  nsxlibrarymanager:
+    container_name: nsxlibrarymanager
+    image: nsxlibrarymanager:latest
+    build:
+      context: .
+    volumes:
+      - /mnt/nfs/library:/app/library
+      - /srv/nsxlibrarymanager/config:/app/config
+      - /srv/nsxlibrarymanager/data:/app/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - '8080:8080'
+    environment:
+      - PUID=1000
+      - PGID=1000
+    restart: always
