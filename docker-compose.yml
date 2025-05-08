@@ -6,6 +6,7 @@
       context: .
     volumes:
       - /mnt/nfs/library:/app/library
+      - /srv/nsxlibrarymanager/icon:/app/wwwroot/images/icon
       - /srv/nsxlibrarymanager/config:/app/config
       - /srv/nsxlibrarymanager/data:/app/data
       - /etc/localtime:/etc/localtime:ro
