@@ -26,4 +26,6 @@ public interface ISettingsService
     public string GetConfigFolder();
 
     public bool RemoveCurrentKeys();
+
+    public Task<Result<bool>> RemovePersistentData();
 }

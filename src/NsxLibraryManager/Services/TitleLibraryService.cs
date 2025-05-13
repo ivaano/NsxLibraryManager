@@ -531,7 +531,6 @@ public class TitleLibraryService(
                 }
             }
         }
-
         await _nsxLibraryDbContext.SaveChangesAsync();
         return true;
     }
@@ -583,6 +582,23 @@ public class TitleLibraryService(
 
     #region Collections
 
+    public async Task<Result<CollectionDto?>> AddCollection(CollectionDto collectionDto)
+    {
+        var exists = _nsxLibraryDbContext.Collections
+            .AsNoTracking()
+            .Any(c => c.Name == collectionDto.Name);
+        if (exists) return Result.Failure<CollectionDto?>("Collection already exists");
+        if (collectionDto.Name is null) return Result.Failure<CollectionDto?>("Collection name is required");
+
+        var collection = new Collection
+        {
+            Name = collectionDto.Name,
+        };
+        _nsxLibraryDbContext.Collections.Add(collection);
+        await _nsxLibraryDbContext.SaveChangesAsync();
+        return Result.Success(collection.MapToCollectionDto());
+    }
+    
     public async Task<Result<IEnumerable<CollectionDto>>> GetCollections()
     {
         var collections = await _nsxLibraryDbContext.Collections
@@ -603,23 +619,6 @@ public class TitleLibraryService(
         return collections.Count > 0
             ? Result.Success<IEnumerable<CollectionDto>>(collections)
             : Result.Failure<IEnumerable<CollectionDto>>("No Collections");
-    }
-
-    public async Task<Result<CollectionDto?>> AddCollection(CollectionDto collectionDto)
-    {
-        var exists = _nsxLibraryDbContext.Collections
-            .AsNoTracking()
-            .Any(c => c.Name == collectionDto.Name);
-        if (exists) return Result.Failure<CollectionDto?>("Collection already exists");
-        if (collectionDto.Name is null) return Result.Failure<CollectionDto?>("Collection name is required");
-
-        var collection = new Collection
-        {
-            Name = collectionDto.Name,
-        };
-        _nsxLibraryDbContext.Collections.Add(collection);
-        await _nsxLibraryDbContext.SaveChangesAsync();
-        return Result.Success(collection.MapToCollectionDto());
     }
 
     public async Task<Result<CollectionDto?>> RemoveCollection(CollectionDto collectionDto)
@@ -861,6 +860,8 @@ public class TitleLibraryService(
         return Result.Success(updatedCount);
     }
 
+
+
     public async Task<Result<int>> UpdateLibraryTitleAsync(LibraryTitleDto title)
     {
         //update by filename only
@@ -879,6 +880,7 @@ public class TitleLibraryService(
 
         var updatedCollectionCount = await UpdateCollectionAssociationsAsync(libraryTitle, title);
         libraryTitle.UserRating = title.UserRating;
+        await UpdatePersistentTitle(title);
         var updatedCount = await _nsxLibraryDbContext.SaveChangesAsync();
         return Result.Success(updatedCount);
     }
@@ -903,6 +905,7 @@ public class TitleLibraryService(
         foreach (var title in toUpdate)
         {
             title.Collection = collection;
+            await UpdatePersistentTitle(title.MapToLibraryTitleDto());
         }
 
         return toUpdate.Count;
@@ -998,6 +1001,42 @@ public class TitleLibraryService(
         return Result.Success(true);
     }
 
+    private async Task<Result<PersistentTitle>> SavePersistentTitleAsync(Title title)
+    {
+        var exists = await _nsxLibraryDbContext
+            .PersistentTitles.FirstOrDefaultAsync(x => x.ApplicationId == title.ApplicationId);
+
+        if (exists is not null)
+        {
+            return Result.Success(exists);
+        }
+        var persistentTitle = new PersistentTitle
+        {
+            ApplicationId = title.ApplicationId,
+            Collection = title.Collection?.Name,
+            FirstSeen = DateTime.UtcNow
+            
+        };
+        
+        _nsxLibraryDbContext.Add(persistentTitle);
+
+        return Result.Success(persistentTitle);
+    }
+    
+    private async Task<Result<bool>> UpdatePersistentTitle(LibraryTitleDto title)
+    {
+        var persistentTitle = await _nsxLibraryDbContext
+            .PersistentTitles.FirstOrDefaultAsync(x => x.ApplicationId == title.ApplicationId);
+
+        if (persistentTitle is not null)
+        {
+            persistentTitle.UserRating = title.UserRating;
+            persistentTitle.Collection = title.Collection?.Name;
+        }
+        
+        return Result.Success(true);
+    }
+
     public async Task<Title?> ProcessFileAsync(LibraryFileDto libraryFile)
     {
         try
@@ -1020,8 +1059,31 @@ public class TitleLibraryService(
                     title.Collection = collection;
                 }
             }
+            
+            var persistentTitle = await SavePersistentTitleAsync(title);
+            if (persistentTitle.IsSuccess)
+            {
+                title.CreatedAt = persistentTitle.Value.FirstSeen;
+                title.UserRating = persistentTitle.Value.UserRating;
+                if (persistentTitle.Value.Collection is not null)
+                {
+                    var collection = _nsxLibraryDbContext.Collections.FirstOrDefault(
+                        x => x.Name == persistentTitle.Value.Collection);
+                    if (collection is null)
+                    {
+                        collection = new Collection
+                        {
+                            Name = persistentTitle.Value.Collection,
+                        };
+                        _nsxLibraryDbContext.Collections.Add(collection);
+                    }
+                    title.Collection = collection;
+                }
+            }
+
             _nsxLibraryDbContext.Add(title);
             await _nsxLibraryDbContext.SaveChangesAsync();
+            
             return title;
         }
         catch (Exception e)
