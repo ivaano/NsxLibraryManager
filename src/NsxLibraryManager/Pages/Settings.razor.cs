@@ -279,6 +279,25 @@ public partial class Settings
         }
     }
 
+    private async Task ClearPersistentData()
+    {
+        var confirmationResult = await DialogService.Confirm("Are you sure?", "Remove persistent titles?",
+            new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (confirmationResult == true)
+        {
+            await SettingsService.RemovePersistentData();
+            ShowNotification(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Success,
+                Summary = "Success",
+                Detail = "Persisted titles have been removed.",
+                Duration = 3000,
+                CloseOnClick = true
+            });
+        }
+        
+    }
+
     private Task ReloadApp()
     {
         ApplicationLifetime.StopApplication();

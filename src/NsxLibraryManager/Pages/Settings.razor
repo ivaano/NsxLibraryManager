@@ -193,19 +193,24 @@
                     </RadzenRow>
                 </RadzenFieldset>
                 <RadzenFieldset Text="Library settings">
-                    <RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center">
                         <RadzenColumn Size="12" SizeMD="6">
                             <RadzenRow>
                                 <RadzenColumn Size="6">
                                     <RadzenSwitch Name="UseEnglishNaming" @bind-Value="@_config.UseEnglishNaming" Change=@(args => ConfigChanged()) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Switch value" }})" MouseEnter="@(args => ShowTooltip("For titles in Asia regions (JP, CN, KO, HK) prefer Nswdb for title name", args))"/>
                                     <RadzenLabel Text="Try to use english naming." Component="UseEnglishNaming" Style="margin-left: 8px; vertical-align: middle;"/>
                                 </RadzenColumn>
-                                <RadzenColumn Size="6">
-                                </RadzenColumn>
                             </RadzenRow>
                         </RadzenColumn>
                         <RadzenColumn Size="12" SizeMD="6">
-                            <RadzenRow class="rz-text-align-center">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="6">
+                                    <RadzenButton 
+                                        Text="Clear persistent titles" 
+                                        Click=@(args => ClearPersistentData()) 
+                                        ButtonStyle="ButtonStyle.Danger" 
+                                        MouseEnter="@(args => ShowTooltip("Used to persist user rating, collection, between library reloads.", args, new TooltipOptions() { Delay = 500, Duration = 5000, Position = TooltipPosition.Bottom }))"/>
+                                </RadzenColumn>
                             </RadzenRow>
                         </RadzenColumn>
 
@@ -278,11 +283,6 @@
             </RadzenStack>
         </RadzenColumn>
 
-    </RadzenRow>
-    <RadzenRow>
-        <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
-
-        </RadzenStack>
     </RadzenRow>
 </RadzenFieldset>
 <RadzenFieldset Text="Misc">
