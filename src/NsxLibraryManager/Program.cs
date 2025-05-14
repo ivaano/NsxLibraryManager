@@ -59,6 +59,18 @@ builder.Services
 await builder.TitleDbDownloader();
 
 builder.Services.AddHttpClient();
+builder.Services
+    .AddHttpClient("webhook", client => 
+        {
+            client.Timeout = TimeSpan.FromSeconds(30);
+        })
+    .ConfigurePrimaryHttpMessageHandler(() =>
+        {
+            return new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+            };
+        });
 
 builder.Services.AddDbContext<NsxLibraryDbContext>(options =>
     options.UseSqlite(initialConfig.GetSection("NsxLibraryManager:NsxLibraryDbConnection").Value));
@@ -74,8 +86,11 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 //nsx services
 if (validatorResult.valid)
 {
-    builder.Services.AddHostedService<FtpBackgroundService>();
+    
     builder.Services.AddSingleton<FtpStateService>();
+    builder.Services.AddSingleton<WebhookStateService>();
+    builder.Services.AddHostedService<FtpBackgroundService>();
+    builder.Services.AddHostedService<WebhookBackgroundService>();
     builder.Services.AddScoped<ISettingsService, SettingsService>();
     builder.Services.AddScoped<ISettingsMediator, SettingsService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
@@ -86,6 +101,7 @@ if (validatorResult.valid)
     builder.Services.AddTransient<ITitleLibraryService, TitleLibraryService>();
     builder.Services.AddTransient<IFtpClientService, FtpClientService>();
     builder.Services.AddTransient<IDownloadService, DownloadService>();
+    builder.Services.AddScoped<IWebhookService, WebhookService>();
     builder.Services.AddScoped<ITitledbService, TitledbService>();
     builder.Services.AddScoped<IRenamerService, RenamerService>();
     builder.Services.AddScoped<IFileUploadService, FileUploadService>();

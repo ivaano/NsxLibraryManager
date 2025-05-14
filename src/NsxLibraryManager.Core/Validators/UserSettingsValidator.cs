@@ -16,7 +16,7 @@ public class UserSettingsValidator : AbstractValidator<UserSettings>
                 }
             });        
         RuleFor(x => x.LibraryLocations).NotEmpty().WithMessage("At least one library location is required.");
-
+        
         RuleFor(x => x.BackupPath)
             .Custom((path, context) =>
             {
@@ -28,7 +28,16 @@ public class UserSettingsValidator : AbstractValidator<UserSettings>
 
         RuleFor(x => x.DownloadSettings)
             .NotNull().WithMessage("Download settings cannot be null.");
+        
+        RuleFor(x => x.LibraryReloadWebhookUrl)
+            .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
+            .When(x => x.LibraryReloadPostWebhook)
+            .WithMessage("Invalid library reload webhook url.");
 
+        RuleFor(x => x.LibraryRefreshWebhookUrl)
+            .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
+            .When(x => x.LibraryRefreshPostWebhook)
+            .WithMessage("Invalid library refresh webhook url.");
     }
 
 }

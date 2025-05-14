@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NsxLibraryManager.Migrations.NsxLibrary
 {
     /// <inheritdoc />
-    public partial class PersistenTitle : Migration
+    public partial class PersistentTitle : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

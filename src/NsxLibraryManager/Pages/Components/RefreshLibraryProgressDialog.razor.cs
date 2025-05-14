@@ -1,17 +1,16 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NsxLibraryManager.Services.Interface;
+using NsxLibraryManager.Shared.Enums;
 using Radzen;
 
 namespace NsxLibraryManager.Pages.Components;
 #nullable disable
 public partial class RefreshLibraryProgressDialog : IDisposable
 {
-    [Inject]
-    protected DialogService DialogService { get; set; }
-    [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
-    [Inject]
-    protected ILogger<RefreshLibraryProgressDialog> Logger { get; set; }
+    [Inject] protected DialogService DialogService { get; set; }
+    [Inject] protected ITitleLibraryService TitleLibraryService { get; set; }
+    [Inject] protected IWebhookService WebhookService { get; set; }    
+
     public double ProgressCompleted { get; set; }
     public int FileCount { get; set; }
 
@@ -35,21 +34,21 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                 FileCount = filesToProcess.TotalFiles;
                 foreach (var libraryTitle in filesToProcess.FilesToAdd)
                 {
-                    var result = await TitleLibraryService.AddLibraryTitleAsync(libraryTitle);
+                    await TitleLibraryService.AddLibraryTitleAsync(libraryTitle);
                     ProgressCompleted++;
                     StateHasChanged();
                 }
 
                 foreach (var libraryTitle in filesToProcess.FilesToRemove)
                 {
-                    var result = await TitleLibraryService.RemoveLibraryTitleAsync(libraryTitle);
+                    await TitleLibraryService.RemoveLibraryTitleAsync(libraryTitle);
                     ProgressCompleted++;
                     StateHasChanged();
                 }
                 
                 foreach (var libraryTitle in filesToProcess.FilesToUpdate)
                 {
-                    var result = await TitleLibraryService.UpdateLibraryTitleAsync(libraryTitle);
+                    await TitleLibraryService.UpdateLibraryTitleAsync(libraryTitle);
                     ProgressCompleted++;
                     StateHasChanged();
                 }
@@ -57,6 +56,8 @@ public partial class RefreshLibraryProgressDialog : IDisposable
 
 
             });
+        var payload = new { EventType = nameof(WebhookType.LibraryRefresh), TimeStamp = DateTime.UtcNow };
+        await WebhookService.SendWebhook(WebhookType.LibraryRefresh, payload);
         DialogService.Close();
     }
     

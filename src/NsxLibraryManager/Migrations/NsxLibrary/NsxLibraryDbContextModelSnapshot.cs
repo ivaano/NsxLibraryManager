@@ -174,7 +174,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
                         .HasMaxLength(100)
                         .HasColumnType("VARCHAR");
 
-                    b.Property<DateTime?>("FirstSeen")
+                    b.Property<DateTime>("FirstSeen")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserRating")
