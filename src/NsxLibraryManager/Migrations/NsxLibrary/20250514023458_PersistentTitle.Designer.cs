@@ -11,8 +11,8 @@ using NsxLibraryManager.Data;
 namespace NsxLibraryManager.Migrations.NsxLibrary
 {
     [DbContext(typeof(NsxLibraryDbContext))]
-    [Migration("20250511205424_PersistenTitle")]
-    partial class PersistenTitle
+    [Migration("20250514023458_PersistentTitle")]
+    partial class PersistentTitle
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,7 +177,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
                         .HasMaxLength(100)
                         .HasColumnType("VARCHAR");
 
-                    b.Property<DateTime?>("FirstSeen")
+                    b.Property<DateTime>("FirstSeen")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserRating")
