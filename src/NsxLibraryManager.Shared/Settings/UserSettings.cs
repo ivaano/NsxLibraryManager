@@ -16,7 +16,13 @@ public class UserSettings
     public string ConsoleKeys { get; set; } = string.Empty;
     public string UiTheme { get; set; } = string.Empty;
     public bool IsConfigured { get; set; }
-    
+    public bool LibraryReloadPostWebhook { get; set; }
+    public string LibraryReloadWebhookUrl { get; set; } = string.Empty;
+    public int LibraryReloadWebhookRequestMethod { get; set; } = 1;
+    public bool LibraryRefreshPostWebhook { get; set; }
+    public string LibraryRefreshWebhookUrl { get; set; } = string.Empty;
+    public int LibraryRefreshWebhookRequestMethod { get; set; } = 1;
+
     public bool UseEnglishNaming { get; set; } = true;
     public AgeRatingAgency AgeRatingAgency { get; set; } = AgeRatingAgency.Esrb;
 

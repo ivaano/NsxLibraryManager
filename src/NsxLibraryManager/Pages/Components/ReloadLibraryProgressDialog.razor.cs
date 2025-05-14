@@ -12,6 +12,9 @@ public partial class ReloadLibraryProgressDialog : IDisposable
     protected DialogService DialogService { get; set; }
     [Inject]
     protected ITitleLibraryService TitleLibraryService { get; set; }
+    
+    [Inject]
+    protected IWebhookService WebhookService { get; set; }
 
     private double ProgressCompleted { get; set; }
     private int FileCount { get; set; }
@@ -63,6 +66,8 @@ public partial class ReloadLibraryProgressDialog : IDisposable
                 
                 await TitleLibraryService.SaveLibraryReloadDate();
             });
+        var payload = new { EventType = "Algo", TimeStamp = DateTime.UtcNow };
+        var result = await WebhookService.SendWebhook(WebhookType.LibraryReload, payload);
         DialogService.Close();
     }
     

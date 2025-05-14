@@ -213,9 +213,99 @@
                                 </RadzenColumn>
                             </RadzenRow>
                         </RadzenColumn>
-
                     </RadzenRow>
                 </RadzenFieldset>
+                <RadzenFieldset Text="Library events webhooks">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12">
+                                    <RadzenSwitch Name="ReloadWebhook" @bind-Value="@_config.LibraryReloadPostWebhook" Change=@(args => ConfigChanged()) InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Enable webhook" } })" MouseEnter="@(args => ShowTooltip("Enable webhook calls on library reload", args))"/>
+                                    <RadzenLabel Text="Library reload webhook" Component="ReloadWebhook" Style="margin-left: 8px; vertical-align: middle;"/>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="5">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12">
+                                    <RadzenFormField Text="Webhook URL" Style="width: 100%;">
+                                        <ChildContent>
+                                            <RadzenTextBox Placeholder="Webhook URL" Name="ReloadWebhookUrl" @bind-Value="@_config.LibraryReloadWebhookUrl" Change=@(args => ConfigChanged()) Style="width: 100%;" Disabled="@(!_config.LibraryReloadPostWebhook)"/>
+                                        </ChildContent>
+                                        <Helper>
+                                            @if (@_validationErrors["LibraryReloadWebhookUrl"] != string.Empty)
+                                            {
+                                                <div class="rz-message rz-messages-error">@_validationErrors["LibraryReloadWebhookUrl"]</div>
+                                            }
+                                            <div class="rz-text-caption">
+                                                use a fully qualified URI including scheme (http or https), port, userinfo etc.
+                                            </div>
+                                        </Helper>
+                                    </RadzenFormField>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12">
+                                    <RadzenLabel Text="Request method:" Component="WebhookRequestMethod" Style="display: block; margin-bottom: 8px;"/>
+                                    <RadzenRadioButtonList @bind-Value="@_config.LibraryReloadWebhookRequestMethod" TValue="int" Change=@(args => ConfigChanged()) Disabled="@(!_config.LibraryReloadPostWebhook)">
+                                        <Items>
+                                            <RadzenRadioButtonListItem Text="POST" Value="1"/>
+                                            <RadzenRadioButtonListItem Text="GET" Value="2"/>
+                                            <RadzenRadioButtonListItem Text="HEAD" Value="3"/>
+                                        </Items>
+                                    </RadzenRadioButtonList>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-2">
+                        <RadzenColumn Size="12" SizeMD="3">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12">
+                                    <RadzenSwitch Name="WebhookRefresh" @bind-Value="@_config.LibraryRefreshPostWebhook" Change=@(args => ConfigChanged()) InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Enable webhook" } })" MouseEnter="@(args => ShowTooltip("Enable webhook calls on library refresh", args))"/>
+                                    <RadzenLabel Text="Library refresh webhook" Component="WebhookRefresh" Style="margin-left: 8px; vertical-align: middle;"/>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="5">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12">
+                                    <RadzenFormField Text="Webhook URL" Style="width: 100%;">
+                                        <ChildContent>
+                                            <RadzenTextBox Placeholder="Webhook URL" Name="RefreshWebhookUrl" @bind-Value="@_config.LibraryRefreshWebhookUrl" Change=@(args => ConfigChanged()) Style="width: 100%;" Disabled="@(!_config.LibraryRefreshPostWebhook)"/>
+                                        </ChildContent>
+                                        <Helper>
+                                            @if (@_validationErrors["LibraryRefreshWebhookUrl"] != string.Empty)
+                                            {
+                                                <div class="rz-message rz-messages-error">@_validationErrors["LibraryRefreshWebhookUrl"]</div>
+                                            }
+                                            <div class="rz-text-caption">
+                                                use a fully qualified URI including scheme (http or https), port, userinfo etc.
+                                            </div>
+                                        </Helper>
+                                    </RadzenFormField>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="4">
+                            <RadzenRow AlignItems="AlignItems.Center">
+                                <RadzenColumn Size="12">
+                                    <RadzenLabel Text="Request method:" Component="WebhookRequestRefreshMethod" Style="display: block; margin-bottom: 8px;"/>
+                                    <RadzenRadioButtonList @bind-Value="@_config.LibraryRefreshWebhookRequestMethod" TValue="int" Change=@(args => ConfigChanged()) Disabled="@(!_config.LibraryRefreshPostWebhook)">
+                                        <Items>
+                                            <RadzenRadioButtonListItem Text="POST" Value="1"/>
+                                            <RadzenRadioButtonListItem Text="GET" Value="2"/>
+                                            <RadzenRadioButtonListItem Text="HEAD" Value="3"/>
+                                        </Items>
+                                    </RadzenRadioButtonList>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenFieldset>
+                
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>

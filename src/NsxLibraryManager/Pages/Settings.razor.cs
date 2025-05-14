@@ -59,7 +59,9 @@ public partial class Settings
         { "DownloadSettings.CnmtsUrl", string.Empty },
         { "DownloadSettings.VersionUrl", string.Empty },
         { "DownloadSettings.TimeoutInSeconds", string.Empty },
-        { "DownloadSettings.Regions", string.Empty }
+        { "DownloadSettings.Regions", string.Empty },
+        { "LibraryReloadWebhookUrl", string.Empty },
+        { "LibraryRefreshWebhookUrl", string.Empty }
     };
 
     protected override async Task OnInitializedAsync()
@@ -188,10 +190,10 @@ public partial class Settings
             });
         }
 
-        LoadConfiguration();
+        await LoadConfiguration();
     }
 
-    private void OnUploadKeysComplete(UploadCompleteEventArgs args)
+    private async Task OnUploadKeysComplete(UploadCompleteEventArgs args)
     {
         var options = new JsonSerializerOptions
         {
@@ -228,7 +230,7 @@ public partial class Settings
             });
         }
 
-        LoadConfiguration();
+        await LoadConfiguration();
     }
 
     private void OnUploadError(UploadErrorEventArgs args)
@@ -263,7 +265,7 @@ public partial class Settings
         });
     }
 
-    private void ClearKeys()
+    private async Task ClearKeys()
     {
         if (SettingsService.RemoveCurrentKeys())
         {
@@ -275,7 +277,7 @@ public partial class Settings
                 Duration = 3000,
                 CloseOnClick = true
             });
-            LoadConfiguration();
+            await LoadConfiguration();
         }
     }
 
