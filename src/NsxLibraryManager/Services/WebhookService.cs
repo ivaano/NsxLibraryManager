@@ -25,8 +25,8 @@ public class WebhookService : IWebhookService
     public Task<Result<string>> SendWebhook(WebhookType webhookType, object payload)
     {
         var userSettings = _settingsService.GetUserSettings();
-        var webhookUrl = string.Empty;
-        
+        string webhookUrl;
+        WebhookHttpMethod webhookMethod;
         switch (webhookType)
         {
             case WebhookType.LibraryReload:
@@ -35,8 +35,29 @@ public class WebhookService : IWebhookService
                     _logger.LogInformation("Webhook {webhookType} is disabled in settings", webhookType);
                     return Task.FromResult(Result.Failure<string>($"Webhook {webhookType} is disabled in settings"));
                 }
-
                 webhookUrl = userSettings.LibraryReloadWebhookUrl;
+                webhookMethod = userSettings.LibraryReloadWebhookRequestMethod switch
+                {
+                    1 => WebhookHttpMethod.Post,
+                    2 => WebhookHttpMethod.Put,
+                    3 => WebhookHttpMethod.Get,
+                    _ => WebhookHttpMethod.Post
+                };
+                break;
+            case WebhookType.LibraryRefresh:
+                if (!userSettings.LibraryRefreshPostWebhook)
+                {
+                    _logger.LogInformation("Webhook {webhookType} is disabled in settings", webhookType);
+                    return Task.FromResult(Result.Failure<string>($"Webhook {webhookType} is disabled in settings"));
+                }
+                webhookUrl = userSettings.LibraryRefreshWebhookUrl;
+                webhookMethod = userSettings.LibraryRefreshWebhookRequestMethod switch
+                {
+                    1 => WebhookHttpMethod.Post,
+                    2 => WebhookHttpMethod.Put,
+                    3 => WebhookHttpMethod.Get,
+                    _ => WebhookHttpMethod.Post
+                };
                 break;
             default:
                 _logger.LogInformation("Unknown webhook type  {webhookType}", webhookType);
@@ -47,6 +68,7 @@ public class WebhookService : IWebhookService
         {
             var requestId = _backgroundService.QueueWebhookRequest(
                 webhookUrl, 
+                webhookMethod,
                 payload, 
                 webhookType);
                 

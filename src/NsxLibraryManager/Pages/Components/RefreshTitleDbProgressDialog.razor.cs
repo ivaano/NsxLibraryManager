@@ -13,11 +13,10 @@ public partial class RefreshTitleDbProgressDialog : IDisposable
 
     [Inject] protected DialogService DialogService { get; set; }
     [Inject] protected ISettingsService SettingsService { get; set; }
-    
     [Inject] protected IDownloadService DownloadService { get; set; }
-    
     [Inject] protected ITitledbService TitledbService { get; set; }
     [Inject] protected TitledbDbContext DbContext { get; set; } = default!;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

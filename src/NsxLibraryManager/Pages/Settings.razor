@@ -1,4 +1,5 @@
 ﻿@page "/settings"
+@using NsxLibraryManager.Shared.Enums
 @using NsxLibraryManager.Shared.Settings
 
 
@@ -251,9 +252,9 @@
                                     <RadzenLabel Text="Request method:" Component="WebhookRequestMethod" Style="display: block; margin-bottom: 8px;"/>
                                     <RadzenRadioButtonList @bind-Value="@_config.LibraryReloadWebhookRequestMethod" TValue="int" Change=@(args => ConfigChanged()) Disabled="@(!_config.LibraryReloadPostWebhook)">
                                         <Items>
-                                            <RadzenRadioButtonListItem Text="POST" Value="1"/>
-                                            <RadzenRadioButtonListItem Text="GET" Value="2"/>
-                                            <RadzenRadioButtonListItem Text="HEAD" Value="3"/>
+                                            <RadzenRadioButtonListItem Text="POST" Value="@Convert.ToInt32(WebhookHttpMethod.Post)"/>
+                                            <RadzenRadioButtonListItem Text="PUT" Value="@Convert.ToInt32(WebhookHttpMethod.Put)"/>
+                                            <RadzenRadioButtonListItem Text="GET" Value="@Convert.ToInt32(WebhookHttpMethod.Get)"/>
                                         </Items>
                                     </RadzenRadioButtonList>
                                 </RadzenColumn>
@@ -296,8 +297,8 @@
                                     <RadzenRadioButtonList @bind-Value="@_config.LibraryRefreshWebhookRequestMethod" TValue="int" Change=@(args => ConfigChanged()) Disabled="@(!_config.LibraryRefreshPostWebhook)">
                                         <Items>
                                             <RadzenRadioButtonListItem Text="POST" Value="1"/>
-                                            <RadzenRadioButtonListItem Text="GET" Value="2"/>
-                                            <RadzenRadioButtonListItem Text="HEAD" Value="3"/>
+                                            <RadzenRadioButtonListItem Text="PUT" Value="2"/>
+                                            <RadzenRadioButtonListItem Text="GET" Value="3"/>
                                         </Items>
                                     </RadzenRadioButtonList>
                                 </RadzenColumn>

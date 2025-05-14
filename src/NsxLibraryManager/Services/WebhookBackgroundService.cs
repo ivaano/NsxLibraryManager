@@ -53,12 +53,13 @@ public class WebhookBackgroundService : BackgroundService
         }
     }
     
-    public string QueueWebhookRequest(string webhookUri, object payload, WebhookType webhookType)
+    public string QueueWebhookRequest(string webhookUri, WebhookHttpMethod httpMethod, object payload, WebhookType webhookType)
     {
         var request = new WebhookRequest
         {
             Id = Guid.NewGuid().ToString(),
             WebhookUri = webhookUri,
+            HttpMethod = httpMethod,
             Payload = payload,
             WebhookType = Enum.GetName(typeof(WebhookType), webhookType) ?? "Unknown",
             Timestamp = DateTime.Now,
@@ -186,17 +187,16 @@ public class WebhookBackgroundService : BackgroundService
             {
                 _logger.LogError(ex, "Error processing webhook request: {id}", request.Id);
                 
-                // Check if we should retry
-                if (request.Retries < 3) // Allow up to 3 retries
+                // Retry 3 times
+                if (request.Retries < 3) 
                 {
                     request.Retries++;
-                    _webhookQueue.Enqueue(request); // Put it back in the queue
+                    _webhookQueue.Enqueue(request); 
                     _logger.LogInformation("Requeueing webhook request for retry: {id}, attempt {attempt}", 
                         request.Id, request.Retries);
                 }
                 else
                 {
-                    // Report failure after all retries are exhausted
                     _stateService.CompleteWebhook(new WebhookCompletedStatus
                     {
                         WebhookId = request.Id,
@@ -213,11 +213,11 @@ public class WebhookBackgroundService : BackgroundService
     
     private async Task SendWebhookRequest(WebhookRequest request, CancellationToken stoppingToken)
     {
-        // Start the webhook status
         _stateService.UpdateStatus(new WebhookStatusUpdate
         {
             WebhookId = request.Id,
             WebhookType = request.WebhookType,
+            HttpMethod = request.HttpMethod,
             WebhookUri = request.WebhookUri,
             StartTime = DateTime.Now,
             LastUpdateTime = DateTime.Now
@@ -232,8 +232,35 @@ public class WebhookBackgroundService : BackgroundService
                 JsonSerializer.Serialize(request.Payload), 
                 Encoding.UTF8, 
                 "application/json");
-            
-            var response = await _httpClient.PostAsync(request.WebhookUri, content, stoppingToken);
+
+            var method = new HttpMethod(request.HttpMethod.ToString()); 
+            HttpResponseMessage response;
+            var uri = new Uri(request.WebhookUri);
+
+            using (var httpRequestMessage = new HttpRequestMessage(method, uri))
+            {
+                if (method == HttpMethod.Post || method == HttpMethod.Put)
+                {
+                    httpRequestMessage.Content = content; 
+                }
+                
+                if (!string.IsNullOrEmpty(uri.UserInfo))
+                {
+                    try
+                    {
+                        var authString = uri.UserInfo;
+                        var base64AuthString = Convert.ToBase64String(Encoding.ASCII.GetBytes(authString));
+                        httpRequestMessage.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", base64AuthString);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error parsing UserInfo from webhook id {id}", request.Id);
+                    }
+                }
+                httpRequestMessage.Headers.Add("User-Agent", "NsxLibraryManager");
+
+                response = await _httpClient.SendAsync(httpRequestMessage, stoppingToken);
+            }
             
             var statusCode = (int)response.StatusCode;
             var success = response.IsSuccessStatusCode;

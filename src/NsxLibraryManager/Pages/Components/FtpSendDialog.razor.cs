@@ -26,8 +26,7 @@ public partial class FtpSendDialog : ComponentBase
     [Inject]
     protected ISettingsService SettingsService { get; set; } = default!;
     
-    
-    private FtpClientSettings _ftpClientSettings;
+    private FtpClientSettings _ftpClientSettings = default!;
     private bool _disableButtons = false;
     
     

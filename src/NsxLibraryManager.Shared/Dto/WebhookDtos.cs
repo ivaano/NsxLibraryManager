@@ -13,6 +13,11 @@ public class WebhookRequest
     /// URI to send the webhook to
     /// </summary>
     public string WebhookUri { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Http method to use for the webhook
+    /// </summary>
+    public WebhookHttpMethod HttpMethod { get; set; } = WebhookHttpMethod.Post;
     
     /// <summary>
     /// Payload to send with the webhook
@@ -89,6 +94,13 @@ public class WebhookStatusUpdate
     /// URI the webhook is being sent to
     /// </summary>
     public string WebhookUri { get; set; } = string.Empty;
+    
+    
+    /// <summary>
+    /// Http method to use for the webhook
+    /// </summary>
+    public WebhookHttpMethod HttpMethod { get; set; } = WebhookHttpMethod.Post;
+
     
     /// <summary>
     /// When the webhook started processing

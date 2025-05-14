@@ -66,8 +66,8 @@ public partial class ReloadLibraryProgressDialog : IDisposable
                 
                 await TitleLibraryService.SaveLibraryReloadDate();
             });
-        var payload = new { EventType = "Algo", TimeStamp = DateTime.UtcNow };
-        var result = await WebhookService.SendWebhook(WebhookType.LibraryReload, payload);
+        var payload = new { EventType = nameof(WebhookType.LibraryReload), TimeStamp = DateTime.UtcNow };
+        await WebhookService.SendWebhook(WebhookType.LibraryReload, payload);
         DialogService.Close();
     }
     
