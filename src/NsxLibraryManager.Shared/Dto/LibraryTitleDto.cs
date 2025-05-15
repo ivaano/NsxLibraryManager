@@ -24,6 +24,8 @@ public class LibraryTitleDto
     public bool IsDuplicate { get; set; }
     public DateTime? LastWriteTime { get; set; }
     public IEnumerable<LanguageDto>? Languages { get; init; }
+
+    public DateTime? LatestMissingDlcDate { get; set; }
     public uint LatestOwnedUpdateVersion { get; init; }
     public uint LatestVersion { get; init; }
     public long? NsuId { get; init; }

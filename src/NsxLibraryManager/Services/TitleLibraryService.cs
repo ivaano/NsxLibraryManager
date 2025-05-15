@@ -151,8 +151,8 @@ public class TitleLibraryService(
 
     private async Task<Title?> AggregateLibraryTitle(LibraryTitleDto libraryTitle)
     {
-        var titledbTitle = await _titledbDbContext
-            .Titles
+        var titledbTitle = await _titledbDbContext.Titles
+            .AsNoTracking()
             .Include(t => t.Languages)
             .Include(r => r.RatingContents)
             .Include(c => c.Categories)
@@ -313,10 +313,27 @@ public class TitleLibraryService(
 
             nsxLibraryTitle.Versions = versions;
         }
-        
-        if (libraryTitle.ContentType == TitleContentType.DLC)
+
+        switch (libraryTitle.ContentType)
         {
-            nsxLibraryTitle.LatestOwnedUpdateVersion = libraryTitle.Version;
+            case TitleContentType.Base:
+            {
+                var latestDlc = await _titledbDbContext.Titles
+                    .AsNoTracking()
+                    .Where(t => t.OtherApplicationId == libraryTitle.ApplicationId &&
+                                t.ContentType == TitleContentType.DLC)
+                    .OrderByDescending(t => t.ReleaseDate)
+                    .FirstOrDefaultAsync();
+                if (latestDlc is not null && latestDlc.ReleaseDate is not null)
+                {
+                    nsxLibraryTitle.LatestMissingDlcDate = (DateTime)latestDlc.ReleaseDate;    
+                }
+                
+                break;
+            }
+            case TitleContentType.DLC:
+                nsxLibraryTitle.LatestOwnedUpdateVersion = libraryTitle.Version;
+                break;
         }
 
         return nsxLibraryTitle;
@@ -481,7 +498,6 @@ public class TitleLibraryService(
     
     public async Task<GetBaseTitlesResultDto> GetDlcTitlesWithMissingLastUpdate(LoadDataArgs args)
     {
-       
         var query = _nsxLibraryDbContext.Titles
             .AsNoTracking()
             .Where(t => t.ContentType == TitleContentType.DLC)
@@ -501,8 +517,8 @@ public class TitleLibraryService(
             .Include(x => x.Categories)
             .Include(x => x.Versions.OrderByDescending(v => v.VersionNumber).Take(1))
             .Include(x => x.Screenshots)
-            .Include(x => x.Languages).AsQueryable();
-
+            .Include(x => x.Languages)
+            .AsQueryable();
         return await ApplyAdditionalFilters(query, args);
     }
 
