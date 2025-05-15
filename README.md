@@ -56,6 +56,7 @@ that I could run on a server and access it from any device.
   - backup (used to move titles when removing duplicates) `--mount type=bind,source=/home/ivan/backup,target=/app/backup`
   - config (used to store app configuration) `--mount type=bind,source=/home/ivan/config,target=/app/config`
   - data (used to store app databases) `--mount type=bind,source=/home/ivan/data,target=/app/data`
+  - icon (this is where the icon data extracted from the titles will be saved) `--mount type=bind,source=/home/ivan/icon,target=/app/wwwroot/images/icon`
 
 ### Manual
 - Download the latest release source

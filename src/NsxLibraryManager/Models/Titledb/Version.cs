@@ -5,5 +5,5 @@ namespace NsxLibraryManager.Models.Titledb;
 
 public class Version : BaseVersion
 {
-    public Title Title { get; set; }
+    public required Title Title { get; set; }
 }

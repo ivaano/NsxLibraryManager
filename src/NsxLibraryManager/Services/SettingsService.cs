@@ -196,6 +196,12 @@ public class SettingsService(
         return true;
     }
 
+    public async Task<Result<bool>> RemovePersistentData()
+    {
+        await _nsxLibraryDbContext.PersistentTitles.ExecuteDeleteAsync();
+        return Result.Success(true);
+    }
+
     public UserSettings GetUserSettings()
     {
         Load();

@@ -23,6 +23,8 @@ public class NsxLibraryDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<LibraryUpdate> LibraryUpdates { get; set; }
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
+    public DbSet<PersistentTitle> PersistentTitles { get; set; } = null!;
+    
     public NsxLibraryDbContext(DbContextOptions<NsxLibraryDbContext> options, IOptions<UserSettings> configuration) :
         base(options)
     {
@@ -81,12 +83,12 @@ public class NsxLibraryDbContext : DbContext, IDataProtectionKeyContext
             var createdAtProperty = entityEntry.Entity.GetType().GetProperty("CreatedAt");
             var updatedAtProperty = entityEntry.Entity.GetType().GetProperty("UpdatedAt");
 
-            if (entityEntry.State == EntityState.Added && createdAtProperty != null)
+            if (entityEntry.State == EntityState.Added && createdAtProperty is not null  && createdAtProperty.GetValue(entityEntry.Entity) is null)
             {
                 createdAtProperty.SetValue(entityEntry.Entity, DateTime.UtcNow);
             }
 
-            if (updatedAtProperty != null)
+            if (updatedAtProperty is not null)
             {
                 updatedAtProperty.SetValue(entityEntry.Entity, DateTime.UtcNow);
             }

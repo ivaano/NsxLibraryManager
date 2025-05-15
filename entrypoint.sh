@@ -1,9 +1,10 @@
-﻿#!/bin/bash
+#!/bin/bash
 
 # This script runs as root initially.
 # It reads the target user ID (PUID) and group ID (PGID) from environment variables.
 # If PUID/PGID are not set, it defaults to the UID/GID of the 'app' user id (1654) according to base image.
 # It changes the ownership of /app/wwwroot to the determined user/group.
+# It makes /app/renamer/in writable by owner and group (775).
 # Then, it uses gosu to execute the main application command as that user/group.
 
 echo "Starting entrypoint script as root."
@@ -42,6 +43,10 @@ fi
 # Change ownership of /app to the target user and group
 echo "Changing ownership of /app/wwwroot to ${TARGET_UID}:${TARGET_GID}"
 chown -R "${TARGET_UID}":"${TARGET_GID}" /app/wwwroot
+
+# Make only /app/renamer/in writable by owner and group (775)
+echo "Setting /app/renamer/in permissions to 775 (owner & group can write)"
+chmod 775 /app/renamer/in
 
 # Execute the main application command using gosu to switch to the target user/group
 echo "Executing dotnet NsxLibraryManager.dll as user ${TARGET_UID}:${TARGET_GID}"
