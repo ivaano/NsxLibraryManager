@@ -160,6 +160,11 @@ public partial class Title
                 0,
             Owned = libraryApplicationIds.Contains(v.VersionNumber)
         }).AsQueryable();
+
+        if (query is null)
+        {
+            return;
+        }
         
         if (!string.IsNullOrEmpty(args.Filter))
         {
