@@ -24,6 +24,8 @@ public sealed class Title : BaseTitle
     
     //For basetitles and dlc only
     public uint LatestOwnedUpdateVersion { get; set; }
+    
+    public DateTime LatestMissingDlcDate { get; set; }
 
     public AccuratePackageType PackageType { get; set; }
     

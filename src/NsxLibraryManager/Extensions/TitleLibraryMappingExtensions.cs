@@ -56,6 +56,7 @@ public static class TitleLibraryMappingExtensions
             FileName = title.FileName,
             IconUrl = title.IconUrl,
             LatestOwnedUpdateVersion = title.LatestOwnedUpdateVersion,
+            LatestMissingDlcDate = title.LatestMissingDlcDate,
             LatestVersion = title.LatestVersion,
             NsuId = title.NsuId,
             NumberOfPlayers = title.NumberOfPlayers,

@@ -55,7 +55,16 @@
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="Region" Title="Region" Visible="true" Width="50px"/>
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="UpdatesCount" Title="Available Updates" Visible="true" Width="50px"/>
                 <RadzenDataGridColumn TItem="LibraryTitleDto" Property="OwnedUpdatesCount" Title="Owned Updates" Visible="true" Width="50px" Sortable="true" />
-                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="ReleaseDate" Title="Release Date" FormatString="{0:d}" Width="50px"/>
+                <RadzenDataGridColumn TItem="LibraryTitleDto" Property="Versions" Title="Release Date" FormatString="{0:d}" Width="50px">
+                    <Template Context="libraryTitle">
+                        @{
+                            @if (libraryTitle.Versions is not null)
+                            {
+                                <span>@libraryTitle.Versions[0].VersionDate</span>
+                            }
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
 
             </Columns>
         </RadzenDataGrid>
