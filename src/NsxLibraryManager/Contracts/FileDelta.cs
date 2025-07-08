@@ -1,7 +1,6 @@
-﻿using NsxLibraryManager.Core.Models;
-using NsxLibraryManager.Shared.Dto;
+﻿using NsxLibraryManager.Shared.Dto;
 
-namespace NsxLibraryManager.Models;
+namespace NsxLibraryManager.Contracts;
 
 public class FileDelta
 {

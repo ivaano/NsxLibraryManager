@@ -82,15 +82,20 @@ builder.Services.AddDbContext<TitledbDbContext>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+});
 
 //nsx services
 if (validatorResult.valid)
 {
-    
     builder.Services.AddSingleton<FtpStateService>();
     builder.Services.AddSingleton<WebhookStateService>();
+    builder.Services.AddSingleton<LibraryBackgroundStateService>();
     builder.Services.AddHostedService<FtpBackgroundService>();
     builder.Services.AddHostedService<WebhookBackgroundService>();
+    builder.Services.AddHostedService<LibraryBackgroundService>();
     builder.Services.AddScoped<ISettingsService, SettingsService>();
     builder.Services.AddScoped<ISettingsMediator, SettingsService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
@@ -110,7 +115,6 @@ if (validatorResult.valid)
     builder.Services.AddScoped<IValidator<CollectionRenamerSettings>, CollectionSettingsValidator>();    
     builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    
 }
-builder.Services.AddControllersWithViews();
 
 //radzen services
 builder.Services.AddRadzenComponents();
@@ -126,8 +130,12 @@ if (builder.Environment.IsEnvironment("DeveLinux"))
     builder.WebHost.UseStaticWebAssets();
 }
 
+
+
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

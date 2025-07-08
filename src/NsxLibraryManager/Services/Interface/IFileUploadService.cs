@@ -1,4 +1,5 @@
-﻿using NsxLibraryManager.Models;
+﻿using NsxLibraryManager.Contracts;
+using NsxLibraryManager.Models;
 
 namespace NsxLibraryManager.Services.Interface;
 

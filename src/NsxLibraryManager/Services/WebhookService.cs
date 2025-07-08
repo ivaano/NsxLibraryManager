@@ -101,8 +101,6 @@ public class WebhookService : IWebhookService
     
     public Task<Result<List<WebhookSetting>>> GetWebhookSettings()
     {
-        //return Task.FromResult(Result.Success(_userSettings.WebhookSettings ?? new List<WebhookSetting>()));
-        var taco = new WebhookSetting();
         return Task.FromResult(Result.Success(new List<WebhookSetting>()));
     }
     
