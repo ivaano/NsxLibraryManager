@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
+using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Enums;
 using Radzen;
+using Radzen.Blazor;
 
 namespace NsxLibraryManager.Pages.Components;
 #nullable disable
@@ -9,8 +11,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
 {
     [Inject] protected DialogService DialogService { get; set; }
     [Inject] protected ITitleLibraryService TitleLibraryService { get; set; }
-    [Inject] protected IWebhookService WebhookService { get; set; }    
-
+    [Inject] protected IWebhookService WebhookService { get; set; }  
     public double ProgressCompleted { get; set; }
     public int FileCount { get; set; }
 

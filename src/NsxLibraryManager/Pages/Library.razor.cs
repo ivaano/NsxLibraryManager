@@ -31,6 +31,10 @@ public partial class Library : IDisposable
     [Inject]
     private FtpStateService FtpStateService { get; set; } = null!;
     
+    [Inject] 
+    protected LibraryBackgroundStateService  LibraryBackgroundStateService { get; set; }
+
+    
     //grid
     private DataGridSettings _settings = null!;
     private RadzenDataGrid<LibraryTitleDto> _grid = null!;
@@ -198,6 +202,14 @@ public partial class Library : IDisposable
     
     private async Task RefreshLibrary()
     {
+        var queuedOrInProgress = LibraryBackgroundStateService.IsTaskTypeQueuedOrInProgress(LibraryBackgroundTaskType.Refresh);
+        if (queuedOrInProgress.Count > 0)
+        {
+            await DialogService.Alert("Refresh background job already running, please wait for the refresh job to finish.");
+            return;
+        }
+        
+        
         var confirmationResult = await DialogService.Confirm(
             "This action will add or remove titles that are not on the library.", "Refresh library?",
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
