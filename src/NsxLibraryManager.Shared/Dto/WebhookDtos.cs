@@ -50,7 +50,7 @@ public class WebhookStatus
     /// <summary>
     /// Current status of the webhook
     /// </summary>
-    public WebhookStatusType Status { get; set; }
+    public BackgroundTaskStatus Status { get; set; }
     
     /// <summary>
     /// Type of webhook

@@ -15,7 +15,7 @@ public partial class GameList
     [Inject]
     private ISettingsService SettingsService { get; set; } = null!;
 
-    public bool ShowDlcInfo { get; set; } = false;
+    private bool ShowDlcInfo { get; set; }
 
     private readonly string _pagingSummaryFormat = "Displaying page {0} of {1} (total {2} games)";
     private readonly int _pageSize = 5;
@@ -70,10 +70,15 @@ public partial class GameList
             _games = loadData.Value.Titles;
             _count = loadData.Value.Count;            
         }
+        else
+        {
+            _games = new List<LibraryTitleDto>();
+            _count = 0;
+        }
         _isLoading = false;
     }
 
-    private async Task OnFilterChange(string? value, string name)
+    private async Task OnFilterChange(string? value)
     {
         if (string.IsNullOrEmpty(value))
         {

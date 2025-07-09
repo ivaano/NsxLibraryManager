@@ -2,6 +2,7 @@
 using System.Linq.Dynamic.Core;
 using Common.Services;
 using Microsoft.EntityFrameworkCore;
+using NsxLibraryManager.Contracts;
 using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Data;
@@ -477,10 +478,10 @@ public class TitleLibraryService(
             .Include(x => x.Categories)
             .Include(x => x.Collection)
             .AsQueryable();
-        var titles = await ApplyAdditionalFilters(query, args);
+        var filteredTitles  = await ApplyAdditionalFilters(query, args);
 
-        return titles.Count > 0
-            ? Result.Success(titles)
+        return filteredTitles.Count > 0
+            ? Result.Success(filteredTitles)
             : Result.Failure<GetBaseTitlesResultDto>("No Titles");
     }
 

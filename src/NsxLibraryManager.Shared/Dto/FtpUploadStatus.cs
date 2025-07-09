@@ -5,7 +5,7 @@ namespace NsxLibraryManager.Shared.Dto;
 public class FtpUploadStatus
 {
     public string Id { get; set; }
-    public UploadStatusType Status { get; set; }
+    public BackgroundTaskStatus Status { get; set; }
     public string FileName { get; set; }
     public double Progress { get; set; }
     public DateTime? StartTime { get; set; }

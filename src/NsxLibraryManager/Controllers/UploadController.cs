@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NsxLibraryManager.Contracts;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Services.Interface;
 
@@ -75,11 +76,5 @@ public class UploadController : ControllerBase
             return StatusCode(500, ex.Message);
         }
 
-    }
-    
-    [HttpGet("hi")]
-    public ActionResult Get()
-    {
-        return StatusCode(200);
     }
 }

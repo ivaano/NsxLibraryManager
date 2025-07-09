@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using NsxLibraryManager.Contracts;
 using NsxLibraryManager.Pages.Components;
 using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
@@ -31,8 +32,12 @@ public partial class Library : IDisposable
     [Inject]
     private FtpStateService FtpStateService { get; set; } = null!;
     
+    [Inject] 
+    private LibraryBackgroundStateService  LibraryBackgroundStateService { get; set; } = null!;
+
+
     //grid
-    private DataGridSettings _settings = null!;
+    private DataGridSettings? _settings = null!;
     private RadzenDataGrid<LibraryTitleDto> _grid = null!;
     private IEnumerable<LibraryTitleDto> _libraryTitles = null!;
     private bool _isLoading;
@@ -120,9 +125,10 @@ public partial class Library : IDisposable
     
     private async Task SaveStateAsync()
     {
-        await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", SettingsParamaterName, 
-            JsonSerializer.Serialize<DataGridSettings>(Settings));
-        
+        if (Settings is not null)
+            await JsRuntime.InvokeVoidAsync("window.localStorage.setItem", SettingsParamaterName,
+                JsonSerializer.Serialize(Settings));
+
         await Task.CompletedTask;
     }
     
@@ -198,70 +204,113 @@ public partial class Library : IDisposable
     
     private async Task RefreshLibrary()
     {
+        var refreshActive = LibraryBackgroundStateService.GetActiveTasks(LibraryBackgroundTaskType.Refresh, LibraryBackgroundTaskType.Reload);
+        if (refreshActive.Count > 0)
+        {
+            await DialogService.Alert("A background job is already running, you can check the job progress in Library -> Task Status.");
+            return;
+        }
+        
         var confirmationResult = await DialogService.Confirm(
             "This action will add or remove titles that are not on the library.", "Refresh library?",
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
         if (confirmationResult is true)
         {
+            var requestTask = new LibraryBackgroundRequest
+            {
+                Id = Guid.NewGuid().ToString(),
+                TaskType = LibraryBackgroundTaskType.Refresh,
+                Parameters = new Dictionary<string, object>(),
+                Timestamp = DateTime.Now,
+                StartTime = DateTime.Now,
+                Status = BackgroundTaskStatus.InProgress
+            };
+            LibraryBackgroundStateService.AddTask(requestTask);
+            
             DialogService.Close();
             StateHasChanged();
-            var paramsDialog = new Dictionary<string, object>();
+            var paramsDialog = new Dictionary<string, object> {{ "RequestId", requestTask.Id }};
             var dialogOptions = new DialogOptions()
                 { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<RefreshLibraryProgressDialog>(
                 "Refreshing library...", paramsDialog, dialogOptions);
             await InitialLoad();
             await _grid.Reload();
+            LibraryBackgroundStateService.UpdateTaskStatus(requestTask.Id, BackgroundTaskStatus.Completed);
         }
     }
     
     private async Task ReloadLibrary()
     {
+        var refreshActive = LibraryBackgroundStateService.GetActiveTasks(LibraryBackgroundTaskType.Refresh, LibraryBackgroundTaskType.Reload);
+        if (refreshActive.Count > 0)
+        {
+            await DialogService.Alert("A background job is already running, you can check the job progress in Library -> Task Status.");            return;
+        }
+        
         var confirmationResult = await DialogService.Confirm(
             "This action will clear the db and reload all your nsp/nsz files in your library path, Are you sure?", "Reload Library",
             new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
         if (confirmationResult is true)
         {
+            var requestTask = new LibraryBackgroundRequest
+            {
+                Id = Guid.NewGuid().ToString(),
+                TaskType = LibraryBackgroundTaskType.Reload,
+                Parameters = new Dictionary<string, object>(),
+                Timestamp = DateTime.Now,
+                StartTime = DateTime.Now,
+                Status = BackgroundTaskStatus.InProgress
+            };
+            LibraryBackgroundStateService.AddTask(requestTask);
+            
             DialogService.Close();
             StateHasChanged();
-            var paramsDialog = new Dictionary<string, object>();
+            var paramsDialog = new Dictionary<string, object> {{ "RequestId", requestTask.Id }};
             var dialogOptions = new DialogOptions()
                 { ShowClose = false, CloseDialogOnOverlayClick = false, CloseDialogOnEsc = false };
             await DialogService.OpenAsync<ReloadLibraryProgressDialog>(
                 "Reloading library...", paramsDialog, dialogOptions);
             await InitialLoad();
             await _grid.Reload();
+            LibraryBackgroundStateService.UpdateTaskStatus(requestTask.Id, BackgroundTaskStatus.Completed);
         }
     }
 
     private async Task FtpSelected()
     {
-        var result = await DialogService.OpenAsync<FtpSendDialog>($"Send by Ftp Multiple Titles",
-            new Dictionary<string, object>() { { "SelectedTitles", _selectedTitles } },
-            new DialogOptions()
-            {
-                CloseDialogOnEsc = true, 
-                CloseDialogOnOverlayClick = true, 
-                Draggable = true, 
-                Style = "background:var(--rz-base-900)"
-            });
+        if (_selectedTitles is not null)
+        {
+            var result = await DialogService.OpenAsync<FtpSendDialog>($"Send by Ftp Multiple Titles",
+                new Dictionary<string, object>() { { "SelectedTitles", _selectedTitles } },
+                new DialogOptions()
+                {
+                    CloseDialogOnEsc = true,
+                    CloseDialogOnOverlayClick = true,
+                    Draggable = true,
+                    Style = "background:var(--rz-base-900)"
+                });
+        }
     }
 
     private async Task EditSelected()
     {
-        var result = await DialogService.OpenAsync<TitleMassEditDialog>($"Edit Multiple Titles",
-            new Dictionary<string, object>() { { "SelectedTitles", _selectedTitles } },
-            new DialogOptions()
-            {
-                CloseDialogOnEsc = true, 
-                CloseDialogOnOverlayClick = true, 
-                Draggable = true, 
-                Style = "background:var(--rz-base-900)"
-            });
-        
-        if (result is true) 
+        if (_selectedTitles is not null)
         {
-            await _grid.Reload();
+            var result = await DialogService.OpenAsync<TitleMassEditDialog>($"Edit Multiple Titles",
+                new Dictionary<string, object>() { { "SelectedTitles", _selectedTitles } },
+                new DialogOptions()
+                {
+                    CloseDialogOnEsc = true, 
+                    CloseDialogOnOverlayClick = true, 
+                    Draggable = true, 
+                    Style = "background:var(--rz-base-900)"
+                });
+        
+            if (result is true) 
+            {
+                await _grid.Reload();
+            }
         }
     }
 

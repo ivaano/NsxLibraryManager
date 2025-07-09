@@ -4,6 +4,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
+using NsxLibraryManager.Contracts;
 using NsxLibraryManager.Extensions;
 using NsxLibraryManager.Models;
 using NsxLibraryManager.Providers;

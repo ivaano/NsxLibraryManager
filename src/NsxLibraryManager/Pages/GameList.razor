@@ -4,7 +4,7 @@
 
 <RadzenCard>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
-    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value?.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
+    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value?.ToString())) Style="width: 100%" aria-label="Search by TitleId Or Name" />
 </RadzenCard>
 
 <RadzenDataList IsLoading="@_isLoading" 
@@ -43,7 +43,7 @@
                         </RadzenColumn>
                         <RadzenColumn Style="border-bottom: 1px solid #5f5f5f;">
                             <RadzenText Text="Release Date" Style="font-weight: bold"/>
-                            <RadzenText Text="@(game.ReleaseDate.ToString())"/>
+                            <RadzenText Text="@(game.ReleaseDate?.ToString("MM/dd/yyyy"))"/>
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow>

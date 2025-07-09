@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using NsxLibraryManager.Shared.Dto;
@@ -134,7 +133,7 @@ public class WebhookBackgroundService : BackgroundService
             return new WebhookStatus
             {
                 Id = id,
-                Status = WebhookStatusType.InProgress,
+                Status = BackgroundTaskStatus.InProgress,
                 WebhookType = activeWebhook.WebhookType,
                 StartTime = activeWebhook.StartTime
             };
@@ -149,7 +148,7 @@ public class WebhookBackgroundService : BackgroundService
             {
                 Id = id,
                 Status = completedWebhook.Success ? 
-                    WebhookStatusType.Completed : WebhookStatusType.Failed,
+                    BackgroundTaskStatus.Completed : BackgroundTaskStatus.Failed,
                 WebhookType = completedWebhook.WebhookType,
                 StartTime = completedWebhook.StartTime,
                 CompletionTime = completedWebhook.CompletionTime,
@@ -163,7 +162,7 @@ public class WebhookBackgroundService : BackgroundService
             return new WebhookStatus
             {
                 Id = id,
-                Status = WebhookStatusType.Queued,
+                Status = BackgroundTaskStatus.Queued,
                 WebhookType = _webhookQueue.First(r => r.Id == id).WebhookType
             };
         }
@@ -171,7 +170,7 @@ public class WebhookBackgroundService : BackgroundService
         return new WebhookStatus
         {
             Id = id,
-            Status = WebhookStatusType.NotFound
+            Status = BackgroundTaskStatus.NotFound
         };
     }
     
@@ -187,7 +186,6 @@ public class WebhookBackgroundService : BackgroundService
             {
                 _logger.LogError(ex, "Error processing webhook request: {id}", request.Id);
                 
-                // Retry 3 times
                 if (request.Retries < 3) 
                 {
                     request.Retries++;

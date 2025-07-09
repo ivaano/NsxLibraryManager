@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Models;
+﻿namespace NsxLibraryManager.Contracts;
 
 public class ErrorResponse
 {
@@ -14,7 +14,7 @@ public class ErrorResponse
             ErrorMessage = message,
             ErrorCode = code,
             Errors = errors,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.Now
         };
     }
 }

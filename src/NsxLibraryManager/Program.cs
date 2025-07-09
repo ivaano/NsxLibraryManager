@@ -82,15 +82,20 @@ builder.Services.AddDbContext<TitledbDbContext>(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+});
 
 //nsx services
 if (validatorResult.valid)
 {
-    
     builder.Services.AddSingleton<FtpStateService>();
     builder.Services.AddSingleton<WebhookStateService>();
+    builder.Services.AddSingleton<LibraryBackgroundStateService>();
     builder.Services.AddHostedService<FtpBackgroundService>();
     builder.Services.AddHostedService<WebhookBackgroundService>();
+    builder.Services.AddHostedService<LibraryBackgroundService>();
     builder.Services.AddScoped<ISettingsService, SettingsService>();
     builder.Services.AddScoped<ISettingsMediator, SettingsService>();
     builder.Services.AddTransient<IFileInfoService, FileInfoService>();
@@ -110,7 +115,6 @@ if (validatorResult.valid)
     builder.Services.AddScoped<IValidator<CollectionRenamerSettings>, CollectionSettingsValidator>();    
     builder.Services.AddScoped<IValidator<UserSettings>, UserSettingsValidator>();    
 }
-builder.Services.AddControllersWithViews();
 
 //radzen services
 builder.Services.AddRadzenComponents();
@@ -128,6 +132,24 @@ if (builder.Environment.IsEnvironment("DeveLinux"))
 
 var app = builder.Build();
 
+var timer = new Timer(_ =>
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var stateService = app.Services.GetRequiredService<LibraryBackgroundStateService>();
+        stateService.CleanupOldTasks(TimeSpan.FromHours(3));
+        logger.LogInformation("Running scheduled tasks cleanup");
+
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error during scheduled cleanup");
+    }
+}, null, TimeSpan.Zero, TimeSpan.FromHours(4));
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -184,6 +206,10 @@ if (app.Environment.IsProduction())
         });
     }
 }
+
+
+
+
 
 app.Run();    
 

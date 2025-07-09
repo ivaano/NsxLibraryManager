@@ -1,10 +1,11 @@
 ﻿namespace NsxLibraryManager.Shared.Enums;
 
-public enum UploadStatusType
+public enum BackgroundTaskStatus
 {
     Queued,
     InProgress,
     Completed,
     Failed,
+    Cancelled,
     NotFound
 }
