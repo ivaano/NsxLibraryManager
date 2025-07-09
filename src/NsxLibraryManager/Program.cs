@@ -130,9 +130,23 @@ if (builder.Environment.IsEnvironment("DeveLinux"))
     builder.WebHost.UseStaticWebAssets();
 }
 
-
-
 var app = builder.Build();
+
+var timer = new Timer(_ =>
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var stateService = app.Services.GetRequiredService<LibraryBackgroundStateService>();
+        stateService.CleanupOldTasks(TimeSpan.FromHours(3));
+        logger.LogInformation("Running scheduled tasks cleanup");
+
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error during scheduled cleanup");
+    }
+}, null, TimeSpan.Zero, TimeSpan.FromHours(4));
 
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -192,6 +206,10 @@ if (app.Environment.IsProduction())
         });
     }
 }
+
+
+
+
 
 app.Run();    
 

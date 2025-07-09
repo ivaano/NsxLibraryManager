@@ -48,7 +48,7 @@ public partial class TaskStatus : ComponentBase, IDisposable
 
     private void CleanupTasks()
     {
-        LibraryBackgroundStateService.CleanupOldTasks(TimeSpan.FromHours(24));
+        LibraryBackgroundStateService.CleanupOldTasks(TimeSpan.FromHours(3));
     }
 
     private void ShowTooltip(ElementReference elementReference, TooltipOptions? options = null) => TooltipService.Open(elementReference, "Remove tasks older than 24 hours.", options);
