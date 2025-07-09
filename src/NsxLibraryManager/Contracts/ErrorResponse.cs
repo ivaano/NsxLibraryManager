@@ -14,7 +14,7 @@ public class ErrorResponse
             ErrorMessage = message,
             ErrorCode = code,
             Errors = errors,
-            Timestamp = DateTime.UtcNow
+            Timestamp = DateTime.Now
         };
     }
 }

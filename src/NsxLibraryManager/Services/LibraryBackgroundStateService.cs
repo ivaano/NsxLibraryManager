@@ -55,15 +55,6 @@ public class LibraryBackgroundStateService
             _logger.LogDebug("Updated task {TaskId} progress to {Progress}/{TotalItems}", taskId, progress, totalItems);
         }
     }
-
-    public List<LibraryBackgroundRequest> IsTaskTypeQueuedOrInProgress(LibraryBackgroundTaskType taskType)
-    {
-        return _tasks.Values
-            .Where(t => t.Status is BackgroundTaskStatus.Queued or BackgroundTaskStatus.InProgress)
-            .Where(t => t.TaskType == taskType)
-            .ToList();
-    }
-
     public List<LibraryBackgroundRequest> GetAllTasks()
     {
         return _tasks.Values.ToList();
@@ -75,7 +66,23 @@ public class LibraryBackgroundStateService
             .Where(t => t.Status == BackgroundTaskStatus.Queued || t.Status == BackgroundTaskStatus.InProgress)
             .ToList();
     }
-
+    
+    public List<LibraryBackgroundRequest> GetActiveTasks(LibraryBackgroundTaskType taskType)
+    {
+        return _tasks.Values
+            .Where(t => t.Status is BackgroundTaskStatus.Queued or BackgroundTaskStatus.InProgress)
+            .Where(t => t.TaskType == taskType)
+            .ToList();
+    }
+    
+    public List<LibraryBackgroundRequest> GetActiveTasks(LibraryBackgroundTaskType taskType, LibraryBackgroundTaskType taskType2)
+    {
+        return _tasks.Values
+            .Where(t => t.Status is BackgroundTaskStatus.Queued or BackgroundTaskStatus.InProgress)
+            .Where(t => t.TaskType == taskType || t.TaskType == taskType2)
+            .ToList();
+    }
+    
     public List<LibraryBackgroundRequest> GetCompletedTasks()
     {
         return _tasks.Values

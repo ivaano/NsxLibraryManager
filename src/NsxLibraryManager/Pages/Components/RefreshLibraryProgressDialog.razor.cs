@@ -9,11 +9,15 @@ namespace NsxLibraryManager.Pages.Components;
 #nullable disable
 public partial class RefreshLibraryProgressDialog : IDisposable
 {
-    [Inject] protected DialogService DialogService { get; set; }
-    [Inject] protected ITitleLibraryService TitleLibraryService { get; set; }
-    [Inject] protected IWebhookService WebhookService { get; set; }  
+    [Inject] private DialogService DialogService { get; set; }
+    [Inject] private ITitleLibraryService TitleLibraryService { get; set; }
+    [Inject] private IWebhookService WebhookService { get; set; }
+    
+    [Inject] private LibraryBackgroundStateService  LibraryBackgroundStateService { get; set; }
+    
     public double ProgressCompleted { get; set; }
     public int FileCount { get; set; }
+    [Parameter] public string RequestId { get; set; }
 
     private IEnumerable<string> FilesEnumerable { get; set; }
 
@@ -37,6 +41,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     await TitleLibraryService.AddLibraryTitleAsync(libraryTitle);
                     ProgressCompleted++;
                     StateHasChanged();
+                    LibraryBackgroundStateService.UpdateTaskProgress(RequestId, (int)ProgressCompleted, FileCount);
                 }
 
                 foreach (var libraryTitle in filesToProcess.FilesToRemove)
@@ -44,6 +49,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     await TitleLibraryService.RemoveLibraryTitleAsync(libraryTitle);
                     ProgressCompleted++;
                     StateHasChanged();
+                    LibraryBackgroundStateService.UpdateTaskProgress(RequestId, (int)ProgressCompleted, FileCount);
                 }
                 
                 foreach (var libraryTitle in filesToProcess.FilesToUpdate)
@@ -51,6 +57,7 @@ public partial class RefreshLibraryProgressDialog : IDisposable
                     await TitleLibraryService.UpdateLibraryTitleAsync(libraryTitle);
                     ProgressCompleted++;
                     StateHasChanged();
+                    LibraryBackgroundStateService.UpdateTaskProgress(RequestId, (int)ProgressCompleted, FileCount);
                 }
                 await TitleLibraryService.SaveLibraryReloadDate(refresh: true);
 

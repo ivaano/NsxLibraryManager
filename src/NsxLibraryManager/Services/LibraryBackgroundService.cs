@@ -51,10 +51,10 @@ public class LibraryBackgroundService : BackgroundService
 
     public string QueueSingleRunLibraryRequest(LibraryBackgroundTaskType taskType, Dictionary<string, object>? parameters = null)
     {
-        var queuedOrInProgress = _stateService.IsTaskTypeQueuedOrInProgress(taskType);
+        var queuedOrInProgress = _stateService.GetActiveTasks(taskType);
         return queuedOrInProgress.Count > 0 ? 
             queuedOrInProgress.First().Id : 
-            QueueLibraryRequest(LibraryBackgroundTaskType.Refresh);
+            QueueLibraryRequest(taskType);
     }
 
     public string QueueLibraryRequest(LibraryBackgroundTaskType taskType, Dictionary<string, object>? parameters = null)
@@ -184,7 +184,10 @@ public class LibraryBackgroundService : BackgroundService
             switch (request.TaskType)
             {
                 case LibraryBackgroundTaskType.Refresh:
-                    await ProcessDeltaRefresh(request, titleLibraryService, stoppingToken);
+                    await ProcessRefresh(request, titleLibraryService, stoppingToken);
+                    break;
+                case LibraryBackgroundTaskType.Reload:
+                    await ProcessReload(request, titleLibraryService, stoppingToken);
                     break;
                 default:
                     throw new ArgumentException($"Unknown task type: {request.TaskType}");
@@ -202,13 +205,13 @@ public class LibraryBackgroundService : BackgroundService
         }
     }
 
-    private async Task ProcessDeltaRefresh(LibraryBackgroundRequest request, ITitleLibraryService titleLibraryService, CancellationToken stoppingToken)
+    private async Task ProcessRefresh(LibraryBackgroundRequest request, ITitleLibraryService titleLibraryService, CancellationToken stoppingToken)
     {
         var filesToProcess = await titleLibraryService.GetDeltaFilesInLibraryAsync();
         var totalFiles = filesToProcess.TotalFiles;
         var processedFiles = 0;
 
-        _stateService.UpdateTaskProgress(request.Id, 0, totalFiles);
+        _stateService.UpdateTaskProgress(request.Id, processedFiles, totalFiles);
 
         foreach (var libraryTitle in filesToProcess.FilesToAdd)
         {
@@ -243,6 +246,49 @@ public class LibraryBackgroundService : BackgroundService
         var webhookService = scope.ServiceProvider.GetRequiredService<IWebhookService>();
         var payload = new { EventType = nameof(WebhookType.LibraryRefresh), TimeStamp = DateTime.Now };
         await webhookService.SendWebhook(WebhookType.LibraryRefresh, payload);
+    }
+
+    private async Task ProcessReload(LibraryBackgroundRequest request, ITitleLibraryService titleLibraryService,
+        CancellationToken stoppingToken)
+    {
+        var libraryFiles = await titleLibraryService.GetLibraryFilesAsync();
+        var fileList = libraryFiles.ToList();
+        var processedFiles = 0;
+
+        _stateService.UpdateTaskProgress(request.Id, processedFiles, fileList.Count);
+
+        if (fileList.Count > 0)
+        {
+            await titleLibraryService.DropLibrary();
+        }
+        
+        var updateCounts = new Dictionary<string, int>();
+        var dlcCounts = new Dictionary<string, int>();
+        foreach (var file in fileList)
+        {
+            var title = await titleLibraryService.ProcessFileAsync(file);
+
+            if (title is { ContentType: TitleContentType.Update, OtherApplicationId: not null })
+            {
+                updateCounts[title.OtherApplicationId] = updateCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
+            }
+                    
+            if (title is { ContentType: TitleContentType.DLC, OtherApplicationId: not null })
+            {
+                dlcCounts[title.OtherApplicationId] = dlcCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
+            }
+            processedFiles++;
+            _stateService.UpdateTaskProgress(request.Id, processedFiles, fileList.Count);
+        }
+        await titleLibraryService.SaveContentCounts(updateCounts, TitleContentType.Update);
+        await titleLibraryService.SaveContentCounts(dlcCounts, TitleContentType.DLC);
+                
+        await titleLibraryService.SaveLibraryReloadDate();
+        
+        using var scope = _serviceProvider.CreateScope();
+        var webhookService = scope.ServiceProvider.GetRequiredService<IWebhookService>();
+        var payload = new { EventType = nameof(WebhookType.LibraryReload), TimeStamp = DateTime.Now };
+        await webhookService.SendWebhook(WebhookType.LibraryReload, payload);
     }
 
 }

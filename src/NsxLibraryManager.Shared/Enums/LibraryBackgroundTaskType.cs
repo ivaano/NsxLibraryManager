@@ -2,5 +2,6 @@
 
 public enum LibraryBackgroundTaskType
 {
-    Refresh
+    Refresh,
+    Reload
 }
