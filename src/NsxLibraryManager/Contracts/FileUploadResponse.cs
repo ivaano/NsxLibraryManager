@@ -1,4 +1,4 @@
-﻿namespace NsxLibraryManager.Models;
+﻿namespace NsxLibraryManager.Contracts;
 
 public class FileUploadResponse
 {

@@ -8,8 +8,8 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ApplicationIcon>wwwroot\images\logo.ico</ApplicationIcon>
         <UserSecretsId>eea14e5f-4e4c-4f80-9ff5-0c48075f0367</UserSecretsId>
-        <AssemblyVersion>0.5.0</AssemblyVersion>
-        <FileVersion>0.5.0</FileVersion>
+        <AssemblyVersion>0.5.1</AssemblyVersion>
+        <FileVersion>0.5.1</FileVersion>
         <DebugType>embedded</DebugType>
         <PathsToSourceRoot>$(MSBuildProjectDirectory)</PathsToSourceRoot>
     </PropertyGroup>
@@ -23,6 +23,9 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
         <PackageReference Include="Radzen.Blazor" Version="5.9.9" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="8.1.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.4" />
         <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     </ItemGroup>
     

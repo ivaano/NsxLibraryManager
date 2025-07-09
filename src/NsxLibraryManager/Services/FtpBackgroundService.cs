@@ -132,7 +132,7 @@ public class FtpBackgroundService : BackgroundService
             return new FtpUploadStatus
             {
                 Id = id,
-                Status = UploadStatusType.InProgress,
+                Status = BackgroundTaskStatus.InProgress,
                 FileName = activeTransfer.Filename,
                 Progress = activeTransfer.ProgressPercentage,
                 StartTime = activeTransfer.StartTime
@@ -148,7 +148,7 @@ public class FtpBackgroundService : BackgroundService
             {
                 Id = id,
                 Status = completedTransfer.Success ? 
-                UploadStatusType.Completed : UploadStatusType.Failed,
+                BackgroundTaskStatus.Completed : BackgroundTaskStatus.Failed,
                 FileName = completedTransfer.Filename,
                 Progress = completedTransfer.Success ? 100 : 0,
                 StartTime = completedTransfer.StartTime,
@@ -163,7 +163,7 @@ public class FtpBackgroundService : BackgroundService
             return new FtpUploadStatus
             {
                 Id = id,
-                Status = UploadStatusType.Queued,
+                Status = BackgroundTaskStatus.Queued,
                 FileName = _uploadQueue.First(r => r.Id == id).FileName
             };
         }
@@ -171,7 +171,7 @@ public class FtpBackgroundService : BackgroundService
         return new FtpUploadStatus
         {
             Id = id,
-            Status = UploadStatusType.NotFound
+            Status = BackgroundTaskStatus.NotFound
         };
     }
     

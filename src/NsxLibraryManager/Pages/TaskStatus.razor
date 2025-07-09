@@ -1,0 +1,28 @@
+﻿@page "/TaskStatus"
+@using NsxLibraryManager.Contracts
+
+<RadzenDataGrid
+    @ref="grid"
+    Data="@data"
+    TItem="LibraryBackgroundRequest"
+    AllowColumnResize="true"
+    AllowFiltering="false"
+    AllowPaging="true"
+    PageSize="100"
+    EmptyText="No queued tasks"
+    AllowSorting="false">
+    <HeaderTemplate>
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="cleaning_services" Text="Cleanup Old Tasks" Click="@CleanupTasks" MouseEnter="@(args => ShowTooltip(args) )" />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Property="Id" Title="Task Id" Width="280px"/>
+        <RadzenDataGridColumn Property="TaskType" Title="Task Type" Width="80px"/>
+        <RadzenDataGridColumn Property="Status" Title="Task Status" Width="100px"/>
+        <RadzenDataGridColumn Property="Progress" Title="Completed Items" Width="130px"/>
+        <RadzenDataGridColumn Property="TotalItems" Title="Total Items" Width="80px"/>
+        <RadzenDataGridColumn Property="ErrorMessage" Title="Error"/>
+        <RadzenDataGridColumn Property="Timestamp" Title="Received Time"/>
+        <RadzenDataGridColumn Property="StartTime" Title="Start Time"/>
+        <RadzenDataGridColumn Property="CompletionTime" Title="Completion Time"/>
+    </Columns>
+</RadzenDataGrid>

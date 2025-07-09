@@ -4,7 +4,7 @@
 
 <RadzenCard>
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Filter by Name or TitleId</RadzenText>
-    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString(), "titleName")) Style="width: 100%" aria-label="Search by TitleId Or Name" />
+    <RadzenTextBox @oninput=@(args => OnFilterChange(args.Value.ToString())) Style="width: 100%" aria-label="Search by TitleId Or Name" />
 </RadzenCard>
 <RadzenStack>
 @{

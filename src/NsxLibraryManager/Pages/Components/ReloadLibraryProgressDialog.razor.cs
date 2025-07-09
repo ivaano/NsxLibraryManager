@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using NsxLibraryManager.Services;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
 using NsxLibraryManager.Shared.Enums;
@@ -10,14 +11,19 @@ public partial class ReloadLibraryProgressDialog : IDisposable
 {
     [Inject]
     protected DialogService DialogService { get; set; }
+    
     [Inject]
     protected ITitleLibraryService TitleLibraryService { get; set; }
     
     [Inject]
     protected IWebhookService WebhookService { get; set; }
+    
+    [Inject] private LibraryBackgroundStateService  LibraryBackgroundStateService { get; set; }
+
 
     private double ProgressCompleted { get; set; }
     private int FileCount { get; set; }
+    [Parameter] public string RequestId { get; set; }
 
     private IEnumerable<LibraryFileDto> FilesEnumerable { get; set; }
 
@@ -57,7 +63,9 @@ public partial class ReloadLibraryProgressDialog : IDisposable
                     {
                         dlcCounts[title.OtherApplicationId] = dlcCounts.GetValueOrDefault(title.OtherApplicationId) + 1;
                     }
+                    
                     ProgressCompleted++;
+                    LibraryBackgroundStateService.UpdateTaskProgress(RequestId, (int)ProgressCompleted, FileCount);
                     StateHasChanged();                    
                 }
       
@@ -66,7 +74,7 @@ public partial class ReloadLibraryProgressDialog : IDisposable
                 
                 await TitleLibraryService.SaveLibraryReloadDate();
             });
-        var payload = new { EventType = nameof(WebhookType.LibraryReload), TimeStamp = DateTime.UtcNow };
+        var payload = new { EventType = nameof(WebhookType.LibraryReload), TimeStamp = DateTime.Now };
         await WebhookService.SendWebhook(WebhookType.LibraryReload, payload);
         DialogService.Close();
     }
