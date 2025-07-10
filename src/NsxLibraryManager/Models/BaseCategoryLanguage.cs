@@ -14,15 +14,15 @@ public class BaseCategoryLanguage
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(2)]
-    public string Region { get; set; }
+    public required string Region { get; set; }
 
     [Column(TypeName = "VARCHAR")]
     [StringLength(2)]
-    public string Language { get; set; }
+    public required string Language { get; set; }
 
     [Column(TypeName = "VARCHAR")]
     [StringLength(30)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     public int CategoryId { get; set; }
    
