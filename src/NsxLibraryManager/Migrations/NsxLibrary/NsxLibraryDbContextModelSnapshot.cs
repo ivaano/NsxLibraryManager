@@ -29,7 +29,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("TitlesId");
 
-                    b.ToTable("LanguageTitle");
+                    b.ToTable("LanguageTitle", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
@@ -46,7 +46,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("DataProtectionKeys");
+                    b.ToTable("DataProtectionKeys", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Category", b =>
@@ -62,7 +62,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.CategoryLanguage", b =>
@@ -93,7 +93,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("CategoryLanguages");
+                    b.ToTable("CategoryLanguages", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Collection", b =>
@@ -109,7 +109,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collections");
+                    b.ToTable("Collections", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Language", b =>
@@ -125,7 +125,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages");
+                    b.ToTable("Languages", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.LibraryUpdate", b =>
@@ -156,7 +156,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("LibraryUpdates");
+                    b.ToTable("LibraryUpdates", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.PersistentTitle", b =>
@@ -182,7 +182,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("PersistentTitles");
+                    b.ToTable("PersistentTitles", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.RatingsContent", b =>
@@ -198,7 +198,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("RatingsContent");
+                    b.ToTable("RatingsContent", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Screenshot", b =>
@@ -222,7 +222,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("TitleId");
 
-                    b.ToTable("Screenshots");
+                    b.ToTable("Screenshots", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Settings", b =>
@@ -240,7 +240,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings");
+                    b.ToTable("Settings", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Title", b =>
@@ -369,7 +369,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("CollectionId");
 
-                    b.ToTable("Titles");
+                    b.ToTable("Titles", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.TitleCategory", b =>
@@ -384,7 +384,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("TitleId");
 
-                    b.ToTable("TitleCategory");
+                    b.ToTable("TitleCategory", (string)null);
                 });
 
             modelBuilder.Entity("NsxLibraryManager.Models.NsxLibrary.Version", b =>
@@ -407,7 +407,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("TitleId");
 
-                    b.ToTable("Versions");
+                    b.ToTable("Versions", (string)null);
                 });
 
             modelBuilder.Entity("RatingsContentTitle", b =>
@@ -422,7 +422,7 @@ namespace NsxLibraryManager.Migrations.NsxLibrary
 
                     b.HasIndex("TitlesId");
 
-                    b.ToTable("RatingsContentTitle");
+                    b.ToTable("RatingsContentTitle", (string)null);
                 });
 
             modelBuilder.Entity("LanguageTitle", b =>

@@ -4,9 +4,9 @@ namespace NsxLibraryManager.Shared.Dto;
 
 public class FtpStatusUpdate
 {
-    public string TransferId { get; set; }
-    public string Filename { get; set; }
-    public string LocalFilePath { get; set; }
+    public string TransferId { get; set; } = string.Empty;
+    public string Filename { get; set; } = string.Empty;
+    public string LocalFilePath { get; set; } = string.Empty;
     public TransferDirection Direction { get; set; }
     public long TotalBytes { get; set; }
     public long TransferredBytes { get; set; }

@@ -7,7 +7,6 @@ using NsxLibraryManager.Core.Extensions;
 using NsxLibraryManager.Core.Services.Interface;
 using NsxLibraryManager.Data;
 using NsxLibraryManager.Extensions;
-using NsxLibraryManager.Models;
 using NsxLibraryManager.Models.NsxLibrary;
 using NsxLibraryManager.Services.Interface;
 using NsxLibraryManager.Shared.Dto;
@@ -457,10 +456,13 @@ public class TitleLibraryService(
 
         var finalQuery = query.Select(t => t.MapLibraryTitleDtoNoDlcOrUpdates());
 
+        var skip = args.Skip ?? 0;
+        var top = args.Top ?? 100; 
+        
         var count = await finalQuery.CountAsync();
         var titles = await finalQuery
-            .Skip(args.Skip.Value)
-            .Take(args.Top.Value)
+            .Skip(skip)
+            .Take(top)
             .ToListAsync();
 
         return new GetBaseTitlesResultDto
@@ -895,7 +897,7 @@ public class TitleLibraryService(
         var libraryTitle = await _nsxLibraryDbContext.Titles.FirstOrDefaultAsync(x => x.Id == title.Id);
         if (libraryTitle is null) return Result.Failure<int>("Title not found");
 
-        var updatedCollectionCount = await UpdateCollectionAssociationsAsync(libraryTitle, title);
+        await UpdateCollectionAssociationsAsync(libraryTitle, title);
         libraryTitle.UserRating = title.UserRating;
         await UpdatePersistentTitle(title);
         var updatedCount = await _nsxLibraryDbContext.SaveChangesAsync();

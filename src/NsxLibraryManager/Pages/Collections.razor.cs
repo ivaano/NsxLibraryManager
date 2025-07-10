@@ -68,9 +68,9 @@ public partial class Collections : ComponentBase
         {
             _newRecordInsertDisabled = false;
             var result = await TitleLibraryService.AddCollection(collectionDto);
-            if (result.IsSuccess)
+            if (result is { IsSuccess: true, Value: { } value })
             {
-                collectionDto.Id = result.Value.Id;
+                collectionDto.Id = value.Id;
                 await LoadData();
                 ShowNotification(
                     NotificationSeverity.Success, 

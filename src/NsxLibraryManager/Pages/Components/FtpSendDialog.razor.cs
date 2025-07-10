@@ -18,7 +18,7 @@ public partial class FtpSendDialog : ComponentBase
     protected ITitleLibraryService TitleLibraryService { get; set; } = default!;
 
     [Inject] 
-    protected IFtpClientService FtpClientService { get; set; } = default;
+    protected IFtpClientService FtpClientService { get; set; } = default!;
     
     [Inject]
     protected DialogService DialogService { get; set; } = default!;

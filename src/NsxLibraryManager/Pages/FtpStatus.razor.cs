@@ -9,17 +9,16 @@ namespace NsxLibraryManager.Pages;
 
 public partial class FtpStatus : ComponentBase, IDisposable
 {
-    RadzenDataGrid<FtpStatusGridDto> grid;
-    
     [Inject]
     private FtpStateService FtpStateService { get; set; } = null!;
     
     [Inject] 
-    protected IFtpClientService FtpClientService { get; set; } = default;
+    protected IFtpClientService FtpClientService { get; set; } = default!;
 
-    private IEnumerable<FtpStatusGridDto> data { get; set; }
+    RadzenDataGrid<FtpStatusGridDto> grid = default!;
+    private IEnumerable<FtpStatusGridDto> data { get; set; }  = default!;
     
-    private System.Timers.Timer _refreshTimer;
+    private System.Timers.Timer _refreshTimer = default!;
     private bool _disposed = false;
 
     private async Task RefreshData()
@@ -30,6 +29,7 @@ public partial class FtpStatus : ComponentBase, IDisposable
         {
             TransferId = c.TransferId,
             Filename = c.Filename,
+            FtpHost = string.Empty,
             Direction = c.Direction,
             TotalBytes = c.TotalBytes,
             TransferredBytes = c.TransferredBytes,

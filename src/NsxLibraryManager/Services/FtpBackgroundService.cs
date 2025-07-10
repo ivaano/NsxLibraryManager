@@ -213,7 +213,7 @@ public class FtpBackgroundService : BackgroundService
         }
     }
     
-    private async Task UploadFile(FtpUploadRequest request)
+    private Task UploadFile(FtpUploadRequest request)
     {
         if (!File.Exists(request.LocalFilePath))
         {
@@ -270,7 +270,7 @@ public class FtpBackgroundService : BackgroundService
             }
         }
 
-        return;
+        return Task.CompletedTask;
 
         // define the progress tracking callback
         void Progress(FtpProgress p)

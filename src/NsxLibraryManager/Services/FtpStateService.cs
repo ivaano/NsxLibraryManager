@@ -4,9 +4,9 @@ namespace NsxLibraryManager.Services;
 
 public class FtpStateService
 {
-    public event Action<FtpStatusUpdate> OnStatusUpdate;
+    public event Action<FtpStatusUpdate> OnStatusUpdate = _ => { };
 
-    public event Action<FtpCompletedTransfer> OnTransferCompleted;
+    public event Action<FtpCompletedTransfer> OnTransferCompleted = _ => { };
     
     public List<FtpStatusUpdate> CurrentTransfers { get; private set; } = [];
     public List<FtpCompletedTransfer> CompletedTransfers { get; private set; } = [];
@@ -37,6 +37,6 @@ public class FtpStateService
             CompletedTransfers.RemoveAt(CompletedTransfers.Count - 1);
         }
 
-        OnTransferCompleted?.Invoke(completed);
+        OnTransferCompleted(completed);
     }
 }

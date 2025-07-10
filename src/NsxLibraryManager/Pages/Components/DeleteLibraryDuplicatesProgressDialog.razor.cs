@@ -8,17 +8,22 @@ namespace NsxLibraryManager.Pages.Components;
 public partial class DeleteLibraryDuplicatesProgressDialog : IDisposable
 {
     [Inject]
-    protected DialogService DialogService { get; set; }
+    protected DialogService DialogService { get; set; }  = default!;
+    
     [Inject]
-    protected ITitleLibraryService TitleLibraryService { get; set; }
+    protected ITitleLibraryService TitleLibraryService { get; set; }  = default!;
+    
     [Inject]
-    protected ILogger<RefreshLibraryProgressDialog> Logger { get; set; }
+    protected ILogger<RefreshLibraryProgressDialog> Logger { get; set; }  = default!;
+    
+    [Parameter] 
+    public IList<LibraryTitleDto>? selectedTitles { get; set; }
     public double ProgressCompleted { get; set; }
     public int FileCount { get; set; }
 
-    [Parameter] public IList<LibraryTitleDto>? selectedTitles { get; set; }
+    
 
-    private IEnumerable<string> FilesEnumerable { get; set; }
+    private IEnumerable<string> FilesEnumerable { get; set; } = default!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -90,12 +90,15 @@ public partial class Library : IDisposable
     
     private void HandleFtpStatusChanged(FtpCompletedTransfer completedTransfer)
     {
+        var uploadResult = completedTransfer.Success ? NotificationSeverity.Success : NotificationSeverity.Error;
+        var uploadMessage = completedTransfer.Success ? $"{completedTransfer.Filename} uploaded successfully." : 
+            $"{completedTransfer.Filename}  {completedTransfer.ErrorMessage}";
         InvokeAsync(() =>
         {
             ShowNotification(
-                NotificationSeverity.Success, 
+                uploadResult, 
                 "Upload completed", 
-                $"{completedTransfer.Filename} uploaded succesfully");
+                uploadMessage);
         });
     }
     
