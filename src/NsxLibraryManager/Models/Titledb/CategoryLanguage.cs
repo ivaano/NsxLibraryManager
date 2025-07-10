@@ -6,5 +6,5 @@ namespace NsxLibraryManager.Models.Titledb;
 
 public class CategoryLanguage : BaseCategoryLanguage
 {
-    public Category Category { get; set; }
+    public Category? Category { get; set; }
 }

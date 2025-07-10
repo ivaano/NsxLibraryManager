@@ -15,5 +15,5 @@ public class Cnmt
     public int TitleType { get; set; }
     public int TitleId { get; set; }
     public int Version { get; set; }
-    public Title Title { get; set; }
+    public Title? Title { get; set; }
 }

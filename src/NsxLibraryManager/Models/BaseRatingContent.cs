@@ -12,6 +12,6 @@ public class BaseRatingContent
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(30)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
    
 }

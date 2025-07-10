@@ -13,5 +13,5 @@ public class BaseRegion
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(2)]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }
