@@ -30,26 +30,24 @@ public static class TitledbMappingExtension
             Rating = title.Rating,
             Region = title.Region,
             ReleaseDate = title.ReleaseDate,
-            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
+            Categories = new Collection<CategoryDto>(title.Categories?.Select(c => new CategoryDto
             {
-                Name = x.Name,
-            }).ToList()),
-            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+                Name = c.Name,
+            }).ToList() ?? []),
+            Languages = new Collection<LanguageDto>(title.Languages?.Select(l => new LanguageDto
             {
-                LanguageCode = x.LanguageCode,
-            }).ToList()),
-            Versions = new Collection<VersionDto>(
-                title.Versions
-                    .Select(x => new VersionDto()
-                    {
-                        VersionNumber = x.VersionNumber,
-                        VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
-                        ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
-                    }).ToList()),
-            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+                LanguageCode = l.LanguageCode,
+            }).ToList() ?? []),
+            Versions = new Collection<VersionDto>(title.Versions?.Select(v => new VersionDto
+            {
+                VersionNumber = v.VersionNumber,
+                VersionDate = DateOnly.ParseExact(v.VersionDate, "yyyy-MM-dd"),
+                ShortVersionNumber = v.VersionNumber.ToString().VersionShifted()
+            }).ToList() ?? []),
+            Screenshots = new Collection<ScreenshotDto>(title.Screenshots?.Select(x => new ScreenshotDto()
             {
                 Url = x.Url
-            }).ToList()),
+            }).ToList() ?? []),
         };
     }
     
@@ -64,10 +62,10 @@ public static class TitledbMappingExtension
                 TitleName = d.TitleName,
                 Size = d.Size.GetValueOrDefault(),
                 Version = d.LatestVersion,
-                Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+                Screenshots = new Collection<ScreenshotDto>(title.Screenshots?.Select(x => new ScreenshotDto()
                 {
                     Url = x.Url
-                }).ToList()),
+                }).ToList() ?? []),
             }).ToList());
         
         var updates = new Collection<UpdateDto>(
@@ -100,26 +98,26 @@ public static class TitledbMappingExtension
             Rating = title.Rating,
             ReleaseDate = title.ReleaseDate,
             Updates = updates,
-            Categories = new List<CategoryDto>((title.Categories ?? null).Select(x => new CategoryDto
+            Categories = new List<CategoryDto>(title.Categories?.Select(x => new CategoryDto
             {
                 Name = x.Name,
-            }).ToList()),
-            Languages = new List<LanguageDto>((title.Languages ?? null).Select(x => new LanguageDto
+            }).ToList() ?? []),
+            Languages = new List<LanguageDto>(title.Languages?.Select(x => new LanguageDto
             {
                 LanguageCode = x.LanguageCode,
-            }).ToList()),
+            }).ToList() ?? []),
             Versions = new Collection<VersionDto>(
-                title.Versions
+                title.Versions?
                     .Select(x => new VersionDto()
                     {
                         VersionNumber = x.VersionNumber,
                         VersionDate = DateOnly.ParseExact(x.VersionDate, "yyyy-MM-dd"),
                         ShortVersionNumber = x.VersionNumber.ToString().VersionShifted()
-                    }).ToList()),
-            Screenshots = new Collection<ScreenshotDto>(title.Screenshots.Select(x => new ScreenshotDto()
+                    }).ToList() ?? []),
+            Screenshots = new Collection<ScreenshotDto>(title.Screenshots?.Select(x => new ScreenshotDto()
             {
                 Url = x.Url
-            }).ToList()),
+            }).ToList() ?? []),
         };
     }
 }

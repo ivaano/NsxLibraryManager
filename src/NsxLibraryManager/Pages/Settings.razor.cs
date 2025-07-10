@@ -68,7 +68,7 @@ public partial class Settings
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        LoadConfiguration();
+        await LoadConfiguration();
         var configExists = bool.TryParse(Configuration.GetValue<string>("IsDefaultConfigCreated"), out _);
         if (configExists)
         {

@@ -22,10 +22,6 @@ public partial class TitleMassEditDialog : ComponentBase
     private int _dropdownValue;
     private string _relatedPatchTitle = string.Empty;
     private string _relatedDlcTitle = string.Empty;   
-    protected override async Task OnParametersSetAsync()
-    {
-        var hola = false;
-    }
     
     private void ShowNotification(NotificationSeverity severity, string summary, string detail, int duration = 4000)
     {

@@ -14,7 +14,7 @@ public partial class TaskStatus : ComponentBase, IDisposable
     [Inject]
     private TooltipService TooltipService { get; set; } = null!;
     
-    private IEnumerable<LibraryBackgroundRequest> data { get; set; } = Enumerable.Empty<LibraryBackgroundRequest>();
+    private IEnumerable<LibraryBackgroundRequest> data { get; set; } = [];
     private RadzenDataGrid<LibraryBackgroundRequest>? grid;
     private System.Timers.Timer? _refreshTimer;
     private bool _disposed;

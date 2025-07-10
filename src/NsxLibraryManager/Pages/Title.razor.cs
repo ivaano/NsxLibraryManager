@@ -176,8 +176,11 @@ public partial class Title
             query = query.OrderBy(args.OrderBy);
         }
         
+        var skip = args.Skip ?? 0;
+        var top = args.Top ?? 100; 
+        
         _updatesCount = query.Count();
-        _updates = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        _updates = query.Skip(skip).Take(top).ToList();
         _updatesIsLoading = false;
     }
 

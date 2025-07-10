@@ -34,13 +34,13 @@ public partial class TitleDbTitle
     private int selectedIndex;
     
     //dlc grid
-    private RadzenDataGrid<DlcDto> _dlcGrid;
+    private RadzenDataGrid<DlcDto>? _dlcGrid;
     private bool _dlcIsLoading;
     private int _dlcCount;
-    private IEnumerable<DlcDto> _dlcs;
+    private IEnumerable<DlcDto> _dlcs = default!;
     
     //updates grid
-    private RadzenDataGrid<UpdateDto> _updatesGrid;
+    private RadzenDataGrid<UpdateDto>? _updatesGrid;
     private bool _updatesIsLoading;
     private int _updatesCount;
     private IEnumerable<UpdateDto> _updates = default!;
@@ -49,8 +49,12 @@ public partial class TitleDbTitle
     {
         if (TitleId is null) return;
         var title =  await TitledbService.GetTitleByApplicationId(TitleId);
-        HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
-        LibraryTitleDto = title;
+        if (title is not null)
+        {
+            HtmlDescription = new MarkupString(title.Description.Text2Html()).Value;
+            LibraryTitleDto = title;
+        }
+
         AgeRatingAgency = SettingsService.GetUserSettings().AgeRatingAgency;
     }
     
@@ -61,7 +65,7 @@ public partial class TitleDbTitle
         if (LibraryTitleDto?.Dlc is null || LibraryTitleDto.Dlc.Count == 0)
         {
             _dlcIsLoading = false;
-            _dlcs = Array.Empty<DlcDto>();
+            _dlcs = [];
             return;
         }
 
@@ -74,20 +78,23 @@ public partial class TitleDbTitle
             Version = t.Version,
             
         }).AsQueryable();
-        
-        
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(args.Filter);
-        }
-        
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
-        }
 
-        _dlcCount = query.Count();
-        _dlcs = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+        if (query is not null)
+        {
+            if (!string.IsNullOrEmpty(args.Filter))
+            {
+                query = query.Where(args.Filter);
+            }
+        
+            if (!string.IsNullOrEmpty(args.OrderBy))
+            {
+                query = query.OrderBy(args.OrderBy);
+            }
+            var skip = args.Skip ?? 0;
+            var top = args.Top ?? 100; 
+            _dlcCount = query.Count();
+            _dlcs = query.Skip(skip).Take(top).ToList();
+        }
 
         _dlcIsLoading = false;
     }
@@ -122,19 +129,27 @@ public partial class TitleDbTitle
             Version = v.VersionNumber,
             ShortVersion = v.ShortVersionNumber,
         }).AsQueryable();
-        
-        if (!string.IsNullOrEmpty(args.Filter))
+
+        if (query is not null)
         {
-            query = query.Where(args.Filter);
+            if (!string.IsNullOrEmpty(args.Filter))
+            {
+                query = query.Where(args.Filter);
+            }
+        
+            if (!string.IsNullOrEmpty(args.OrderBy))
+            {
+                query = query.OrderBy(args.OrderBy);
+            }
+        
+            var skip = args.Skip ?? 0;
+            var top = args.Top ?? 100; 
+        
+            _updatesCount = query.Count();
+            _updates = query.Skip(skip).Take(top).ToList();
         }
         
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
-        }
-        
-        _updatesCount = query.Count();
-        _updates = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
+
         _updatesIsLoading = false;
     }
 }
