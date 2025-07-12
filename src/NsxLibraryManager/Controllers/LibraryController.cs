@@ -36,6 +36,7 @@ public class LibraryController : ControllerBase
     [SwaggerOperation(Summary = "Search titles", Description = "Search Titles by TitleId or Name")]
     [ProducesResponseType(typeof(List<SearchResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(List<ErrorResponse>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(List<ErrorResponse>), StatusCodes.Status404NotFound)]
     public async Task<ActionResult> SearchTitles(SearchRequest searchRequest)
     {
         var filterContentType = new FilterDescriptor
@@ -70,7 +71,7 @@ public class LibraryController : ControllerBase
         if (loadData.IsFailure)
         {
             var errors = new List<string> { loadData.Error ?? "Unknown error"};
-            return BadRequest(ErrorResponse.FromError("Failed to process search", errors, "SEARCH_ERROR")  );
+            return NotFound(ErrorResponse.FromError("Failed to process search", errors, "SEARCH_ERROR")  );
         }
         
         var response = new SearchResponse

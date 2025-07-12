@@ -9,7 +9,7 @@ if [ -z "$ReleasePath" ] || [ -z "$Version" ]; then
   exit 1
 fi
 
-platforms=("linux-x64" "win-x64" "osx-arm64" "osx-x64")
+platforms=("linux-x64" "win-x64" "osx-arm64" "osx-x64" "linux-arm64")
 
 for platform in "${platforms[@]}"; do
   platformPath="$ReleasePath/$platform"

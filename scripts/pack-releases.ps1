@@ -13,7 +13,7 @@ if (-not (Test-Path -Path $7zipPath -PathType Leaf)) {
 Set-Alias Start-SevenZip $7zipPath
 
 # List of platform folders to process
-$platforms = @("linux-x64", "win-x64", "osx-arm64", "osx-x64")
+$platforms = @("linux-x64", "win-x64", "osx-arm64", "osx-x64", "linux-arm64")
 
 foreach ($platform in $platforms) {
     $platformPath = Join-Path $ReleasePath $platform
