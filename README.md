@@ -7,6 +7,7 @@ that I could run on a server and access it from any device.
 
 ## Features
 - Web interface.
+- API for searching, and refresh reload library.
 - Runs on Windows, Linux and Mac.
 - Supports NSP, NSZ, XCI, XCZ files.
 - Read a folder and analyze all the files.
@@ -120,7 +121,9 @@ or you can leave `nsxlibrarymanager:latest` and the image will be built from sou
       - This organizes the files in your library based on the collection they are in.
     - Duplicate Titles
       - Find all the duplicate titles in your library.
-
+- API
+  - The API specification is located at `swagger/v1/swagger.json` 
+  - There is a swagger client that let you test the API here `/swagger/index.html`
 
 ## Screenshots
 ![Dashboard](./screenshots/dashboard.png)
@@ -146,5 +149,4 @@ or you can leave `nsxlibrarymanager:latest` and the image will be built from sou
 ## Credits
 - [Libhac](https://github.com/Thealexbarney/LibHac) For the amazing library to read nintendo switch files.
 - [Titledb](https://github.com/blawar/titledb) For the excellent database with all the information.
-- [LiteDb](https://www.litedb.org) 
 - [Radzen.Blazor](https://github.com/radzenhq/radzen-blazor)

@@ -12,7 +12,7 @@ public class Tests : PageTest
     private IBrowserContext _context;
     private IPage _page;
     private readonly string _baseUrl = "http://localhost:5161";
-    private Process _appProcess;
+    private Process _appProcess = default!;
     
     [SetUp]
     public async Task SetUp()
@@ -93,7 +93,7 @@ public class Tests : PageTest
         try
         {
             _appProcess.Kill();
-            _appProcess.WaitForExit(); // Optionally wait for the process to fully exit
+            _appProcess.WaitForExit();
         }
         catch (Exception ex)
         {
@@ -118,14 +118,13 @@ public class Tests : PageTest
     {
         await _page.GotoAsync(_baseUrl);
         var title = await _page.TitleAsync();
-        Assert.That(title, Does.Contain("NsxLibraryManager"));
+        Assert.That(title, Does.Contain("Dashboard"));
     }
     
     [Test]
     public async Task SettingsPageMustShowOnFirstLoad()
     {
-        await _page.GotoAsync(_baseUrl);
-        await _page.WaitForNavigationAsync();
+        await _page.WaitForURLAsync(_baseUrl);
         var url = _page.Url;
         Assert.Multiple(() =>
         {

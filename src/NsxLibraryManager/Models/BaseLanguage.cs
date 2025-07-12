@@ -13,5 +13,5 @@ public class BaseLanguage
     
     [Column(TypeName = "VARCHAR")]
     [StringLength(2)]
-    public string LanguageCode { get; set; }
+    public required string LanguageCode { get; set; }
 }

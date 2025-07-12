@@ -4,5 +4,5 @@ namespace NsxLibraryManager.Models.NsxLibrary;
 
 public class Version : BaseVersion
 {
-    public Title Title { get; init; }
+    public Title? Title { get; init; }
 }

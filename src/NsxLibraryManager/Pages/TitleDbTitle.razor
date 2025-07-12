@@ -31,7 +31,7 @@
                 </RadzenText>
             </RadzenColumn>
             <RadzenColumn Size="6" Style="display: inline-flex; align-items: center;">
-                <RadzenText Text="@(LibraryTitleDto?.ReleaseDate.ToString())" TextStyle="TextStyle.Body1"
+                <RadzenText Text="@(LibraryTitleDto?.ReleaseDate?.ToString("MM/dd/yyyy"))" TextStyle="TextStyle.Body1"
                             Style="margin-bottom: 0"/>
             </RadzenColumn>
         </RadzenRow>
