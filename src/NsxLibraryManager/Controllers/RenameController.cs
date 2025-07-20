@@ -35,13 +35,53 @@ public class RenameController : ControllerBase
         _settingsService = settingsService;
     }
     
+    [HttpPost("package")]
+    [SwaggerOperation(Summary = "Request a rename by package operation", Description = "Rename by package settings must be configured before using this endpoint.")]
+    [ProducesResponseType(typeof(LibraryBackgroundResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LibraryBackgroundResponse), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(LibraryBackgroundResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<LibraryBackgroundResponse>> RenameByPackage()
+    {
+        var settings = await _settingsService.GetPackageRenamerSettings();
+        if (settings.InputPath == string.Empty || settings.OutputBasePath == string.Empty)
+        {
+            return NotFound("Package type settings must be configured before using this endpoint.");
+        }
+
+        
+        var activeTasks = _stateService.GetActiveTasks(
+            LibraryBackgroundTaskType.PackageRename, 
+            LibraryBackgroundTaskType.PackageRename);
+        if (activeTasks.Count > 0)
+        {
+            return StatusCode(StatusCodes.Status409Conflict, new LibraryBackgroundResponse
+            {
+                TaskId = activeTasks.FirstOrDefault()?.Id,
+                Message = $"A rename operation is already in progress.",
+                Success = false
+            });
+        }
+        var taskId = _backgroundService.QueueSingleRunLibraryRequest(LibraryBackgroundTaskType.PackageRename);
+            
+        _logger.LogInformation("Queued {TaskType} task with ID: {TaskId}", LibraryBackgroundTaskType.PackageRename, taskId);
+            
+        return Ok(new LibraryBackgroundResponse
+        {
+            TaskId = taskId,
+            Message = $"{LibraryBackgroundTaskType.PackageRename} task queued successfully",
+            Success = true
+        });
+    }
+    
+    
     [HttpPost("bundle")]
     [SwaggerOperation(Summary = "Request a bundle rename operation", Description = "Bundle settings must be configured before using this endpoint.")]
     [ProducesResponseType(typeof(LibraryBackgroundResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(LibraryBackgroundResponse), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(LibraryBackgroundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<LibraryBackgroundResponse>> RenameBundle()
+    public async Task<ActionResult<LibraryBackgroundResponse>> RenameByBundle()
     {
         var settings = await _settingsService.GetBundleRenamerSettings();
         if (settings.InputPath == string.Empty || settings.OutputBasePath == string.Empty)

@@ -190,7 +190,10 @@ public class LibraryBackgroundService : BackgroundService
                     await ProcessReload(request, titleLibraryService, stoppingToken);
                     break;
                 case LibraryBackgroundTaskType.BundleRename:
-                    await ProcessBundleRename(request, titleLibraryService, stoppingToken);
+                    await ProcessBundleRename(request, stoppingToken);
+                    break;
+                case LibraryBackgroundTaskType.PackageRename:
+                    await ProcessPackageRename(request, stoppingToken);
                     break;
                 default:
                     throw new ArgumentException($"Unknown task type: {request.TaskType}");
@@ -294,10 +297,45 @@ public class LibraryBackgroundService : BackgroundService
         await webhookService.SendWebhook(WebhookType.LibraryReload, payload);
     }
 
-    private async Task ProcessBundleRename(LibraryBackgroundRequest request, ITitleLibraryService titleLibraryService,
-        CancellationToken stoppingToken)
+    private async Task ProcessPackageRename(LibraryBackgroundRequest request, CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Renamer started");
+        _logger.LogInformation("Package Type renamer started");
+
+        using var scope = _serviceProvider.CreateScope();
+        var renameService = scope.ServiceProvider.GetRequiredService<IRenamerService>();
+        var settingsService = scope.ServiceProvider.GetRequiredService<ISettingsService>();
+        var packageSettings = await settingsService.GetPackageRenamerSettings();
+        _ = await renameService.LoadRenamerSettingsAsync(packageSettings);
+
+        var renameTitles = await  renameService.GetFilesToRenameAsync(
+            packageSettings.InputPath, RenameType.PackageType, packageSettings.Recursive);
+        var renameTitleDtos = renameTitles.ToList();
+        if (renameTitleDtos.Count != 0)
+        {
+            _stateService.UpdateTaskProgress(request.Id, 0, renameTitleDtos.Count);
+
+            var renamedTitles = await renameService.RenameFilesAsync(renameTitleDtos.ToList());
+            
+            if (packageSettings.DeleteEmptyFolders)
+            {
+                var deleteFoldersResult = await renameService.DeleteEmptyFoldersAsync(packageSettings.InputPath);
+                if (!deleteFoldersResult)
+                {
+                    _logger.LogWarning("Some Folders Couldn't be Deleted");
+                }
+            }
+            
+            var stats = renamedTitles.ToList();
+            var errors = stats.Count(x => x.Error);
+            var success = stats.Count(x => x.RenamedSuccessfully);
+            _stateService.UpdateTaskProgress(request.Id, success, renameTitleDtos.Count);
+            _logger.LogInformation("Package Type Rename finished, titles renamed successfully {success} errors {errors}", success, errors);
+        } 
+    }
+    
+    private async Task ProcessBundleRename(LibraryBackgroundRequest request, CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Bundle renamer started");
 
         using var scope = _serviceProvider.CreateScope();
         var renameService = scope.ServiceProvider.GetRequiredService<IRenamerService>();

@@ -4,5 +4,6 @@ public enum LibraryBackgroundTaskType
 {
     Refresh,
     Reload,
-    BundleRename
+    BundleRename,
+    PackageRename
 }
