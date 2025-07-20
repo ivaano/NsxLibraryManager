@@ -127,6 +127,7 @@ public class RenamerService(
                 
                 if (renameTitleDto.DestinationFileName is not null)
                 {
+                    logger.LogInformation("Renaming file {source} to {target}",  renameTitleDto.SourceFileName, renameTitleDto.DestinationFileName);
                     File.Move(renameTitleDto.SourceFileName, renameTitleDto.DestinationFileName);
                     if (renameTitleDto is { UpdateLibrary: true, Id: > 0 })
                     {

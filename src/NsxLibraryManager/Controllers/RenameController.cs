@@ -50,7 +50,7 @@ public class RenameController : ControllerBase
         }
 
         
-        var activeTasks = _stateService.GetActiveTasks(LibraryBackgroundTaskType.Rename);
+        var activeTasks = _stateService.GetActiveTasks(LibraryBackgroundTaskType.BundleRename);
         if (activeTasks.Count > 0)
         {
             return StatusCode(StatusCodes.Status409Conflict, new LibraryBackgroundResponse
@@ -60,7 +60,16 @@ public class RenameController : ControllerBase
                 Success = false
             });
         }
-        return Ok();
+        var taskId = _backgroundService.QueueSingleRunLibraryRequest(LibraryBackgroundTaskType.BundleRename);
+            
+        _logger.LogInformation("Queued {TaskType} task with ID: {TaskId}", LibraryBackgroundTaskType.BundleRename, taskId);
+            
+        return Ok(new LibraryBackgroundResponse
+        {
+            TaskId = taskId,
+            Message = $"{LibraryBackgroundTaskType.BundleRename} task queued successfully",
+            Success = true
+        });
     }
     
     
