@@ -697,6 +697,9 @@ public class TitleLibraryService(
             if (fileInfoService.TryGetFileInfoFromFileName(fileName.FileName, out var fileInfo))
             {
                 dirFiles.Add(fileName.FileName, fileInfo);
+            } else if (libraryFiles.TryGetValue(fileName.FileName, out var title))
+            {
+                dirFiles.Add(fileName.FileName, title.MapToLibraryTitleDto());
             }
         }
 
