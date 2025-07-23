@@ -43,6 +43,12 @@ public static class StartupFileDownloader
             var response = await request.Result.Content.ReadAsStringAsync();
             remoteVersion = response.TrimEnd( '\r', '\n' );
 
+            if (remoteVersion.Length != 32)
+            {
+                Console.WriteLine($"Invalid titledb version number from {versionUrl}, skipping download");
+                return builder;
+            }
+            
             if (localVersion != remoteVersion)
             {
                 Console.WriteLine($"Downloading titledb version {remoteVersion}");
