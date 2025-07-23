@@ -477,9 +477,10 @@ public class RenamerService(
                 }
                 return Result.Success(fileInfo);
             }
-            //prefer Name  from titledb instead of the file
+            //prefer Name and Region from titledb instead of the file
             fileInfo.TitleName = titledbTitle.TitleName;
-
+            fileInfo.Region = titledbTitle.Region;
+            
             if (useEnglishNaming)
             {
                 if (LanguageChecker.IsNonEnglish(fileInfo.TitleName))

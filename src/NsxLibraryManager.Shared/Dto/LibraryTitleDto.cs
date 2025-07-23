@@ -43,7 +43,7 @@ public class LibraryTitleDto
     public int? Rating { get; init; }
     public IEnumerable<RatingContentDto>? RatingsContent { get; init; }
     public DateTime? ReleaseDate { get; init; }
-    public string? Region { get; init; }
+    public string? Region { get; set; }
     public Collection<ScreenshotDto>? Screenshots { get; init; }
     public long Size { get; set; }
     public string? TitleName { get; set; }
