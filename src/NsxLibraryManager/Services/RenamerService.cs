@@ -127,6 +127,7 @@ public class RenamerService(
                 
                 if (renameTitleDto.DestinationFileName is not null)
                 {
+                    logger.LogInformation("Renaming file {source} to {target}",  renameTitleDto.SourceFileName, renameTitleDto.DestinationFileName);
                     File.Move(renameTitleDto.SourceFileName, renameTitleDto.DestinationFileName);
                     if (renameTitleDto is { UpdateLibrary: true, Id: > 0 })
                     {
@@ -431,7 +432,7 @@ public class RenamerService(
                 TemplateField.Version        => fileInfo.Version.ToString(),
                 TemplateField.Extension      => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName        => safeAppTitleName,
-                TemplateField.Region         =>  fileInfo.Region,
+                TemplateField.Region         => fileInfo.Region,
                 TemplateField.PatchId        => fileInfo.PatchTitleId,
                 TemplateField.PackageType    => fileInfo.PackageType.ToString().ToUpper(),
                 TemplateField.Size           => fileInfo.Size.ToHumanReadableBytes(),

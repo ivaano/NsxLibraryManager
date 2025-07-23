@@ -8,14 +8,14 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <ApplicationIcon>wwwroot\images\logo.ico</ApplicationIcon>
         <UserSecretsId>eea14e5f-4e4c-4f80-9ff5-0c48075f0367</UserSecretsId>
-        <AssemblyVersion>0.5.2</AssemblyVersion>
-        <FileVersion>0.5.2</FileVersion>
+        <AssemblyVersion>0.5.3</AssemblyVersion>
+        <FileVersion>0.5.3</FileVersion>
         <DebugType>embedded</DebugType>
         <PathsToSourceRoot>$(MSBuildProjectDirectory)</PathsToSourceRoot>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentFTP" Version="52.1.0" />
+        <PackageReference Include="FluentFTP" Version="53.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.13" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
           <PrivateAssets>all</PrivateAssets>
