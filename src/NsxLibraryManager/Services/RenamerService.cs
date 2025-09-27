@@ -429,6 +429,7 @@ public class RenamerService(
                 TemplateField.CollectionName => fileInfo.Collection?.Name,
                 TemplateField.TitleName      => safeTitleName,
                 TemplateField.TitleId        => fileInfo.ApplicationId,
+                TemplateField.AppTitleId     => fileInfo.OtherApplicationId ?? fileInfo.ApplicationId,
                 TemplateField.Version        => fileInfo.Version.ToString(),
                 TemplateField.Extension      => fileInfo.PackageType.ToString().ToLower(),
                 TemplateField.AppName        => safeAppTitleName,

@@ -1,0 +1,347 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\pages\\packagerenamer.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\pages\\packagerenamer.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\pages\\bundlerenamer.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\pages\\bundlerenamer.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\pages\\bundlerenamer.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\pages\\bundlerenamer.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\pages\\collectionrenamer.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\pages\\collectionrenamer.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\pages\\collectionrenamer.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\pages\\collectionrenamer.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}|src\\NsxLibraryManager.Shared\\NsxLibraryManager.Shared.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager.shared\\enums\\templatefield.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}|src\\NsxLibraryManager.Shared\\NsxLibraryManager.Shared.csproj|solutionrelative:src\\nsxlibrarymanager.shared\\enums\\templatefield.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}|src\\NsxLibraryManager.Shared\\NsxLibraryManager.Shared.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager.shared\\mapping\\renamertemplatefields.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97EEDFE6-DE5F-45FF-BD29-8C3C5BC79C06}|src\\NsxLibraryManager.Shared\\NsxLibraryManager.Shared.csproj|solutionrelative:src\\nsxlibrarymanager.shared\\mapping\\renamertemplatefields.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\pages\\packagerenamer.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\pages\\packagerenamer.razor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\services\\renamerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\services\\renamerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\controllers\\renamecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\controllers\\renamecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\extensions\\titledbmappingextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\extensions\\titledbmappingextension.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\extensions\\titlelibrarymappingextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\extensions\\titlelibrarymappingextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\extensions\\updatedtoextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\extensions\\updatedtoextensions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\migrations\\nsxlibrary\\20250201011126_adding title collections.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\migrations\\nsxlibrary\\20250201011126_adding title collections.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\data\\nsxlibrarydbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\data\\nsxlibrarydbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\models\\basetitle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\models\\basetitle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\models\\titledb\\category.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\models\\titledb\\category.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\models\\basecategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\models\\basecategory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|c:\\users\\omery\\documents\\github\\nsxlibrarymanager\\src\\nsxlibrarymanager\\models\\baseversion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{29510E4F-B514-42CE-A410-1810E072AF6A}|src\\NsxLibraryManager\\NsxLibraryManager.csproj|solutionrelative:src\\nsxlibrarymanager\\models\\baseversion.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{269a02dc-6af8-11d3-bdc4-00c04f688e50}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "RenamerTemplateFields.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager.Shared\\Mapping\\RenamerTemplateFields.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager.Shared\\Mapping\\RenamerTemplateFields.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager.Shared\\Mapping\\RenamerTemplateFields.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager.Shared\\Mapping\\RenamerTemplateFields.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T18:31:13.795Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "PackageRenamer.razor.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\PackageRenamer.razor.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Pages\\PackageRenamer.razor.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\PackageRenamer.razor.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Pages\\PackageRenamer.razor.cs",
+              "ViewState": "AgIAAHsBAAAAAAAAAAAYwJYBAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T18:30:33.947Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PackageRenamer.razor",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\PackageRenamer.razor",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Pages\\PackageRenamer.razor",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\PackageRenamer.razor",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Pages\\PackageRenamer.razor",
+              "ViewState": "AgIAAKAAAAAAAAAAAAAUwLYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-27T18:30:23.592Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CollectionRenamer.razor.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor.cs",
+              "ViewState": "AgIAAJ8AAAAAAAAAAAAYwL0AAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T18:30:14.48Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CollectionRenamer.razor",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Pages\\CollectionRenamer.razor",
+              "ViewState": "AgIAAKwAAAAAAAAAAAAUwL4AAABpAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-27T18:30:07.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BundleRenamer.razor.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\BundleRenamer.razor.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Pages\\BundleRenamer.razor.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\BundleRenamer.razor.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Pages\\BundleRenamer.razor.cs",
+              "ViewState": "AgIAAKwAAAAAAAAAAAAYwLIAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T18:27:23.516Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "BundleRenamer.razor",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\BundleRenamer.razor",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Pages\\BundleRenamer.razor",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Pages\\BundleRenamer.razor",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Pages\\BundleRenamer.razor",
+              "ViewState": "AgIAAKsAAAAAAAAAAAAUwMAAAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-27T18:27:03.271Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TemplateField.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager.Shared\\Enums\\TemplateField.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager.Shared\\Enums\\TemplateField.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager.Shared\\Enums\\TemplateField.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager.Shared\\Enums\\TemplateField.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T18:12:54.789Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "RenamerService.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Services\\RenamerService.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Services\\RenamerService.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Services\\RenamerService.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Services\\RenamerService.cs",
+              "ViewState": "AgIAAKABAAAAAAAAAAAYwLIBAAAlAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:51:24.124Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "NsxLibraryDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Data\\NsxLibraryDbContext.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Data\\NsxLibraryDbContext.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Data\\NsxLibraryDbContext.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Data\\NsxLibraryDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:48:02.7Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "Category.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\Titledb\\Category.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Models\\Titledb\\Category.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\Titledb\\Category.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Models\\Titledb\\Category.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:37:40.916Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "BaseVersion.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\BaseVersion.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Models\\BaseVersion.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\BaseVersion.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Models\\BaseVersion.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:37:34.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "BaseTitle.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\BaseTitle.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Models\\BaseTitle.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\BaseTitle.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Models\\BaseTitle.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAAAC0AAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:37:29.481Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "BaseCategory.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\BaseCategory.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Models\\BaseCategory.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Models\\BaseCategory.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Models\\BaseCategory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:37:22.432Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "20250201011126_Adding Title Collections.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Migrations\\NsxLibrary\\20250201011126_Adding Title Collections.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Migrations\\NsxLibrary\\20250201011126_Adding Title Collections.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Migrations\\NsxLibrary\\20250201011126_Adding Title Collections.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Migrations\\NsxLibrary\\20250201011126_Adding Title Collections.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:37:07.999Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "UpdateDtoExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Extensions\\UpdateDtoExtensions.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Extensions\\UpdateDtoExtensions.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Extensions\\UpdateDtoExtensions.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Extensions\\UpdateDtoExtensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:36:47.477Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "TitleLibraryMappingExtensions.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Extensions\\TitleLibraryMappingExtensions.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Extensions\\TitleLibraryMappingExtensions.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Extensions\\TitleLibraryMappingExtensions.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Extensions\\TitleLibraryMappingExtensions.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAALgAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:28:52.706Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "TitledbMappingExtension.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Extensions\\TitledbMappingExtension.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Extensions\\TitledbMappingExtension.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Extensions\\TitledbMappingExtension.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Extensions\\TitledbMappingExtension.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAAAFsAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:26:45.906Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "RenameController.cs",
+              "DocumentMoniker": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Controllers\\RenameController.cs",
+              "RelativeDocumentMoniker": "src\\NsxLibraryManager\\Controllers\\RenameController.cs",
+              "ToolTip": "C:\\Users\\omery\\Documents\\GitHub\\NsxLibraryManager\\src\\NsxLibraryManager\\Controllers\\RenameController.cs",
+              "RelativeToolTip": "src\\NsxLibraryManager\\Controllers\\RenameController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-27T17:19:44.283Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
