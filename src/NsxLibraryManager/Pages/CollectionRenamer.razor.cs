@@ -190,7 +190,7 @@ public partial class CollectionRenamer : ComponentBase
             TemplateField.AppName =>
                 "Title name of the corresponding Application defined in OtherApplicationId, useful in updates and dlc to see the Application they belong to",
             TemplateField.AppTitleId =>
-                "The title id of the base game [0100F2200C984000] (useful for dlc and updates",
+                "The title id of the base game [0100F2200C984000] (useful for dlc and updates)",
             TemplateField.PatchId =>
                 "If content is an Application, this value is equal to the id of the corresponding Patch content, otherwise empty",
             TemplateField.PatchCount =>
