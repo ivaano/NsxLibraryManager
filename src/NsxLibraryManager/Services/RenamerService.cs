@@ -380,7 +380,10 @@ public class RenamerService(
         var newPath = renameTemplate;
         foreach (var (key, pattern) in RenamerTemplateFields.TemplateFieldMappings)
         {
-            var match = Regex.Match(renameTemplate, pattern, RegexOptions.IgnoreCase);
+            // Build an augmented pattern that supports {Field:-default} syntax
+            var fieldName = pattern.Trim('{', '}');
+            var augmentedPattern = $@"\{{{fieldName}(?::-([^}}]*))?\}}";
+            var match = Regex.Match(renameTemplate, augmentedPattern, RegexOptions.IgnoreCase);
             if (!match.Success) continue;
             var safeTitleName = string.Empty;
             var safeAppTitleName = string.Empty;
@@ -442,9 +445,14 @@ public class RenamerService(
             };
             
             if (replacement is null)
-                throw new InvalidPathException($"No replacement for {key} value most likely due to missing titledb entry");
-            
-            newPath = TokenReplace(renameTemplate, pattern, replacement);
+            {
+                if (match.Groups[1].Success)
+                    replacement = match.Groups[1].Value;
+                else
+                    throw new InvalidPathException($"No replacement for {key} value most likely due to missing titledb entry");
+            }
+
+            newPath = TokenReplace(renameTemplate, augmentedPattern, replacement);
             renameTemplate = newPath;
         }
         return Task.FromResult(newPath);
@@ -474,6 +482,7 @@ public class RenamerService(
                     if (otherApplication is null) return Result.Success(fileInfo);
             
                     fileInfo.OtherApplicationName = otherApplication.TitleName;
+                    fileInfo.Region = otherApplication.Region;
                 }
                 return Result.Success(fileInfo);
             }
