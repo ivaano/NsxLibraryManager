@@ -2,6 +2,7 @@ name: Docker
 on:
   push:
     tags: ['v*.*.*']
+    branches: ['add-fallbacks-regex']
   release:
     types: [created]
 env:
