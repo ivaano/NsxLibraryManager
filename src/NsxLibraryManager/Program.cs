@@ -45,6 +45,15 @@ if (!Directory.Exists(iconPath))
     Directory.CreateDirectory(iconPath);
 }
 
+// One-shot titledb refresh: download-if-changed and exit, without starting the web host.
+// Meant to be driven by an external scheduler (cron, k8s CronJob, systemd timer).
+if (args.Contains("--refresh-titledb"))
+{
+    var updated = await StartupFileDownloader.RefreshTitleDb(initialConfig);
+    Console.WriteLine(updated ? "Titledb refresh complete." : "Titledb refresh: nothing to do.");
+    return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // configuration.
