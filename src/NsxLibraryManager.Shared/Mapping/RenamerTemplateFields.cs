@@ -20,6 +20,7 @@ public class RenamerTemplateFields
         { TemplateField.Region, "{Region}" },
         { TemplateField.Size, "{Size}" },
         { TemplateField.CollectionName, "{Collection}" },
+        { TemplateField.AppTitleId, "{AppTitleId}" },
     };
     
     public static string GetTemplateField(TemplateField templateField)

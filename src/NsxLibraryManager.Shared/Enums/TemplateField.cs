@@ -14,5 +14,6 @@ public enum TemplateField
     PatchCount,
     Region,
     Size,
-    DlcCount
+    DlcCount,
+    AppTitleId
 }
