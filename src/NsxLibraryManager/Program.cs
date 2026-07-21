@@ -1,3 +1,4 @@
+using System.CommandLine;
 using System.Diagnostics;
 using System.Text;
 using Common.Contracts;
@@ -23,6 +24,19 @@ using IRenamerService = NsxLibraryManager.Services.Interface.IRenamerService;
 
 Console.OutputEncoding = Encoding.UTF8;
 
+// Command-line flags, parsed once via System.CommandLine (parse-only — the web host still owns startup).
+var refreshTitledbOption = new Option<bool>("--refresh-titledb")
+{
+    Description = "Download titledb if the remote version changed, then exit without starting the web host."
+};
+var noBrowserOption = new Option<bool>("--no-browser")
+{
+    Description = "Do not open a browser window on startup."
+};
+var cli = new RootCommand("NsxLibraryManager") { refreshTitledbOption, noBrowserOption }.Parse(args);
+var refreshTitledb = cli.GetValue(refreshTitledbOption);
+var noBrowser = cli.GetValue(noBrowserOption);
+
 // if no config.json file exists, create one with default values
 var configFile = Path.Combine(AppContext.BaseDirectory, AppConstants.ConfigDirectory, AppConstants.ConfigFileName);
 
@@ -47,7 +61,7 @@ if (!Directory.Exists(iconPath))
 
 // One-shot titledb refresh: download-if-changed and exit, without starting the web host.
 // Meant to be driven by an external scheduler (cron, k8s CronJob, systemd timer).
-if (args.Contains("--refresh-titledb"))
+if (refreshTitledb)
 {
     var updated = await StartupFileDownloader.RefreshTitleDb(initialConfig);
     Console.WriteLine(updated ? "Titledb refresh complete." : "Titledb refresh: nothing to do.");
@@ -179,7 +193,6 @@ app.EnsureDatabaseMigrated<NsxLibraryDbContext>();
 
 if (app.Environment.IsProduction())
 {
-    var noBrowser = args.Contains("--no-browser");
     var isWindows = OperatingSystem.IsWindows();
     if (!noBrowser && isWindows)
     {
